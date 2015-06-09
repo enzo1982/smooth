@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -322,9 +322,11 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
 
 	Rect	 rect	    = iRect;
-	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
+	Int	 lineHeight = 0;
 
 	const Array<String>	&lines = string.Explode("\n");
+
+	if (lines.Length() > 1) lineHeight = font.GetScaledTextSizeY() + 3;
 
 	foreach (const String &line, lines)
 	{
@@ -387,33 +389,18 @@ S::Int S::GUI::SurfaceHaiku::Gradient(const Rect &iRect, const Color &color1, co
 
 	Rect	 rect = rightToLeft.TranslateRect(iRect) - Size(1, 1);
 
-	BGradient	*gradient = NIL;
+	/* Setup colors.
+	 */
+	Color	 c1   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color2 : color1;
+	Color	 c2   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color1 : color2;
 
-	switch (style)
-	{
-		case OR_HORZ:
-			gradient = new BGradientLinear(0, 0, rect.GetWidth(), 0);
+	/* Setup graphics objects and draw gradient.
+	 */
+	BGradient	*gradient = new BGradientLinear(0, 0, style == OR_HORZ ? rect.GetWidth()  : 0,
+							      style == OR_VERT ? rect.GetHeight() : 0);
 
-			if (rightToLeft.GetRightToLeft())
-			{
-				gradient->AddColorStop(BGradient::ColorStop(color1.GetRed(), color1.GetGreen(), color1.GetBlue(), 255, 255), 0);
-				gradient->AddColorStop(BGradient::ColorStop(color2.GetRed(), color2.GetGreen(), color2.GetBlue(), 255, 0), 1);
-			}
-			else
-			{
-				gradient->AddColorStop(BGradient::ColorStop(color1.GetRed(), color1.GetGreen(), color1.GetBlue(), 255, 0), 0);
-				gradient->AddColorStop(BGradient::ColorStop(color2.GetRed(), color2.GetGreen(), color2.GetBlue(), 255, 255), 1);
-			}
-
-			break;
-		case OR_VERT:
-			gradient = new BGradientLinear(0, 0, 0, rect.GetHeight());
-
-			gradient->AddColorStop(BGradient::ColorStop(color1.GetRed(), color1.GetGreen(), color1.GetBlue(), 255, 0), 0);
-			gradient->AddColorStop(BGradient::ColorStop(color2.GetRed(), color2.GetGreen(), color2.GetBlue(), 255, 255), 1);
-
-			break;
-	}
+	gradient->AddColorStop(BGradient::ColorStop(c1.GetRed(), c1.GetGreen(), c1.GetBlue(), 255, 0), 0);
+	gradient->AddColorStop(BGradient::ColorStop(c2.GetRed(), c2.GetGreen(), c2.GetBlue(), 255, 255), 1);
 
 	if (!painting) view->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom), *gradient);
 	bitmapView->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom), *gradient);

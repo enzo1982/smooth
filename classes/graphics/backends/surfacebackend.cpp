@@ -191,12 +191,16 @@ S::Int S::GUI::SurfaceBackend::Frame(const Rect &iRect, Short style)
 
 	rightToLeft.SetRightToLeft(False);
 
+	StartPaint(rect);
+
 	Line(p1, p2, color1);
 	Line(p1, p3, color1);
 	Line(p2, p4, color2);
 	Line(p3, p4, color2);
 
 	SetPixel(p4, color2);
+
+	EndPaint();
 
 	rightToLeft.SetRightToLeft(preRTL);
 

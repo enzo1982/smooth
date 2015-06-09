@@ -124,7 +124,7 @@ S::Int S::GUI::SurfaceGDI::PaintRect(const Rect &pRect)
 	{
 		HDC	 gdi_dc = GetWindowDC(window);
 
-		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paintContext, pRect.left, pRect.top, SRCCOPY);
+		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight(), paintContext, pRect.left, pRect.top, SRCCOPY);
 
 		ReleaseDC(window, gdi_dc);
 	}
@@ -247,17 +247,18 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 {
 	if (window == NIL) return Success();
 
-	Rect	 rect = rightToLeft.TranslateRect(iRect);
+	Rect	 rect	= rightToLeft.TranslateRect(iRect);
 
-	HDC	 gdi_dc = GetWindowDC(window);
-	HBRUSH	 brush = CreateSolidBrush(color);
-	HPEN	 pen = CreatePen(PS_SOLID, 0, color);
-	RECT	 wRect = { rect.left, rect.top, rect.right, rect.bottom };
+	HDC	 gdi_dc = painting ? NIL : GetWindowDC(window);
+	HBRUSH	 brush	= CreateSolidBrush(color);
+	RECT	 wRect	= { rect.left, rect.top, rect.right, rect.bottom };
 
 	if (style & Rect::Filled)
 	{
 		if (style & Rect::Rounded)
 		{
+			HPEN	 pen = CreatePen(PS_SOLID, 0, color);
+
 			if (!painting)
 			{
 				HBRUSH	 previousBrush	= (HBRUSH) SelectObject(gdi_dc, brush);
@@ -276,6 +277,8 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 
 			brush	= (HBRUSH) SelectObject(paintContext, previousBrush);
 			pen	= (HPEN) SelectObject(paintContext, previousPen);
+
+			::DeleteObject(pen);
 		}
 		else
 		{
@@ -297,22 +300,21 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 	{
 		if (!painting)
 		{
-			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) ::SetPixel(gdi_dc, x, rect.top, color);
-			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) ::SetPixel(gdi_dc, rect.right - 1, y, color);
-			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) ::SetPixel(gdi_dc, x, rect.bottom - 1, color);
-			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) ::SetPixel(gdi_dc, rect.left, y, color);
+			for (Int x = rect.left						    + 1; x <  rect.right;  x += 2) ::SetPixel(gdi_dc, x, rect.top, color);
+			for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2; y <  rect.bottom; y += 2) ::SetPixel(gdi_dc, rect.right - 1, y, color);
+			for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2; x >= rect.left;   x -= 2) ::SetPixel(gdi_dc, x, rect.bottom - 1, color);
+			for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1; y >= rect.top;	   y -= 2) ::SetPixel(gdi_dc, rect.left, y, color);
 		}
 
-		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) ::SetPixel(paintContext, x, rect.top, color);
-		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) ::SetPixel(paintContext, rect.right - 1, y, color);
-		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) ::SetPixel(paintContext, x, rect.bottom - 1, color);
-		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) ::SetPixel(paintContext, rect.left, y, color);
+		for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) ::SetPixel(paintContext, x, rect.top, color);
+		for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) ::SetPixel(paintContext, rect.right - 1, y, color);
+		for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) ::SetPixel(paintContext, x, rect.bottom - 1, color);
+		for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1;  y >= rect.top;    y -= 2) ::SetPixel(paintContext, rect.left, y, color);
 	}
 
 	::DeleteObject(brush);
-	::DeleteObject(pen);
 
-	ReleaseDC(window, gdi_dc);
+	if (!painting) ReleaseDC(window, gdi_dc);
 
 	return Success();
 }
@@ -326,7 +328,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	Font	 font	    = iFont;
 	Rect	 rect	    = iRect;
-	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
+	Int	 lineHeight = 0;
 
 	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
 	 */
@@ -337,7 +339,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	/* Set up Windows font.
 	 */
-	HDC	 gdi_dc	   = GetWindowDC(window);
+	HDC	 gdi_dc	   = painting ? NIL : GetWindowDC(window);
 	HFONT	 hfont	   = CreateFont(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
 	HFONT	 holdfont  = NIL;
 	HFONT	 holdfont2 = NIL;
@@ -358,6 +360,8 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	/* Draw text line by line.
 	 */
 	const Array<String>	&lines = string.Explode("\n");
+
+	if (lines.Length() > 1) lineHeight = font.GetScaledTextSizeY() + 3;
 
 	foreach (const String &line, lines)
 	{
@@ -447,13 +451,16 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	String::ExplodeFinish();
 
-	if (!painting) SelectObject(gdi_dc, holdfont);
+	if (!painting)
+	{
+		SelectObject(gdi_dc, holdfont);
+
+		ReleaseDC(window, gdi_dc);
+	}
 
 	SelectObject(paintContext, holdfont2);
 
 	::DeleteObject(hfont);
-
-	ReleaseDC(window, gdi_dc);
 
 	return Success();
 }
@@ -464,9 +471,16 @@ S::Int S::GUI::SurfaceGDI::Gradient(const Rect &iRect, const Color &color1, cons
 
 	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
+	/* Setup colors.
+	 */
+	Color	 c1   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color2 : color1;
+	Color	 c2   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color1 : color2;
+
+	/* Setup GDI structures and draw gradient.
+	 */
 	GRADIENT_RECT	 rects[1]    = { { 0, 1 } };
-	TRIVERTEX	 vertices[2] = { { rect.left,  rect.top,    COLOR16(color1.GetRed() << 8), COLOR16(color1.GetGreen() << 8), COLOR16(color1.GetBlue() << 8), 0 },
-					 { rect.right, rect.bottom, COLOR16(color2.GetRed() << 8), COLOR16(color2.GetGreen() << 8), COLOR16(color2.GetBlue() << 8), 0 } };
+	TRIVERTEX	 vertices[2] = { { rect.left,  rect.top,    COLOR16(c1.GetRed() << 8), COLOR16(c1.GetGreen() << 8), COLOR16(c1.GetBlue() << 8), 0 },
+					 { rect.right, rect.bottom, COLOR16(c2.GetRed() << 8), COLOR16(c2.GetGreen() << 8), COLOR16(c2.GetBlue() << 8), 0 } };
 
 	if (!painting)
 	{
@@ -496,8 +510,8 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 
 	/* Copy the image.
 	 */
-	HDC	 gdi_dc	  = GetWindowDC(window);
-	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
+	HDC	 gdi_dc = painting ? NIL : GetWindowDC(window);
+	HDC	 cdc	= CreateCompatibleDC(paintContext);
 
 	if (destRect.GetSize() == srcRect.GetSize())
 	{
@@ -527,7 +541,8 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 	}
 
 	DeleteDC(cdc);
-	ReleaseDC(window, gdi_dc);
+
+	if (!painting) ReleaseDC(window, gdi_dc);
 
 	return Success();
 }
@@ -547,14 +562,14 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, co
 	HDC	 cdc	 = CreateCompatibleDC(paintContext);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
-	if ((destRect.right - destRect.left == srcRect.right - srcRect.left) && (destRect.bottom - destRect.top == srcRect.bottom - srcRect.top))
+	if (destRect.GetSize() == srcRect.GetSize())
 	{
-		BitBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, paintContext, srcRect.left, srcRect.top, SRCCOPY);
+		BitBlt(cdc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), paintContext, srcRect.left, srcRect.top, SRCCOPY);
 	}
 	else
 	{
 		SetStretchBltMode(cdc, HALFTONE);
-		StretchBlt(cdc, destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top, paintContext, srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top, SRCCOPY);
+		StretchBlt(cdc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), paintContext, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), SRCCOPY);
 	}
 
 	SelectObject(cdc, backup);

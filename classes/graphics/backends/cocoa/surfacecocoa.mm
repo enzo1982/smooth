@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -121,7 +121,7 @@ S::Int S::GUI::SurfaceCocoa::StartPaint(const Rect &iPRect)
 
 	[NSGraphicsContext saveGraphicsState];
 
-	[[NSBezierPath bezierPathWithRect: NSMakeRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top)] addClip];
+	[[NSBezierPath bezierPathWithRect: NSMakeRect(pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight())] addClip];
 
 	paintRects.Add(new Rect(pRect));
 
@@ -253,33 +253,9 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 	{
 		if (style & Rect::Rounded)
 		{
-			if (!painting)
-			{
-/*				cairo_move_to(context, rect.left + ellipse.cx, rect.top);
-				cairo_line_to(context, rect.right - ellipse.cx, rect.top);
-				cairo_curve_to(context, rect.right, rect.top, rect.right, rect.top, rect.right, rect.top + ellipse.cy);
-				cairo_line_to(context, rect.right, rect.bottom - ellipse.cy);
-				cairo_curve_to(context, rect.right, rect.bottom, rect.right, rect.bottom, rect.right - ellipse.cx, rect.bottom);
-				cairo_line_to(context, rect.left + ellipse.cx, rect.bottom);
-				cairo_curve_to(context, rect.left, rect.bottom, rect.left, rect.bottom, rect.left, rect.bottom - ellipse.cy);
-				cairo_line_to(context, rect.left, rect.top + ellipse.cy);
-				cairo_curve_to(context, rect.left, rect.top, rect.left, rect.top, rect.left + ellipse.cx, rect.top);
-
-				cairo_fill(context);
-*/			}
-
-/*			cairo_move_to(paintContextCairo, rect.left + ellipse.cx, rect.top);
-			cairo_line_to(paintContextCairo, rect.right - ellipse.cx, rect.top);
-			cairo_curve_to(paintContextCairo, rect.right, rect.top, rect.right, rect.top, rect.right, rect.top + ellipse.cy);
-			cairo_line_to(paintContextCairo, rect.right, rect.bottom - ellipse.cy);
-			cairo_curve_to(paintContextCairo, rect.right, rect.bottom, rect.right, rect.bottom, rect.right - ellipse.cx, rect.bottom);
-			cairo_line_to(paintContextCairo, rect.left + ellipse.cx, rect.bottom);
-			cairo_curve_to(paintContextCairo, rect.left, rect.bottom, rect.left, rect.bottom, rect.left, rect.bottom - ellipse.cy);
-			cairo_line_to(paintContextCairo, rect.left, rect.top + ellipse.cy);
-			cairo_curve_to(paintContextCairo, rect.left, rect.top, rect.left, rect.top, rect.left + ellipse.cx, rect.top);
-
-			cairo_fill(paintContextCairo);
-*/		}
+			/* ToDo: Implement drawing of rounded boxes.
+			 */
+		}
 		else
 		{
 			if (!painting) [[window contentView] lockFocus];
@@ -291,7 +267,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 						    blue: color.GetBlue()  / 255.0
 						   alpha: 1.0] set];
 
-			[NSBezierPath fillRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)];
+			[NSBezierPath fillRect: NSMakeRect(rect.left, rect.top, rect.GetWidth(), rect.GetHeight())];
 
 			if (!painting) [[window contentView] unlockFocus];
 
@@ -309,7 +285,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 					    blue: color.GetBlue()  / 255.0
 					   alpha: 1.0] set];
 
-		[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
+		[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1)];
 
 		if (!painting) [[window contentView] unlockFocus];
 
@@ -336,7 +312,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 					    blue: color.GetBlue()  / 255.0
 					   alpha: 1.0] set];
 
-		NSBezierPath	*path	    = [NSBezierPath bezierPathWithRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1)];
+		NSBezierPath	*path	    = [NSBezierPath bezierPathWithRect: NSMakeRect(rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1)];
 		CGFloat		 pattern[2] = { 1.0, 1.0 };
 
 		[path setLineDash: pattern count: 2 phase: 1];
@@ -386,7 +362,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	[NSGraphicsContext saveGraphicsState];
 
-	[[NSBezierPath bezierPathWithRect: NSMakeRect(tRect.left, tRect.top, tRect.right - tRect.left, tRect.bottom - tRect.top)] addClip];
+	[[NSBezierPath bezierPathWithRect: NSMakeRect(tRect.left, tRect.top, tRect.GetWidth(), tRect.GetHeight())] addClip];
 
 	foreach (const String &line, lines)
 	{
@@ -436,7 +412,7 @@ S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, co
 													  blue: color2.GetBlue()  / 255.0
 													 alpha: 1.0]];
 
-	[gradient drawInRect: NSMakeRect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top)
+	[gradient drawInRect: NSMakeRect(rect.left, rect.top, rect.GetWidth(), rect.GetHeight())
 		       angle: (style == OR_HORZ ? (rightToLeft.GetRightToLeft() ? 180 : 0.0) : 270)];
 
 	[gradient release];
@@ -464,8 +440,8 @@ S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	NSImage	*image = (NSImage *) bitmap.GetSystemBitmap();
 
-	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top)
-		 fromRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)
+	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight())
+		 fromRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight())
 		operation: NSCompositeCopy
 		 fraction: 1.0];
 
@@ -490,7 +466,7 @@ S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	 */
 	[[window contentView] lockFocus];
 
-	NSBitmapImageRep	*imageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)];
+	NSBitmapImageRep	*imageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight())];
 	NSImage			*image	  = [[NSImage alloc] initWithSize: NSMakeSize([imageRep pixelsWide], [imageRep pixelsHigh])];
 
 	[image addRepresentation: imageRep];
@@ -504,8 +480,8 @@ S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	[NSGraphicsContext saveGraphicsState];
 	[NSGraphicsContext setCurrentContext: context];
 
-	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.right - destRect.left, destRect.bottom - destRect.top)
-		 fromRect: NSMakeRect(0, 0, srcRect.right - srcRect.left, srcRect.bottom - srcRect.top)
+	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight())
+		 fromRect: NSMakeRect(0, 0, srcRect.GetWidth(), srcRect.GetHeight())
 		operation: NSCompositeCopy
 		 fraction: 1.0];
 

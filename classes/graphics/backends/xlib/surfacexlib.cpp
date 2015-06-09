@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -124,7 +124,7 @@ S::Int S::GUI::SurfaceXLib::PaintRect(const Rect &pRect)
 
 	if (window != NIL)
 	{
-		XCopyArea(display, bitmap, window, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
+		XCopyArea(display, bitmap, window, gc, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight(), pRect.left, pRect.top);
 	}
 
 	return Success();
@@ -307,16 +307,16 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 		}
 		else
 		{
-			if (!painting) XFillRectangle(display, window, gc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			if (!painting) XFillRectangle(display, window, gc, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 
-			XFillRectangle(display, bitmap, gc, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			XFillRectangle(display, bitmap, gc, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 		}
 	}
 	else if (style == Rect::Outlined)
 	{
-		if (!painting) XDrawRectangle(display, window, gc, rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
+		if (!painting) XDrawRectangle(display, window, gc, rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1);
 
-		XDrawRectangle(display, bitmap, gc, rect.left, rect.top, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
+		XDrawRectangle(display, bitmap, gc, rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1);
 	}
 	else if (style & Rect::Inverted)
 	{
@@ -332,16 +332,16 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 	{
 		if (!painting)
 		{
-			for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) XDrawPoint(display, window, gc, x, rect.top);
-			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) XDrawPoint(display, window, gc, rect.right - 1, y);
-			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) XDrawPoint(display, window, gc, x, rect.bottom - 1);
-			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) XDrawPoint(display, window, gc, rect.left, y);
+			for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) XDrawPoint(display, window, gc, x, rect.top);
+			for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) XDrawPoint(display, window, gc, rect.right - 1, y);
+			for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) XDrawPoint(display, window, gc, x, rect.bottom - 1);
+			for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1;  y >= rect.top;    y -= 2) XDrawPoint(display, window, gc, rect.left, y);
 		}
 
-		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) XDrawPoint(display, bitmap, gc, x, rect.top);
-		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) XDrawPoint(display, bitmap, gc, rect.right - 1, y);
-		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) XDrawPoint(display, bitmap, gc, x, rect.bottom - 1);
-		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) XDrawPoint(display, bitmap, gc, rect.left, y);
+		for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) XDrawPoint(display, bitmap, gc, x, rect.top);
+		for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) XDrawPoint(display, bitmap, gc, rect.right - 1, y);
+		for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) XDrawPoint(display, bitmap, gc, x, rect.bottom - 1);
+		for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1;  y >= rect.top;    y -= 2) XDrawPoint(display, bitmap, gc, rect.left, y);
 	}
 
 	return Success();

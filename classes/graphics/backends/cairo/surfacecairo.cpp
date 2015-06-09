@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -220,13 +220,13 @@ S::Int S::GUI::SurfaceCairo::PaintRect(const Rect &pRect)
 #ifdef __WIN32__
 		HDC	 gdi_dc = GetWindowDC(window);
 
-		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, paintContext, pRect.left, pRect.top, SRCCOPY);
+		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight(), paintContext, pRect.left, pRect.top, SRCCOPY);
 
 		ReleaseDC(window, gdi_dc);
 #else
 		GC	 gc = XCreateGC(display, window, 0, NIL);
 
-		XCopyArea(display, paintBitmap, window, gc, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top, pRect.left, pRect.top);
+		XCopyArea(display, paintBitmap, window, gc, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight(), pRect.left, pRect.top);
 
 		XFreeGC(display, gc);
 #endif
@@ -242,7 +242,7 @@ S::Int S::GUI::SurfaceCairo::StartPaint(const Rect &iPRect)
 	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
 
 	cairo_save(paintContextCairo);
-	cairo_rectangle(paintContextCairo, pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top);
+	cairo_rectangle(paintContextCairo, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight());
 	cairo_clip(paintContextCairo);
 
 	paintRects.Add(new Rect(pRect));
@@ -467,11 +467,11 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		{
 			if (!painting)
 			{
-				cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+				cairo_rectangle(context, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 				cairo_fill(context);
 			}
 
-			cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 			cairo_fill(paintContextCairo);
 		}
 	}
@@ -480,12 +480,12 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 		if (!painting)
 		{
 			cairo_set_line_width(context, 1.0);
-			cairo_rectangle(context, rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
+			cairo_rectangle(context, rect.left + 0.5, rect.top + 0.5, rect.GetWidth() - 1, rect.GetHeight() - 1);
 			cairo_stroke(context);
 		}
 
 		cairo_set_line_width(paintContextCairo, 1.0);
-		cairo_rectangle(paintContextCairo, rect.left + 0.5, rect.top + 0.5, rect.right - rect.left - 1, rect.bottom - rect.top - 1);
+		cairo_rectangle(paintContextCairo, rect.left + 0.5, rect.top + 0.5, rect.GetWidth() - 1, rect.GetHeight() - 1);
 		cairo_stroke(paintContextCairo);
 	}
 	else if (style & Rect::Inverted)
@@ -496,14 +496,14 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 			{
 				cairo_set_operator(context, CAIRO_OPERATOR_DIFFERENCE);
 				cairo_set_source_rgb(context, 1.0, 1.0, 1.0);
-				cairo_rectangle(context, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+				cairo_rectangle(context, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 				cairo_fill(context);
 				cairo_set_operator(context, CAIRO_OPERATOR_OVER);
 			}
 
 			cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_DIFFERENCE);
 			cairo_set_source_rgb(paintContextCairo, 1.0, 1.0, 1.0);
-			cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+			cairo_rectangle(paintContextCairo, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 			cairo_fill(paintContextCairo);
 			cairo_set_operator(paintContextCairo, CAIRO_OPERATOR_OVER);
 		}
@@ -522,18 +522,18 @@ S::Int S::GUI::SurfaceCairo::Box(const Rect &iRect, const Color &color, Int styl
 	{
 		if (!painting)
 		{
-			for (Int x = rect.left								 + 1; x <  rect.right;	 x += 2) cairo_rectangle(context, x, rect.top, 1.0, 1.0);
-			for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2; y <  rect.bottom;	 y += 2) cairo_rectangle(context, rect.right - 1, y, 1.0, 1.0);
-			for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2; x >= rect.left;	 x -= 2) cairo_rectangle(context, x, rect.bottom - 1, 1.0, 1.0);
-			for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1; y >= rect.top;	 y -= 2) cairo_rectangle(context, rect.left, y, 1.0, 1.0);
+			for (Int x = rect.left						    + 1; x <  rect.right;  x += 2) cairo_rectangle(context, x, rect.top, 1.0, 1.0);
+			for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2; y <  rect.bottom; y += 2) cairo_rectangle(context, rect.right - 1, y, 1.0, 1.0);
+			for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2; x >= rect.left;   x -= 2) cairo_rectangle(context, x, rect.bottom - 1, 1.0, 1.0);
+			for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1; y >= rect.top;	   y -= 2) cairo_rectangle(context, rect.left, y, 1.0, 1.0);
 
 			cairo_fill(context);
 		}
 
-		for (Int x = rect.left								 + 1;  x <  rect.right;	 x += 2) cairo_rectangle(paintContextCairo, x, rect.top,  1.0, 1.0);
-		for (Int y = rect.top	 - (rect.right - rect.left			   ) % 2 + 2;  y <  rect.bottom; y += 2) cairo_rectangle(paintContextCairo, rect.right - 1, y,  1.0, 1.0);
-		for (Int x = rect.right	 - (rect.right - rect.left + rect.bottom - rect.top) % 2 - 2;  x >= rect.left;	 x -= 2) cairo_rectangle(paintContextCairo, x, rect.bottom - 1,  1.0, 1.0);
-		for (Int y = rect.bottom - (			     rect.bottom - rect.top) % 2 - 1;  y >= rect.top;	 y -= 2) cairo_rectangle(paintContextCairo, rect.left, y,  1.0, 1.0);
+		for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) cairo_rectangle(paintContextCairo, x, rect.top,  1.0, 1.0);
+		for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) cairo_rectangle(paintContextCairo, rect.right - 1, y,  1.0, 1.0);
+		for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) cairo_rectangle(paintContextCairo, x, rect.bottom - 1,  1.0, 1.0);
+		for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1;  y >= rect.top;    y -= 2) cairo_rectangle(paintContextCairo, rect.left, y,  1.0, 1.0);
 
 		cairo_fill(paintContextCairo);
 	}
@@ -552,7 +552,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 	Font	 font	    = iFont;
 	Rect	 rect	    = iRect;
-	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
+	Int	 lineHeight = 0;
 
 #ifdef __WIN32__
 	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
@@ -566,6 +566,8 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	/* Draw text line by line.
 	 */
 	const Array<String>	&lines = string.Explode("\n");
+
+	if (lines.Length() > 1) lineHeight = font.GetScaledTextSizeY() + 3;
 
 #ifdef __WIN32__
 	foreach (String line, lines)
@@ -608,7 +610,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 			CreateCairoContext();
 
 			cairo_save(context);
-			cairo_rectangle(context, tRect.left, tRect.top, tRect.right - tRect.left, tRect.bottom - tRect.top + 1);
+			cairo_rectangle(context, tRect.left, tRect.top, tRect.GetWidth(), tRect.GetHeight() + 1);
 			cairo_clip(context);
 
 			cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
@@ -661,7 +663,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		}
 
 		cairo_save(paintContextCairo);
-		cairo_rectangle(paintContextCairo, tRect.left, tRect.top, tRect.right - tRect.left, tRect.bottom - tRect.top + 1);
+		cairo_rectangle(paintContextCairo, tRect.left, tRect.top, tRect.GetWidth(), tRect.GetHeight() + 1);
 		cairo_clip(paintContextCairo);
 
 		cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
@@ -723,33 +725,18 @@ S::Int S::GUI::SurfaceCairo::Gradient(const Rect &iRect, const Color &color1, co
 
 	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
-	cairo_pattern_t	*pattern = NIL;
+	/* Setup colors.
+	 */
+	Color	 c1   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color2 : color1;
+	Color	 c2   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color1 : color2;
 
-	switch (style)
-	{
-		case OR_HORZ:
-			pattern = cairo_pattern_create_linear(0, 0, rect.GetWidth(), 0);
+	/* Setup Cairo objects and draw gradient.
+	 */
+	cairo_pattern_t	*pattern = cairo_pattern_create_linear(0, 0, style == OR_HORZ ? rect.GetWidth()	 : 0,
+								     style == OR_VERT ? rect.GetHeight() : 0);
 
-			if (rightToLeft.GetRightToLeft())
-			{
-				cairo_pattern_add_color_stop_rgb(pattern, 1, color1.GetRed() / 255.0, color1.GetGreen() / 255.0, color1.GetBlue() / 255.0);
-				cairo_pattern_add_color_stop_rgb(pattern, 0, color2.GetRed() / 255.0, color2.GetGreen() / 255.0, color2.GetBlue() / 255.0);
-			}
-			else
-			{
-				cairo_pattern_add_color_stop_rgb(pattern, 0, color1.GetRed() / 255.0, color1.GetGreen() / 255.0, color1.GetBlue() / 255.0);
-				cairo_pattern_add_color_stop_rgb(pattern, 1, color2.GetRed() / 255.0, color2.GetGreen() / 255.0, color2.GetBlue() / 255.0);
-			}
-
-			break;
-		case OR_VERT:
-			pattern = cairo_pattern_create_linear(0, 0, 0, rect.GetHeight());
-
-			cairo_pattern_add_color_stop_rgb(pattern, 0, color1.GetRed() / 255.0, color1.GetGreen() / 255.0, color1.GetBlue() / 255.0);
-			cairo_pattern_add_color_stop_rgb(pattern, 1, color2.GetRed() / 255.0, color2.GetGreen() / 255.0, color2.GetBlue() / 255.0);
-
-			break;
-	}
+	cairo_pattern_add_color_stop_rgb(pattern, 0, c1.GetRed() / 255.0, c1.GetGreen() / 255.0, c1.GetBlue() / 255.0);
+	cairo_pattern_add_color_stop_rgb(pattern, 1, c2.GetRed() / 255.0, c2.GetGreen() / 255.0, c2.GetBlue() / 255.0);
 
 	if (!painting)
 	{
@@ -784,8 +771,8 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 #ifdef __WIN32__
 	/* Copy the image.
 	 */
-	HDC	 gdi_dc	  = GetWindowDC(window);
-	HDC	 cdc	  = CreateCompatibleDC(gdi_dc);
+	HDC	 gdi_dc = painting ? NIL : GetWindowDC(window);
+	HDC	 cdc	= CreateCompatibleDC(paintContext);
 
 	if (destRect.GetSize() == srcRect.GetSize())
 	{
@@ -815,7 +802,8 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	}
 
 	DeleteDC(cdc);
-	ReleaseDC(window, gdi_dc);
+
+	if (!painting) ReleaseDC(window, gdi_dc);
 #else
 	/* Copy the image.
 	 */
@@ -868,7 +856,7 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	HDC	 cdc	 = CreateCompatibleDC(paintContext);
 	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
 
-	if ((destRect.GetWidth() == srcRect.GetWidth()) && (destRect.GetHeight() == srcRect.GetHeight()))
+	if (destRect.GetSize() == srcRect.GetSize())
 	{
 		BitBlt(cdc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), paintContext, srcRect.left, srcRect.top, SRCCOPY);
 	}

@@ -354,7 +354,7 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 
 	Font	 font	    = iFont;
 	Rect	 rect	    = iRect;
-	Int	 lineHeight = font.GetScaledTextSizeY() + 3;
+	Int	 lineHeight = 0;
 	Color	 color	    = font.GetColor();
 
 	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
@@ -386,6 +386,8 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 	/* Draw text line by line.
 	 */
 	const Array<String>	&lines = string.Explode("\n");
+
+	if (lines.Length() > 1) lineHeight = font.GetScaledTextSizeY() + 3;
 
 	foreach (const String &line, lines)
 	{
@@ -430,11 +432,18 @@ S::Int S::GUI::SurfaceGDIPlus::Gradient(const Rect &iRect, const Color &color1, 
 
 	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
+	/* Setup colors.
+	 */
+	Color	 c1   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color2 : color1;
+	Color	 c2   = (style == OR_HORZ && rightToLeft.GetRightToLeft()) ? color1 : color2;
+
+	/* Setup GDI+ objects and draw gradient.
+	 */
 	Gdiplus::LinearGradientBrush	 gdip_brush(Gdiplus::Point(rect.left, rect.top),
 						    Gdiplus::Point(rect.left + (style == OR_HORZ ? rect.GetWidth()  : 0),
 								   rect.top  + (style == OR_VERT ? rect.GetHeight() : 0)),
-						    Gdiplus::Color(color1.GetRed(), color1.GetGreen(), color1.GetBlue()),
-						    Gdiplus::Color(color2.GetRed(), color2.GetGreen(), color2.GetBlue()));
+						    Gdiplus::Color(c1.GetRed(), c1.GetGreen(), c1.GetBlue()),
+						    Gdiplus::Color(c2.GetRed(), c2.GetGreen(), c2.GetBlue()));
 	Gdiplus::Rect			 gdip_rect(rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 
 	if (!painting)

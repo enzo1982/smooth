@@ -15,6 +15,7 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - surfacegdi.cpp	- added native Gradient() implementation
 - surfacegdiplus.cpp	- added native Gradient() implementation
 - titlebar.cpp		- do not close main windows when pressing escape
+- image.cpp		- cache scaled version of bitmap for display
 - file.cpp		- added support for moving/deleting files with read-only attribute
 - translator.cpp	- added Afrikaans and Serbian (Cyrillic) language support
 - cursor.cpp		- fixed CJK input method editor appearing offset in Windows Vista/7/8 default designs

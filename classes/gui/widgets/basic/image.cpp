@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,7 +53,10 @@ S::Int S::GUI::Image::Paint(Int message)
 
 				surface->StartPaint(GetVisibleArea());
 
-				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bmpSize), bmpRect);
+				if (bmpSize != newSize && bitmapScaled.GetSize() != newSize) bitmapScaled = bitmap.Scale(newSize);
+
+				if (bmpSize == newSize) surface->BlitFromBitmap(bitmap,	      Rect(Point(0, 0), bmpSize), bmpRect);
+				else			surface->BlitFromBitmap(bitmapScaled, Rect(Point(0, 0), newSize), bmpRect);
 
 				surface->EndPaint();
 			}

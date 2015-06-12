@@ -26,10 +26,7 @@ else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C libpng
 	$(MAKE) -C libxml
 	$(MAKE) -C libz
-	$(MAKE) -C lzma
-	$(MAKE) -C mzip
 	$(MAKE) -C nsucd
-	$(MAKE) -C pcre
 endif
 ifeq ($(BUILD_V8),True)
 	$(MAKE) -C v8
@@ -59,10 +56,7 @@ else ifeq ($(BUILD_WIN32),True)
 	$(MAKE) -C libpng clean
 	$(MAKE) -C libxml clean
 	$(MAKE) -C libz clean
-	$(MAKE) -C lzma clean
-	$(MAKE) -C mzip clean
 	$(MAKE) -C nsucd clean
-	$(MAKE) -C pcre clean
 endif
 ifeq ($(BUILD_V8),True)
 	$(MAKE) -C v8 clean

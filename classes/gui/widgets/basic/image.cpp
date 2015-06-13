@@ -73,7 +73,8 @@ S::Int S::GUI::Image::SetBitmap(const Bitmap &newBmp)
 
 	if (prevVisible) Hide();
 
-	bitmap = newBmp;
+	bitmap	     = newBmp;
+	bitmapScaled = NIL;
 
 	if (GetSize() == Size(0, 0)) SetSize(bitmap.GetSize());
 

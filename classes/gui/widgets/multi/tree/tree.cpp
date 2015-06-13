@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -82,28 +82,28 @@ S::Void S::GUI::Tree::CalculateHeight()
 		for (Int i = 0; i < Length(); i++) height += GetNthEntry(i)->GetHeight();
 	}
 
-	if (height != GetHeight())
+	/* Set new height if changed.
+	 */
+	if (height == GetHeight()) return;
+
+	SetHeight(height);
+
+	/* Recalculate parent trees.
+	 */
+	if (!IsRegistered()) return;
+
+	Widget	*widget = container;
+
+	while (widget->GetObjectType() != ListBox::classID)
 	{
-		SetHeight(height);
-
-		if (IsRegistered())
+		if (widget->GetObjectType() == Tree::classID)
 		{
-			/* Recalculate all parent trees.
-		 	*/
-			Widget	*widget = container;
+			((Tree *) widget)->CalculateHeight();
 
-			while (widget->GetObjectType() != ListBox::classID)
-			{
-				if (widget->GetObjectType() == Tree::classID)
-				{
-					((Tree *) widget)->CalculateHeight();
-
-					break;
-				}
-
-				widget = widget->GetContainer();
-			}
+			break;
 		}
+
+		widget = widget->GetContainer();
 	}
 }
 
@@ -112,77 +112,64 @@ S::Int S::GUI::Tree::Paint(Int message)
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
 
+	Surface	*surface = GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+	Window	*window	 = container->GetContainerWindow();
+
 	CalculateHeight();
 
 	switch (message)
 	{
 		case SP_PAINT:
+			surface->StartPaint(GetVisibleArea());
+
+			if (!IsMarked()) list.Hide();
+
+			if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(),  Math::Round(16 * surface->GetSurfaceDPI() / 96.0))))) PaintText(Setup::GradientTextColor, True);
+			else																       PaintText(active ? font.GetColor() : Setup::InactiveTextColor, False);
+
+			if (IsMarked())
 			{
-				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-				Window	*window	 = container->GetContainerWindow();
+				list.SetVisibleDirect(False);
+				list.SetMetrics(Point(12, 16), GetSize() - Size(12, 15));
 
-				if (window == NIL) break;
+				Rect	 visibleArea	   = list.GetVisibleArea() - list.GetRealPosition();
 
-				surface->StartPaint(GetVisibleArea());
+				Point	 entryPosition	   = Point(0, 0);
+				Point	 entryRealPosition = Point(0, 0);
 
-				if (!IsMarked())
+				for (Int i = 0; i < Length(); i++)
 				{
-					list.Hide();
-				}
+					ListEntry	*entry	       = GetNthEntry(i);
+					Size		 entryRealSize = entry->GetRealSize();
 
-				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(),  Math::Round(16 * surface->GetSurfaceDPI() / 96.0))))) PaintText(Setup::GradientTextColor, True);
-				else																       PaintText(active ? font.GetColor() : Setup::InactiveTextColor, False);
+					entry->SetVisibleDirect(False);
 
-				if (IsMarked())
-				{
-					list.SetVisibleDirect(False);
-					list.SetMetrics(Point(12, 16), GetSize() - Size(12, 15));
-
-					Rect	 visibleArea	   = list.GetVisibleArea() - list.GetRealPosition();
-
-					Point	 entryPosition	   = Point(0, 0);
-					Point	 entryRealPosition = Point(0, 0);
-
-					for (Int i = 0; i < Length(); i++)
+					if (entryRealPosition.y + entryRealSize.cy >= visibleArea.top && entryRealPosition.y <= visibleArea.bottom)
 					{
-						ListEntry	*entry	       = GetNthEntry(i);
-						Size		 entryRealSize = entry->GetRealSize();
-
-						entry->SetVisibleDirect(False);
-
-						if (entryRealPosition.y + entryRealSize.cy >= visibleArea.top && entryRealPosition.y <= visibleArea.bottom)
-						{
-							entry->SetMetrics(entryPosition, Size(list.GetWidth(), entry->GetHeight()));
-							entry->SetVisibleDirect(True);
-						}
-
-						entryPosition.y	    += entry->GetHeight();
-						entryRealPosition.y  = Math::Round(entryPosition.y * surface->GetSurfaceDPI() / 96.0);
+						entry->SetMetrics(entryPosition, Size(list.GetWidth(), entry->GetHeight()));
+						entry->SetVisibleDirect(True);
 					}
 
-					list.Show();
-
-					Point	 realPos = GetRealPosition();
-
-					for (Int i = Math::Round(16 * surface->GetSurfaceDPI() / 96.0); i < frame.GetHeight() - Math::Round(7 * surface->GetSurfaceDPI() / 96.0); i += 2)
-					{
-						surface->SetPixel(realPos + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), i), Setup::InactiveTextColor);
-					}
+					entryPosition.y	    += entry->GetHeight();
+					entryRealPosition.y  = Math::Round(entryPosition.y * surface->GetSurfaceDPI() / 96.0);
 				}
 
-				surface->EndPaint();
+				list.Show();
+
+				Point	 realPos = GetRealPosition();
+
+				for (Int i = Math::Round(16 * surface->GetSurfaceDPI() / 96.0); i < frame.GetHeight() - Math::Round(7 * surface->GetSurfaceDPI() / 96.0); i += 2)
+				{
+					surface->SetPixel(realPos + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), i), Setup::InactiveTextColor);
+				}
 			}
+
+			surface->EndPaint();
 
 			break;
 		case SP_MOUSEIN:
-			{
-				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-				Window	*window	 = container->GetContainerWindow();
-
-				if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))))) PaintText(Setup::GradientTextColor, True);
-			}
+			if (window->IsMouseOn(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))))) PaintText(Setup::GradientTextColor, True);
 
 			break;
 		case SP_MOUSEOUT:

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,12 +18,10 @@ const S::Short	 S::GUI::ListBox::classID = S::Object::RequestClassID();
 
 S::GUI::ListBox::ListBox(const Point &iPos, const Size &iSize)
 {
-	type			= classID;
+	type	     = classID;
 
-	scrollbar		= NIL;
-	scrollbarPos		= 0;
-
-	visibleEntriesChecksum	= 0;
+	scrollbar    = NIL;
+	scrollbarPos = 0;
 
 	SetFont(Font(font.GetName(), Font::DefaultSize, Font::Normal, Font::Normal, Setup::ClientTextColor));
 
@@ -60,24 +58,29 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
-	Rect	 entryRect	= frame;
+	Surface		*surface	   = GetDrawSurface();
+	Rect		 frame		   = Rect(GetRealPosition(), GetRealSize());
+	Rect		 entryRect	   = frame;
 
-	String	 visibleEntries;
+	String		 visibleEntries;
+	Int		 visibleEntryCount = 0;
+
+	ListEntry	*lastVisibleEntry  = NIL;
 
 	if (GetNOfTabs() > 0 && !(flags & LF_HIDEHEADER)) header->Show();
 	else						  header->Hide();
 
-	Int	 entriesHeight	= 0;
-	Int	 headerHeight	= (header->IsVisible()	  ? header->GetHeight()	  : 0);
-	Int	 scrollbarWidth	= (scrollbar->IsVisible() ? scrollbar->GetWidth() : 0);
+	Int		 entriesHeight	   = 0;
+	Int		 headerHeight	   = (header->IsVisible()    ? header->GetHeight()   : 0);
+	Int		 scrollbarWidth	   = (scrollbar->IsVisible() ? scrollbar->GetWidth() : 0);
 
 	switch (message)
 	{
 		case SP_PAINT:
 			surface->StartPaint(frame);
 
+			/* Update scrollbar if necessary.
+			 */
 			entriesHeight = GetEntriesHeight();
 
 			if (entriesHeight > GetHeight() - headerHeight - 4 && !(flags & LF_HIDESCROLLBAR))
@@ -115,14 +118,14 @@ S::Int S::GUI::ListBox::Paint(Int message)
 					entry->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - scrollbarWidth, entry->GetHeight()));
 					entry->SetVisibleDirect(True);
 
-					visibleEntries.Append(entry->GetName());
+					visibleEntries[visibleEntryCount++] = entry->GetHandle() % 32767 + 1;
 				}
 
 				entryRect.top	 += entry->GetHeight();
 				entryRect.bottom += entry->GetHeight();
 			}
 
-			visibleEntriesChecksum = visibleEntries.ComputeCRC32();
+			visibleEntriesString = visibleEntries;
 
 			/* Now paint the listbox and all entries.
 			 */
@@ -137,33 +140,60 @@ S::Int S::GUI::ListBox::Paint(Int message)
 
 			break;
 		case SP_UPDATE:
+			/* Update scrollbar if necessary.
+			 */
 			entriesHeight = GetEntriesHeight();
 
-			if (entriesHeight > GetHeight() - headerHeight - 4 && !(flags & LF_HIDESCROLLBAR))
-			{
-				if (!scrollbar->IsVisible())	Paint(SP_PAINT);
-				else 				scrollbar->SetRange(0, entriesHeight - (GetHeight() - 4 - headerHeight));
-			}
+			if ((entriesHeight >  GetHeight() - headerHeight - 4 && !scrollbar->IsVisible() && !(flags & LF_HIDESCROLLBAR)) ||
+			    (entriesHeight <= GetHeight() - headerHeight - 4 &&  scrollbar->IsVisible()				      )) return Paint(SP_PAINT);
 
-			frame.top = -scrollbarPos;
-			frame.bottom = frame.top;
+			scrollbar->SetRange(0, entriesHeight - (GetHeight() - 4 - headerHeight));
+
+			/* Find visible entries.
+			 */
+			entryRect.top	 = -scrollbarPos;
+			entryRect.bottom = -scrollbarPos;
 
 			for (Int i = 0; i < Length(); i++)
 			{
 				ListEntry	*entry = GetNthEntry(i);
 
-				if (frame.bottom + entry->GetHeight() >= 0 && frame.top <= GetHeight() - headerHeight - 4)
+				entry->SetVisibleDirect(False);
+
+				if (entryRect.bottom + entry->GetHeight() >= 0 && entryRect.top <= GetHeight() - headerHeight - 4)
 				{
-					visibleEntries.Append(entry->GetName());
+					entry->SetMetrics(Point(2, entryRect.top + 2 + headerHeight), Size(GetWidth() - 4 - scrollbarWidth, entry->GetHeight()));
+					entry->SetVisibleDirect(True);
+
+					lastVisibleEntry = entry;
+
+					visibleEntries[visibleEntryCount++] = entry->GetHandle() % 32767 + 1;
 				}
 
-				frame.top    += entry->GetHeight();
-				frame.bottom += entry->GetHeight();
+				entryRect.top	 += entry->GetHeight();
+				entryRect.bottom += entry->GetHeight();
 
-				if (frame.top > GetHeight() - headerHeight - 4) break;
+				if (entryRect.top > GetHeight() - headerHeight - 4) break;
 			}
 
-			if (visibleEntriesChecksum != visibleEntries.ComputeCRC32()) Paint(SP_PAINT);
+			/* Check for changes.
+			 */
+			if (visibleEntriesString != visibleEntries)
+			{
+				/* Draw added entry only if it was added to the end.
+				 */
+				if	(visibleEntries.StartsWith(visibleEntriesString) && visibleEntries.Length() == visibleEntriesString.Length() + 1) lastVisibleEntry->Paint(SP_PAINT);
+
+				/* Nothing needs to be done if last entry was removed.
+				 */
+				else if (visibleEntriesString.StartsWith(visibleEntries) && visibleEntriesString.Length() == visibleEntries.Length() + 1) ;
+
+				/* Redraw the whole list if something else changed.
+				 */
+				else															  Paint(SP_PAINT);
+
+				visibleEntriesString = visibleEntries;
+			}
 
 			break;
 	}

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,12 +18,10 @@ const S::Short	 S::GUI::ImageBox::classID = S::Object::RequestClassID();
 
 S::GUI::ImageBox::ImageBox(const Point &iPos, const Size &iSize)
 {
-	type			= classID;
+	type	     = classID;
 
-	scrollbar		= NIL;
-	scrollbarPos		= 0;
-
-	visibleEntriesChecksum	= 0;
+	scrollbar    = NIL;
+	scrollbarPos = 0;
 
 	SetBackgroundColor(Setup::ClientColor);
 	SetMetrics(iPos, iSize);
@@ -52,18 +50,23 @@ S::Int S::GUI::ImageBox::Paint(Int message)
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
 
-	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
+	Surface		*surface	   = GetDrawSurface();
+	Rect		 frame		   = Rect(GetRealPosition(), GetRealSize());
+	Rect		 entryRect	   = frame;
 
-	String	 visibleEntries;
+	String		 visibleEntries;
+	Int		 visibleEntryCount = 0;
 
-	Int	 entriesWidth	= 0;
+	Int		 entriesWidth	   = 0;
+	Int		 scrollbarHeight   = (scrollbar->IsVisible() ? scrollbar->GetHeight() : 0);
 
 	switch (message)
 	{
 		case SP_PAINT:
 			surface->StartPaint(frame);
 
+			/* Update scrollbar if necessary.
+			 */
 			entriesWidth = GetEntriesWidth();
 
 			if (entriesWidth > GetWidth() - 4)
@@ -74,44 +77,48 @@ S::Int S::GUI::ImageBox::Paint(Int message)
 				scrollbar->SetPageSize(GetWidth() - 4);
 
 				scrollbar->Show();
+
+				scrollbarHeight = scrollbar->GetHeight();
 			}
 			else
 			{
 				scrollbar->Hide();
 
-				scrollbarPos = 0;
+				scrollbarPos	= 0;
+				scrollbarHeight = 0;
 			}
 
-			if (IsActive())	surface->Box(frame - Size(0, scrollbar->IsVisible() ? 18 : 0), Setup::ClientColor, Rect::Filled);
-			else		surface->Box(frame - Size(0, scrollbar->IsVisible() ? 18 : 0), Setup::BackgroundColor, Rect::Filled);
-
-			surface->Frame(frame, FRAME_DOWN);
-
-			frame.left = -scrollbarPos;
-			frame.right = frame.left;
+			/* Set visibility of image entries first.
+			 */
+			entryRect.left	= -scrollbarPos;
+			entryRect.right = -scrollbarPos;
 
 			for (Int i = 0; i < Length(); i++)
 			{
-				ListEntry	*operat = GetNthEntry(i);
+				ListEntry	*entry = GetNthEntry(i);
 
-				frame.right += operat->GetRealSize().cx;
+				entry->SetVisibleDirect(False);
 
-				if (frame.right >= 0 && frame.left <= GetRealSize().cx - 4)
+				if (entryRect.right + entry->GetWidth() >= 0 && entryRect.left <= GetWidth() - 4)
 				{
-					operat->SetMetrics(Point(frame.left + 2, 2), Size(operat->GetWidth(), GetHeight() - 4 - (scrollbar->IsVisible() ? 17 : 0)));
-					operat->Show();
+					entry->SetMetrics(Point(entryRect.left + 2, 2), Size(entry->GetWidth(), GetHeight() - 4 - scrollbarHeight));
+					entry->SetVisibleDirect(True);
 
-					visibleEntries.Append(operat->GetName());
-				}
-				else
-				{
-					operat->Hide();
+					visibleEntries[visibleEntryCount++] = entry->GetHandle() % 32767 + 1;
 				}
 
-				frame.left += operat->GetRealSize().cx;
+				entryRect.left	+= entry->GetWidth();
+				entryRect.right += entry->GetWidth();
 			}
 
-			visibleEntriesChecksum = visibleEntries.ComputeCRC32();
+			visibleEntriesString = visibleEntries;
+
+			/* Now paint the imagebox and all entries.
+			 */
+			if (IsActive())	surface->Box(frame - Size(0, scrollbarHeight), Setup::ClientColor, Rect::Filled);
+			else		surface->Box(frame - Size(0, scrollbarHeight), Setup::BackgroundColor, Rect::Filled);
+
+			surface->Frame(frame, FRAME_DOWN);
 
 			Widget::Paint(message);
 
@@ -119,32 +126,36 @@ S::Int S::GUI::ImageBox::Paint(Int message)
 
 			break;
 		case SP_UPDATE:
+			/* Update scrollbar if necessary.
+			 */
 			entriesWidth = GetEntriesWidth();
 
-			if (entriesWidth > GetWidth() - 4)
-			{
-				if (!scrollbar->IsVisible())	Paint(SP_PAINT);
-				else 				scrollbar->SetRange(0, entriesWidth - (GetWidth() - 4));
-			}
+			if ((entriesWidth >  GetWidth() - 4 && !scrollbar->IsVisible()) ||
+			    (entriesWidth <= GetWidth() - 4 &&  scrollbar->IsVisible())) return Paint(SP_PAINT);
 
-			frame.left = -scrollbarPos;
-			frame.right = frame.left;
+			scrollbar->SetRange(0, entriesWidth - (GetWidth() - 4));
+
+			/* Find visible entries.
+			 */
+			entryRect.left	= -scrollbarPos;
+			entryRect.right = -scrollbarPos;
 
 			for (Int i = 0; i < Length(); i++)
 			{
-				ListEntry	*operat = GetNthEntry(i);
+				ListEntry	*entry = GetNthEntry(i);
 
-				frame.right += operat->GetRealSize().cx;
-
-				if (frame.right >= 0 && frame.left <= GetRealSize().cx - 4)
+				if (entryRect.right + entry->GetWidth() >= 0 && entryRect.left <= GetWidth() - 4)
 				{
-					visibleEntries.Append(operat->GetName());
+					visibleEntries[visibleEntryCount++] = entry->GetHandle() % 32767 + 1;
 				}
 
-				frame.left += operat->GetRealSize().cx;
+				entryRect.left	+= entry->GetWidth();
+				entryRect.right += entry->GetWidth();
 			}
 
-			if (visibleEntriesChecksum != visibleEntries.ComputeCRC32()) Paint(SP_PAINT);
+			/* Check for changes.
+			 */
+			if (visibleEntriesString != visibleEntries) Paint(SP_PAINT);
 
 			break;
 	}
@@ -155,7 +166,7 @@ S::Int S::GUI::ImageBox::Paint(Int message)
 S::GUI::Rect S::GUI::ImageBox::GetVisibleArea() const
 {
 	if (!IsVisible()) return Widget::GetVisibleArea();
-	else		  return Widget::GetVisibleArea() + Point(0, 2) - Size(0, 4);
+	else		  return Widget::GetVisibleArea() + Point(2, 0) - Size(4, 0);
 }
 
 S::Int S::GUI::ImageBox::GetEntriesWidth() const

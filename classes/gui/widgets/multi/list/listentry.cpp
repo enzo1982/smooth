@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -77,7 +77,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 			if (mouseOver) nFont.SetColor(Setup::GradientTextColor);
 			if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
-			for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
+			gotTabs = text.Contains("\t");
 
 			surface->StartPaint(GetVisibleArea());
 
@@ -134,11 +134,15 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 
 			/* Draw entry text.
 			 */
+			Int	 lineHeight = scaledTextSize.cy;
+
+			if (text.Contains("\n")) lineHeight = nFont.GetScaledTextSizeY();
+
 			if (listBox != NIL && ((ListBox *) listBox)->GetNOfTabs() > 0 && gotTabs)
 			{
 				for (Int i = 0; i < ((ListBox *) listBox)->GetNOfTabs(); i++)
 				{
-					Rect	 rect = Rect(GetRealPosition() + Point(0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(i > 0 && listBox != container ? listBox->GetRealPosition().x - container->GetRealPosition().x + 2 : 0, 0), GetRealSize() - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(1, 0));
+					Rect	 rect = Rect(GetRealPosition() + Point(0, Math::Ceil(Float(frame.GetHeight() - lineHeight) / 2) - 2) + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(i > 0 && listBox != container ? listBox->GetRealPosition().x - container->GetRealPosition().x + 2 : 0, 0), GetRealSize() - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(1, 0));
 
 					rect.left += Math::Round(((ListBox *) listBox)->GetNthTabOffset(i) * surface->GetSurfaceDPI() / 96.0);
 					rect.left += (i == 0 ? (container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0) : 0);
@@ -158,7 +162,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 			}
 			else
 			{
-				surface->SetText(text, frame + Point(0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0, 0) - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0, 0), nFont);
+				surface->SetText(text, frame + Point(0, Math::Ceil(Float(frame.GetHeight() - lineHeight) / 2) - 2) + Point(1, 1) * surface->GetSurfaceDPI() / 96.0 + Point(container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0, 0) - Size(1, 1) * surface->GetSurfaceDPI() / 96.0 * 2 - Size(container->GetFlags() & LF_MULTICHECKBOX ? Math::Round(12 * surface->GetSurfaceDPI() / 96.0) : 0, 0), nFont);
 			}
 
 			Widget::Paint(SP_PAINT);

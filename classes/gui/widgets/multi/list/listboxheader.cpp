@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -210,15 +210,23 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 					if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
 					{
+						surface->StartPaint(frame);
+
 						surface->Box(frame, Setup::LightGrayColor, Rect::Filled);
 						surface->SetText(tabNames.GetNth(j), frame + Point(2, Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1) - Size(2, 0), font);
+
+						surface->EndPaint();
 
 						tabChecked.Set(tabChecked.GetNthIndex(j), True);
 					}
 					else if ((!window->IsMouseOn(frame) || moveTab != -1) && tabChecked.GetNth(j))
 					{
+						surface->StartPaint(frame);
+
 						surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 						surface->SetText(tabNames.GetNth(j), frame + Point(2, Math::Ceil(Float(frame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1) - Size(2, 0), font);
+
+						surface->EndPaint();
 
 						tabChecked.Set(tabChecked.GetNthIndex(j), False);
 					}

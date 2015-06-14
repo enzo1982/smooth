@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -198,12 +198,13 @@ S::Void S::GUI::TabWidget::OnChangeSize(const Size &nSize)
 
 S::Int S::GUI::TabWidget::Add(Widget *widget)
 {
+	widget->Hide();
+
 	if (Widget::Add(widget) == Success())
 	{
 		widget->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
 
 		if (GetNOfObjects() == 1) SelectTab(widget);
-		else			  widget->Hide();
 
 		return Success();
 	}

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,9 +46,11 @@ S::Int S::GUI::List::EnableLocking(Bool enable)
 	return Widget::EnableLocking(enable);
 }
 
-S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text)
+S::GUI::ListEntry *S::GUI::List::AddEntry(const String &text, Bool marked)
 {
 	ListEntry	*newEntry = new ListEntry(text);
+
+	newEntry->SetMark(marked);
 
 	if (Add(newEntry) == Success())
 	{

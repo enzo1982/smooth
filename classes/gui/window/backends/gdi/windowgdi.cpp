@@ -886,11 +886,11 @@ S::Int S::GUI::WindowGDI::Maximize()
 		nonMaxRect = Rect(Point(rect.left, rect.top), (Size(rect.right - rect.left, rect.bottom - rect.top) - sizeModifier) / fontSize);
 	}
 
-	SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), (Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) - sizeModifier) / fontSize);
-
 	nonMaxWndStyle = GetWindowLong(hwnd, GWL_STYLE);
 
-	SetWindowLong(hwnd, GWL_STYLE, (nonMaxWndStyle ^ WS_THICKFRAME) | WS_DLGFRAME);
+	SetWindowLong(hwnd, GWL_STYLE, nonMaxWndStyle ^ (WS_THICKFRAME | WS_SYSMENU));
+
+	SetMetrics(Point(workArea.left - (frameSize.cx - 1), workArea.top - (frameSize.cy - 1)), (Size(workArea.GetWidth() + (2 * frameSize.cx - 2), workArea.GetHeight() + (2 * frameSize.cy - 2)) - sizeModifier) / fontSize);
 
 	maximized = True;
 
@@ -901,9 +901,9 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 S::Int S::GUI::WindowGDI::Restore()
 {
-	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.GetWidth()), (Int) Math::Max(minSize.cy, nonMaxRect.GetHeight())));
-
 	SetWindowLong(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
+
+	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.GetWidth()), (Int) Math::Max(minSize.cy, nonMaxRect.GetHeight())));
 
 	maximized = False;
 

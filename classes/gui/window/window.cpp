@@ -499,8 +499,8 @@ S::Void S::GUI::Window::OnMaximize()
 
 S::Void S::GUI::Window::OnRestore()
 {
-	minimized = False;
-	maximized = False;
+	if	(minimized) minimized = False;
+	else if (maximized) maximized = False;
 }
 
 S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)

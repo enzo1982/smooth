@@ -387,8 +387,7 @@ const char *S::Directory::GetUnicodePathPrefix(const String &path)
 	if (unicodePathPrefix == NIL)
 	{
 #ifdef __WIN32__
-		if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT)) unicodePathPrefix = (char *) "\\\\?\\";
-		else									    unicodePathPrefix = (char *) "";
+		unicodePathPrefix = (char *) "\\\\?\\";
 #else
 		unicodePathPrefix = (char *) "";
 #endif

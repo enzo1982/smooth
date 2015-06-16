@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -768,11 +768,6 @@ S::Int S::GUI::WindowGDI::SetIconDirect(Void *newIcon)
 
 S::Int S::GUI::WindowGDI::EnableDropFiles(Bool nEnableDropFiles)
 {
-	/* Enable Drag & Drop only on the Windows NT family
-	 * for now, due to problems on Windows 9x.
-	 */
-	if (!Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT)) return Error();
-
 	enableDropFiles = nEnableDropFiles;
 
 	if (hwnd != NIL) DragAcceptFiles(hwnd, enableDropFiles);

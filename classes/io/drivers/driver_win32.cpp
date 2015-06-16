@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,13 +22,7 @@ S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
 
 	/* Find prefix for Unicode paths.
 	 */
-	static char	*unicodePathPrefix = NIL;
-
-	if (unicodePathPrefix == NIL)
-	{
-		if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT)) unicodePathPrefix = (char *) "\\\\?\\";
-		else									    unicodePathPrefix = (char *) "";
-	}
+	static const char	*unicodePathPrefix = "\\\\?\\";
 
 	/* Build real filename to pass to CreateFile.
 	 */

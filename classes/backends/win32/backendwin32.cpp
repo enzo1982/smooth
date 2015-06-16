@@ -151,7 +151,7 @@ S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformI
 	}
 
 	if (versionInfo.dwPlatformId == platformId && ( versionInfo.dwMajorVersion  > majorVersion ||
-						       (versionInfo.dwMajorVersion == majorVersion && versionInfo.dwMinorVersion > minorVersion))) return True;
+						       (versionInfo.dwMajorVersion == majorVersion && versionInfo.dwMinorVersion >= minorVersion))) return True;
 
 	return False;
 }

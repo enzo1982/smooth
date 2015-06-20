@@ -198,6 +198,8 @@ S::Void S::GUI::TabWidget::OnChangeSize(const Size &nSize)
 
 S::Int S::GUI::TabWidget::Add(Widget *widget)
 {
+	if (widget == NIL) return Error();
+
 	widget->Hide();
 
 	if (Widget::Add(widget) == Success())

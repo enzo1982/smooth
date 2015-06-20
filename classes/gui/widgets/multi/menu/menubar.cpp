@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,10 @@
 
 #ifdef __APPLE__
 #	include <smooth/gui/widgets/multi/menu/menubar_cocoa.h>
+#endif
+
+#ifdef __WIN32__
+#	include <smooth/backends/win32/backendwin32.h>
 #endif
 
 const S::Short	 S::GUI::Menubar::classID = S::Object::RequestClassID();
@@ -66,9 +70,15 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	}
 #endif
 
-	Window	*window	 = GetContainerWindow();
-	Surface	*surface = GetDrawSurface();
-	Rect	 menubar = Rect(GetRealPosition(), GetRealSize() - Size(1, 1));
+	Window		*window	   = GetContainerWindow();
+	Surface		*surface   = GetDrawSurface();
+	Rect		 menubar   = Rect(GetRealPosition(), GetRealSize() - Size(1, 1));
+
+#ifdef __WIN32__
+	static Bool	 flatStyle = Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2);
+#else
+	static Bool	 flatStyle = False;
+#endif
 
 	if (orientation == OR_TOP || orientation == OR_BOTTOM)
 	{
@@ -89,6 +99,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 #else
 		Int	 nextXPosLeft	= 7 + (window->GetIcon() != NIL ? 17 : 0);
 		Int	 nextXPosRight	= GetSize().cx - 1;
+
+		if (flatStyle) nextXPosLeft = 1;
 #endif
 		Int	 highestEntry	= 0;
 
@@ -184,6 +196,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 	switch (message)
 	{
 		case SP_PAINT:
+			if (flatStyle) break;
+
 			if (orientation == OR_TOP || orientation == OR_BOTTOM)
 			{
 				if (orientation == OR_BOTTOM) { menubar.top--; menubar.bottom--; }

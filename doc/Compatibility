@@ -6,7 +6,7 @@ smooth can be compiled using GCC 4.0+ or MSVC 10.0.
 Supported operating systems
 ---------------------------
 
-Windows Vista/7/8	complete support
+Windows Vista/7/8/10	complete support
 Windows 2000/XP		complete support
 
 Mac OS X 10.5+		complete support

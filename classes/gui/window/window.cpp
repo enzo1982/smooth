@@ -28,7 +28,7 @@
 #include <smooth/resources.h>
 
 #ifdef __WIN32__
-#	include <windows.h>
+#	include <smooth/backends/win32/backendwin32.h>
 
 #	undef GetObject
 
@@ -635,6 +635,12 @@ S::Int S::GUI::Window::Paint(Int message)
 
 	Surface	*surface = GetDrawSurface();
 
+#ifdef __WIN32__
+	static Bool	 flatStyle = Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2);
+#else
+	static Bool	 flatStyle = False;
+#endif
+
 	Size	 realSize = GetRealSize();
 	Float	 fontSize = surface->GetSurfaceDPI() / 96.0;
 
@@ -684,13 +690,11 @@ S::Int S::GUI::Window::Paint(Int message)
 					{
 						topoffset += object->GetSize().cy + 3;
 
-						Point	 p1 = Point(frameWidth * fontSize + 1, topoffset * fontSize - 2);
+						Point	 p1 = Point(frameWidth * fontSize, topoffset * fontSize - 2);
 						Point	 p2 = Point(realSize.cx - frameWidth, p1.y);
 
 #ifndef __APPLE__
-						if (icon != NIL) p1.x += Math::Round(18 * fontSize) - 1;
-#else
-						p1.x--;
+						if (!flatStyle && icon != NIL) p1.x += Math::Round(18 * fontSize);
 #endif
 
 						surface->Bar(p1, p2, OR_HORZ);

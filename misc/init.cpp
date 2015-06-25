@@ -42,7 +42,7 @@ __declspec (dllexport) HINSTANCE	 S::hPrevInstance = NIL;
 
 __declspec (dllexport) HICON		 S::SMOOTHICON	  = NIL;
 
-int CALLBACK EnumFontProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD fontType, LPARAM lParam)
+int CALLBACK EnumFontProc(const LOGFONTW *lpelfe, const TEXTMETRICW *lpntme, DWORD fontType, LPARAM lParam)
 {
 	return 0;
 }

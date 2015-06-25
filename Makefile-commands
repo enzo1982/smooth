@@ -128,9 +128,6 @@ endif
 endif
 endif
 
-CPPC	 = g++
-CPPCOPTS = $(CCOPTS)
-
 .SUFFIXES: .mm .rc
 
 TARGETS =
@@ -186,13 +183,13 @@ endif
 	$(CC) $(CCOPTS) -c $< -o $@
 
 .cc.o:
-	$(CPPC) $(CPPCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) -c $< -o $@
 
 .cpp.o:
-	$(CPPC) $(CPPCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) -c $< -o $@
 
 .mm.o:
-	$(CPPC) $(CPPCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) -c $< -o $@
 
 .rc.o:
 	$(RC) $(RCOPTS) $< -o $@

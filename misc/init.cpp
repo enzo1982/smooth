@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -252,14 +252,16 @@ S::Void S::GetDefaultFont()
 
 	for (Int i = 0; fonts[i] != NIL; i++)
 	{
-		LOGFONT	 fontInfo;
+		LOGFONTW	 fontInfo;
+
+		ZeroMemory(&fontInfo, sizeof(fontInfo));
 
 		fontInfo.lfCharSet	  = DEFAULT_CHARSET;
 		fontInfo.lfPitchAndFamily = 0;
 
-		wcscpy(fontInfo.lfFaceName, fonts[i]);
+		wcsncpy(fontInfo.lfFaceName, fonts[i], LF_FACESIZE - 1);
 
-		if (EnumFontFamiliesEx(dc, &fontInfo, &EnumFontProc, 0, 0) == 0) { GUI::Font::Default = fonts[i]; break; }
+		if (EnumFontFamiliesExW(dc, &fontInfo, &EnumFontProc, 0, 0) == 0) { GUI::Font::Default = fonts[i]; break; }
 	}
 
 	ReleaseDC(0, dc);

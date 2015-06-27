@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,24 +24,13 @@ static unsigned char PADDING[64] = {
  */
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
-S::Hash::SHA1::SHA1(const Buffer<UnsignedByte> &iBuffer) : buffer(iBuffer)
+S::Hash::SHA1::SHA1()
 {
-	memset(&state, 0, sizeof(state));
+	Reset();
 }
 
 S::Hash::SHA1::~SHA1()
 {
-}
-
-S::Void S::Hash::SHA1::Init()
-{
-	/* Load magic initialization constants.
-	 */
-	state[0] = 0x67452301;
-	state[1] = 0xefcdab89;
-	state[2] = 0x98badcfe;
-	state[3] = 0x10325476;
-	state[4] = 0xc3d2e1f0;
 }
 
 S::Void S::Hash::SHA1::Transform(UnsignedByte *buffer)
@@ -82,12 +71,44 @@ S::Void S::Hash::SHA1::Transform(UnsignedByte *buffer)
 	state[2] += c;
 	state[3] += d;
 	state[4] += e;
+
+	size += 64;
 }
 
-S::Void S::Hash::SHA1::Final()
+S::Bool S::Hash::SHA1::Reset()
 {
-	UnsignedInt64	 bits = buffer.Size() * 8;
-	Int		 index = buffer.Size() % 64;
+	/* Load magic initialization constants.
+	 */
+	state[0] = 0x67452301;
+	state[1] = 0xefcdab89;
+	state[2] = 0x98badcfe;
+	state[3] = 0x10325476;
+	state[4] = 0xc3d2e1f0;
+
+	size = 0;
+
+	return True;
+}
+
+S::Bool S::Hash::SHA1::Feed(const Buffer<UnsignedByte> &data)
+{
+	buffer.Resize(buffer.Size() + data.Size());
+
+	memcpy(buffer + buffer.Size() - data.Size(), data, data.Size());
+
+	for (Int i = 0; i + 63 < buffer.Size(); i += 64) Transform(buffer + i);
+
+	memcpy(buffer, buffer + buffer.Size() - buffer.Size() % 64, buffer.Size() % 64);
+
+	buffer.Resize(buffer.Size() % 64);
+
+	return True;
+}
+
+S::String S::Hash::SHA1::Finish()
+{
+	UnsignedInt64	 bits	= (buffer.Size() + size) * 8;
+	Int		 index	= buffer.Size();
 
 	/* Pad out to 56 mod 64.
 	 */
@@ -95,7 +116,7 @@ S::Void S::Hash::SHA1::Final()
 
 	UnsignedByte	*end = new UnsignedByte [128];
 
-	memcpy(end, buffer + buffer.Size() - index, index);
+	memcpy(end, buffer, index);
 	memcpy(end + index, PADDING, padLen);
 
 	for (Int i = 0; i < 8; i++) end[index + padLen + i] = bits >> 8 * (7 - i) & 0xFF;
@@ -105,19 +126,19 @@ S::Void S::Hash::SHA1::Final()
 	if (padLen > 56) Transform(end + 64);
 
 	delete [] end;
-}
-
-S::String S::Hash::SHA1::Compute()
-{
-	Init();
-
-	for (Int i = 0; i + 63 < buffer.Size(); i += 64) Transform(buffer + i);
-
-	Final();
 
 	String	 string;
 
 	for (Int i = 0; i < 5; i++) string.Append(Number((Int64) ((UnsignedInt32 *) state)[i]).ToHexString(8));
 
 	return string;
+}
+
+S::String S::Hash::SHA1::Compute(const Buffer<UnsignedByte> &data)
+{
+	SHA1	 sha1;
+
+	sha1.Feed(data);
+
+	return sha1.Finish();
 }

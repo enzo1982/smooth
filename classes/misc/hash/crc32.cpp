@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,9 +13,8 @@
 S::UnsignedInt32	 S::Hash::CRC32::table[256];
 S::Bool			 S::Hash::CRC32::initialized = False;
 
-S::Hash::CRC32::CRC32(const Buffer<UnsignedByte> &iBuffer) : buffer(iBuffer)
+S::Hash::CRC32::CRC32()
 {
-	if (!initialized) InitTable();
 }
 
 S::Hash::CRC32::~CRC32()
@@ -52,8 +51,10 @@ S::UnsignedInt32 S::Hash::CRC32::Reflect(UnsignedInt32 ref, char ch)
 	return value;
 }
 
-S::UnsignedInt32 S::Hash::CRC32::Compute() const
+S::UnsignedInt32 S::Hash::CRC32::Compute(const Buffer<UnsignedByte> &buffer)
 {
+	if (!initialized) InitTable();
+
 	UnsignedInt32	 ulCRC(0xffffffff);
 	Int		 len = buffer.Size();
 	UnsignedByte	*pBuffer = buffer;

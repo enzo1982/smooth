@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -86,26 +86,16 @@ static unsigned char PADDING[64] = {
 			  (((x) >> 16) & 0xFF) <<  8 |			\
 			   ((x) >> 24) & 0xFF )
 
-S::Hash::MD5::MD5(const Buffer<UnsignedByte> &iBuffer) : buffer(iBuffer)
+S::Hash::MD5::MD5()
 {
-	memset(&state, 0, sizeof(state));
+	Reset();
 }
 
 S::Hash::MD5::~MD5()
 {
 }
 
-S::Void S::Hash::MD5::Init()
-{
-	/* Load magic initialization constants.
-	 */
-	state[0] = 0x67452301;
-	state[1] = 0xefcdab89;
-	state[2] = 0x98badcfe;
-	state[3] = 0x10325476;
-}
-
-S::Void S::Hash::MD5::Transform(UnsignedByte *buffer)
+S::Void S::Hash::MD5::Transform(UnsignedByte *data)
 {
 	UnsignedInt32	 a = state[0];
 	UnsignedInt32	 b = state[1];
@@ -113,87 +103,118 @@ S::Void S::Hash::MD5::Transform(UnsignedByte *buffer)
 	UnsignedInt32	 d = state[3];
 
 	/* Round 1 */
-	FF(a, b, c, d, GET_INT32( 0, buffer), S11, 0xd76aa478); /*  1 */
-	FF(d, a, b, c, GET_INT32( 1, buffer), S12, 0xe8c7b756); /*  2 */
-	FF(c, d, a, b, GET_INT32( 2, buffer), S13, 0x242070db); /*  3 */
-	FF(b, c, d, a, GET_INT32( 3, buffer), S14, 0xc1bdceee); /*  4 */
-	FF(a, b, c, d, GET_INT32( 4, buffer), S11, 0xf57c0faf); /*  5 */
-	FF(d, a, b, c, GET_INT32( 5, buffer), S12, 0x4787c62a); /*  6 */
-	FF(c, d, a, b, GET_INT32( 6, buffer), S13, 0xa8304613); /*  7 */
-	FF(b, c, d, a, GET_INT32( 7, buffer), S14, 0xfd469501); /*  8 */
-	FF(a, b, c, d, GET_INT32( 8, buffer), S11, 0x698098d8); /*  9 */
-	FF(d, a, b, c, GET_INT32( 9, buffer), S12, 0x8b44f7af); /* 10 */
-	FF(c, d, a, b, GET_INT32(10, buffer), S13, 0xffff5bb1); /* 11 */
-	FF(b, c, d, a, GET_INT32(11, buffer), S14, 0x895cd7be); /* 12 */
-	FF(a, b, c, d, GET_INT32(12, buffer), S11, 0x6b901122); /* 13 */
-	FF(d, a, b, c, GET_INT32(13, buffer), S12, 0xfd987193); /* 14 */
-	FF(c, d, a, b, GET_INT32(14, buffer), S13, 0xa679438e); /* 15 */
-	FF(b, c, d, a, GET_INT32(15, buffer), S14, 0x49b40821); /* 16 */
+	FF(a, b, c, d, GET_INT32( 0, data), S11, 0xd76aa478); /*  1 */
+	FF(d, a, b, c, GET_INT32( 1, data), S12, 0xe8c7b756); /*  2 */
+	FF(c, d, a, b, GET_INT32( 2, data), S13, 0x242070db); /*  3 */
+	FF(b, c, d, a, GET_INT32( 3, data), S14, 0xc1bdceee); /*  4 */
+	FF(a, b, c, d, GET_INT32( 4, data), S11, 0xf57c0faf); /*  5 */
+	FF(d, a, b, c, GET_INT32( 5, data), S12, 0x4787c62a); /*  6 */
+	FF(c, d, a, b, GET_INT32( 6, data), S13, 0xa8304613); /*  7 */
+	FF(b, c, d, a, GET_INT32( 7, data), S14, 0xfd469501); /*  8 */
+	FF(a, b, c, d, GET_INT32( 8, data), S11, 0x698098d8); /*  9 */
+	FF(d, a, b, c, GET_INT32( 9, data), S12, 0x8b44f7af); /* 10 */
+	FF(c, d, a, b, GET_INT32(10, data), S13, 0xffff5bb1); /* 11 */
+	FF(b, c, d, a, GET_INT32(11, data), S14, 0x895cd7be); /* 12 */
+	FF(a, b, c, d, GET_INT32(12, data), S11, 0x6b901122); /* 13 */
+	FF(d, a, b, c, GET_INT32(13, data), S12, 0xfd987193); /* 14 */
+	FF(c, d, a, b, GET_INT32(14, data), S13, 0xa679438e); /* 15 */
+	FF(b, c, d, a, GET_INT32(15, data), S14, 0x49b40821); /* 16 */
 
 	/* Round 2 */
-	GG(a, b, c, d, GET_INT32( 1, buffer), S21, 0xf61e2562); /* 17 */
-	GG(d, a, b, c, GET_INT32( 6, buffer), S22, 0xc040b340); /* 18 */
-	GG(c, d, a, b, GET_INT32(11, buffer), S23, 0x265e5a51); /* 19 */
-	GG(b, c, d, a, GET_INT32( 0, buffer), S24, 0xe9b6c7aa); /* 20 */
-	GG(a, b, c, d, GET_INT32( 5, buffer), S21, 0xd62f105d); /* 21 */
-	GG(d, a, b, c, GET_INT32(10, buffer), S22, 0x02441453); /* 22 */
-	GG(c, d, a, b, GET_INT32(15, buffer), S23, 0xd8a1e681); /* 23 */
-	GG(b, c, d, a, GET_INT32( 4, buffer), S24, 0xe7d3fbc8); /* 24 */
-	GG(a, b, c, d, GET_INT32( 9, buffer), S21, 0x21e1cde6); /* 25 */
-	GG(d, a, b, c, GET_INT32(14, buffer), S22, 0xc33707d6); /* 26 */
-	GG(c, d, a, b, GET_INT32( 3, buffer), S23, 0xf4d50d87); /* 27 */
-	GG(b, c, d, a, GET_INT32( 8, buffer), S24, 0x455a14ed); /* 28 */
-	GG(a, b, c, d, GET_INT32(13, buffer), S21, 0xa9e3e905); /* 29 */
-	GG(d, a, b, c, GET_INT32( 2, buffer), S22, 0xfcefa3f8); /* 30 */
-	GG(c, d, a, b, GET_INT32( 7, buffer), S23, 0x676f02d9); /* 31 */
-	GG(b, c, d, a, GET_INT32(12, buffer), S24, 0x8d2a4c8a); /* 32 */
+	GG(a, b, c, d, GET_INT32( 1, data), S21, 0xf61e2562); /* 17 */
+	GG(d, a, b, c, GET_INT32( 6, data), S22, 0xc040b340); /* 18 */
+	GG(c, d, a, b, GET_INT32(11, data), S23, 0x265e5a51); /* 19 */
+	GG(b, c, d, a, GET_INT32( 0, data), S24, 0xe9b6c7aa); /* 20 */
+	GG(a, b, c, d, GET_INT32( 5, data), S21, 0xd62f105d); /* 21 */
+	GG(d, a, b, c, GET_INT32(10, data), S22, 0x02441453); /* 22 */
+	GG(c, d, a, b, GET_INT32(15, data), S23, 0xd8a1e681); /* 23 */
+	GG(b, c, d, a, GET_INT32( 4, data), S24, 0xe7d3fbc8); /* 24 */
+	GG(a, b, c, d, GET_INT32( 9, data), S21, 0x21e1cde6); /* 25 */
+	GG(d, a, b, c, GET_INT32(14, data), S22, 0xc33707d6); /* 26 */
+	GG(c, d, a, b, GET_INT32( 3, data), S23, 0xf4d50d87); /* 27 */
+	GG(b, c, d, a, GET_INT32( 8, data), S24, 0x455a14ed); /* 28 */
+	GG(a, b, c, d, GET_INT32(13, data), S21, 0xa9e3e905); /* 29 */
+	GG(d, a, b, c, GET_INT32( 2, data), S22, 0xfcefa3f8); /* 30 */
+	GG(c, d, a, b, GET_INT32( 7, data), S23, 0x676f02d9); /* 31 */
+	GG(b, c, d, a, GET_INT32(12, data), S24, 0x8d2a4c8a); /* 32 */
 
 	/* Round 3 */
-	HH(a, b, c, d, GET_INT32( 5, buffer), S31, 0xfffa3942); /* 33 */
-	HH(d, a, b, c, GET_INT32( 8, buffer), S32, 0x8771f681); /* 34 */
-	HH(c, d, a, b, GET_INT32(11, buffer), S33, 0x6d9d6122); /* 35 */
-	HH(b, c, d, a, GET_INT32(14, buffer), S34, 0xfde5380c); /* 36 */
-	HH(a, b, c, d, GET_INT32( 1, buffer), S31, 0xa4beea44); /* 37 */
-	HH(d, a, b, c, GET_INT32( 4, buffer), S32, 0x4bdecfa9); /* 38 */
-	HH(c, d, a, b, GET_INT32( 7, buffer), S33, 0xf6bb4b60); /* 39 */
-	HH(b, c, d, a, GET_INT32(10, buffer), S34, 0xbebfbc70); /* 40 */
-	HH(a, b, c, d, GET_INT32(13, buffer), S31, 0x289b7ec6); /* 41 */
-	HH(d, a, b, c, GET_INT32( 0, buffer), S32, 0xeaa127fa); /* 42 */
-	HH(c, d, a, b, GET_INT32( 3, buffer), S33, 0xd4ef3085); /* 43 */
-	HH(b, c, d, a, GET_INT32( 6, buffer), S34, 0x04881d05); /* 44 */
-	HH(a, b, c, d, GET_INT32( 9, buffer), S31, 0xd9d4d039); /* 45 */
-	HH(d, a, b, c, GET_INT32(12, buffer), S32, 0xe6db99e5); /* 46 */
-	HH(c, d, a, b, GET_INT32(15, buffer), S33, 0x1fa27cf8); /* 47 */
-	HH(b, c, d, a, GET_INT32( 2, buffer), S34, 0xc4ac5665); /* 48 */
+	HH(a, b, c, d, GET_INT32( 5, data), S31, 0xfffa3942); /* 33 */
+	HH(d, a, b, c, GET_INT32( 8, data), S32, 0x8771f681); /* 34 */
+	HH(c, d, a, b, GET_INT32(11, data), S33, 0x6d9d6122); /* 35 */
+	HH(b, c, d, a, GET_INT32(14, data), S34, 0xfde5380c); /* 36 */
+	HH(a, b, c, d, GET_INT32( 1, data), S31, 0xa4beea44); /* 37 */
+	HH(d, a, b, c, GET_INT32( 4, data), S32, 0x4bdecfa9); /* 38 */
+	HH(c, d, a, b, GET_INT32( 7, data), S33, 0xf6bb4b60); /* 39 */
+	HH(b, c, d, a, GET_INT32(10, data), S34, 0xbebfbc70); /* 40 */
+	HH(a, b, c, d, GET_INT32(13, data), S31, 0x289b7ec6); /* 41 */
+	HH(d, a, b, c, GET_INT32( 0, data), S32, 0xeaa127fa); /* 42 */
+	HH(c, d, a, b, GET_INT32( 3, data), S33, 0xd4ef3085); /* 43 */
+	HH(b, c, d, a, GET_INT32( 6, data), S34, 0x04881d05); /* 44 */
+	HH(a, b, c, d, GET_INT32( 9, data), S31, 0xd9d4d039); /* 45 */
+	HH(d, a, b, c, GET_INT32(12, data), S32, 0xe6db99e5); /* 46 */
+	HH(c, d, a, b, GET_INT32(15, data), S33, 0x1fa27cf8); /* 47 */
+	HH(b, c, d, a, GET_INT32( 2, data), S34, 0xc4ac5665); /* 48 */
 
 	/* Round 4 */
-	II(a, b, c, d, GET_INT32( 0, buffer), S41, 0xf4292244); /* 49 */
-	II(d, a, b, c, GET_INT32( 7, buffer), S42, 0x432aff97); /* 50 */
-	II(c, d, a, b, GET_INT32(14, buffer), S43, 0xab9423a7); /* 51 */
-	II(b, c, d, a, GET_INT32( 5, buffer), S44, 0xfc93a039); /* 52 */
-	II(a, b, c, d, GET_INT32(12, buffer), S41, 0x655b59c3); /* 53 */
-	II(d, a, b, c, GET_INT32( 3, buffer), S42, 0x8f0ccc92); /* 54 */
-	II(c, d, a, b, GET_INT32(10, buffer), S43, 0xffeff47d); /* 55 */
-	II(b, c, d, a, GET_INT32( 1, buffer), S44, 0x85845dd1); /* 56 */
-	II(a, b, c, d, GET_INT32( 8, buffer), S41, 0x6fa87e4f); /* 57 */
-	II(d, a, b, c, GET_INT32(15, buffer), S42, 0xfe2ce6e0); /* 58 */
-	II(c, d, a, b, GET_INT32( 6, buffer), S43, 0xa3014314); /* 59 */
-	II(b, c, d, a, GET_INT32(13, buffer), S44, 0x4e0811a1); /* 60 */
-	II(a, b, c, d, GET_INT32( 4, buffer), S41, 0xf7537e82); /* 61 */
-	II(d, a, b, c, GET_INT32(11, buffer), S42, 0xbd3af235); /* 62 */
-	II(c, d, a, b, GET_INT32( 2, buffer), S43, 0x2ad7d2bb); /* 63 */
-	II(b, c, d, a, GET_INT32( 9, buffer), S44, 0xeb86d391); /* 64 */
+	II(a, b, c, d, GET_INT32( 0, data), S41, 0xf4292244); /* 49 */
+	II(d, a, b, c, GET_INT32( 7, data), S42, 0x432aff97); /* 50 */
+	II(c, d, a, b, GET_INT32(14, data), S43, 0xab9423a7); /* 51 */
+	II(b, c, d, a, GET_INT32( 5, data), S44, 0xfc93a039); /* 52 */
+	II(a, b, c, d, GET_INT32(12, data), S41, 0x655b59c3); /* 53 */
+	II(d, a, b, c, GET_INT32( 3, data), S42, 0x8f0ccc92); /* 54 */
+	II(c, d, a, b, GET_INT32(10, data), S43, 0xffeff47d); /* 55 */
+	II(b, c, d, a, GET_INT32( 1, data), S44, 0x85845dd1); /* 56 */
+	II(a, b, c, d, GET_INT32( 8, data), S41, 0x6fa87e4f); /* 57 */
+	II(d, a, b, c, GET_INT32(15, data), S42, 0xfe2ce6e0); /* 58 */
+	II(c, d, a, b, GET_INT32( 6, data), S43, 0xa3014314); /* 59 */
+	II(b, c, d, a, GET_INT32(13, data), S44, 0x4e0811a1); /* 60 */
+	II(a, b, c, d, GET_INT32( 4, data), S41, 0xf7537e82); /* 61 */
+	II(d, a, b, c, GET_INT32(11, data), S42, 0xbd3af235); /* 62 */
+	II(c, d, a, b, GET_INT32( 2, data), S43, 0x2ad7d2bb); /* 63 */
+	II(b, c, d, a, GET_INT32( 9, data), S44, 0xeb86d391); /* 64 */
 
 	state[0] += a;
 	state[1] += b;
 	state[2] += c;
 	state[3] += d;
+
+	size += 64;
 }
 
-S::Void S::Hash::MD5::Final()
+S::Bool S::Hash::MD5::Reset()
 {
-	UnsignedInt64	 bits = buffer.Size() * 8;
-	Int		 index = buffer.Size() % 64;
+	/* Load magic initialization constants.
+	 */
+	state[0] = 0x67452301;
+	state[1] = 0xefcdab89;
+	state[2] = 0x98badcfe;
+	state[3] = 0x10325476;
+
+	size = 0;
+
+	return True;
+}
+
+S::Bool S::Hash::MD5::Feed(const Buffer<UnsignedByte> &data)
+{
+	buffer.Resize(buffer.Size() + data.Size());
+
+	memcpy(buffer + buffer.Size() - data.Size(), data, data.Size());
+
+	for (Int i = 0; i + 63 < buffer.Size(); i += 64) Transform(buffer + i);
+
+	memcpy(buffer, buffer + buffer.Size() - buffer.Size() % 64, buffer.Size() % 64);
+
+	buffer.Resize(buffer.Size() % 64);
+
+	return True;
+}
+
+S::String S::Hash::MD5::Finish()
+{
+	UnsignedInt64	 bits	= (buffer.Size() + size) * 8;
+	Int		 index	= buffer.Size();
 
 	/* Pad out to 56 mod 64.
 	 */
@@ -201,7 +222,7 @@ S::Void S::Hash::MD5::Final()
 
 	UnsignedByte	*end = new UnsignedByte [128];
 
-	memcpy(end, buffer + buffer.Size() - index, index);
+	memcpy(end, buffer, index);
 	memcpy(end + index, PADDING, padLen);
 
 	end[index + padLen    ] = bits	     & 0xFF;
@@ -218,19 +239,19 @@ S::Void S::Hash::MD5::Final()
 	if (padLen > 56) Transform(end + 64);
 
 	delete [] end;
-}
-
-S::String S::Hash::MD5::Compute()
-{
-	Init();
-
-	for (Int i = 0; i + 63 < buffer.Size(); i += 64) Transform(buffer + i);
-
-	Final();
 
 	String	 string;
 
 	for (Int i = 0; i < 4; i++) string.Append(Number((Int64) REVERSE_INT32(state[i])).ToHexString(8));
 
 	return string;
+}
+
+S::String S::Hash::MD5::Compute(const Buffer<UnsignedByte> &data)
+{
+	MD5	 md5;
+
+	md5.Feed(data);
+
+	return md5.Finish();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,13 +18,13 @@ S::IO::Stream::Stream()
 	size		 = 0;
 	currentFilePos	 = 0;
 	currentBufferPos = 0;
-	pbdActive	 = false;
-	keepPbd		 = false;
-	pbdLength	 = 0;
-	closefile	 = true;
-	crosslinked	 = false;
-	driver		 = NULL;
-	allowpackset	 = true;
+	bitstreamActive	 = False;
+	keepBits	 = False;
+	bitLength	 = 0;
+	closefile	 = True;
+	crosslinked	 = False;
+	driver		 = NIL;
+	allowpackset	 = True;
 	packageSize	 = defaultPackageSize;
 	stdpacksize	 = packageSize;
 	origpacksize	 = packageSize;
@@ -32,7 +32,7 @@ S::IO::Stream::Stream()
 	origfilepos	 = 0;
 	lastError	 = IO_ERROR_OK;
 
-	memset(&pbdBuffer, 0, sizeof(pbdBuffer));
+	memset(&bitBuffer, 0, sizeof(bitBuffer));
 }
 
 S::IO::Stream::~Stream()
@@ -45,8 +45,8 @@ S::Bool S::IO::Stream::SetDefaultPackageSize(Int nDefaultPackageSize)
 	{
 		defaultPackageSize = nDefaultPackageSize;
 
-		return true;
+		return True;
 	}
 
-	return false;
+	return False;
 }

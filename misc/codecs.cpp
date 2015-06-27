@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -161,7 +161,7 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 	{
 		case BZIP2:
 		case UNCOMPRESSED:
-			for (int x = 0; x < sizex; x++) out->OutputNumberPBD(line[x], ctsize * bpcc);
+			for (int x = 0; x < sizex; x++) out->OutputBits(line[x], ctsize * bpcc);
 
 			break;
 		case RLE:
@@ -169,8 +169,8 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 			{
 				int	 rle = GetRLE(line, sizex, x, rlebits);
 
-				out->OutputNumberPBD(line[x], ctsize * bpcc);
-				out->OutputNumberPBD(rle, rlebits);
+				out->OutputBits(line[x], ctsize * bpcc);
+				out->OutputBits(rle, rlebits);
 
 				x += rle;
 			}
@@ -179,11 +179,11 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 		case PCI:
 			if (GetSLAL(line, previousLine, sizex))
 			{
-				out->OutputNumberPBD(1, 1);
+				out->OutputBits(1, 1);
 			}
 			else
 			{
-				out->OutputNumberPBD(0, 1);
+				out->OutputBits(0, 1);
 
 				ProbeComp(0, sizex, line, previousLine, sizex, ctsize, false, bits, bitssaa);
 				ProbeComp(0, sizex, line, previousLine, sizex, ctsize, true, bitsnrle, bitssaanrle);
@@ -193,33 +193,33 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 				if (bitssaa < bits)
 				{
-					out->OutputNumberPBD(1, 1);
+					out->OutputBits(1, 1);
 					dosaa = 1;
 
 					if (bitssaa < bitssaanrle)
 					{
-						out->OutputNumberPBD(1, 1);
+						out->OutputBits(1, 1);
 						dorle = 1;
 					}
 					else
 					{
-						out->OutputNumberPBD(0, 1);
+						out->OutputBits(0, 1);
 						dorle = 0;
 					}
 				}
 				else
 				{
-					out->OutputNumberPBD(0, 1);
+					out->OutputBits(0, 1);
 					dosaa = 0;
 
 					if (bits < bitsnrle)
 					{
-						out->OutputNumberPBD(1, 1);
+						out->OutputBits(1, 1);
 						dorle = 1;
 					}
 					else
 					{
-						out->OutputNumberPBD(0, 1);
+						out->OutputBits(0, 1);
 						dorle = 0;
 					}
 				}
@@ -242,8 +242,8 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 							if ((x + x2) < sizex && GetPaletteEntry(line[x + x2]) == -1) { gallinpal = 0; break; }
 						}
 
-						if (gallinpal == 1) out->OutputNumberPBD(1, 1);
-						else		    out->OutputNumberPBD(0, 1);
+						if (gallinpal == 1) out->OutputBits(1, 1);
+						else		    out->OutputBits(0, 1);
 					}
 
 					if (((x % 4) == mod04) && !gallinpal)
@@ -255,24 +255,24 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 							if ((x + x2) < sizex && GetPaletteEntry(line[x + x2]) == -1) { allinpal = 0; break; }
 						}
 
-						if (allinpal == 1) out->OutputNumberPBD(1, 1);
-						else		   out->OutputNumberPBD(0, 1);
+						if (allinpal == 1) out->OutputBits(1, 1);
+						else		   out->OutputBits(0, 1);
 					}
 
 					if ((GetPaletteEntry(line[x]) == -1))
 					{
-						out->OutputNumberPBD(0, 1);
+						out->OutputBits(0, 1);
 
 						if (GetDelta(line, previousLine, x, ctsize))
 						{
-							out->OutputNumberPBD(1, 1);
+							out->OutputBits(1, 1);
 
 							CompressDelta(line, previousLine, x, ctsize, out);
 						}
 						else
 						{
-							out->OutputNumberPBD(0, 1);
-							out->OutputNumberPBD(line[x], ctsize * bpcc);
+							out->OutputBits(0, 1);
+							out->OutputBits(line[x], ctsize * bpcc);
 						}
 
 						if (palentries < maxpalentries)
@@ -287,47 +287,47 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 					}
 					else
 					{
-						if (!allinpal && !gallinpal) out->OutputNumberPBD(1, 1);
+						if (!allinpal && !gallinpal) out->OutputBits(1, 1);
 
 						if (GetSAA(line, previousLine, x) && dosaa)
 						{
-							out->OutputNumberPBD(1, 1);
+							out->OutputBits(1, 1);
 						}
 						else
 						{
-							if (dosaa) out->OutputNumberPBD(0, 1);
+							if (dosaa) out->OutputBits(0, 1);
 
 							if ((palentries - 1) - GetPaletteEntry(line[x]) < 2)
 							{
-								out->OutputNumberPBD(1, 1);
-								out->OutputNumberPBD((palentries - 1) - GetPaletteEntry(line[x]), 1);
+								out->OutputBits(1, 1);
+								out->OutputBits((palentries - 1) - GetPaletteEntry(line[x]), 1);
 							}
 							else
 							{
-								out->OutputNumberPBD(0, 1);
+								out->OutputBits(0, 1);
 
 								if ((palentries - 1)-GetPaletteEntry(line[x]) < 18)
 								{
 									int	 lbits = Math::Min(GetMinimumBits(palentries - 2), 4);
 
-									out->OutputNumberPBD(1, 1);
-									out->OutputNumberPBD((palentries - 1) - GetPaletteEntry(line[x]) - 2, lbits);
+									out->OutputBits(1, 1);
+									out->OutputBits((palentries - 1) - GetPaletteEntry(line[x]) - 2, lbits);
 								}
 								else
 								{
-									out->OutputNumberPBD(0, 1);
+									out->OutputBits(0, 1);
 
 									if ((palentries - 1) - GetPaletteEntry(line[x]) < 82)
 									{
 										int	 lbits = Math::Min(GetMinimumBits(palentries - 18), 6);
 
-										out->OutputNumberPBD(1, 1);
-										out->OutputNumberPBD((palentries - 1)-GetPaletteEntry(line[x]) - 18, lbits);
+										out->OutputBits(1, 1);
+										out->OutputBits((palentries - 1)-GetPaletteEntry(line[x]) - 18, lbits);
 									}
 									else
 									{
-										out->OutputNumberPBD(0, 1);
-										out->OutputNumberPBD((palentries - 1)-GetPaletteEntry(line[x]) - 82, GetMinimumBits(palentries - 83));
+										out->OutputBits(0, 1);
+										out->OutputBits((palentries - 1)-GetPaletteEntry(line[x]) - 82, GetMinimumBits(palentries - 83));
 									}
 								}
 							}
@@ -342,17 +342,17 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 						if (pcirle >= 2)
 						{
-							out->OutputNumberPBD(1, 1);
+							out->OutputBits(1, 1);
 
 							if (pcirle > 9)
 							{
-								out->OutputNumberPBD(1, 1);
-								out->OutputNumberPBD(pcirle - 2, 8);
+								out->OutputBits(1, 1);
+								out->OutputBits(pcirle - 2, 8);
 							}
 							else
 							{
-								out->OutputNumberPBD(0, 1);
-								out->OutputNumberPBD(pcirle - 2, 3);
+								out->OutputBits(0, 1);
+								out->OutputBits(pcirle - 2, 3);
 							}
 
 							x = x + pcirle;
@@ -365,7 +365,7 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 						}
 						else
 						{
-							out->OutputNumberPBD(0, 1);
+							out->OutputBits(0, 1);
 						}
 					}
 					else if ((line[x] == previousLine[x]) && dorle)
@@ -374,17 +374,17 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 
 						if (pcirle >= 2)
 						{
-							out->OutputNumberPBD(1, 1);
+							out->OutputBits(1, 1);
 
 							if (pcirle > 9)
 							{
-								out->OutputNumberPBD(1, 1);
-								out->OutputNumberPBD(pcirle - 2, 8);
+								out->OutputBits(1, 1);
+								out->OutputBits(pcirle - 2, 8);
 							}
 							else
 							{
-								out->OutputNumberPBD(0, 1);
-								out->OutputNumberPBD(pcirle - 2, 3);
+								out->OutputBits(0, 1);
+								out->OutputBits(pcirle - 2, 3);
 							}
 
 							x = x + pcirle;
@@ -397,7 +397,7 @@ bool PCIIO::WriteLine(PCIOut out, int y)
 						}
 						else
 						{
-							out->OutputNumberPBD(0, 1);
+							out->OutputBits(0, 1);
 						}
 					}
 				}
@@ -461,15 +461,15 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 		case UNCOMPRESSED:
 			for (int x = 0; x < sizex; x++)
 			{
-				line[x] = in->InputNumberPBD(ctsize * bpcc);
+				line[x] = in->InputBits(ctsize * bpcc);
 			}
 
 			break;
 		case RLE:
 			for (int x = 0; x < sizex; x++)
 			{
-				int	 col = in->InputNumberPBD(ctsize * bpcc);
-				int	 rle = in->InputNumberPBD(rlebits);
+				int	 col = in->InputBits(ctsize * bpcc);
+				int	 rle = in->InputBits(rlebits);
 
 				for (int i = x; i <= x + rle; i++) line[i] = col;
 
@@ -478,7 +478,7 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 
 			break;
 		case PCI:
-			if (in->InputNumberPBD(1) == 1)
+			if (in->InputBits(1) == 1)
 			{
 				DecompressSLAL(line, previousLine, sizex);
 			}
@@ -489,25 +489,25 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 				int	 mod04 = 0;
 				int	 mod16 = 0;
 
-				int	 dosaa = in->InputNumberPBD(1);
-				int	 dorle = in->InputNumberPBD(1);
+				int	 dosaa = in->InputBits(1);
+				int	 dorle = in->InputBits(1);
 
 				for (int x = 0; x < sizex; x++)
 				{
 					int	 previousColor = (x > 0 ? line[x - 1] : 0);
 
-					if ( (x % 16) == mod16		     ) gallinpal = in->InputNumberPBD(1);
-					if (((x %  4) == mod04) && !gallinpal) allinpal	 = in->InputNumberPBD(1);
+					if ( (x % 16) == mod16		     ) gallinpal = in->InputBits(1);
+					if (((x %  4) == mod04) && !gallinpal) allinpal	 = in->InputBits(1);
 
 					int	 col = 0;
 					int	 inpal = 1;
 
-					if (!allinpal && !gallinpal) inpal = in->InputNumberPBD(1);
+					if (!allinpal && !gallinpal) inpal = in->InputBits(1);
 
 					if (inpal == 0)
 					{
-						if (in->InputNumberPBD(1)) col = DecompressDelta(line, previousLine, x, ctsize, in);
-						else			   col = in->InputNumberPBD(ctsize * bpcc);
+						if (in->InputBits(1)) col = DecompressDelta(line, previousLine, x, ctsize, in);
+						else		      col = in->InputBits(ctsize * bpcc);
 
 						if (palentries < maxpalentries)
 						{
@@ -523,7 +523,7 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 					{
 						int	 saa = 0;
 
-						if (dosaa) saa = in->InputNumberPBD(1);
+						if (dosaa) saa = in->InputBits(1);
 
 						if (saa)
 						{
@@ -531,29 +531,29 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 						}
 						else
 						{
-							if (in->InputNumberPBD(1) == 1)
+							if (in->InputBits(1) == 1)
 							{
-								col = palette[(palentries - 1) - in->InputNumberPBD(1)];
+								col = palette[(palentries - 1) - in->InputBits(1)];
 							}
 							else
 							{
-								if (in->InputNumberPBD(1) == 1)
+								if (in->InputBits(1) == 1)
 								{
 									int	 lbits = Math::Min(GetMinimumBits(palentries - 2), 4);
 
-									col = palette[(palentries - 1) - in->InputNumberPBD(lbits) - 2];
+									col = palette[(palentries - 1) - in->InputBits(lbits) - 2];
 								}
 								else
 								{
-									if (in->InputNumberPBD(1) == 1)
+									if (in->InputBits(1) == 1)
 									{
 										int	 lbits = Math::Min(GetMinimumBits(palentries - 18), 6);
 
-										col = palette[(palentries - 1) - in->InputNumberPBD(lbits) - 18];
+										col = palette[(palentries - 1) - in->InputBits(lbits) - 18];
 									}
 									else
 									{
-										col = palette[(palentries - 1) - in->InputNumberPBD(GetMinimumBits(palentries - 83)) - 82];
+										col = palette[(palentries - 1) - in->InputBits(GetMinimumBits(palentries - 83)) - 82];
 									}
 								}
 							}
@@ -568,12 +568,12 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 
 					if (col == previousColor)
 					{
-						if (in->InputNumberPBD(1) == 1)
+						if (in->InputBits(1) == 1)
 						{
 							int	 pcirle;
 
-							if (in->InputNumberPBD(1) == 1) pcirle = in->InputNumberPBD(8) + 2;
-							else				pcirle = in->InputNumberPBD(3) + 2;
+							if (in->InputBits(1) == 1) pcirle = in->InputBits(8) + 2;
+							else			   pcirle = in->InputBits(3) + 2;
 
 							for (int i = x + 1; i <= x + pcirle; i++) line[i] = line[x];
 
@@ -588,12 +588,12 @@ bool PCIIO::ReadLine(PCIIn in, int y)
 					}
 					else if ((col == previousLine[x]) && dorle)
 					{
-						if (in->InputNumberPBD(1) == 1)
+						if (in->InputBits(1) == 1)
 						{
 							int	 pcirle;
 
-							if (in->InputNumberPBD(1) == 1) pcirle = in->InputNumberPBD(8) + 2;
-							else				pcirle = in->InputNumberPBD(3) + 2;
+							if (in->InputBits(1) == 1) pcirle = in->InputBits(8) + 2;
+							else			   pcirle = in->InputBits(3) + 2;
 
 							for (int i = x + 1; i <= x + pcirle; i++) line[i] = previousLine[i];
 
@@ -737,13 +737,13 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 			if (bias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - bias, 3);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - bias, 3);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(bias - 1, 3);
+				out->OutputBits(1, 1);
+				out->OutputBits(bias - 1, 3);
 			}
 
 			break;
@@ -754,54 +754,54 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))))
 			{
-				out->OutputNumberPBD(0, 2);
+				out->OutputBits(0, 2);
 				md = 2;
 			}
 			else if (((redbias > -Math::Pow(2l, 3)) && (redbias <= Math::Pow(2l, 3))) && ((greenbias > -Math::Pow(2l, 3)) && (greenbias <= Math::Pow(2l, 3))) && ((bluebias > -Math::Pow(2l, 3)) && (bluebias <= Math::Pow(2l, 3))))
 			{
-				out->OutputNumberPBD(1, 2);
+				out->OutputBits(1, 2);
 				md = 3;
 			}
 			else if (((redbias > -Math::Pow(2l, 4)) && (redbias <= Math::Pow(2l, 4))) && ((greenbias > -Math::Pow(2l, 4)) && (greenbias <= Math::Pow(2l, 4))) && ((bluebias > -Math::Pow(2l, 4)) && (bluebias <= Math::Pow(2l, 4))))
 			{
-				out->OutputNumberPBD(2, 2);
+				out->OutputBits(2, 2);
 				md = 4;
 			}
 			else if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))))
 			{
-				out->OutputNumberPBD(3, 2);
+				out->OutputBits(3, 2);
 				md = 5;
 			}
 
 			if (redbias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - redbias, md);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - redbias, md);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(redbias - 1, md);
+				out->OutputBits(1, 1);
+				out->OutputBits(redbias - 1, md);
 			}
 			if (greenbias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - greenbias, md);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - greenbias, md);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(greenbias - 1, md);
+				out->OutputBits(1, 1);
+				out->OutputBits(greenbias - 1, md);
 			}
 			if (bluebias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - bluebias, md);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - bluebias, md);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(bluebias - 1, md);
+				out->OutputBits(1, 1);
+				out->OutputBits(bluebias - 1, md);
 			}
 
 			break;
@@ -813,64 +813,64 @@ int CompressDelta(int line[], int prevline[], int x, int parts, PCIOut out)
 
 			if (((redbias > -Math::Pow(2l, 2)) && (redbias <= Math::Pow(2l, 2))) && ((greenbias > -Math::Pow(2l, 2)) && (greenbias <= Math::Pow(2l, 2))) && ((bluebias > -Math::Pow(2l, 2)) && (bluebias <= Math::Pow(2l, 2))) && ((alphabias > -Math::Pow(2l, 2)) && (alphabias <= Math::Pow(2l, 2))))
 			{
-				out->OutputNumberPBD(0, 2);
+				out->OutputBits(0, 2);
 				md = 2;
 			}
 			else if (((redbias > -Math::Pow(2l, 3)) && (redbias <= Math::Pow(2l, 3))) && ((greenbias > -Math::Pow(2l, 3)) && (greenbias <= Math::Pow(2l, 3))) && ((bluebias > -Math::Pow(2l, 3)) && (bluebias <= Math::Pow(2l, 3))) && ((alphabias > -Math::Pow(2l, 3)) && (alphabias <= Math::Pow(2l, 3))))
 			{
-				out->OutputNumberPBD(1, 2);
+				out->OutputBits(1, 2);
 				md = 3;
 			}
 			else if (((redbias > -Math::Pow(2l, 4)) && (redbias <= Math::Pow(2l, 4))) && ((greenbias > -Math::Pow(2l, 4)) && (greenbias <= Math::Pow(2l, 4))) && ((bluebias > -Math::Pow(2l, 4)) && (bluebias <= Math::Pow(2l, 4))) && ((alphabias > -Math::Pow(2l, 4)) && (alphabias <= Math::Pow(2l, 4))))
 			{
-				out->OutputNumberPBD(2, 2);
+				out->OutputBits(2, 2);
 				md = 4;
 			}
 			else if (((redbias > -Math::Pow(2l, 5)) && (redbias <= Math::Pow(2l, 5))) && ((greenbias > -Math::Pow(2l, 5)) && (greenbias <= Math::Pow(2l, 5))) && ((bluebias > -Math::Pow(2l, 5)) && (bluebias <= Math::Pow(2l, 5))) && ((alphabias > -Math::Pow(2l, 5)) && (alphabias <= Math::Pow(2l, 5))))
 			{
-				out->OutputNumberPBD(3, 2);
+				out->OutputBits(3, 2);
 				md = 5;
 			}
 
 			if (redbias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - redbias, md);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - redbias, md);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(redbias - 1, md);
+				out->OutputBits(1, 1);
+				out->OutputBits(redbias - 1, md);
 			}
 			if (greenbias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - greenbias, md);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - greenbias, md);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(greenbias - 1, md);
+				out->OutputBits(1, 1);
+				out->OutputBits(greenbias - 1, md);
 			}
 			if (bluebias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - bluebias, md);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - bluebias, md);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(bluebias - 1, md);
+				out->OutputBits(1, 1);
+				out->OutputBits(bluebias - 1, md);
 			}
 			if (alphabias <= 0)
 			{
-				out->OutputNumberPBD(0, 1);
-				out->OutputNumberPBD(0 - alphabias, md);
+				out->OutputBits(0, 1);
+				out->OutputBits(0 - alphabias, md);
 			}
 			else
 			{
-				out->OutputNumberPBD(1, 1);
-				out->OutputNumberPBD(alphabias - 1, md);
+				out->OutputBits(1, 1);
+				out->OutputBits(alphabias - 1, md);
 			}
 
 			break;
@@ -900,8 +900,8 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 		case 1:
 			gray = (pixb1 + prevline[x]) / 2;
 
-			if (in->InputNumberPBD(1) == 1) bias = in->InputNumberPBD(3) + 1;
-			else				bias = 0 - in->InputNumberPBD(3);
+			if (in->InputBits(1) == 1) bias =     in->InputBits(3) + 1;
+			else			   bias = 0 - in->InputBits(3);
 
 			return gray + bias;
 		case 3:
@@ -909,16 +909,16 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 			green = (Color(pixb1).GetGreen() + Color(prevline[x]).GetGreen()) / 2;
 			blue  = (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 
-			md = in->InputNumberPBD(2) + 2;
+			md = in->InputBits(2) + 2;
 
-			if (in->InputNumberPBD(1) == 1) redbias	  =	in->InputNumberPBD(md) + 1;
-			else				redbias	  = 0 - in->InputNumberPBD(md);
+			if (in->InputBits(1) == 1) redbias   =	   in->InputBits(md) + 1;
+			else			   redbias   = 0 - in->InputBits(md);
 
-			if (in->InputNumberPBD(1) == 1) greenbias =	in->InputNumberPBD(md) + 1;
-			else				greenbias = 0 - in->InputNumberPBD(md);
+			if (in->InputBits(1) == 1) greenbias =	   in->InputBits(md) + 1;
+			else			   greenbias = 0 - in->InputBits(md);
 
-			if (in->InputNumberPBD(1) == 1) bluebias  =	in->InputNumberPBD(md) + 1;
-			else				bluebias  = 0 - in->InputNumberPBD(md);
+			if (in->InputBits(1) == 1) bluebias  =	   in->InputBits(md) + 1;
+			else			   bluebias  = 0 - in->InputBits(md);
 
 			return Color(red + redbias, green + greenbias, blue + bluebias);
 		case 4:
@@ -927,19 +927,19 @@ int DecompressDelta(int line[], int prevline[], int x, int parts, PCIIn in)
 			blue  = (Color(pixb1).GetBlue()	 + Color(prevline[x]).GetBlue())  / 2;
 			alpha = (Color(pixb1).GetAlpha() + Color(prevline[x]).GetAlpha()) / 2;
 
-			md = in->InputNumberPBD(2) + 2;
+			md = in->InputBits(2) + 2;
 
-			if (in->InputNumberPBD(1) == 1) redbias	  =	in->InputNumberPBD(md) + 1;
-			else				redbias	  = 0 - in->InputNumberPBD(md);
+			if (in->InputBits(1) == 1) redbias   =	   in->InputBits(md) + 1;
+			else			   redbias   = 0 - in->InputBits(md);
 
-			if (in->InputNumberPBD(1) == 1) greenbias =	in->InputNumberPBD(md) + 1;
-			else				greenbias = 0 - in->InputNumberPBD(md);
+			if (in->InputBits(1) == 1) greenbias =	   in->InputBits(md) + 1;
+			else			   greenbias = 0 - in->InputBits(md);
 
-			if (in->InputNumberPBD(1) == 1) bluebias  =	in->InputNumberPBD(md) + 1;
-			else				bluebias  = 0 - in->InputNumberPBD(md);
+			if (in->InputBits(1) == 1) bluebias  =	   in->InputBits(md) + 1;
+			else			   bluebias  = 0 - in->InputBits(md);
 
-			if (in->InputNumberPBD(1) == 1) alphabias =	in->InputNumberPBD(md) + 1;
-			else				alphabias = 0 - in->InputNumberPBD(md);
+			if (in->InputBits(1) == 1) alphabias =	   in->InputBits(md) + 1;
+			else			   alphabias = 0 - in->InputBits(md);
 
 			return Color( (red   + redbias	)	 |
 				     ((green + greenbias) <<  8) |

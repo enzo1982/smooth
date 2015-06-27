@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -151,7 +151,7 @@ S::Bool S::IO::OutStream::Flush()
 
 	if (currentBufferPos <= 0) return true;
 
-	if (pbdActive) CompletePBD();
+	if (bitstreamActive) CompleteBitstream();
 
 	int	 ps		= packageSize;
 	int	 oldcpos	= currentBufferPos;
@@ -230,7 +230,7 @@ S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
 	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	for (Int i = 0; i < bytes; i++)
 	{
@@ -258,7 +258,7 @@ S::Bool S::IO::OutStream::OutputNumberRaw(Int64 number, Int bytes)
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
 	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	for (int i = bytes - 1; i >= 0; i--)
 	{
@@ -281,61 +281,28 @@ S::Bool S::IO::OutStream::OutputNumberRaw(Int64 number, Int bytes)
 	return true;
 }
 
-S::Bool S::IO::OutStream::OutputNumberPDP(Int64 number, Int bytes)
-{
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
-
-	if (pbdActive && !keepPbd) CompletePBD();
-
-	number <<= 8 * (4 - bytes);
-
-	for (int i = 0; i < 4; i++)
-	{
-		if (bytes >= (i ^ 1) + 1)
-		{
-			if (currentBufferPos >= packageSize)
-			{
-				if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
-			}
-
-			dataBuffer[currentBufferPos] = IOGetByte(number, (3 - i) ^ 1);
-			if (currentFilePos == size) size++;
-			currentBufferPos++;
-			currentFilePos++;
-		}
-	}
-
-	if (currentBufferPos >= packageSize)
-	{
-		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
-	}
-
-	return true;
-}
-
-S::Bool S::IO::OutStream::OutputNumberPBD(Int64 number, Int bits)
+S::Bool S::IO::OutStream::OutputBits(Int64 number, Int bits)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
 	if (bits > 64 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
-	if (!pbdActive) InitPBD();
+	if (!bitstreamActive) InitBitstream();
 
 	for (int j = 0; j < bits; j++)
 	{
-		pbdBuffer[pbdLength] = IOGetBit(number, j);
-		pbdLength++;
+		bitBuffer[bitLength] = IOGetBit(number, j);
+		bitLength++;
 	}
 
-	while (pbdLength >= 8)
+	while (bitLength >= 8)
 	{
 		unsigned char	 out = 0;
 
-		for (int i = 0; i < 8; i++) out = out | (pbdBuffer[i] << i);
+		for (int i = 0; i < 8; i++) out = out | (bitBuffer[i] << i);
 
-		pbdLength = pbdLength - 8;
+		bitLength = bitLength - 8;
 
-		for (int j = 0; j < pbdLength; j++) pbdBuffer[j] = pbdBuffer[j + 8];
+		for (int j = 0; j < bitLength; j++) bitBuffer[j] = bitBuffer[j + 8];
 
 		dataBuffer[currentBufferPos] = out;
 
@@ -358,7 +325,7 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 	if (streamType == STREAM_NONE)		{ lastError = IO_ERROR_NOTOPEN; return false; }
 	if (string == NIL)			{ lastError = IO_ERROR_BADPARAM; return false; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	/* Convert the string to char * here once to avoid
 	 * having to convert it again and again later.
@@ -406,7 +373,7 @@ S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 	if (pointer == NULL)			{ lastError = IO_ERROR_BADPARAM; return false; }
 	if (bytes < 0)				{ lastError = IO_ERROR_BADPARAM; return false; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	int	 bytesleft	= bytes;
 	int	 databufferpos	= 0;
@@ -430,31 +397,31 @@ S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 	return true;
 }
 
-S::Bool S::IO::OutStream::InitPBD()
+S::Bool S::IO::OutStream::InitBitstream()
 {
-	pbdLength	= 0;
-	pbdActive	= 1;
+	bitLength	= 0;
+	bitstreamActive	= 1;
 
 	return true;
 }
 
-S::Bool S::IO::OutStream::CompletePBD()
+S::Bool S::IO::OutStream::CompleteBitstream()
 {
-	if (pbdLength > 0)
+	if (bitLength > 0)
 	{
 		int	out = 0;
 
 		for (int i = 0; i < 8; i++)
 		{
-			if (i < pbdLength) out = out | (pbdBuffer[i] << i);
+			if (i < bitLength) out = out | (bitBuffer[i] << i);
 		}
 
-		keepPbd = true;
+		keepBits = true;
 		OutputNumber(out, 1);
-		keepPbd = false;
+		keepBits = false;
 	}
 
-	pbdActive = 0;
+	bitstreamActive = 0;
 
 	return true;
 }
@@ -483,7 +450,7 @@ S::Bool S::IO::OutStream::AddFilter(Filter *newFilter)
 
 	if (newFilter->Activate() == false) { lastError = IO_ERROR_UNKNOWN; return false; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	Flush();
 
@@ -517,7 +484,7 @@ S::Bool S::IO::OutStream::RemoveFilter(Filter *oldFilter)
 
 	if (index == -1) { lastError = IO_ERROR_BADPARAM; return false; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	int	 oldcpos = currentBufferPos;
 

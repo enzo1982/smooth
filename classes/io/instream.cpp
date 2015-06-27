@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -215,7 +215,7 @@ S::Int64 S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
 	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	Int64	 rval = 0;
 
@@ -241,7 +241,7 @@ S::Int64 S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
 	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	Int64	 rval = 0;
 
@@ -262,45 +262,16 @@ S::Int64 S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 	return rval;
 }
 
-S::Int64 S::IO::InStream::InputNumberPDP(Int bytes)	// PDP byte order BADC
-{
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
-	if (bytes > 4 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
-
-	if (pbdActive && !keepPbd) CompletePBD();
-
-	Int64	 rval = 0;
-
-	for (Int i = 0; i < 4; i++)
-	{
-		if (bytes >= (i ^ 1) + 1)
-		{
-			if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return -1; }
-
-			while (currentBufferPos >= packageSize)
-			{
-				if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
-			}
-
-			rval += (dataBuffer[currentBufferPos] << (((3 - i) ^ 1) * 8)) >> (8 * (4 - bytes));
-			currentBufferPos++;
-			currentFilePos++;
-		}
-	}
-
-	return rval;
-}
-
-S::Int64 S::IO::InStream::InputNumberPBD(Int bits)
+S::Int64 S::IO::InStream::InputBits(Int bits)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return -1; }
 	if (bits > 64 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return -1; }
 
-	if (!pbdActive) InitPBD();
+	if (!bitstreamActive) InitBitstream();
 
 	Int64	 rval = 0;
 
-	while (pbdLength < bits)
+	while (bitLength < bits)
 	{
 		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return -1; }
 
@@ -311,8 +282,8 @@ S::Int64 S::IO::InStream::InputNumberPBD(Int bits)
 
 		for (Int i = 0; i < 8; i++)
 		{
-			pbdBuffer[pbdLength] = IOGetBit(dataBuffer[currentBufferPos], i);
-			pbdLength++;
+			bitBuffer[bitLength] = IOGetBit(dataBuffer[currentBufferPos], i);
+			bitLength++;
 		}
 
 		currentBufferPos++;
@@ -321,14 +292,14 @@ S::Int64 S::IO::InStream::InputNumberPBD(Int bits)
 
 	for (Int i = 0; i < bits; i++)
 	{
-		rval = rval | (pbdBuffer[i] << i);
+		rval = rval | (bitBuffer[i] << i);
 	}
 
-	pbdLength = pbdLength - bits;
+	bitLength = bitLength - bits;
 
-	for (Int i = 0; i < pbdLength; i++)
+	for (Int i = 0; i < bitLength; i++)
 	{
-		pbdBuffer[i] = pbdBuffer[i + bits];
+		bitBuffer[i] = bitBuffer[i + bits];
 	}
 
 	return rval;
@@ -339,7 +310,7 @@ S::String S::IO::InStream::InputString(Int bytes)
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return NIL; }
 	if (bytes <= 0)			{ lastError = IO_ERROR_BADPARAM; return NIL; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	int	 bytesleft	= bytes;
 	int	 databufferpos	= 0;
@@ -381,7 +352,7 @@ S::String S::IO::InStream::InputLine()
 {
 	if (streamType == STREAM_NONE)		{ lastError = IO_ERROR_NOTOPEN; return NIL; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	long	 inpval;
 	int	 bytes = 0;
@@ -427,7 +398,7 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 	if (pointer == NULL)			{ lastError = IO_ERROR_BADPARAM; return 0; }
 	if (bytes < 0)				{ lastError = IO_ERROR_BADPARAM; return 0; }
 
-	if (pbdActive && !keepPbd) CompletePBD();
+	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	int	 bytesleft	= bytes;
 	int	 databufferpos	= 0;
@@ -459,18 +430,18 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 	return bytes;
 }
 
-S::Bool S::IO::InStream::InitPBD()
+S::Bool S::IO::InStream::InitBitstream()
 {
-	pbdLength	= 0;
-	pbdActive	= 1;
+	bitLength	= 0;
+	bitstreamActive	= 1;
 
 	return true;
 }
 
-S::Bool S::IO::InStream::CompletePBD()
+S::Bool S::IO::InStream::CompleteBitstream()
 {
-	pbdLength	= 0;
-	pbdActive	= 0;
+	bitLength	= 0;
+	bitstreamActive	= 0;
 
 	return true;
 }
@@ -481,7 +452,7 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 	if (!allowpackset)		{ lastError = IO_ERROR_OPNOTAVAIL; return false; }
 	if (newPackageSize <= 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
 
-	if (pbdActive) CompletePBD();
+	if (bitstreamActive) CompleteBitstream();
 
 	if (filters.Length() == 0) dataBuffer.Resize(newPackageSize);
 
@@ -540,7 +511,7 @@ S::Bool S::IO::InStream::Close()
 {
 	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
 
-	if (pbdActive) CompletePBD();
+	if (bitstreamActive) CompleteBitstream();
 
 	while (filters.Length() != 0) RemoveFilter(filters.GetLast());
 
@@ -572,7 +543,7 @@ S::Bool S::IO::InStream::RelSeek(Int64 offset)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
 
-	if (pbdActive) CompletePBD();
+	if (bitstreamActive) CompleteBitstream();
 
 	if (currentBufferPos + offset >= 0 && currentBufferPos + offset <= packageSize)
 	{

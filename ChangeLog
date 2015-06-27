@@ -21,6 +21,10 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - image.cpp		- cache scaled version of bitmap for display
 - list.cpp		- allow setting marked state when adding new text entries
 - file.cpp		- added support for moving/deleting files with read-only attribute
+- instream.cpp		- removed support for PDP byte order
+			- method InputNumberPBD renamed InputBits
+- outstream.cpp		- removed support for PDP byte order
+			- method OutputNumberPBD renamed OutputBits
 - translator.cpp	- added Afrikaans and Serbian (Cyrillic) language support
 - cursor.cpp		- fixed CJK input method editor appearing offset in Windows Vista/7/8 default designs
 - urlencode.cpp		- new class: URLEncode, handles URL (percent) encoding/decoding

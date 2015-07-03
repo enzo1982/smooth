@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -93,6 +93,80 @@ S::Bool S::System::System::Sleep(UnsignedInt mSeconds)
 #endif
 
 	return True;
+}
+
+S::Void S::System::System::Reboot()
+{
+#ifdef __WIN32__
+	/* Acquire shutdown privilege.
+	 */
+	LUID			 value;
+	TOKEN_PRIVILEGES	 token;
+	HANDLE			 htoken;
+
+	OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &htoken);
+
+	LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &value);
+
+	token.PrivilegeCount = 1;
+	token.Privileges[0].Luid = value;
+	token.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+	AdjustTokenPrivileges(htoken, false, &token, 0, NULL, NULL);
+
+	/* Reboot system.
+	 */
+	ExitWindowsEx(EWX_REBOOT | EWX_FORCEIFHUNG, 0);
+#else
+	if (!fork())
+	{
+		execl("/bin/sh", "sh", "-c", "shutdown -r now", NULL);
+		exit(0);
+	}
+#endif
+}
+
+S::Void S::System::System::Shutdown()
+{
+#if defined __WIN32__
+	/* Acquire shutdown privilege.
+	 */
+	LUID			 value;
+	TOKEN_PRIVILEGES	 token;
+	HANDLE			 htoken;
+
+	OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &htoken);
+
+	LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &value);
+
+	token.PrivilegeCount = 1;
+	token.Privileges[0].Luid = value;
+	token.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+	AdjustTokenPrivileges(htoken, false, &token, 0, NULL, NULL);
+
+	/* Shutdown system.
+	 */
+	ExitWindowsEx(EWX_POWEROFF | EWX_FORCEIFHUNG, 0);
+#elif defined __linux__ || defined __GNU__
+	if (!fork())
+	{
+		execl("/bin/sh", "sh", "-c", "shutdown -P now", NULL);
+		exit(0);
+	}
+#elif defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
+	if (!fork())
+	{
+		execl("/bin/sh", "sh", "-c", "shutdown -p now", NULL);
+		exit(0);
+	}
+#else
+	if (!fork())
+	{
+		execl("/bin/sh", "sh", "-c", "shutdown -h now", NULL);
+		exit(0);
+	}
+#endif
 }
 
 S::Bool S::System::System::OpenURL(const String &url)

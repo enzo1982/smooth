@@ -8,6 +8,7 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - pointer.cpp		- moved system dependent code to backends
 - window.cpp		- method Stay() renamed WaitUntilClosed()
 			- WaitUntilClosed() no longer sets the WF_MODAL flag
+			- added SetProgressIndicator() method to control taskbar progress indicator
 			- fixed restoring after maximized window was minimized
 - windowgdi.cpp		- fixed handling of modal windows on Windows
 			- fixed maximized window glitches on Windows 8 and 10

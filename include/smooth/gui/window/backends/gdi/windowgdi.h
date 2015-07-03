@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,7 @@
 #ifndef H_OBJSMOOTH_WINDOWGDI
 #define H_OBJSMOOTH_WINDOWGDI
 
-#include <windows.h>
+#include <shlobj.h>
 #include <imm.h>
 
 namespace smooth
@@ -71,6 +71,8 @@ namespace smooth
 				HDROP					 hDrop;
 				Bool					 enableDropFiles;
 
+				ITaskbarList3				*taskbar;
+
 				Rect					 nonMaxRect;
 				Int					 nonMaxWndStyle;
 
@@ -104,6 +106,8 @@ namespace smooth
 
 				Int					 SetIcon(const Bitmap &);
 				Int					 SetIconDirect(Void *);
+
+				Int					 SetProgressIndicator(Window::ProgressIndicatorState, Float);
 
 				Int					 EnableDropFiles(Bool);
 				const Array<String>			&GetDroppedFiles() const;

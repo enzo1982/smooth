@@ -236,6 +236,11 @@ S::Int S::GUI::Window::RestoreDefaultStatusText()
 	return Success();
 }
 
+S::Int S::GUI::Window::SetProgressIndicator(ProgressIndicatorState state, Float value)
+{
+	return backend->SetProgressIndicator(state, value);
+}
+
 const S::Array<S::String> &S::GUI::Window::GetDroppedFiles() const
 {
 	return backend->GetDroppedFiles();

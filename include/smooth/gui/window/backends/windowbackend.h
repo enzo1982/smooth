@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,11 +19,8 @@ namespace smooth
 	};
 };
 
-#include "../../../misc/string.h"
-#include "../../../graphics/forms/point.h"
-#include "../../../graphics/forms/size.h"
-#include "../../../templates/signals.h"
-#include "../../../templates/callbacks.h"
+#include "../window.h"
+
 #include "../../../graphics/surface.h"
 
 namespace smooth
@@ -66,6 +63,8 @@ namespace smooth
 
 				virtual Int			 SetIcon(const Bitmap &);
 				virtual Int			 SetIconDirect(Void *);
+
+				virtual Int			 SetProgressIndicator(Window::ProgressIndicatorState, Float);
 
 				virtual Int			 EnableDropFiles(Bool);
 				virtual const Array<String>	&GetDroppedFiles() const;

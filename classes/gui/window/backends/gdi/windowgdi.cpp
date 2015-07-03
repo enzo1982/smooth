@@ -99,6 +99,8 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 	hwnd		= NIL;
 	wndclass	= NIL;
 
+	taskbar		= NIL;
+
 	className	= String::FromInt(System::System::RequestGUID());
 
 	id		= windowBackends.Add(this);
@@ -126,6 +128,8 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 S::GUI::WindowGDI::~WindowGDI()
 {
 	if (destroyIcon) DestroyIcon(sysIcon);
+
+	if (taskbar != NIL) taskbar->Release();
 
 	windowBackends.Remove(id);
 }
@@ -940,6 +944,37 @@ S::Void S::GUI::WindowGDI::MouseNotifier()
 
 		savedMousePos = Point(currentMousePos.x, currentMousePos.y);
 	}
+}
+
+S::Int S::GUI::WindowGDI::SetProgressIndicator(Window::ProgressIndicatorState state, Float value)
+{
+	HRESULT	 hr = S_OK;
+
+	if (taskbar == NIL) hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_ALL, IID_ITaskbarList3, (void **) &taskbar);
+
+	if (hr != S_OK) return Error();
+
+	switch (state)
+	{
+		case Window::ProgressIndicatorNone:
+			taskbar->SetProgressState(hwnd, TBPF_NOPROGRESS);
+
+			break;
+		case Window::ProgressIndicatorNormal:
+			taskbar->SetProgressState(hwnd, TBPF_NORMAL);
+
+			if (value >= 0) taskbar->SetProgressValue(hwnd, Math::Round(value * 10.0), 1000);
+
+			break;
+		case Window::ProgressIndicatorPaused:
+			taskbar->SetProgressState(hwnd, TBPF_PAUSED);
+
+			if (value >= 0) taskbar->SetProgressValue(hwnd, Math::Round(value * 10.0), 1000);
+
+			break;
+	}
+
+	return Success();
 }
 
 S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)

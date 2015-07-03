@@ -20,7 +20,7 @@ ifeq ($(BUILD_WIN32),True)
 		LIBS += -lcairo.dll
 	endif
 
-	LIBS += -lnsucd -lpng -lz -lws2_32 -limm32 -lole32
+	LIBS += -lnsucd -lpng -lz -lws2_32 -limm32 -lole32 -luuid
 
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a

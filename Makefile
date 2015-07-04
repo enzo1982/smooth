@@ -135,7 +135,7 @@ MKDIR = mkdir
 
 ### Targets ###
 
-.PHONY: all objects lib programs libs install uninstall clean clean_all doc doc-clean
+.PHONY: all objects lib programs libs install uninstall clean distclean doc doc-clean
 
 all: lib programs
 
@@ -259,7 +259,7 @@ clean:
 	$(MAKE) -C samples clean
 	$(REMOVE) $(REMOVE_OPTS) $(DLLNAME) $(LIBNAME)
 
-clean_all: clean
+distclean: clean
 	$(MAKE) -C libraries clean
 
 doc: doc-clean

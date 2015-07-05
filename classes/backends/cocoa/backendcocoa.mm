@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -89,4 +89,21 @@ S::Int S::Backends::BackendCocoa::Deinit()
 	[pool release];
 
 	return Success();
+}
+
+S::Bool S::Backends::BackendCocoa::IsOSXVersionAtLeast(Int majorVersion, Int minorVersion, Int microVersion)
+{
+	SInt32	 osMajorVersion = 0;
+	SInt32	 osMinorVersion = 0;
+	SInt32	 osMicroVersion = 0;
+
+	Gestalt(gestaltSystemVersionMajor, &osMajorVersion);
+	Gestalt(gestaltSystemVersionMinor, &osMinorVersion);
+	Gestalt(gestaltSystemVersionBugFix, &osMicroVersion);
+
+	if ( osMajorVersion >  majorVersion ||
+	    (osMajorVersion == majorVersion && ( osMinorVersion >  minorVersion ||
+						(osMinorVersion == minorVersion && osMicroVersion >= microVersion)))) return True;
+
+	return False;
 }

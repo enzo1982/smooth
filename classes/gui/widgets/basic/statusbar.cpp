@@ -12,6 +12,10 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/graphics/surface.h>
 
+#ifdef __APPLE__
+#	include <smooth/backends/cocoa/backendcocoa.h>
+#endif
+
 const S::Short	 S::GUI::Statusbar::classID = S::Object::RequestClassID();
 
 S::GUI::Statusbar::Statusbar(const String &status) : Widget(Point(), Size(0, 16))
@@ -51,22 +55,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	/* Check if OS X version is lower than 10.7 (Darwin 11.0) and
 	 * occupy ten pixels for the handle at the right in that case.
 	 */
-	static Int	 resizeGripSize = -1;
-
-	if (resizeGripSize == -1)
-	{
-		Buffer<char>	 buffer(32);
-		FILE		*pstdin = popen("sysctl kern.osrelease", "r");
-
-		fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
-
-		pclose(pstdin);
-
-		String		 osrelease = (char *) buffer;
-
-		if (!osrelease.StartsWith("kern.osrelease: ") || osrelease.Tail(osrelease.Length() - 16).ToInt() < 11) resizeGripSize = 10;
-		else												       resizeGripSize =  0;
-	}
+	Int	 resizeGripSize = (Backends::BackendCocoa::IsOSXVersionAtLeast(10, 7, 0) ? 0 : 10);
 
 	occupied_right += resizeGripSize;
 

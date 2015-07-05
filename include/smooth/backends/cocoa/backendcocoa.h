@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,11 @@
 #ifndef H_OBJSMOOTH_BACKENDCOCOA
 #define H_OBJSMOOTH_BACKENDCOCOA
 
-#include <Cocoa/Cocoa.h>
+#ifdef __OBJC__
+#	include <Cocoa/Cocoa.h>
+#else
+	class NSAutoReleasePool;
+#endif
 
 namespace smooth
 {
@@ -34,6 +38,8 @@ namespace smooth
 			private:
 				NSAutoreleasePool	*pool;
 			public:
+				static Bool		 IsOSXVersionAtLeast(Int = 10, Int = 5, Int = 0);
+
 							 BackendCocoa();
 				virtual			~BackendCocoa();
 

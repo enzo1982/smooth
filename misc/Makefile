@@ -13,10 +13,6 @@ endif
 # Enter object files here:
 OBJECTS	  = codecs.o init.o pciio.o
 
-ifeq ($(EXPLICIT_TEMPLATES),True)
-	OBJECTS += templates.o
-endif
-
 ## Do not change anything below this line. ##
 
 include $(SMOOTH_PATH)/Makefile-directories

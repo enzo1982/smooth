@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -214,7 +214,7 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 		{
 			responseCode = str.SubString(9, 3).ToInt();
 		}
-		else if (str.Find(":") >= 0)
+		else if (str.Contains(":"))
 		{
 			Parameter	 field;
 			Int		 colon	= str.Find(":");

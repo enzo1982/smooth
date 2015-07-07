@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -316,7 +316,7 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 
 	if (lang != NIL)
 	{
-		if (lang.Find(".") >= 0) lang = lang.Head(lang.Find(".")).Append(lang.Find("@") >= 0 ? lang.Tail(lang.Length() - lang.Find("@")) : "");
+		if (lang.Contains(".")) lang = lang.Head(lang.Find(".")).Append(lang.Contains("@") ? lang.Tail(lang.Length() - lang.Find("@")) : "");
 
 		code = lang;
 	}
@@ -330,7 +330,7 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 
 	if (lang != NIL)
 	{
-		if (lang.Find(".") >= 0) lang = lang.Head(lang.Find(".")).Append(lang.Find("@") >= 0 ? lang.Tail(lang.Length() - lang.Find("@")) : "");
+		if (lang.Contains(".")) lang = lang.Head(lang.Find(".")).Append(lang.Contains("@") ? lang.Tail(lang.Length() - lang.Find("@")) : "");
 
 		code = lang;
 	}
@@ -345,21 +345,21 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 
 	/* If failed, try without the script code if applicable.
 	 */
-	if (code.Find("@") >= 0)
+	if (code.Contains("@"))
 	{
 		if (ActivateLanguage(String(appPrefix).Append("_").Append(code.Head(code.Find("@"))).Append(".xml")) == Success()) return Success();
 	}
 
 	/* If failed, try without the country code if applicable.
 	 */
-	if (code.Find("_") >= 0 && code.Find("@") >= 0)
+	if (code.Contains("_") && code.Contains("@"))
 	{
-		if (ActivateLanguage(String(appPrefix).Append("_").Append(code.Head(code.Find("_"))).Append(code.Find("@") >= 0 ? code.Tail(code.Length() - code.Find("@")) : "").Append(".xml")) == Success()) return Success();
+		if (ActivateLanguage(String(appPrefix).Append("_").Append(code.Head(code.Find("_"))).Append(code.Contains("@") ? code.Tail(code.Length() - code.Find("@")) : "").Append(".xml")) == Success()) return Success();
 	}
 
 	/* If failed, try the base language code if applicable.
 	 */
-	if (code.Find("_") >= 0)
+	if (code.Contains("_"))
 	{
 		if (ActivateLanguage(String(appPrefix).Append("_").Append(code.Head(code.Find("_"))).Append(".xml")) == Success()) return Success();
 	}
@@ -511,7 +511,7 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 			{
 				/* If failed, try the base language code if applicable.
 				 */
-				if (code.Find("_") >= 0)
+				if (code.Contains("_"))
 				{
 					id = String("smooth_").Append(code.Head(code.Find("_"))).Append(".xml");
 

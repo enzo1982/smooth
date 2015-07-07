@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -157,7 +157,7 @@ Bool Section::Filter(const String &string, List *list_filtered)
 				delete tree;
 			}
 		}
-		else if (entry->GetObjectType() == StringItem::classID && entry->GetText().ToLower().Find(string) >= 0)
+		else if (entry->GetObjectType() == StringItem::classID && entry->GetText().ToLower().Contains(string))
 		{
 			StringItem	*item = new StringItem(((StringItem *) entry)->GetID(),
 							       ((StringItem *) entry)->GetOriginal(),

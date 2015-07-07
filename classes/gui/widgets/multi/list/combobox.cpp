@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -118,7 +118,7 @@ S::Int S::GUI::ComboBox::Paint(Int message)
 					{
 						String	 entryText = entry->GetText();
 
-						if (entryText.Find("\t") >= 0) entryText = entryText.Head(entryText.Find("\t"));
+						if (entryText.Contains("\t")) entryText = entryText.Head(entryText.Find("\t"));
 
 						surface->SetText(entryText, frame + Point(3 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - entry->GetFont().GetScaledTextSizeY()) / 2) - 1) - Size(frame.GetHeight() + 2, 0), entry->GetFont());
 

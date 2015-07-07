@@ -1,5 +1,5 @@
 /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,12 +39,12 @@ S::GUI::Bitmap S::GUI::ImageLoader::Load(const String &fileName)
 {
 	ImageLoader	*loader = NIL;
 
-	if	(fileName.ToLower().Find(".pci:") != -1) loader = new ImageLoaderPCI(fileName);
-	else if (fileName.ToLower().EndsWith(".png"))	 loader = new ImageLoaderPNG(fileName);
+	if	(fileName.ToLower().Contains(".pci:"))	loader = new ImageLoaderPCI(fileName);
+	else if (fileName.ToLower().EndsWith(".png"))	loader = new ImageLoaderPNG(fileName);
 	else if (fileName.ToLower().EndsWith(".jpg") ||
-		(fileName.ToLower().EndsWith(".jpeg")))	 loader = new ImageLoaderJPEG(fileName);
+		(fileName.ToLower().EndsWith(".jpeg")))	loader = new ImageLoaderJPEG(fileName);
 #ifdef __WIN32__
-	else if (fileName.StartsWith("Icon:"))		 loader = new ImageLoaderIcon(fileName);
+	else if (fileName.StartsWith("Icon:"))		loader = new ImageLoaderIcon(fileName);
 #endif
 
 	if (loader == NIL) return NIL;

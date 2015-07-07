@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -60,14 +60,14 @@ S::System::DynamicLoader::DynamicLoader(const String &module) : handle(NIL)
 	{
 		/* Try the supplied module name in application directory.
 		 */
-		handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), dlopenFlags);
+		handle = dlopen(GUI::Application::GetApplicationDirectory().Append(module).Append(module.EndsWith(dllExt) || module.Contains(String(dllExt).Append(".")) ? String() : dllExt), dlopenFlags);
 	}
 
 	if (handle == NIL)
 	{
 		/* Try the supplied module name system wide.
 		 */
-		handle = dlopen(String(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt), dlopenFlags);
+		handle = dlopen(String(module).Append(module.EndsWith(dllExt) || module.Contains(String(dllExt).Append(".")) ? String() : dllExt), dlopenFlags);
 	}
 
 	if (handle == NIL)
@@ -79,7 +79,7 @@ S::System::DynamicLoader::DynamicLoader(const String &module) : handle(NIL)
 		foreach (const String &path, directories)
 		{
 			Directory		 directory(path);
-			const Array<File>	&files = directory.GetFilesByPattern(String(module.StartsWith("lib") || module.Find("/") >= 0 ? String() : "lib").Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : dllExt));
+			const Array<File>	&files = directory.GetFilesByPattern(String(module.StartsWith("lib") || module.Contains("/") ? String() : "lib").Append(module).Append(module.EndsWith(dllExt) || module.Contains(String(dllExt).Append(".")) ? String() : dllExt));
 
 			if (files.Length() > 0)
 			{
@@ -94,7 +94,7 @@ S::System::DynamicLoader::DynamicLoader(const String &module) : handle(NIL)
 		foreach (const String &path, directories)
 		{
 			Directory		 directory(path);
-			const Array<File>	&files = directory.GetFilesByPattern(String(module.StartsWith("lib") || module.Find("/") >= 0 ? String() : "lib").Append(module).Append(module.EndsWith(dllExt) || module.Find(String(dllExt).Append(".")) >= 0 ? String() : versionPattern));
+			const Array<File>	&files = directory.GetFilesByPattern(String(module.StartsWith("lib") || module.Contains("/") ? String() : "lib").Append(module).Append(module.EndsWith(dllExt) || module.Contains(String(dllExt).Append(".")) ? String() : versionPattern));
 
 			if (files.Length() > 0)
 			{

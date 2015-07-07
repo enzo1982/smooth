@@ -201,6 +201,22 @@ S::Int S::GUI::ListBox::Paint(Int message)
 	return Success();
 }
 
+S::Int S::GUI::ListBox::ScrollUp(Int n)
+{
+	if (n == ScrollToTop) scrollbar->SetValue(0);
+	else		      scrollbar->SetValue(scrollbarPos - scrollbar->GetStepSize());
+
+	return Success();
+}
+
+S::Int S::GUI::ListBox::ScrollDown(Int n)
+{
+	if (n == ScrollToBottom) scrollbar->SetValue(2147483647);
+	else			 scrollbar->SetValue(scrollbarPos + scrollbar->GetStepSize());
+
+	return Success();
+}
+
 S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 {
 	if (!(flags & LF_ALLOWREORDER)) return Error();

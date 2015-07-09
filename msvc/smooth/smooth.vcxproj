@@ -579,7 +579,6 @@
     <ClCompile Include="..\..\misc\codecs.cpp" />
     <ClCompile Include="..\..\misc\init.cpp" />
     <ClCompile Include="..\..\misc\pciio.cpp" />
-    <ClCompile Include="..\..\misc\templates.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\classes\i18n\locales\smooth_ar.h" />

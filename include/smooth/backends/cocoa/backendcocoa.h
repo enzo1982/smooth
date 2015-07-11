@@ -14,7 +14,7 @@
 #ifdef __OBJC__
 #	include <Cocoa/Cocoa.h>
 #else
-	class NSAutoReleasePool;
+	class NSAutoreleasePool;
 #endif
 
 namespace smooth

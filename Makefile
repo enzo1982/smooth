@@ -106,7 +106,7 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
 else ifeq ($(BUILD_OSX),True)
-	LINKER_OPTS += -framework Cocoa -Wl,-dylib_install_name,libsmooth-$(VERSION).$(REVISION)$(SHARED)
+	LINKER_OPTS += -framework Carbon -framework Cocoa -Wl,-dylib_install_name,libsmooth-$(VERSION).$(REVISION)$(SHARED)
 
 	ifeq ($(BUILD_XLIB),True)
 		LINKER_OPTS += -L/usr/X11/lib

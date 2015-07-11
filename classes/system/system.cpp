@@ -8,14 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#ifdef __APPLE__
+#	include <CoreServices/CoreServices.h>
+#	include <Carbon/Carbon.h>
+#endif
+
 #include <smooth/system/system.h>
 #include <smooth/files/directory.h>
 #include <smooth/io/instream.h>
 #include <smooth/version.h>
-
-#ifdef __APPLE__
-#	include <CoreServices/CoreServices.h>
-#endif
 
 #ifdef __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
@@ -117,12 +118,32 @@ S::Void S::System::System::Reboot()
 	/* Reboot system.
 	 */
 	ExitWindowsEx(EWX_REBOOT | EWX_FORCEIFHUNG, 0);
+#elif defined __APPLE__
+	static const ProcessSerialNumber	 kPSNOfSystemProcess = { 0, kSystemProcess };
+
+	/* Send restart message to system process.
+	 */
+	AEAddressDesc	 targetDesc;
+	AppleEvent	 eventReply	  = { typeNull, NULL };
+	AppleEvent	 appleEventToSend = { typeNull, NULL };
+
+	AECreateDesc(typeProcessSerialNumber, &kPSNOfSystemProcess, sizeof(kPSNOfSystemProcess), &targetDesc);
+
+	AECreateAppleEvent(kCoreEventClass, kAERestart, &targetDesc, kAutoGenerateReturnID, kAnyTransactionID, &appleEventToSend);
+	AESend(&appleEventToSend, &eventReply, kAENoReply, kAENormalPriority, kAEDefaultTimeout, NULL, NULL);
+
+	AEDisposeDesc(&eventReply);
+	AEDisposeDesc(&appleEventToSend);
+	AEDisposeDesc(&targetDesc);
 #else
-	if (!fork())
-	{
-		execl("/bin/sh", "sh", "-c", "shutdown -r now", NULL);
-		exit(0);
-	}
+	/* Try rebooting using D-Bus messages to ConsoleKit and systemd-logind.
+	 */
+	if (!fork()) { execl("/bin/sh", "sh", "-c", "dbus-send --system --dest=\"org.freedesktop.ConsoleKit\" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart", NULL); exit(0); }
+	if (!fork()) { execl("/bin/sh", "sh", "-c", "dbus-send --system --dest=\"org.freedesktop.login1\" /org/freedesktop/login1 org.freedesktop.login1.Manager.Reboot boolean:true", NULL); exit(0); }
+
+	/* Try rebooting using the shutdown command.
+	 */
+	if (!fork()) { execl("/bin/sh", "sh", "-c", "shutdown -r now", NULL); exit(0); }
 #endif
 }
 
@@ -148,24 +169,38 @@ S::Void S::System::System::Shutdown()
 	/* Shutdown system.
 	 */
 	ExitWindowsEx(EWX_POWEROFF | EWX_FORCEIFHUNG, 0);
-#elif defined __linux__ || defined __GNU__
-	if (!fork())
-	{
-		execl("/bin/sh", "sh", "-c", "shutdown -P now", NULL);
-		exit(0);
-	}
-#elif defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
-	if (!fork())
-	{
-		execl("/bin/sh", "sh", "-c", "shutdown -p now", NULL);
-		exit(0);
-	}
+#elif defined __APPLE__
+	static const ProcessSerialNumber	 kPSNOfSystemProcess = { 0, kSystemProcess };
+
+	/* Send shutdown message to system process.
+	 */
+	AEAddressDesc	 targetDesc;
+	AppleEvent	 eventReply	  = { typeNull, NULL };
+	AppleEvent	 appleEventToSend = { typeNull, NULL };
+
+	AECreateDesc(typeProcessSerialNumber, &kPSNOfSystemProcess, sizeof(kPSNOfSystemProcess), &targetDesc);
+
+	AECreateAppleEvent(kCoreEventClass, kAEShutDown, &targetDesc, kAutoGenerateReturnID, kAnyTransactionID, &appleEventToSend);
+	AESend(&appleEventToSend, &eventReply, kAENoReply, kAENormalPriority, kAEDefaultTimeout, NULL, NULL);
+
+	AEDisposeDesc(&eventReply);
+	AEDisposeDesc(&appleEventToSend);
+	AEDisposeDesc(&targetDesc);
 #else
-	if (!fork())
-	{
-		execl("/bin/sh", "sh", "-c", "shutdown -h now", NULL);
-		exit(0);
-	}
+	/* Try shutting down using D-Bus messages to ConsoleKit and systemd-logind.
+	 */
+	if (!fork()) { execl("/bin/sh", "sh", "-c", "dbus-send --system --dest=\"org.freedesktop.ConsoleKit\" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop", NULL); exit(0); }
+	if (!fork()) { execl("/bin/sh", "sh", "-c", "dbus-send --system --dest=\"org.freedesktop.login1\" /org/freedesktop/login1 org.freedesktop.login1.Manager.PowerOff boolean:true", NULL); exit(0); }
+
+	/* Try shutting down using the shutdown command.
+	 */
+#	if defined __linux__ || defined __GNU__
+		if (!fork()) { execl("/bin/sh", "sh", "-c", "shutdown -P now", NULL); exit(0); }
+#	elif defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
+		if (!fork()) { execl("/bin/sh", "sh", "-c", "shutdown -p now", NULL); exit(0); }
+#	else
+		if (!fork()) { execl("/bin/sh", "sh", "-c", "shutdown -h now", NULL); exit(0); }
+#	endif
 #endif
 }
 

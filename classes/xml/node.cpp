@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/xml/node.h>
+#include <smooth/foreach.h>
 
 S::Array<S::String> S::XML::Node::elementNames;
 
@@ -25,13 +26,52 @@ S::XML::Node::Node(const String &iName, const String &iContent)
 	if (elementNames.Get(nameIndex) == NIL) elementNames.Add(iName, nameIndex);
 }
 
+S::XML::Node::Node(const Node &oNode)
+{
+	nodeID		= -1;
+
+	nameIndex	= oNode.nameIndex;
+	content		= oNode.content;
+
+	attributes	= NIL;
+	subnodes	= NIL;
+
+	/* Copy attributes.
+	 */
+	if (oNode.attributes != NIL)
+	{
+		foreach (Attribute *oAttribute, *oNode.attributes)
+		{
+			Attribute	*attribute = new Attribute(*oAttribute);
+
+			if (attributes == NIL) attributes = new Array<Attribute *, Void *>();
+
+			attribute->SetAttributeID(attributes->Add(attribute));
+		}
+	}
+
+	/* Copy subnodes.
+	 */
+	if (oNode.subnodes != NIL)
+	{
+		foreach (Node *oSubnode, *oNode.subnodes)
+		{
+			Node	*node = new Node(*oSubnode);
+
+			if (subnodes == NIL) subnodes = new Array<Node *, Void *>();
+
+			node->SetNodeID(subnodes->Add(node));
+		}
+	}
+}
+
 S::XML::Node::~Node()
 {
 	Int	 nOfAttributes	= GetNOfAttributes();
 	Int	 nOfNodes	= GetNOfNodes();
 
 	for (Int i = 0; i < nOfAttributes; i++)	RemoveAttribute(GetNthAttribute(0));
-	for (Int j = 0; j < nOfNodes; j++)	RemoveNode(GetNthNode(0));
+	for (Int i = 0; i < nOfNodes; i++)	RemoveNode(GetNthNode(0));
 
 	if (attributes != NIL)	delete attributes;
 	if (subnodes != NIL)	delete subnodes;

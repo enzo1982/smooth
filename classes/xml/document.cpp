@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,6 +18,12 @@ S::XML::Document::Document()
 	rootNode	= NIL;
 	ownRoot		= False;
 	encoding	= "UTF-8";
+}
+
+S::XML::Document::Document(const Document &oDocument)
+{
+	rootNode	= new Node(*oDocument.GetRootNode());
+	encoding	= oDocument.encoding;
 }
 
 S::XML::Document::~Document()
@@ -164,7 +170,7 @@ S::Int S::XML::Document::SaveNode(xmlTextWriterPtr writer, Node *node)
 
 	xmlTextWriterWriteString(writer, (xmlChar *) node->GetContent().ConvertTo("UTF-8"));
 
-	for (Int j = 0; j < node->GetNOfNodes(); j++) SaveNode(writer, node->GetNthNode(j));
+	for (Int i = 0; i < node->GetNOfNodes(); i++) SaveNode(writer, node->GetNthNode(i));
 
 	xmlTextWriterEndElement(writer);
 

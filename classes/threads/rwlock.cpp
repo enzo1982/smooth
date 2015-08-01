@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,13 +57,13 @@ S::Int S::Threads::RWLock::LockForRead()
 
 S::Int S::Threads::RWLock::LockForWrite()
 {
-	/* Acquire exclusive lock.
-	 */
-	exclusiveAccessMutex->Lock();
-
 	/* Wait for read operations to finish.
 	 */
 	for (Int i = 0; i < maxReadLocks; i++) sharedAccessSemaphore->Wait();
+
+	/* Acquire exclusive lock.
+	 */
+	exclusiveAccessMutex->Lock();
 
 	/* Mark ourself locked for write.
 	 */
@@ -74,6 +74,10 @@ S::Int S::Threads::RWLock::LockForWrite()
 
 S::Int S::Threads::RWLock::Release()
 {
+	/* Acquire exclusive lock.
+	 */
+	exclusiveAccessMutex->Lock();
+
 	/* Check if we are locked for write.
 	 */
 	if (writeLocked)
@@ -82,14 +86,22 @@ S::Int S::Threads::RWLock::Release()
 		 */
 		writeLocked = False;
 
+		/* Release exclusive lock to allow
+		 * new read and write locks again.
+		 */
+		exclusiveAccessMutex->Release();
+		exclusiveAccessMutex->Release();
+
 		/* Release shared access semaphore.
 		 */
 		for (Int i = 0; i < maxReadLocks; i++) sharedAccessSemaphore->Release();
 
-		/* Allow new read and write locks again.
-		 */
-		return exclusiveAccessMutex->Release();
+		return Success();
 	}
+
+	/* Release exclusive lock.
+	 */
+	exclusiveAccessMutex->Release();
 
 	/* Decrease shared access counter by one.
 	 */

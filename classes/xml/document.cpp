@@ -15,15 +15,16 @@
 
 S::XML::Document::Document()
 {
-	rootNode	= NIL;
-	ownRoot		= False;
-	encoding	= "UTF-8";
+	rootNode = NIL;
+	ownRoot	 = False;
+	encoding = "UTF-8";
 }
 
 S::XML::Document::Document(const Document &oDocument)
 {
-	rootNode	= new Node(*oDocument.GetRootNode());
-	encoding	= oDocument.encoding;
+	rootNode = new Node(*oDocument.GetRootNode());
+	ownRoot	 = True;
+	encoding = oDocument.encoding;
 }
 
 S::XML::Document::~Document()
@@ -39,7 +40,7 @@ S::XML::Node *S::XML::Document::GetRootNode() const
 S::Int S::XML::Document::SetRootNode(Node *newRootNode)
 {
 	rootNode = newRootNode;
-	ownRoot = False;
+	ownRoot	 = False;
 
 	return Success();
 }
@@ -66,7 +67,7 @@ S::Int S::XML::Document::LoadFile(const String &fileName)
 			String	 inputFormat = String::SetInputFormat("UTF-8");
 
 			rootNode = new Node(NIL);
-			ownRoot = True;
+			ownRoot	 = True;
 
 			LoadNode(reader, rootNode);
 
@@ -101,7 +102,7 @@ S::Int S::XML::Document::ParseMemory(const Void *memory, Int size)
 			String	 inputFormat = String::SetInputFormat("UTF-8");
 
 			rootNode = new Node(NIL);
-			ownRoot = True;
+			ownRoot	 = True;
 
 			LoadNode(reader, rootNode);
 

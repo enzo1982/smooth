@@ -183,9 +183,9 @@ S::Bool S::IO::OutStream::Flush()
 
 S::Bool S::IO::OutStream::WriteData()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
 
-	if (currentBufferPos < packageSize) return true;
+	if (currentBufferPos < packageSize) return True;
 
 	if (filters.Length() > 0)
 	{
@@ -196,13 +196,15 @@ S::Bool S::IO::OutStream::WriteData()
 			packageSize += defaultPackageSize;
 			stdpacksize = packageSize;
 
-			return true;
+			return True;
 		}
 	}
 
 	if (streamType == STREAM_DRIVER)
 	{
 		Int	 encsize = 0;
+
+		dataBuffer.Resize(packageSize);
 
 		if (filters.Length() == 0) encsize = driver->WriteData(dataBuffer, packageSize);
 		else			   encsize = filters.GetFirst()->WriteData(dataBuffer, packageSize);
@@ -211,7 +213,7 @@ S::Bool S::IO::OutStream::WriteData()
 		{
 			packageSize = 0;
 
-			return false;
+			return False;
 		}
 
 		driver->Flush();
@@ -222,7 +224,7 @@ S::Bool S::IO::OutStream::WriteData()
 		currentBufferPos -= packageSize;
 	}
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)

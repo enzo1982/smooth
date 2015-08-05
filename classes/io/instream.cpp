@@ -183,8 +183,10 @@ S::Bool S::IO::InStream::ReadData()
 		if (filters.GetFirst()->GetPackageSize() > 0) packageSize = filters.GetFirst()->GetPackageSize();
 		else					      packageSize = stdpacksize;
 
-		if (size != -1)	decsize = filters.GetFirst()->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
-		else		decsize = filters.GetFirst()->ReadData(dataBuffer, packageSize);
+		if (size != -1)	dataBuffer.Resize(packageSize < size - currentFilePos ? packageSize : size - currentFilePos);
+		else		dataBuffer.Resize(packageSize);
+
+		decsize = filters.GetFirst()->ReadData(dataBuffer);
 	}
 
 	if (packageSize <= size - currentFilePos || filters.Length() > 0 || size == -1)

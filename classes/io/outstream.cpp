@@ -207,7 +207,7 @@ S::Bool S::IO::OutStream::WriteData()
 		dataBuffer.Resize(packageSize);
 
 		if (filters.Length() == 0) encsize = driver->WriteData(dataBuffer, packageSize);
-		else			   encsize = filters.GetFirst()->WriteData(dataBuffer, packageSize);
+		else			   encsize = filters.GetFirst()->WriteData(dataBuffer);
 
 		if (encsize == -1)
 		{

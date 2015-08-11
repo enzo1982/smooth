@@ -352,16 +352,18 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 	if (string == NIL) return Error();
 	if (shadow)	   return SurfaceBackend::SetText(string, iRect, iFont, shadow);
 
-	Font	 font	    = iFont;
-	Rect	 rect	    = iRect;
-	Int	 lineHeight = 0;
-	Color	 color	    = font.GetColor();
+	Int	 stringLength = string.Length();
+
+	Font	 font	      = iFont;
+	Rect	 rect	      = iRect;
+	Int	 lineHeight   = 0;
+	Color	 color	      = font.GetColor();
 
 	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
 	 */
 	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
 	{
-		for (Int i = 0; i < string.Length(); i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
+		for (Int i = 0; i < stringLength; i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
 	}
 
 	/* Set up GDI+ font.
@@ -391,11 +393,13 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 
 	foreach (const String &line, lines)
 	{
+		Int	 lineLength = line.Length();
+
 		/* Check for right to left characters in text.
 		 */
 		Bool	 rtlCharacters = False;
 
-		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
+		for (Int i = 0; i < lineLength; i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 		Rect		 tRect = rightToLeft.TranslateRect(rect);
 		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top, tRect.GetWidth() + 2, tRect.GetHeight());

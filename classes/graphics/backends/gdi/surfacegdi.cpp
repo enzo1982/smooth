@@ -326,15 +326,17 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 	if (string == NIL) return Error();
 	if (shadow)	   return SurfaceBackend::SetText(string, iRect, iFont, shadow);
 
-	Font	 font	    = iFont;
-	Rect	 rect	    = iRect;
-	Int	 lineHeight = 0;
+	Int	 stringLength = string.Length();
+
+	Font	 font	      = iFont;
+	Rect	 rect	      = iRect;
+	Int	 lineHeight   = 0;
 
 	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
 	 */
 	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
 	{
-		for (Int i = 0; i < string.Length(); i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
+		for (Int i = 0; i < stringLength; i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
 	}
 
 	/* Set up Windows font.
@@ -365,11 +367,13 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	foreach (const String &line, lines)
 	{
+		Int	 lineLength = line.Length();
+
 		/* Check for right to left characters in text.
 		 */
 		Bool	 rtlCharacters = False;
 
-		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
+		for (Int i = 0; i < lineLength; i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 		/* Draw text, reordering if necessary.
 		 */
@@ -385,27 +389,27 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			 * and display using the glyph indices.
 			 * This does not work with Kanji.
 			 */
-			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
+			FriBidiChar	*visual = new FriBidiChar [lineLength + 1];
 			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
-			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
+			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), lineLength, &type, visual, NIL, NIL, NIL);
 
-			visual[line.Length()] = 0;
+			visual[lineLength] = 0;
 
 			visualLine.ImportFrom("UCS-4LE", (char *) visual);
 
 			delete [] visual;
 
 			GCP_RESULTS	 results;
-			wchar_t		*glyphs = new wchar_t [visualLine.Length() + 1];
+			wchar_t		*glyphs = new wchar_t [lineLength + 1];
 
 			ZeroMemory(&results, sizeof(results));
 
 			results.lStructSize = sizeof(results);
 			results.lpGlyphs    = glyphs;
-			results.nGlyphs     = visualLine.Length() + 1;
+			results.nGlyphs     = lineLength + 1;
 
-			ZeroMemory(glyphs, 2 * (visualLine.Length() + 1));
+			ZeroMemory(glyphs, 2 * (lineLength + 1));
 
 			if (!painting)
 			{
@@ -416,7 +420,7 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			if (rightToLeft.GetRightToLeft()) SetTextAlign(paintContext, TA_RIGHT);
 			else				  SetTextAlign(paintContext, TA_LEFT);
 
-			GetCharacterPlacement(paintContext, visualLine, visualLine.Length(), 0, &results, 0);
+			GetCharacterPlacement(paintContext, visualLine, lineLength, 0, &results, 0);
 
 			if (rightToLeft.GetRightToLeft()) wRect.left -= 10;
 			else				  wRect.right += 10;

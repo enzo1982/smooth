@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,13 +32,15 @@ S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text, Bool scaled) const
 {
 	if (text == NIL) return Size();
 
+	Int	 textLength = text.Length();
+
 	/* Fall back to Tahoma when trying to measure Hebrew on pre Windows 8 using Segoe UI.
 	 */
 	String	 fontName = this->fontName;
 
 	if (fontName == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
 	{
-		for (Int i = 0; i < text.Length(); i++) if (text[i] >= 0x0590 && text[i] <= 0x05FF) { fontName = "Tahoma"; break; }
+		for (Int i = 0; i < textLength; i++) if (text[i] >= 0x0590 && text[i] <= 0x05FF) { fontName = "Tahoma"; break; }
 	}
 
 	/* Set up Windows font and calculate text size.
@@ -51,7 +53,7 @@ S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text, Bool scaled) const
 	HFONT	 hOldFont = (HFONT) SelectObject(dc, hFont);
 	SIZE	 tSize;
 
-	GetTextExtentPoint32(dc, text, text.Length(), &tSize);
+	GetTextExtentPoint32(dc, text, textLength, &tSize);
 
 	SelectObject(dc, hOldFont);
 	::DeleteObject(hFont);

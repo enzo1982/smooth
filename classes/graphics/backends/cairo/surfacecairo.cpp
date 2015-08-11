@@ -550,16 +550,18 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	if (string == NIL) return Error();
 	if (shadow)	   return SurfaceBackend::SetText(string, iRect, iFont, shadow);
 
-	Font	 font	    = iFont;
-	Rect	 rect	    = iRect;
-	Int	 lineHeight = 0;
+	Int	 stringLength = string.Length();
+
+	Font	 font	      = iFont;
+	Rect	 rect	      = iRect;
+	Int	 lineHeight   = 0;
 
 #ifdef __WIN32__
 	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
 	 */
 	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
 	{
-		for (Int i = 0; i < string.Length(); i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
+		for (Int i = 0; i < stringLength; i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
 	}
 #endif
 
@@ -579,23 +581,25 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
 
+		Int	 lineLength = line.Length();
+
 #ifdef __WIN32__
 		/* Check for right to left characters in text.
 		 */
 		Bool	 rtlCharacters = False;
 
-		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
+		for (Int i = 0; i < lineLength; i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 		if (rtlCharacters && Setup::useIconv)
 		{
 			/* Reorder the string with fribidi.
 			 */
-			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
+			FriBidiChar	*visual = new FriBidiChar [lineLength + 1];
 			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
-			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
+			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), lineLength, &type, visual, NIL, NIL, NIL);
 
-			visual[line.Length()] = 0;
+			visual[lineLength] = 0;
 
 			line.ImportFrom("UCS-4LE", (char *) visual);
 
@@ -645,7 +649,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 			pango_attr_list_unref(attributes);
 
-			if (line.Length() > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
+			if (lineLength > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
 
 			pango_layout_set_font_description(layout, desc);
 
@@ -698,7 +702,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		pango_attr_list_unref(attributes);
 
-		if (line.Length() > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
+		if (lineLength > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
 
 		pango_layout_set_font_description(layout, desc);
 		pango_font_description_free(desc);

@@ -392,31 +392,37 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 
 	foreach (String line, lines)
 	{
+		Int	 lineLength = line.Length();
+
+		/* Check for right to left characters in text.
+		 */
 		Bool	 rtlCharacters = False;
 
-		for (Int i = 0; i < line.Length(); i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
+		for (Int i = 0; i < lineLength; i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
+		/* Draw text, reordering if necessary.
+		 */
 		Rect	 tRect = rightToLeft.TranslateRect(rect);
 
 		if (rtlCharacters && Setup::useIconv)
 		{
 			/* Reorder the string with fribidi.
 			 */
-			FriBidiChar	*visual = new FriBidiChar [line.Length() + 1];
+			FriBidiChar	*visual = new FriBidiChar [lineLength + 1];
 			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
-			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), line.Length(), &type, visual, NIL, NIL, NIL);
+			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), lineLength, &type, visual, NIL, NIL, NIL);
 
-			visual[line.Length()] = 0;
+			visual[lineLength] = 0;
 
 			line.ImportFrom("UCS-4LE", (char *) visual);
 
 			delete [] visual;
 		}
 
-		if (!painting) XftDrawString16(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
+		if (!painting) XftDrawString16(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), lineLength);
 
-		XftDrawString16(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), line.Length());
+		XftDrawString16(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), lineLength);
 
 		rect.top += lineHeight;
 	}

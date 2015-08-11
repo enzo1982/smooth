@@ -377,13 +377,16 @@ S::Int S::GUI::Cursor::DrawWidget()
 	surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
 	String	 line;
+
 	Bool	 fillLineIndices = (lineIndices.Length() == 0);
-	Int	 lineNumber = (fillLineIndices ? 0 : scrollPos);
-	Int	 lineStart = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
+	Int	 lineNumber	 = (fillLineIndices ? 0 : scrollPos);
+	Int	 lineStart	 = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
+
+	Int	 textLength	 = text.Length();
 
 	if (fillLineIndices) lineIndices.Add(0);
 
-	for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= text.Length(); i++)
+	for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= textLength; i++)
 	{
 		/* Check if the line is above the first visible line due to scrolling
 		 */
@@ -406,24 +409,26 @@ S::Int S::GUI::Cursor::DrawWidget()
 		{
 			line[i - lineStart] = 0;
 
+			Int	 lineLength = line.Length();
+
 			if ((lineNumber - scrollPos) * (font.GetUnscaledTextSizeY() + 3) >= frame.GetHeight() && !fillLineIndices) break;
 
-			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))	surface->SetText(ConvertTabs(line),		     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
-			else								surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
+			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
+			else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
 
 			if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 			{
 				Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
-				Int	 lineMarkEnd = Math::Min(line.Length(), Math::Max(markStart, markEnd) - lineStart);
+				Int	 lineMarkEnd   = Math::Min(lineLength, Math::Max(markStart, markEnd) - lineStart);
 
-				if (lineMarkStart < line.Length() && lineMarkEnd > 0)
+				if (lineMarkStart < lineLength && lineMarkEnd > 0)
 				{
 					Array<Int>	 markRegionStarts;
 					Array<Int>	 markRegionEnds;
 
 					if (Setup::useIconv && ContainsRTLCharacters(line))
 					{
-						FriBidiStrIndex	 length = line.Length();
+						FriBidiStrIndex	 length = lineLength;
 
 						/* Get visual positions.
 						 */
@@ -504,8 +509,8 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 						surface->Box(markRect, Setup::HighlightColor, Rect::Filled);
 
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),		     frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
-						else							     surface->SetText(String().FillN('*', line.Length()), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+						else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
 
 						surface->EndPaint();
 					}
@@ -1463,15 +1468,17 @@ S::Int S::GUI::Cursor::GetVisualCursorPositionFromLogical(const String &line, In
  */
 S::String S::GUI::Cursor::ConvertTabs(const String &line) const
 {
-	String	 string = line;
+	String	 string	      = line;
+	Int	 stringLength = string.Length();
 
-	for (Int i = 0; i < string.Length(); i++)
+	for (Int i = 0; i < stringLength; i++)
 	{
 		if (string[i] != '\t') continue;
 
 		Int	 spaces = tabSize - i % tabSize;
 
-		string = string.Head(i).Append(String().FillN(' ', spaces)).Append(string.Tail(string.Length() - i - 1));
+		string	      = string.Head(i).Append(String().FillN(' ', spaces)).Append(string.Tail(string.Length() - i - 1));
+		stringLength += spaces;
 	}
 
 	return string;

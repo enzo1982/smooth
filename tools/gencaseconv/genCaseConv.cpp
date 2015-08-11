@@ -46,22 +46,22 @@ Void generateConversion(Int field, OutStream &out)
 
 			if (seriesLength == 1)
 			{
-				out.OutputString(String("if\t((*this)[i] == 0x").Append(Number(seriesStart).ToHexString()).Append(")"));
-				out.OutputString("\t\t\t\t\t\t\t");
-				out.OutputString(String("retVal[i] =\t\t 0x").Append(Number(seriesStart + difference).ToHexString()).Append(";\t// Single character"));
+				out.OutputString(String("if\t(value == 0x").Append(Number(seriesStart).ToHexString()).Append(")"));
+				out.OutputString("\t\t\t\t\t");
+				out.OutputString(String("retVal[i] =\t    0x").Append(Number(seriesStart + difference).ToHexString()).Append(";\t// Single character"));
 			}
 			else if (seriesType == 0)
 			{
-				out.OutputString(String("if\t((*this)[i] >= 0x").Append(Number(seriesStart).ToHexString()).Append(" && (*this)[i] <= 0x").Append(Number(seriesStart + seriesLength - 1).ToHexString()).Append(")"));
-				out.OutputString("\t\t\t\t");
-				out.OutputString(String("retVal[i] = (*this)[i] ").Append(difference >= 0 ? "+" : "-").Append(" 0x"));
+				out.OutputString(String("if\t(value >= 0x").Append(Number(seriesStart).ToHexString()).Append(" && value <= 0x").Append(Number(seriesStart + seriesLength - 1).ToHexString()).Append(")"));
+				out.OutputString("\t\t\t");
+				out.OutputString(String("retVal[i] = value ").Append(difference >= 0 ? "+" : "-").Append(" 0x"));
 				out.OutputString(Number(Math::Abs(difference)).ToHexString().Append(";\t// Alphabet"));
 			}
 			else if (seriesType == 1)
 			{
-				out.OutputString(String("if\t((*this)[i] >= 0x").Append(Number(seriesStart).ToHexString()).Append(" && (*this)[i] <= 0x").Append(Number(seriesStart + 2 * (seriesLength - 1)).ToHexString()).Append(" && ").Append(seriesStart & 1 ? " " : "!").Append("((*this)[i] & 1)").Append(")"));
+				out.OutputString(String("if\t(value >= 0x").Append(Number(seriesStart).ToHexString()).Append(" && value <= 0x").Append(Number(seriesStart + 2 * (seriesLength - 1)).ToHexString()).Append(" && ").Append(seriesStart & 1 ? " " : "!").Append("(value & 1)").Append(")"));
 				out.OutputString("\t");
-				out.OutputString(String("retVal[i] = (*this)[i] ").Append(difference >= 0 ? "+" : "-").Append(" 0x"));
+				out.OutputString(String("retVal[i] = value ").Append(difference >= 0 ? "+" : "-").Append(" 0x"));
 				out.OutputString(Number(Math::Abs(difference)).ToHexString().Append(";\t// Special letters"));
 			}
 
@@ -101,7 +101,7 @@ Int smooth::Main()
 	OutStream	 out(STREAM_FILE, String("string_case.cpp"), OS_REPLACE);
 
 	out.OutputString(" /* The smooth Class Library						\
-		\r\n  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>		\
+		\r\n  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>		\
 		\r\n  *										\
 		\r\n  * This library is free software; you can redistribute it and/or		\
 		\r\n  * modify it under the terms of \"The Artistic License, Version 2.0\".	\
@@ -115,9 +115,12 @@ Int smooth::Main()
 		\r\nS::String S::String::ToUpper() const					\
 		\r\n{										\
 		\r\n	String	 retVal = *this;						\
+		\r\n	Int	 length = Length();						\
 		\r\n										\
-		\r\n	for (Int i = 0; i < Length(); i++)					\
-		\r\n	{");
+		\r\n	for (Int i = 0; i < length; i++)					\
+		\r\n	{									\
+		\r\n		Int	 value = (*this)[i];					\
+		\r\n");
 
 	generateConversion(12, out);	// To upper case
 
@@ -134,9 +137,12 @@ Int smooth::Main()
 		\r\nS::String S::String::ToLower() const	\
 		\r\n{						\
 		\r\n	String	 retVal = *this;		\
+		\r\n	Int	 length = Length();		\
 		\r\n						\
-		\r\n	for (Int i = 0; i < Length(); i++)	\
-		\r\n	{");
+		\r\n	for (Int i = 0; i < length; i++)	\
+		\r\n	{					\
+		\r\n		Int	 value = (*this)[i];	\
+		\r\n");
 
 	generateConversion(13, out);	// To lower case
 
@@ -153,9 +159,12 @@ Int smooth::Main()
 		\r\nS::String S::String::ToTitle() const	\
 		\r\n{						\
 		\r\n	String	 retVal = *this;		\
+		\r\n	Int	 length = Length();		\
 		\r\n						\
-		\r\n	for (Int i = 0; i < Length(); i++)	\
-		\r\n	{");
+		\r\n	for (Int i = 0; i < length; i++)	\
+		\r\n	{					\
+		\r\n		Int	 value = (*this)[i];	\
+		\r\n");
 
 	generateConversion(14, out);	// To title case
 

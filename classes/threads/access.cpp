@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,6 +31,28 @@ S::Int S::Threads::Access::Free()
 	mutex = NIL;
 
 	return Success();
+}
+
+S::Bool S::Threads::Access::Value(volatile Bool &value)
+{
+	if (mutex != NIL) mutex->Lock();
+
+	Bool	 result = value;
+
+	if (mutex != NIL) mutex->Release();
+
+	return result;
+}
+
+S::Bool S::Threads::Access::Set(volatile Bool &value, Bool n)
+{
+	mutex->Lock();
+
+	Bool	 result = value = n;
+
+	mutex->Release();
+
+	return result;
 }
 
 S::Short S::Threads::Access::Value(volatile Short &value)

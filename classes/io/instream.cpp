@@ -38,7 +38,7 @@ S::IO::InStream::InStream(Int type, Driver *iDriver)
 
 	streamType	 = STREAM_DRIVER;
 	size		 = driver->GetSize();
-	closefile	 = false;
+	closefile	 = False;
 
 	currentBufferPos = defaultPackageSize;
 	origsize	 = size;
@@ -123,10 +123,10 @@ S::IO::InStream::InStream(Int type, OutStream *out)
 
 	streamType	 = STREAM_STREAM;
 
-	crosslinked		= true;
+	crosslinked		= True;
 	outStream		= out;
 	outStream->inStream	= this;
-	outStream->crosslinked	= true;
+	outStream->crosslinked	= True;
 
 	if (outStream->streamType == STREAM_DRIVER)
 	{
@@ -135,7 +135,7 @@ S::IO::InStream::InStream(Int type, OutStream *out)
 		streamType	 = STREAM_DRIVER;
 		size		 = outStream->size;
 		currentFilePos	 = outStream->currentFilePos;
-		closefile	 = false;
+		closefile	 = False;
 
 		packageSize	 = 1;
 		stdpacksize	 = packageSize;
@@ -149,67 +149,77 @@ S::IO::InStream::InStream(Int type, OutStream *out)
 
 S::IO::InStream::~InStream()
 {
-	Close();	// close stream
+	/* Close stream.
+	 */
+	Close();
 }
 
 S::Bool S::IO::InStream::ReadData()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
 
-	if (streamType != STREAM_DRIVER) return true;
+	if (streamType != STREAM_DRIVER) return True;
 
 	Int	 decsize = 0;
 
-	size	       = origsize;
-	currentFilePos = origfilepos;
-
-	if (filter == NIL)
+	do
 	{
-		/* Read unfiltered data.
+		size	       = origsize;
+		currentFilePos = origfilepos;
+
+		if (filter == NIL)
+		{
+			/* Read unfiltered data.
+			 */
+			packageSize = stdpacksize;
+
+			dataBuffer.Resize(packageSize);
+
+			driver->Seek(currentFilePos);
+
+			if (size != -1)	dataBuffer.Resize(packageSize < size - currentFilePos ? packageSize : size - currentFilePos);
+			else		dataBuffer.Resize(packageSize);
+
+			decsize = driver->ReadData(dataBuffer, dataBuffer.Size());
+		}
+		else
+		{
+			/* Read filtered data.
+			 */
+			if (filter->GetPackageSize() > 0) packageSize = filter->GetPackageSize();
+			else				  packageSize = stdpacksize;
+
+			dataBuffer.Resize(packageSize);
+
+			decsize = filter->ReadData(dataBuffer);
+		}
+
+		/* Update package size and buffer positions.
 		 */
-		packageSize = stdpacksize;
+		if (packageSize <= size - currentFilePos || filter != NIL || size == -1)
+		{
+			if (decsize == -1) { packageSize = 0; return False; }
 
-		dataBuffer.Resize(packageSize);
+			packageSize = decsize;
+			origsize    = size;
+			origfilepos = currentFilePos + packageSize;
 
-		driver->Seek(currentFilePos);
+			if (packageSize + currentFilePos > size && size != -1) size = packageSize + currentFilePos;
+		}
+		else
+		{
+			if (decsize <= 0) { packageSize = 0; return False; }
+		}
 
-		if (size != -1)	decsize = driver->ReadData(dataBuffer, ((packageSize) < (size - currentFilePos) ? (packageSize) : (size - currentFilePos)));
-		else		decsize = driver->ReadData(dataBuffer, packageSize);
-	}
-	else
-	{
-		/* Read filtered data.
+		currentBufferPos = 0;
+
+		/* Bail out if more data is requested, but we do not have any more.
 		 */
-		if (filter->GetPackageSize() > 0) packageSize = filter->GetPackageSize();
-		else				  packageSize = stdpacksize;
-
-		if (size != -1)	dataBuffer.Resize(packageSize < size - currentFilePos ? packageSize : size - currentFilePos);
-		else		dataBuffer.Resize(packageSize);
-
-		decsize = filter->ReadData(dataBuffer);
+		if (packageSize == 0 && driver->GetPos() == driver->GetSize()) return False;
 	}
+	while (packageSize == 0);
 
-	if (packageSize <= size - currentFilePos || filter != NIL || size == -1)
-	{
-		origfilepos = currentFilePos + packageSize;
-
-		if (decsize == -1) { packageSize = 0; return false; }
-
-		packageSize = decsize;
-		origsize    = size;
-
-		if (packageSize + currentFilePos > size && size != -1) size = packageSize + currentFilePos;
-	}
-	else
-	{
-		if (decsize <= 0) { packageSize = 0; return false; }
-	}
-
-	currentBufferPos = 0;
-
-	if (packageSize == 0) return ReadData();
-
-	return true;
+	return True;
 }
 
 S::Int64 S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
@@ -314,8 +324,8 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
-	int	 bytesleft	= bytes;
-	int	 databufferpos	= 0;
+	Int	 bytesleft	= bytes;
+	Int	 databufferpos	= 0;
 
 	Buffer<UnsignedByte>	 stringBuffer(bytes + 1);
 
@@ -335,7 +345,7 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 		/* Get amount of data read and copy to string buffer.
 		 */
-		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		Int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		for (Int i = 0; i < amount; i++) stringBuffer[databufferpos + i] = (((UnsignedByte *) dataBuffer) + currentBufferPos)[i];
 
@@ -356,14 +366,14 @@ S::String S::IO::InStream::InputLine()
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
-	long	 inpval;
-	int	 bytes = 0;
+	Long	 inpval;
+	Int	 bytes = 0;
 
 	Buffer<UnsignedByte>	 stringBuffer(1024);
 
 	while (True)
 	{
-		for (int i = 0; i < 1024; i++)
+		for (Int i = 0; i < 1024; i++)
 		{
 			inpval = InputNumber(1);
 
@@ -402,8 +412,8 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
-	int	 bytesleft	= bytes;
-	int	 databufferpos	= 0;
+	Int	 bytesleft	= bytes;
+	Int	 databufferpos	= 0;
 
 	while (bytesleft)
 	{
@@ -419,7 +429,7 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 		/* Get amount of data read and copy to output buffer.
 		 */
-		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		Int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		memcpy((void *) ((unsigned char *) pointer + databufferpos), (void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), amount);
 
@@ -437,7 +447,7 @@ S::Bool S::IO::InStream::InitBitstream()
 	bitLength	= 0;
 	bitstreamActive	= 1;
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::InStream::CompleteBitstream()
@@ -445,14 +455,14 @@ S::Bool S::IO::InStream::CompleteBitstream()
 	bitLength	= 0;
 	bitstreamActive	= 0;
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (!allowpackset)		{ lastError = IO_ERROR_OPNOTAVAIL; return false; }
-	if (newPackageSize <= 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (!allowpackset)		{ lastError = IO_ERROR_OPNOTAVAIL; return False; }
+	if (newPackageSize <= 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive) CompleteBitstream();
 
@@ -463,7 +473,7 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 
 	Seek(currentFilePos);
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::InStream::SetFilter(Filter *newFilter)
@@ -491,22 +501,22 @@ S::Bool S::IO::InStream::SetFilter(Filter *newFilter)
 
 S::Bool S::IO::InStream::RemoveFilter()
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 	if (filter == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	filter->Deactivate();
 	filter = NIL;
 
-	allowpackset = true;
+	allowpackset = True;
 
 	SetPackageSize(origpacksize);
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::InStream::Close()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
 
 	if (bitstreamActive) CompleteBitstream();
 
@@ -514,31 +524,31 @@ S::Bool S::IO::InStream::Close()
 
 	if (crosslinked)
 	{
-		if (closefile) outStream->closefile = true;
+		if (closefile) outStream->closefile = True;
 
-		outStream->crosslinked	= false;
+		outStream->crosslinked	= False;
 		outStream->inStream	= NIL;
 
-		closefile = false;
+		closefile = False;
 	}
 
 	if (closefile) delete driver;
 
 	streamType = STREAM_NONE;
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::InStream::Seek(Int64 position)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
 	return RelSeek(position - currentFilePos);
 }
 
 S::Bool S::IO::InStream::RelSeek(Int64 offset)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
 	if (bitstreamActive) CompleteBitstream();
 
@@ -556,5 +566,5 @@ S::Bool S::IO::InStream::RelSeek(Int64 offset)
 		origfilepos	 = currentFilePos;
 	}
 
-	return true;
+	return True;
 }

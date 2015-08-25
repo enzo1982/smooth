@@ -11,7 +11,7 @@ ifneq ($(BUILD_WIN32),True)
 endif
 
 # Enter object files here:
-OBJECTS	  = args.o binary.o config.o datetime.o math.o memory.o number.o string.o string_case.o
+OBJECTS	  = args.o array.o binary.o config.o datetime.o math.o memory.o number.o string.o string_case.o
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = cd encoding && $(MAKE)

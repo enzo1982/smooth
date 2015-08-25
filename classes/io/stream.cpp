@@ -16,20 +16,27 @@ S::IO::Stream::Stream()
 {
 	streamType	 = STREAM_NONE;
 	size		 = 0;
+
 	currentFilePos	 = 0;
 	currentBufferPos = 0;
+
 	bitstreamActive	 = False;
 	keepBits	 = False;
 	bitLength	 = 0;
+
 	closefile	 = True;
 	crosslinked	 = False;
+
 	driver		 = NIL;
+	filter		 = NIL;
+
 	allowpackset	 = True;
 	packageSize	 = defaultPackageSize;
 	stdpacksize	 = packageSize;
 	origpacksize	 = packageSize;
 	origsize	 = 0;
 	origfilepos	 = 0;
+
 	lastError	 = IO_ERROR_OK;
 
 	memset(&bitBuffer, 0, sizeof(bitBuffer));

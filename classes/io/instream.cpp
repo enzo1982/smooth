@@ -163,7 +163,7 @@ S::Bool S::IO::InStream::ReadData()
 	size	       = origsize;
 	currentFilePos = origfilepos;
 
-	if (filters.Length() == 0)
+	if (filter == NIL)
 	{
 		/* Read unfiltered data.
 		 */
@@ -180,16 +180,16 @@ S::Bool S::IO::InStream::ReadData()
 	{
 		/* Read filtered data.
 		 */
-		if (filters.GetFirst()->GetPackageSize() > 0) packageSize = filters.GetFirst()->GetPackageSize();
-		else					      packageSize = stdpacksize;
+		if (filter->GetPackageSize() > 0) packageSize = filter->GetPackageSize();
+		else				  packageSize = stdpacksize;
 
 		if (size != -1)	dataBuffer.Resize(packageSize < size - currentFilePos ? packageSize : size - currentFilePos);
 		else		dataBuffer.Resize(packageSize);
 
-		decsize = filters.GetFirst()->ReadData(dataBuffer);
+		decsize = filter->ReadData(dataBuffer);
 	}
 
-	if (packageSize <= size - currentFilePos || filters.Length() > 0 || size == -1)
+	if (packageSize <= size - currentFilePos || filter != NIL || size == -1)
 	{
 		origfilepos = currentFilePos + packageSize;
 
@@ -396,9 +396,9 @@ S::String S::IO::InStream::InputLine()
 
 S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 {
-	if (streamType == STREAM_NONE)		{ lastError = IO_ERROR_NOTOPEN; return 0; }
-	if (pointer == NULL)			{ lastError = IO_ERROR_BADPARAM; return 0; }
-	if (bytes < 0)				{ lastError = IO_ERROR_BADPARAM; return 0; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return 0; }
+	if (pointer == NIL)		{ lastError = IO_ERROR_BADPARAM; return 0; }
+	if (bytes < 0)			{ lastError = IO_ERROR_BADPARAM; return 0; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
@@ -456,7 +456,7 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 
 	if (bitstreamActive) CompleteBitstream();
 
-	if (filters.Length() == 0) dataBuffer.Resize(newPackageSize);
+	if (filter == NIL) dataBuffer.Resize(newPackageSize);
 
 	packageSize = newPackageSize;
 	stdpacksize = packageSize;
@@ -466,9 +466,10 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 	return true;
 }
 
-S::Bool S::IO::InStream::AddFilter(Filter *newFilter)
+S::Bool S::IO::InStream::SetFilter(Filter *newFilter)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (filter != NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	newFilter->SetDriver(driver);
 
@@ -483,24 +484,18 @@ S::Bool S::IO::InStream::AddFilter(Filter *newFilter)
 
 	allowpackset = False;
 
-	filters.Add(newFilter);
+	filter = newFilter;
 
 	return True;
 }
 
-S::Bool S::IO::InStream::RemoveFilter(Filter *oldFilter)
+S::Bool S::IO::InStream::RemoveFilter()
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (filter == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 
-	Int	 index = -1;
-
-	for (Int i = 0; i < filters.Length(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
-
-	if (index == -1) { lastError = IO_ERROR_BADPARAM; return false; }
-
-	oldFilter->Deactivate();
-
-	filters.Remove(index);
+	filter->Deactivate();
+	filter = NIL;
 
 	allowpackset = true;
 
@@ -515,14 +510,14 @@ S::Bool S::IO::InStream::Close()
 
 	if (bitstreamActive) CompleteBitstream();
 
-	while (filters.Length() != 0) RemoveFilter(filters.GetLast());
+	while (filter != NIL) RemoveFilter();
 
 	if (crosslinked)
 	{
 		if (closefile) outStream->closefile = true;
 
 		outStream->crosslinked	= false;
-		outStream->inStream	= NULL;
+		outStream->inStream	= NIL;
 
 		closefile = false;
 	}

@@ -40,7 +40,7 @@ S::IO::OutStream::OutStream(Int type, Driver *iDriver)
 	streamType	= STREAM_DRIVER;
 	size		= driver->GetSize();
 	currentFilePos	= driver->GetPos();
-	closefile	= false;
+	closefile	= False;
 
 	dataBuffer.Resize(packageSize);
 }
@@ -116,10 +116,10 @@ S::IO::OutStream::OutStream(Int type, InStream *in)
 
 	streamType	= STREAM_STREAM;
 
-	crosslinked		= true;
+	crosslinked		= True;
 	inStream		= in;
 	inStream->outStream	= this;
-	inStream->crosslinked	= true;
+	inStream->crosslinked	= True;
 
 	if (inStream->streamType == STREAM_DRIVER)
 	{
@@ -128,7 +128,7 @@ S::IO::OutStream::OutStream(Int type, InStream *in)
 		streamType	= STREAM_DRIVER;
 		size		= inStream->origsize;
 		currentFilePos	= inStream->currentFilePos;
-		closefile	= false;
+		closefile	= False;
 
 		packageSize	= 1;
 		stdpacksize	= packageSize;
@@ -147,21 +147,18 @@ S::IO::OutStream::~OutStream()
 
 S::Bool S::IO::OutStream::Flush()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
 
-	if (currentBufferPos <= 0) return true;
+	if (currentBufferPos <= 0) return True;
 
 	if (bitstreamActive) CompleteBitstream();
 
-	int	 ps		= packageSize;
-	int	 oldcpos	= currentBufferPos;
+	Int	 ps		= packageSize;
+	Int	 oldcpos	= currentBufferPos;
 
-	if (filters.Length() > 0)
+	if (filter != NIL && filter->GetPackageSize() > 0)
 	{
-		if (filters.GetFirst()->GetPackageSize() > 0)
-		{
-			for (int i = 0; i < (packageSize - oldcpos); i++) OutputNumber(0, 1);
-		}
+		for (Int i = 0; i < (packageSize - oldcpos); i++) OutputNumber(0, 1);
 	}
 
 	if (currentBufferPos > 0)
@@ -172,13 +169,13 @@ S::Bool S::IO::OutStream::Flush()
 		{
 			packageSize = ps;
 
-			{ lastError = IO_ERROR_UNKNOWN; return false; }
+			{ lastError = IO_ERROR_UNKNOWN; return False; }
 		}
 
 		packageSize = ps;
 	}
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::WriteData()
@@ -187,17 +184,14 @@ S::Bool S::IO::OutStream::WriteData()
 
 	if (currentBufferPos < packageSize) return True;
 
-	if (filters.Length() > 0)
+	if (filter != NIL && filter->GetPackageSize() == -1)
 	{
-		if (filters.GetFirst()->GetPackageSize() == -1)
-		{
-			dataBuffer.Resize(packageSize + defaultPackageSize);
+		dataBuffer.Resize(packageSize + defaultPackageSize);
 
-			packageSize += defaultPackageSize;
-			stdpacksize = packageSize;
+		packageSize += defaultPackageSize;
+		stdpacksize = packageSize;
 
-			return True;
-		}
+		return True;
 	}
 
 	if (streamType == STREAM_DRIVER)
@@ -206,8 +200,8 @@ S::Bool S::IO::OutStream::WriteData()
 
 		dataBuffer.Resize(packageSize);
 
-		if (filters.Length() == 0) encsize = driver->WriteData(dataBuffer, packageSize);
-		else			   encsize = filters.GetFirst()->WriteData(dataBuffer);
+		if (filter == NIL) encsize = driver->WriteData(dataBuffer, packageSize);
+		else		   encsize = filter->WriteData(dataBuffer);
 
 		if (encsize == -1)
 		{
@@ -229,8 +223,8 @@ S::Bool S::IO::OutStream::WriteData()
 
 S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
@@ -238,7 +232,7 @@ S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)
 	{
 		if (currentBufferPos >= packageSize)
 		{
-			if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
+			if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return False; }
 		}
 
 		dataBuffer[currentBufferPos] = IOGetByte(number, i);
@@ -249,24 +243,24 @@ S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)
 
 	if (currentBufferPos >= packageSize)
 	{
-		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
+		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return False; }
 	}
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::OutputNumberRaw(Int64 number, Int bytes)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
-	for (int i = bytes - 1; i >= 0; i--)
+	for (Int i = bytes - 1; i >= 0; i--)
 	{
 		if (currentBufferPos >= packageSize)
 		{
-			if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
+			if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return False; }
 		}
 
 		dataBuffer[currentBufferPos] = IOGetByte(number, i);
@@ -277,20 +271,20 @@ S::Bool S::IO::OutStream::OutputNumberRaw(Int64 number, Int bytes)
 
 	if (currentBufferPos >= packageSize)
 	{
-		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
+		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return False; }
 	}
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::OutputBits(Int64 number, Int bits)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (bits > 64 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (bits > 64 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (!bitstreamActive) InitBitstream();
 
-	for (int j = 0; j < bits; j++)
+	for (Int j = 0; j < bits; j++)
 	{
 		bitBuffer[bitLength] = IOGetBit(number, j);
 		bitLength++;
@@ -300,11 +294,11 @@ S::Bool S::IO::OutStream::OutputBits(Int64 number, Int bits)
 	{
 		unsigned char	 out = 0;
 
-		for (int i = 0; i < 8; i++) out = out | (bitBuffer[i] << i);
+		for (Int i = 0; i < 8; i++) out = out | (bitBuffer[i] << i);
 
 		bitLength = bitLength - 8;
 
-		for (int j = 0; j < bitLength; j++) bitBuffer[j] = bitBuffer[j + 8];
+		for (Int j = 0; j < bitLength; j++) bitBuffer[j] = bitBuffer[j + 8];
 
 		dataBuffer[currentBufferPos] = out;
 
@@ -315,17 +309,17 @@ S::Bool S::IO::OutStream::OutputBits(Int64 number, Int bits)
 
 		if (currentBufferPos >= packageSize)
 		{
-			if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
+			if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return False; }
 		}
 	}
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::OutputString(const String &string)
 {
-	if (streamType == STREAM_NONE)		{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (string == NIL)			{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (string == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
@@ -334,12 +328,12 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 	 */
 	const char	*value		= string;
 
-	int		 bytesleft	= strlen(value);
-	int		 databufferpos	= 0;
+	Int		 bytesleft	= strlen(value);
+	Int		 databufferpos	= 0;
 
 	while (bytesleft)
 	{
-		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		Int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		for (Int i = 0; i < amount; i++) ((char *) (((UnsignedByte *) dataBuffer) + currentBufferPos))[i] = value[databufferpos + i];
 
@@ -350,10 +344,10 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 
 		if (size < currentFilePos) size = currentFilePos;
 
-		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
+		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return False; }
 	}
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::OutputLine(const String &string)
@@ -366,23 +360,23 @@ S::Bool S::IO::OutStream::OutputLine(const String &string)
 
 	OutputNumber(10, 1);
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 {
-	if (streamType == STREAM_NONE)		{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (pointer == NULL)			{ lastError = IO_ERROR_BADPARAM; return false; }
-	if (bytes < 0)				{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (pointer == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
+	if (bytes < 0)			{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
-	int	 bytesleft	= bytes;
-	int	 databufferpos	= 0;
+	Int	 bytesleft	= bytes;
+	Int	 databufferpos	= 0;
 
 	while (bytesleft)
 	{
-		int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
+		Int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
 		memcpy((void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), (void *) ((unsigned char *) pointer + databufferpos), amount);
 
@@ -393,10 +387,10 @@ S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 
 		if (size < currentFilePos) size = currentFilePos;
 
-		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return false; }
+		if (!WriteData()) { lastError = IO_ERROR_UNKNOWN; return False; }
 	}
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::InitBitstream()
@@ -404,35 +398,35 @@ S::Bool S::IO::OutStream::InitBitstream()
 	bitLength	= 0;
 	bitstreamActive	= 1;
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::CompleteBitstream()
 {
 	if (bitLength > 0)
 	{
-		int	out = 0;
+		Int	out = 0;
 
-		for (int i = 0; i < 8; i++)
+		for (Int i = 0; i < 8; i++)
 		{
 			if (i < bitLength) out = out | (bitBuffer[i] << i);
 		}
 
-		keepBits = true;
+		keepBits = True;
 		OutputNumber(out, 1);
-		keepBits = false;
+		keepBits = False;
 	}
 
 	bitstreamActive = 0;
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::SetPackageSize(Int newPackageSize)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-	if (!allowpackset)		{ lastError = IO_ERROR_OPNOTAVAIL; return false; }
-	if (newPackageSize <= 0)	{ lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (!allowpackset)		{ lastError = IO_ERROR_OPNOTAVAIL; return False; }
+	if (newPackageSize <= 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	Flush();
 
@@ -441,105 +435,100 @@ S::Bool S::IO::OutStream::SetPackageSize(Int newPackageSize)
 	packageSize = newPackageSize;
 	stdpacksize = packageSize;
 
-	return true;
+	return True;
 }
 
-S::Bool S::IO::OutStream::AddFilter(Filter *newFilter)
+S::Bool S::IO::OutStream::SetFilter(Filter *newFilter)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (filter != NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	newFilter->SetDriver(driver);
 
-	if (newFilter->Activate() == false) { lastError = IO_ERROR_UNKNOWN; return false; }
+	if (newFilter->Activate() == False) { lastError = IO_ERROR_UNKNOWN; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
 	Flush();
 
-	filters.Add(newFilter);
+	filter = newFilter;
 
-	allowpackset = true;
+	allowpackset = True;
 
-	if (newFilter->GetPackageSize() > 0)
+	if (filter->GetPackageSize() > 0)
 	{
-		SetPackageSize(newFilter->GetPackageSize());	// package size must be eqv filter size
+		SetPackageSize(filter->GetPackageSize());	// package size must be eqv filter size
 
-		allowpackset = false;
+		allowpackset = False;
 	}
-	else if (newFilter->GetPackageSize() == -1)
+	else if (filter->GetPackageSize() == -1)
 	{
 		SetPackageSize(defaultPackageSize);
 
-		allowpackset = false;
+		allowpackset = False;
 	}
 
-	return true;
+	return True;
 }
 
-S::Bool S::IO::OutStream::RemoveFilter(Filter *oldFilter)
+S::Bool S::IO::OutStream::RemoveFilter()
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
-
-	Int	 index = -1;
-
-	for (Int i = 0; i < filters.Length(); i++) if (filters.GetNth(i) == oldFilter) index = filters.GetNthIndex(i);
-
-	if (index == -1) { lastError = IO_ERROR_BADPARAM; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (filter == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 
-	int	 oldcpos = currentBufferPos;
+	Int	 oldcpos = currentBufferPos;
 
-	if (oldFilter->GetPackageSize() > 0 && currentBufferPos != 0)
+	if (filter->GetPackageSize() > 0 && currentBufferPos != 0)
 	{
-		for (int i = 0; i < (packageSize - oldcpos); i++) OutputNumber(0, 1);
+		for (Int i = 0; i < (packageSize - oldcpos); i++) OutputNumber(0, 1);
 	}
 	else
 	{
-		if (oldFilter->GetPackageSize() == -1) allowpackset = true;
+		if (filter->GetPackageSize() == -1) allowpackset = True;
 
 		Flush();
 	}
 
-	allowpackset = true;
+	allowpackset = True;
 
-	oldFilter->Deactivate();
-
-	filters.Remove(index);
+	filter->Deactivate();
+	filter = NIL;
 
 	SetPackageSize(origpacksize);
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::Close()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
 
-	while (filters.Length() != 0) RemoveFilter(filters.GetLast());
+	while (filter != NIL) RemoveFilter();
 
 	Flush();
 
 	if (crosslinked)
 	{
-		if (closefile) inStream->closefile = true;
+		if (closefile) inStream->closefile = True;
 
-		inStream->crosslinked	= false;
-		inStream->outStream	= NULL;
+		inStream->crosslinked	= False;
+		inStream->outStream	= NIL;
 
-		closefile = false;
+		closefile = False;
 	}
 
 	if (closefile) delete driver;
 
 	streamType = STREAM_NONE;
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::Seek(Int64 position)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
 	Flush();
 
@@ -548,12 +537,12 @@ S::Bool S::IO::OutStream::Seek(Int64 position)
 	currentFilePos	 = position;
 	currentBufferPos = 0;
 
-	return true;
+	return True;
 }
 
 S::Bool S::IO::OutStream::RelSeek(Int64 offset)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return false; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
 	Flush();
 
@@ -562,5 +551,5 @@ S::Bool S::IO::OutStream::RelSeek(Int64 offset)
 	currentFilePos	 += offset;
 	currentBufferPos = 0;
 
-	return true;
+	return True;
 }

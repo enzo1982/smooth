@@ -60,14 +60,14 @@ Bool PCIIO::CompressPCI(PCIOut out)
 	{
 		filter = new IO::FilterBZip2();
 
-		out->AddFilter(filter);
+		out->SetFilter(filter);
 	}
 
 	for (Int y = 0; y < sizey; y++) WriteLine(out, y);
 
 	if (compression == BZIP2)
 	{
-		out->RemoveFilter(filter);
+		out->RemoveFilter();
 
 		delete filter;
 	}
@@ -96,14 +96,14 @@ Bool PCIIO::DecompressPCI(PCIIn in)
 	{
 		filter = new IO::FilterBZip2();
 
-		in->AddFilter(filter);
+		in->SetFilter(filter);
 	}
 
 	for (Int y = 0; y < sizey; y++) ReadLine(in, y);
 
 	if (compression == BZIP2)
 	{
-		in->RemoveFilter(filter);
+		in->RemoveFilter();
 
 		delete filter;
 	}

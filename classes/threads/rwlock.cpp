@@ -10,17 +10,15 @@
 
 #include <smooth/misc/string.h>
 #include <smooth/threads/mutex.h>
-#include <smooth/threads/semaphore.h>
 #include <smooth/system/system.h>
-
-const S::Short	 S::Threads::RWLock::maxReadLocks = 16;
 
 S::Threads::RWLock::RWLock()
 {
-	writeLocked = False;
+	readLocked  = 0;
+	writeLocked = 0;
 
-	exclusiveAccessMutex  = new Mutex();
-	sharedAccessSemaphore = new Semaphore(maxReadLocks);
+	exclusiveAccessMutex = new Mutex();
+	sharedAccessMutex    = new Mutex();
 }
 
 S::Threads::RWLock::RWLock(const RWLock &oRWLock)
@@ -31,79 +29,84 @@ S::Threads::RWLock::RWLock(const RWLock &oRWLock)
 S::Threads::RWLock::~RWLock()
 {
 	delete exclusiveAccessMutex;
-	delete sharedAccessSemaphore;
+	delete sharedAccessMutex;
 }
 
 S::Threads::RWLock &S::Threads::RWLock::operator =(const RWLock &oRWLock)
 {
 	if (&oRWLock == this) return *this;
 
-	writeLocked = False;
+	readLocked  = 0;
+	writeLocked = 0;
 
-	exclusiveAccessMutex  = new Mutex();
-	sharedAccessSemaphore = new Semaphore(maxReadLocks);
+	exclusiveAccessMutex = new Mutex();
+	sharedAccessMutex    = new Mutex();
 
 	return *this;
 }
 
 S::Int S::Threads::RWLock::LockForRead()
 {
-	/* Increase shared access counter by one.
+	/* Acquire exclusive lock.
 	 */
-	sharedAccessSemaphore->Wait();
+	exclusiveAccessMutex->Lock();
+
+	/* Increase read lock counter by one.
+	 */
+	sharedAccessMutex->Lock();
+
+	readLocked++;
+
+	sharedAccessMutex->Release();
+
+	/* Allow other read and write locks.
+	 */
+	exclusiveAccessMutex->Release();
 
 	return Success();
 }
 
 S::Int S::Threads::RWLock::LockForWrite()
 {
-	/* Wait for read operations to finish.
-	 */
-	for (Int i = 0; i < maxReadLocks; i++) sharedAccessSemaphore->Wait();
-
 	/* Acquire exclusive lock.
 	 */
 	exclusiveAccessMutex->Lock();
 
-	/* Mark ourself locked for write.
+	/* Wait for read operations to finish.
 	 */
-	writeLocked = True;
+	while (readLocked) S::System::System::Sleep(0);
+
+	/* Increase write lock counter.
+	 */
+	writeLocked++;
 
 	return Success();
 }
 
 S::Int S::Threads::RWLock::Release()
 {
-	/* Acquire exclusive lock.
-	 */
-	exclusiveAccessMutex->Lock();
-
 	/* Check if we are locked for write.
 	 */
-	if (writeLocked)
+	if (writeLocked && !readLocked)
 	{
-		/* Release write lock.
+		/* Decrease write lock counter.
 		 */
-		writeLocked = False;
+		writeLocked--;
 
-		/* Release exclusive lock to allow
-		 * new read and write locks again.
+		/* Allow new read and write locks again.
 		 */
 		exclusiveAccessMutex->Release();
-		exclusiveAccessMutex->Release();
-
-		/* Release shared access semaphore.
-		 */
-		for (Int i = 0; i < maxReadLocks; i++) sharedAccessSemaphore->Release();
 
 		return Success();
 	}
 
-	/* Release exclusive lock.
+	/* Decrease read lock counter by one.
 	 */
-	exclusiveAccessMutex->Release();
+	sharedAccessMutex->Lock();
 
-	/* Decrease shared access counter by one.
-	 */
-	return sharedAccessSemaphore->Release();
+	readLocked--;
+
+	sharedAccessMutex->Release();
+
+	return Success();
 }

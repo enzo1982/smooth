@@ -84,19 +84,22 @@ S::Int S::GUI::List::Add(Widget *widget)
 {
 	if (widget == NIL) return Error();
 
-	if (widget->GetObjectType() == ListEntry::classID) widget->Hide();
-
-	if (Widget::Add(widget) == Success() && widget->GetObjectType() == ListEntry::classID)
+	if (!widget->IsRegistered())
 	{
-		elementOrder.Add((ListEntry *) widget, widget->GetHandle());
-		createdEntry.Add(False, widget->GetHandle());
+		if (widget->GetObjectType() == ListEntry::classID) widget->Hide();
 
-		Paint(SP_UPDATE);
-		Process(SM_MOUSEMOVE, 0, 0);
+		if (Widget::Add(widget) == Success() && widget->GetObjectType() == ListEntry::classID)
+		{
+			elementOrder.Add((ListEntry *) widget, widget->GetHandle());
+			createdEntry.Add(False, widget->GetHandle());
 
-		onChangeEntryOrder.Emit();
+			Paint(SP_UPDATE);
+			Process(SM_MOUSEMOVE, 0, 0);
 
-		return Success();
+			onChangeEntryOrder.Emit();
+
+			return Success();
+		}
 	}
 
 	return Error();

@@ -200,15 +200,18 @@ S::Int S::GUI::TabWidget::Add(Widget *widget)
 {
 	if (widget == NIL) return Error();
 
-	widget->Hide();
-
-	if (Widget::Add(widget) == Success())
+	if (!widget->IsRegistered())
 	{
-		widget->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
+		widget->Hide();
 
-		if (GetNOfObjects() == 1) SelectTab(widget);
+		if (Widget::Add(widget) == Success())
+		{
+			widget->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
 
-		return Success();
+			if (GetNOfObjects() == 1) SelectTab(widget);
+
+			return Success();
+		}
 	}
 
 	return Error();

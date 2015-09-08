@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -82,7 +82,7 @@ S::Bool S::GUI::BitmapCocoa::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	if (nDepth == -1)		  nDepth = [[NSScreen mainScreen] depth];
+	if (nDepth == -1)		  nDepth = [[NSScreen deepestScreen] depth];
 	if (nDepth != 24 && nDepth != 32) nDepth = 24;
 
 	bitmap	= [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil

@@ -200,23 +200,39 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 {
 	if (window == NIL || ![window isVisible]) return Success();
 
-	Point	 pos1 = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos1));
-	Point	 pos2 = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos2));
+	/* Get screen information.
+	 */
+	static SEL	 selScaleFactor	     = @selector(backingScaleFactor);
+	static Bool	 canQueryScaleFactor = [[NSScreen mainScreen] respondsToSelector: selScaleFactor];
+
+	NSScreen	*screen	     = [window screen];
+	Float		 scaleFactor = canQueryScaleFactor ? ((CGFloat (*)(id, SEL)) [screen methodForSelector: selScaleFactor])(screen, selScaleFactor) : 1.0;
+
+	/* Convert coordinates.
+	 */
+	Point	 pos1	= upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos1));
+	Point	 pos2	= upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos2));
+
+	NSPoint	 point1 = NSMakePoint(pos1.x + 0.5, pos1.y + 0.5);
+	NSPoint	 point2 = NSMakePoint(pos2.x + 0.5, pos2.y + 0.5);
 
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
-	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
+	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y) && scaleFactor == 1.0)
 	{
-		if (pos1.x < pos2.x && pos1.y < pos2.y) { pos2.x--; pos2.y--; }
-		if (pos1.x > pos2.x && pos1.y < pos2.y) { pos2.x++; pos2.y--; }
-		if (pos1.x < pos2.x && pos1.y > pos2.y) { pos1.x++; pos1.y--; }
-		if (pos1.x > pos2.x && pos1.y > pos2.y) { pos1.x--; pos1.y--; }
+		if (pos1.x < pos2.x && pos1.y < pos2.y) { point2.x--; point2.y--; }
+		if (pos1.x > pos2.x && pos1.y < pos2.y) { point2.x++; point2.y--; }
+		if (pos1.x < pos2.x && pos1.y > pos2.y) { point1.x++; point1.y--; }
+		if (pos1.x > pos2.x && pos1.y > pos2.y) { point1.x--; point1.y--; }
 	}
 
 	/* Adjust to Windows GDI behaviour for horizontal and vertical lines.
 	 */
-	if (pos1.x > pos2.x) { pos1.x++; pos2.x++; }
-	if (pos1.y > pos2.y) { pos1.y++; pos2.y++; }
+	if (point1.x < point2.x) { point1.x -= 0.5; point2.x -= 0.5; }
+	if (point1.x > point2.x) { point1.x += 0.5; point2.x += 0.5; }
+
+	if (point1.y < point2.y) { point1.y -= 0.5; point2.y -= 0.5; }
+	if (point1.y > point2.y) { point1.y += 0.5; point2.y += 0.5; }
 
 	if (!painting) [[window contentView] lockFocus];
 
@@ -231,8 +247,8 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 	[path setLineWidth: 0.0];
 
-	[path moveToPoint: NSMakePoint(pos1.x, pos1.y)];
-	[path lineToPoint: NSMakePoint(pos2.x, pos2.y)];
+	[path moveToPoint: point1];
+	[path lineToPoint: point2];
 
 	[path stroke];
 
@@ -285,7 +301,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 					    blue: color.GetBlue()  / 255.0
 					   alpha: 1.0] set];
 
-		[NSBezierPath strokeRect: NSMakeRect(rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1)];
+		[NSBezierPath strokeRect: NSMakeRect(rect.left + 0.5, rect.top + 0.5, rect.GetWidth() - 1, rect.GetHeight() - 1)];
 
 		if (!painting) [[window contentView] unlockFocus];
 
@@ -312,7 +328,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 					    blue: color.GetBlue()  / 255.0
 					   alpha: 1.0] set];
 
-		NSBezierPath	*path	    = [NSBezierPath bezierPathWithRect: NSMakeRect(rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1)];
+		NSBezierPath	*path	    = [NSBezierPath bezierPathWithRect: NSMakeRect(rect.left + 0.5, rect.top + 0.5, rect.GetWidth() - 1, rect.GetHeight() - 1)];
 		CGFloat		 pattern[2] = { 1.0, 1.0 };
 
 		[path setLineDash: pattern count: 2 phase: 1];

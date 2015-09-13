@@ -391,7 +391,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2015\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Asterisk);
+	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2015\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Information);
 }
 
 Void BeatClock::StoreConfig()

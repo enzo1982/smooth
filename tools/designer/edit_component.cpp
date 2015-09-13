@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -170,7 +170,7 @@ Widget *Designer_EditComponent::AddObject(Short objid)
 
 			break;
 		default:
-			QuickMessage("Unknown object ID!", "Error", Message::Buttons::Ok, Message::Icon::Hand);
+			QuickMessage("Unknown object ID!", "Error", Message::Buttons::Ok, Message::Icon::Error);
 
 			return NIL;
 	}

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -61,11 +61,13 @@ S::Int S::Encoding::Base64::Decode(const String &string)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			if	(string[i + j] >= 'A' && string[i + j] <= 'Z')	val[j] = string[i + j] - 'A' +  0;
-			else if (string[i + j] >= 'a' && string[i + j] <= 'z')	val[j] = string[i + j] - 'a' + 26;
-			else if (string[i + j] >= '0' && string[i + j] <= '9')	val[j] = string[i + j] - '0' + 52;
-			else if (string[i + j] == '+')				val[j] = 62;
-			else if (string[i + j] == '/')				val[j] = 63;
+			wchar_t	 value = string[i + j];							
+
+			if	(value >= 'A' && value <= 'Z')	val[j] = value - 'A' +  0;
+			else if (value >= 'a' && value <= 'z')	val[j] = value - 'a' + 26;
+			else if (value >= '0' && value <= '9')	val[j] = value - '0' + 52;
+			else if (value == '+')			val[j] = 62;
+			else if (value == '/')			val[j] = 63;
 		}
 
 		if (val[0] == 64) break;

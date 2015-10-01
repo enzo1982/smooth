@@ -240,7 +240,7 @@ S::Int64 S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		rval += dataBuffer[currentBufferPos] * (1 << (i * 8));
+		rval += dataBuffer[currentBufferPos] * (1LL << (i * 8));
 		currentBufferPos++;
 		currentFilePos++;
 	}
@@ -266,7 +266,7 @@ S::Int64 S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		rval += dataBuffer[currentBufferPos] * (1 << (i * 8));
+		rval += dataBuffer[currentBufferPos] * (1LL << (i * 8));
 		currentBufferPos++;
 		currentFilePos++;
 	}
@@ -304,7 +304,7 @@ S::Int64 S::IO::InStream::InputBits(Int bits)
 
 	for (Int i = 0; i < bits; i++)
 	{
-		rval = rval | (bitBuffer[i] << i);
+		rval = rval | (Int64(bitBuffer[i]) << i);
 	}
 
 	bitLength = bitLength - bits;

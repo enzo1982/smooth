@@ -79,6 +79,18 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 		}
 	}
 
+	/* Replace ../ elements.
+	 */
+	if (!dirPath.EndsWith(GetDirectoryDelimiter())) dirPath.Append(GetDirectoryDelimiter());
+
+	while (dirPath.Contains(String(GetDirectoryDelimiter()).Append("..").Append(GetDirectoryDelimiter())))
+	{
+		Int	 upPos	= dirPath.Find(String(GetDirectoryDelimiter()).Append("..").Append(GetDirectoryDelimiter()));
+		Int	 prePos	= dirPath.Head(upPos).FindLast(GetDirectoryDelimiter());
+
+		dirPath.Replace(dirPath.SubString(prePos, upPos - prePos + 3), String());
+	}
+
 	if (dirPath.EndsWith(Directory::GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;
 }
 

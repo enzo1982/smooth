@@ -91,6 +91,8 @@ S::File::File(const String &iFileName, const String &iFilePath)
 		filePath[lastBS >= 0 ? lastBS : 0] = 0;
 	}
 
+	/* Replace ../ elements.
+	 */
 	if (!filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath.Append(Directory::GetDirectoryDelimiter());
 
 	while (filePath.Contains(String(Directory::GetDirectoryDelimiter()).Append("..").Append(Directory::GetDirectoryDelimiter())))

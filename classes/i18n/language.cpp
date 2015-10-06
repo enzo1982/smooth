@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,7 @@
 S::I18n::Language::Language()
 {
 	rightToLeft = False;
+	incomplete  = False;
 }
 
 S::I18n::Language::~Language()
@@ -36,9 +37,10 @@ S::Errors::Error S::I18n::Language::ParseHeader(XML::Node *language)
 		if (property == "language")	 SetName(info->GetNthNode(i)->GetContent());
 
 		if (property == "righttoleft")	 rightToLeft = (info->GetNthNode(i)->GetContent() == "true" ? True : False);
-		if (property == "encoding")	 encoding = info->GetNthNode(i)->GetContent();
-		if (property == "author")	 author = info->GetNthNode(i)->GetContent();
-		if (property == "url")		 url = info->GetNthNode(i)->GetContent();
+		if (property == "encoding")	 encoding    =  info->GetNthNode(i)->GetContent();
+		if (property == "author")	 author	     =  info->GetNthNode(i)->GetContent();
+		if (property == "url")		 url	     =  info->GetNthNode(i)->GetContent();
+		if (property == "incomplete")	 incomplete  = (info->GetNthNode(i)->GetContent() == "true" ? True : False);
 	}
 
 	return Success();

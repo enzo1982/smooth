@@ -128,7 +128,7 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 	return Success();
 }
 
-S::Int S::I18n::Translator::SelectUserDefaultLanguage()
+S::String S::I18n::Translator::GetUserDefaultLanguageCode()
 {
 	String	 code;
 
@@ -312,32 +312,24 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 
 	pclose(pstdin);
 
-	String	 lang = (char *) buffer;
-
-	if (lang != NIL)
-	{
-		if (lang.Contains(".")) lang = lang.Head(lang.Find(".")).Append(lang.Contains("@") ? lang.Tail(lang.Length() - lang.Find("@")) : "");
-
-		code = lang;
-	}
-
-	lang.Replace("@latin", "@Latn");
-	lang.Replace("@cyrillic", "@Cyrl");
+	code = (char *) buffer;
 #else
-	String	 lang = getenv("LANG");
+	code = getenv("LANG");
 
-	if (lang == NIL) lang = getenv("LC_MESSAGES");
-
-	if (lang != NIL)
-	{
-		if (lang.Contains(".")) lang = lang.Head(lang.Find(".")).Append(lang.Contains("@") ? lang.Tail(lang.Length() - lang.Find("@")) : "");
-
-		code = lang;
-	}
-
-	lang.Replace("@latin", "@Latn");
-	lang.Replace("@cyrillic", "@Cyrl");
+	if (code == NIL) code = getenv("LC_MESSAGES");
 #endif
+
+	if (code.Contains(".")) code = code.Head(code.Find(".")).Append(code.Contains("@") ? code.Tail(code.Length() - code.Find("@")) : "");
+
+	code.Replace("@latin", "@Latn");
+	code.Replace("@cyrillic", "@Cyrl");
+
+	return code;
+}
+
+S::Int S::I18n::Translator::SelectUserDefaultLanguage()
+{
+	String	 code = GetUserDefaultLanguageCode();
 
 	/* Try the language code, possibly with appended country and script code.
 	 */
@@ -462,6 +454,11 @@ S::Bool S::I18n::Translator::IsNthLanguageRightToLeft(Int index) const
 	return languages.GetNth(index)->rightToLeft;
 }
 
+S::Bool S::I18n::Translator::IsNthLanguageIncomplete(Int index) const
+{
+	return languages.GetNth(index)->incomplete;
+}
+
 const S::String &S::I18n::Translator::GetActiveLanguageName() const
 {
 	return activeLanguage->GetName();
@@ -490,6 +487,11 @@ const S::String &S::I18n::Translator::GetActiveLanguageURL() const
 S::Bool S::I18n::Translator::IsActiveLanguageRightToLeft() const
 {
 	return activeLanguage->rightToLeft;
+}
+
+S::Bool S::I18n::Translator::IsActiveLanguageIncomplete() const
+{
+	return activeLanguage->incomplete;
 }
 
 S::Int S::I18n::Translator::ActivateLanguage(const String &magic)

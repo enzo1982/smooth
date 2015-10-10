@@ -30,6 +30,7 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 			- method OutputNumberPBD renamed OutputBits
 - translator.cpp	- added Afrikaans and Serbian (Cyrillic) language support
 - cursor.cpp		- fixed CJK input method editor appearing offset in Windows Vista/7/8 default designs
+			- added support for Ctrl+Ins, Shift+Ins and Shift+Del shortcuts
 - urlencode.cpp		- new class: URLEncode, handles URL (percent) encoding/decoding
 - config.cpp		- added copy constructor for copying Configuration objects
 - document.cpp		- added copy constructor for copying XML document objects

@@ -988,51 +988,72 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			onLoseFocus.Emit();
 
 			return True;
+		case Input::Keyboard::KeyInsert:
+#ifndef __APPLE__
+			if (		   Input::Keyboard::GetKeyState(controlKey) && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) CopyToClipboard();
+			if (IsActive() && !Input::Keyboard::GetKeyState(controlKey) &&  Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) InsertFromClipboard();
+#endif
+			break;
 		case Input::Keyboard::KeyBack:
-		case Input::Keyboard::KeyDelete:
-			if (!IsActive()) break;
+			if (!IsActive() || Input::Keyboard::GetKeyState(controlKey) || Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) break;
 
 			if (markStart != markEnd) { DeleteSelectedText(); break; }
 
-			if (promptPos == 0	       && keyCode == Input::Keyboard::KeyBack)	 break;
-			if (promptPos == text.Length() && keyCode == Input::Keyboard::KeyDelete) break;
+			if (promptPos == 0) break;
 
-			if (keyCode == Input::Keyboard::KeyBack)
+			markStart = promptPos - 1;
+			markEnd	  = promptPos;
+
+			DeleteSelectedText();
+
+			break;
+		case Input::Keyboard::KeyDelete:
+			if (!IsActive() || Input::Keyboard::GetKeyState(controlKey)) break;
+#ifdef __APPLE__
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) break;
+#endif
+			if (markStart != markEnd)
 			{
-				markStart	= promptPos - 1;
-				markEnd		= promptPos;
+				if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) CopyToClipboard();
+
+				DeleteSelectedText();
+
+				break;
 			}
-			else
-			{
-				markStart	= promptPos;
-				markEnd		= promptPos + 1;
-			}
+
+			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) break;
+
+			if (promptPos == text.Length()) break;
+
+			markStart = promptPos;
+			markEnd	  = promptPos + 1;
 
 			DeleteSelectedText();
 
 			break;
 		case Input::Keyboard::KeyA:
-			if (Input::Keyboard::GetKeyState(controlKey))   MarkAll();
+			if (		  Input::Keyboard::GetKeyState(controlKey))   MarkAll();
 
 			break;
 		case Input::Keyboard::KeyC:
-			if (Input::Keyboard::GetKeyState(controlKey))   CopyToClipboard();
+			if (		  Input::Keyboard::GetKeyState(controlKey))   CopyToClipboard();
 
 			break;
 		case Input::Keyboard::KeyX:
-			if (Input::Keyboard::GetKeyState(controlKey)) { CopyToClipboard(); DeleteSelectedText(); }
+			if (IsActive() && Input::Keyboard::GetKeyState(controlKey)) { CopyToClipboard(); DeleteSelectedText(); }
 
 			break;
 		case Input::Keyboard::KeyV:
-			if (Input::Keyboard::GetKeyState(controlKey))   InsertFromClipboard();
+			if (IsActive() && Input::Keyboard::GetKeyState(controlKey))   InsertFromClipboard();
 
 			break;
 		case Input::Keyboard::KeyZ:
-			if (Input::Keyboard::GetKeyState(controlKey))   Undo();
+
+			if (IsActive() && Input::Keyboard::GetKeyState(controlKey))   Undo();
 
 			break;
 		case Input::Keyboard::KeyY:
-			if (Input::Keyboard::GetKeyState(controlKey))   Redo();
+			if (IsActive() && Input::Keyboard::GetKeyState(controlKey))   Redo();
 
 			break;
 	}

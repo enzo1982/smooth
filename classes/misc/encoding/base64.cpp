@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/misc/encoding/base64.h>
+#include <smooth/misc/math.h>
 
 S::Encoding::Base64::Base64(Buffer<UnsignedByte> &iBuffer) : buffer(iBuffer)
 {
@@ -24,6 +25,10 @@ S::String S::Encoding::Base64::Encode(Int bytes) const
 	if (bytes == -1) bytes = buffer.Size();
 
 	String	 b64;
+
+	/* Set last byte to reserve memory and speed up processing.
+	 */
+	b64[Math::Ceil(bytes / 3.0) * 4] = 0;
 
 	for (Int i = 0; i < bytes; i += 3)
 	{

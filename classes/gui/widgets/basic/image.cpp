@@ -69,6 +69,8 @@ S::Int S::GUI::Image::Paint(Int message)
 
 S::Int S::GUI::Image::SetBitmap(const Bitmap &newBmp)
 {
+	if (bitmap == newBmp) return Success();
+
 	Bool	 prevVisible = IsVisible();
 
 	if (prevVisible) Hide();

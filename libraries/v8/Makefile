@@ -128,6 +128,10 @@ ifeq ($(BUILD_WIN32),True)
 	LIBS = -lwinmm -lws2_32
 endif
 
+ifeq ($(BUILD_LINUX),True)
+	LIBS = -lrt
+endif
+
 ifeq ($(BUILD_FREEBSD),True)
 	LIBS = -L/usr/local/lib -lexecinfo
 endif

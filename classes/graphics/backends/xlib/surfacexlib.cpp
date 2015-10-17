@@ -453,6 +453,10 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 
 	/* Convert format if depths do not match.
 	 */
+	XWindowAttributes	 windowAttributes;
+
+	XGetWindowAttributes(display, window, &windowAttributes);
+
 	const Bitmap	*srcBitmap = &bitmap;
 	Size		 srcSize   =  bitmap.GetSize();
 

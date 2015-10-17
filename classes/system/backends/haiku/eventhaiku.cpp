@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,7 +24,7 @@ S::System::EventBackend *CreateEventHaiku()
 
 S::Int	 eventHaikuTmp = S::System::EventBackend::SetBackend(&CreateEventHaiku);
 
-S::Array<S::System::EventHaiku::Message *>	 S::System::EventHaiku::messages;
+S::Array<S::System::EventHaiku::Message *, S::Void *>	 S::System::EventHaiku::messages;
 
 S::System::EventHaiku::EventHaiku()
 {

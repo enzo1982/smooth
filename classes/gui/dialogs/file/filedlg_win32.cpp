@@ -55,7 +55,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	ofn.lpstrFile	    = buffer;
 	ofn.nMaxFile	    = 32768;
 	ofn.lpstrFileTitle  = NIL;
-	ofn.lpstrInitialDir = NIL;
+	ofn.lpstrInitialDir = defPath;
 	ofn.lpstrTitle	    = caption;
 	ofn.Flags	    = OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
 	ofn.lpstrDefExt	    = defExt;

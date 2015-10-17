@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,10 +42,10 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 						     NULL);
 
 		if (flags & SFD_CONFIRMOVERWRITE) gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), True);
-
-		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), File(defFile).GetFilePath());
-		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), File(defFile).GetFileName());
 	}
+
+	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), defPath);
+	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), defFile);
 
 	/* Add file filters.
 	 */

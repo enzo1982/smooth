@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,6 +38,13 @@ S::Int S::GUI::Dialogs::FileSelectionBase::SetFlags(Short newFlags)
 S::Int S::GUI::Dialogs::FileSelectionBase::SetMode(Short newMode)
 {
 	mode = newMode;
+
+	return Success();
+}
+
+S::Int S::GUI::Dialogs::FileSelectionBase::SetInitialPath(const String &newDefPath)
+{
+	defPath = newDefPath;
 
 	return Success();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,22 +16,30 @@
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
-	/* Show file selection dialog.
+	/* Setup file selection dialog.
 	 */
 	PtFileSelectionInfo_t	 info;
-	int			 result = -1;
 
 	memset(&info, 0, sizeof(info));
 
-	if (mode == SFM_OPEN)
-	{
-		result = PtFileSelection(NULL, NULL, caption, "~", NULL, NULL, NULL, NULL, &info, flags & SFD_ALLOWMULTISELECT ? Pt_FSR_MULTIPLE : 0);
-	}
-	else if (mode == SFM_SAVE)
-	{
-		result = PtFileSelection(NULL, NULL, caption, defFile, NULL, NULL, NULL, NULL, &info, Pt_FSR_NO_FCHECK |
-								      (flags & SFD_CONFIRMOVERWRITE ? Pt_FSR_CONFIRM_EXISTING : 0));
-	}
+	/* Generate default path.
+	 */
+	String	 path = defPath != NIL ? defPath : "~";
+
+	if (!path.EndsWith("/") && defFile != NIL) path.Append("/");
+
+	path.Append(defFile);
+
+	/* Setup flags.
+	 */
+	int	 ptfl = 0;
+
+	if	(mode == SFM_OPEN) ptfl =  flags & SFD_ALLOWMULTISELECT ? Pt_FSR_MULTIPLE	  : 0;
+	else if (mode == SFM_SAVE) ptfl = (flags & SFD_CONFIRMOVERWRITE ? Pt_FSR_CONFIRM_EXISTING : 0) | Pt_FSR_NO_FCHECK;
+
+	/* Show dialog.
+	 */
+	int	 result = PtFileSelection(NULL, NULL, caption, path, NULL, NULL, NULL, NULL, &info, ptlf);
 
 	/* Check result and get file names.
 	 */

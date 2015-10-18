@@ -47,3 +47,4 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - upgraded libjpeg to version 9a
 - upgraded libpng to version 1.6.17
 - upgraded libxml2 to version 2.9.2
+- upgraded fribidi2 to version 0.19.7

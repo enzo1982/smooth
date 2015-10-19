@@ -10,6 +10,7 @@
 
 #include <smooth/misc/string.h>
 #include <smooth/misc/number.h>
+#include <smooth/misc/math.h>
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
 #include <smooth/system/cpu.h>
@@ -410,7 +411,7 @@ wchar_t &S::String::operator [](int n)
 		/* Allocate more memory than actually
 		 * needed to speed up string operations.
 		 */
-		wString.Resize(n + 100);
+		wString.Resize(n + Math::Max(10, Math::Min(n / 10, 100000)));
 
 		wmemset(wString + length, 0, wString.Size() - length);
 	}

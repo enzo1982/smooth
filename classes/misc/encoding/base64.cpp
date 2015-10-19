@@ -28,7 +28,7 @@ S::String S::Encoding::Base64::Encode(Int bytes) const
 
 	/* Set last byte to reserve memory and speed up processing.
 	 */
-	b64[Math::Ceil(bytes / 3.0) * 4] = 0;
+	b64[(Int) Math::Ceil(bytes / 3.0) * 4] = 0;
 
 	for (Int i = 0; i < bytes; i += 3)
 	{

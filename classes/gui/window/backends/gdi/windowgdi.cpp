@@ -214,7 +214,7 @@ S::Input::Keyboard::Key S::GUI::WindowGDI::ConvertKey(Int keySym)
 	return key;
 }
 
-S::Int S::GUI::WindowGDI::ProcessSystemMessages(Int message, Int wParam, Int lParam)
+S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	/* Process system messages not relevant
 	 * to portable Window implementation.

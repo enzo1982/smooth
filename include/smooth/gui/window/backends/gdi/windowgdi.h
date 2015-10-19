@@ -54,7 +54,7 @@ namespace smooth
 				static System::Timer			*mouseNotifyTimer;
 				static Cursor				*activeCursor;
 
-				Int					 ProcessSystemMessages(Int, Int, Int);
+				Int					 ProcessSystemMessages(UINT, WPARAM, LPARAM);
 
 				WindowGDI				*FindLeaderWindow();
 			protected:

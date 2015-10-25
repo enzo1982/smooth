@@ -8,14 +8,16 @@
 #include "ras.h"
 
 using namespace std;
+
 using namespace smooth;
+using namespace smooth::GUI;
 
 Int smooth::Main(const Array<String> &args)
 {
 	if (args.Length() < 6)
 	{
 		cout << "RAS2PCI converter v0.2\n";
-		cout << "Copyright (C) 1998-2011 Robert Kausch\n\n";
+		cout << "Copyright (C) 1998-2015 Robert Kausch\n\n";
 		cout << "Usage: ras2pci <ras file> <pci file> <image id> <compression> <color> <depth>\n\n";
 		cout << "<compression> is one of these compression formats:\n";
 		cout << "\t0 = uncompressed\n";
@@ -54,7 +56,7 @@ Int smooth::Main(const Array<String> &args)
 	PCIIO	*pio = new PCIIO(bmp);
 
 	pio->SetCompressionType(comp);
-	pio->SetColorspace(color);
+	pio->SetColorspace(Color::ColorSpace(color));
 	pio->SetBitsPerChannel(bpc);
 	pio->SetImageID(im_id);
 

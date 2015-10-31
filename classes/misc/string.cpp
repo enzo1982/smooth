@@ -404,6 +404,10 @@ char *S::String::ConvertTo(const char *encoding) const
 
 wchar_t &S::String::operator [](int n)
 {
+	static wchar_t	 dummy = 0;
+
+	if (n < 0) return dummy;
+
 	if (n + 1 >= wString.Size())
 	{
 		Int	 length = Length();
@@ -419,9 +423,9 @@ wchar_t &S::String::operator [](int n)
 	return wString[n];
 }
 
-wchar_t S::String::operator [](int n) const
+wchar_t S::String::operator []( int n) const
 {
-	if (n + 1 >= wString.Size()) return 0;
+	if (n < 0 || n + 1 >= wString.Size()) return 0;
 
 	return wString[n];
 }

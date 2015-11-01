@@ -209,17 +209,13 @@ S::Bool S::System::System::OpenURL(const String &url)
 #if defined __WIN32__
 	ShellExecute(NULL, (wchar_t *) L"open", url, NULL, NULL, 0);
 #elif defined __APPLE__
-	if (!fork())
-	{
-		execl("/usr/bin/open", "open", (char *) url, NULL);
-		exit(0);
-	}
+	cosnt char	*args = url;
+
+	if (!fork()) { execl("/usr/bin/open", "open", args, NULL); exit(0); }
 #elif defined __HAIKU__
-	if (!fork())
-	{
-		execl("/boot/system/bin/open", "open", (char *) url, NULL);
-		exit(0);
-	}
+	cosnt char	*args = url;
+
+	if (!fork()) { execl("/boot/system/bin/open", "open", args, NULL); exit(0); }
 #else
 	/* Try the open commands from freedesktop.org and the Gnome and
 	 * KDE desktops first, then try some widely used browsers.
@@ -237,11 +233,9 @@ S::Bool S::System::System::OpenURL(const String &url)
 		command.Append(browsers[i]).Append(" \"").Append(url).Append("\"");
 	}
 
-	if (!fork())
-	{
-		execl("/bin/sh", "sh", "-c", (char *) command, NULL);
-		exit(0);
-	}
+	const char	*cmd = command;
+
+	if (!fork()) { execl("/bin/sh", "sh", "-c", cmd, NULL); exit(0); }
 #endif
 
 	return True;

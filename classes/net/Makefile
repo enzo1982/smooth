@@ -1,7 +1,12 @@
 ########## smooth directory makefile ##########
 
+# Change these variables to fit this location:
+SMOOTH_PATH = ../..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+
 all:
-	cd protocols && $(MAKE)
+	$(call makein,protocols)
 
 clean:
-	cd protocols && $(MAKE) clean
+	$(call cleanin,protocols)

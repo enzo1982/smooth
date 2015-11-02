@@ -7,12 +7,11 @@ SMOOTH_PATH = ../..
 OBJECTS	  = driver.o filter.o instream.o outstream.o stream.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd drivers && $(MAKE)
-ALLCMD2   = cd filters && $(MAKE)
-CLEANCMD1 = cd drivers && $(MAKE) clean
-CLEANCMD2 = cd filters && $(MAKE) clean
+ALLCMD1   = $(call makein,drivers)
+ALLCMD2   = $(call makein,filters)
+CLEANCMD1 = $(call cleanin,drivers)
+CLEANCMD2 = $(call cleanin,filters)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

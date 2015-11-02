@@ -3,7 +3,7 @@
 # Change these variables to fit this location:
 SMOOTH_PATH = ../..
 
-include $(SMOOTH_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Disable PowerPC builds of V8 on OS X for now.
 ifeq ($(BUILD_OSX),True)
@@ -15,7 +15,7 @@ endif
 GLOBALDLL   = smooth-js
 IMPORTLIB   = libsmooth-js.a
 
-MYCCOPTS    = -I. -I./include
+MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/include
 
 ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS += -Wno-unused-local-typedefs
@@ -141,25 +141,26 @@ ifeq ($(BUILD_OPENBSD),True)
 endif
 
 # Additional things to do on clean:
-CLEANCMD1 = rm -f experimental-libraries.cc libraries.cc jsmin.pyc
+ALLCMD1	  = mkdir -p extensions platform utils arm ia32 mips x64
+CLEANCMD1 = rmdir extensions platform utils arm ia32 mips x64 || true
+CLEANCMD2 = rm -f experimental-libraries.cc libraries.cc jsmin.pyc
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands
 
 libraries.cc: runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js debug-debugger.js mirror-debugger.js liveedit-debugger.js date.js json.js regexp.js arraybuffer.js typedarray.js macros.py
 ifeq ($(BUILD_HAIKU),True)
-	python ./js2c.py libraries.cc CORE off runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js debug-debugger.js mirror-debugger.js liveedit-debugger.js date.js json.js regexp.js arraybuffer.js typedarray.js macros.py
+	python $(SRCDIR)/js2c.py $@ CORE off $^
 else
-	chmod a+x ./js2c.py
-	./js2c.py libraries.cc CORE off runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js debug-debugger.js mirror-debugger.js liveedit-debugger.js date.js json.js regexp.js arraybuffer.js typedarray.js macros.py
+	chmod a+x $(SRCDIR)/js2c.py
+	$(SRCDIR)/js2c.py $@ CORE off $^
 endif
 
 experimental-libraries.cc: symbol.js proxy.js collection.js object-observe.js generator.js array-iterator.js harmony-string.js harmony-array.js harmony-math.js macros.py
 ifeq ($(BUILD_HAIKU),True)
-	python ./js2c.py experimental-libraries.cc EXPERIMENTAL off symbol.js proxy.js collection.js object-observe.js generator.js array-iterator.js harmony-string.js harmony-array.js harmony-math.js macros.py
+	python $(SRCDIR)/js2c.py $@ EXPERIMENTAL off $^
 else
-	chmod a+x ./js2c.py
-	./js2c.py experimental-libraries.cc EXPERIMENTAL off symbol.js proxy.js collection.js object-observe.js generator.js array-iterator.js harmony-string.js harmony-array.js harmony-math.js macros.py
+	chmod a+x $(SRCDIR)/js2c.py
+	$(SRCDIR)/js2c.py $@ EXPERIMENTAL off $^
 endif

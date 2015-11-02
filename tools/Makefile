@@ -1,11 +1,16 @@
 ########## smooth directory makefile ##########
 
+# Change these variables to fit this location:
+SMOOTH_PATH = ..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+
 all:
-	cd designer && $(MAKE)
-	cd pciffmanager && $(MAKE)
-	cd translator && $(MAKE)
+	$(call makein,designer)
+	$(call makein,pciffmanager)
+	$(call makein,translator)
 
 clean:
-	cd designer && $(MAKE) clean
-	cd pciffmanager && $(MAKE) clean
-	cd translator && $(MAKE) clean
+	$(call cleanin,designer)
+	$(call cleanin,pciffmanager)
+	$(call cleanin,translator)

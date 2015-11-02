@@ -7,12 +7,11 @@ SMOOTH_PATH = ../..
 OBJECTS	  = error.o success.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd fs && $(MAKE)
-ALLCMD2   = cd misc && $(MAKE)
-CLEANCMD1 = cd fs && $(MAKE) clean
-CLEANCMD2 = cd misc && $(MAKE) clean
+ALLCMD1   = $(call makein,fs)
+ALLCMD2   = $(call makein,misc)
+CLEANCMD1 = $(call cleanin,fs)
+CLEANCMD2 = $(call cleanin,misc)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

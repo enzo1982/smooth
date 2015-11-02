@@ -1,21 +1,26 @@
 ########## smooth directory makefile ##########
 
+# Change these variables to fit this location:
+SMOOTH_PATH = ..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+
 all:
-	cd beatclock && $(MAKE)
-	cd test && $(MAKE)
-	cd testkey && $(MAKE)
+	$(call makein,beatclock)
+	$(call makein,test)
+	$(call makein,testkey)
 ifeq ($(BUILD_WIN32),True)
-	cd v8test && $(MAKE)
+	$(call makein,v8test)
 endif
-#	cd widgettest && $(MAKE)
-	cd xul && $(MAKE)
+#	$(call makein,widgettest)
+	$(call makein,xul)
 
 clean:
-	cd beatclock && $(MAKE) clean
-	cd test && $(MAKE) clean
-	cd testkey && $(MAKE) clean
+	$(call cleanin,beatclock)
+	$(call cleanin,test)
+	$(call cleanin,testkey)
 ifeq ($(BUILD_WIN32),True)
-	cd v8test && $(MAKE) clean
+	$(call cleanin,v8test)
 endif
-#	cd widgettest && $(MAKE) clean
-	cd xul && $(MAKE) clean
+#	$(call cleanin,widgettest)
+	$(call cleanin,xul)

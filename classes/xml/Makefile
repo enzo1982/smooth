@@ -3,7 +3,7 @@
 # Change these variables to fit this location:
 SMOOTH_PATH = ../..
 
-include $(SMOOTH_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
@@ -20,10 +20,9 @@ endif
 OBJECTS	  = attribute.o document.o node.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd xul && $(MAKE)
-CLEANCMD1 = cd xul && $(MAKE) clean
+ALLCMD1   = $(call makein,xul)
+CLEANCMD1 = $(call cleanin,xul)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

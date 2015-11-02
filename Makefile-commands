@@ -1,21 +1,17 @@
 ########## smooth commands makefile ##########
 
-include $(SMOOTH_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 CC	   = gcc
-CCOPTS	   = -pipe -g0 -Wall -I$(SMOOTH_PATH)/include $(MYCCOPTS)
+CCOPTS	   = -I$(SRCDIR)/$(SMOOTH_PATH)/include $(MYCCOPTS)
 RC	   = windres
 RCOPTS	   = -DSMOOTH_DLL -O coff
 LD	   = gcc
-LDOPTS	   = -pipe -L$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+LDOPTS	   = -L$(SRCDIR)/$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
 
 ifeq ($(BUILD_FREEBSD),True)
 	CC = clang
 	LD = clang
-endif
-
-ifneq ($(BUILD_SOLARIS),True)
-	CCOPTS += -Os
 endif
 
 ifndef GLOBALDLL
@@ -29,7 +25,7 @@ endif
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	CCOPTS += -DUNICODE -D_UNICODE -I$(SMOOTH_PATH)/include/support
+	CCOPTS += -DUNICODE -D_UNICODE -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
 	LDOPTS += -mwindows -Wl,--dynamicbase,--nxcompat
 
 	ifdef IMPORTLIB
@@ -39,8 +35,26 @@ ifeq ($(BUILD_WIN32),True)
 			LDOPTS += -Wl,--out-implib,$(IMPORTLIB)
 		endif
 	endif
+
+	ifeq ($(BUILD_X86),True)
+		RCOPTS += --target=pe-i386
+	else ifeq ($(BUILD_X86_64),True)
+		RCOPTS += --target=pe-x86-64
+	endif
 else
-	LDOPTS += -Wl,-rpath,.
+	CCOPTS += -fPIC
+
+	ifneq ($(BUILD_SOLARIS),True)
+	ifneq ($(BUILD_HAIKU),True)
+	ifneq ($(BUILD_QNX),True)
+		CCOPTS += -pthread
+	endif
+	endif
+	endif
+
+	ifeq ($(BUILD_QNX),True)
+		CCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
+	endif
 
 	ifdef GLOBALDLL
 		ifeq ($(BUILD_OSX),True)
@@ -50,64 +64,9 @@ else
 		endif
 	endif
 
-ifeq ($(BUILD_OPENBSD),True)
-	LDOPTS += -L/usr/X11R6/lib -L/usr/local/lib
-endif
-
-ifneq ($(BUILD_SOLARIS),True)
-ifneq ($(BUILD_HAIKU),True)
-ifneq ($(BUILD_QNX),True)
-	CCOPTS += -pthread
-endif
-endif
-endif
-endif
-
-ifneq ($(BUILD_WIN32),True)
-	CCOPTS += -fPIC
-endif
-
-ifeq ($(BUILD_QNX),True)
-	CCOPTS += -I$(SMOOTH_PATH)/include/support
-endif
-
-ifneq ($(EXCEPTION),True)
-	CCOPTS += -fno-exceptions
-endif
-
-ifeq ($(BUILD_OSX),True)
-	LDOPTS += -Wl,-x
-
-ifeq ($(BUILD_X86),True)
-	CCOPTS += -arch i386 -Xarch_i386 -march=prescott
-	LDOPTS += -arch i386
-endif
-ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -arch x86_64 -Xarch_x86_64 -march=core2
-	LDOPTS += -arch x86_64
-endif
-ifeq ($(BUILD_PPC),True)
-	CCOPTS += -arch ppc -Xarch_ppc -mcpu=G4
-	LDOPTS += -arch ppc
-endif
-ifeq ($(BUILD_PPC64),True)
-	CCOPTS += -arch ppc64 -Xarch_ppc64 -mcpu=G5
-	LDOPTS += -arch ppc64
-endif
-else
-	LDOPTS += -s
-
-ifeq ($(BUILD_X86),True)
-	CCOPTS += -m32
-	LDOPTS += -m32
-
-	RCOPTS += --target=pe-i386
-else ifeq ($(BUILD_X86_64),True)
-	CCOPTS += -m64
-	LDOPTS += -m64
-
-	RCOPTS += --target=pe-x86-64
-endif
+	ifeq ($(BUILD_OPENBSD),True)
+		LDOPTS += -L/usr/X11R6/lib -L/usr/local/lib
+	endif
 endif
 
 ifndef GLOBALLIB
@@ -116,12 +75,6 @@ ifndef GLOBALDLL
 ifndef LOCALEXE
 ifndef LOCALDLL
 	CCOPTS += -DSMOOTH_DLL
-
-ifeq ($(BUILD_WIN32),True)
-	CCOPTS += -DLIBICONV_PLUG -DLIBXML_STATIC
-else ifeq ($(BUILD_QNX),True)
-	CCOPTS += -DLIBICONV_PLUG
-endif
 endif
 endif
 endif
@@ -161,7 +114,9 @@ ifeq ($(BUILD_WIN32),True)
 endif
 endif
 
-all: $(OBJECTS) $(TARGETS)
+all: allcmds $(OBJECTS) $(TARGETS)
+
+allcmds:
 	$(ALLCMD1)
 	$(ALLCMD2)
 	$(ALLCMD3)
@@ -180,16 +135,19 @@ endif
 	$(CLEANCMD4)
 
 .c.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CFLAGS) -c $< -o $@
 
 .cc.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
 
 .cpp.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
+
+.m.o:
+	$(CC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
 
 .mm.o:
-	$(CC) $(CCOPTS) -c $< -o $@
+	$(CC) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@
 
 .rc.o:
 	$(RC) $(RCOPTS) $< -o $@
@@ -203,7 +161,7 @@ endif
 ifdef GLOBALEXE
 $(SMOOTH_PATH)/$(BINDIR)/$(GLOBALEXE)$(EXECUTABLE): $(OBJECTS)
 	mkdir -p $(SMOOTH_PATH)/$(BINDIR)
-	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS) $(LDFLAGS_TOOLS)
 endif
 
 ifdef GLOBALDLL
@@ -215,9 +173,9 @@ $(SMOOTH_PATH)/$(LIBDIR)/lib$(GLOBALDLL)-$(VERSION)$(SHARED): $(OBJECTS)
 endif
 	mkdir -p $(SMOOTH_PATH)/$(LIBDIR)
 ifneq ($(BUILD_OSX),True)
-	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS) $(LDFLAGS_TOOLS)
 else
-	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS) $(LDFLAGS_TOOLS)
 endif
 
 ifeq ($(BUILD_WIN32),True)
@@ -227,15 +185,15 @@ endif
 
 ifdef LOCALEXE
 $(LOCALEXE)$(EXECUTABLE): $(OBJECTS)
-	$(LD) -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS) $(LDFLAGS_TOOLS)
 endif
 
 ifdef LOCALDLL
 $(LOCALDLL)$(SHARED): $(OBJECTS)
 ifneq ($(BUILD_OSX),True)
-	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) --shared -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS) $(LDFLAGS_TOOLS)
 else
-	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS)
+	$(LD) -dynamiclib -o $@ $(OBJECTS) $(LDOPTS) $(LDFLAGS) $(LDFLAGS_TOOLS)
 endif
 
 ifeq ($(BUILD_WIN32),True)

@@ -1,15 +1,20 @@
 ########## smooth directory $(MAKE)file ##########
 
+# Change these variables to fit this location:
+SMOOTH_PATH = ../..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+
 all:
-	cd application && $(MAKE)
-	cd clipboard && $(MAKE)
-	cd dialogs && $(MAKE)
-	cd widgets && $(MAKE)
-	cd window && $(MAKE)
+	$(call makein,application)
+	$(call makein,clipboard)
+	$(call makein,dialogs)
+	$(call makein,widgets)
+	$(call makein,window)
 
 clean:
-	cd application && $(MAKE) clean
-	cd clipboard && $(MAKE) clean
-	cd dialogs && $(MAKE) clean
-	cd widgets && $(MAKE) clean
-	cd window && $(MAKE) clean
+	$(call cleanin,application)
+	$(call cleanin,clipboard)
+	$(call cleanin,dialogs)
+	$(call cleanin,widgets)
+	$(call cleanin,window)

@@ -7,12 +7,11 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = pointerbackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd cocoa && $(MAKE) && cd ../haiku && $(MAKE)
-ALLCMD2   = cd win32 && $(MAKE) && cd ../xlib && $(MAKE)
-CLEANCMD1 = cd cocoa && $(MAKE) clean && cd ../haiku && $(MAKE) clean
-CLEANCMD2 = cd win32 && $(MAKE) clean && cd ../xlib && $(MAKE) clean
+ALLCMD1   = $(call makein,cocoa) && $(call makein,haiku)
+ALLCMD2   = $(call makein,win32) && $(call makein,xlib)
+CLEANCMD1 = $(call cleanin,cocoa) && $(call cleanin,haiku)
+CLEANCMD2 = $(call cleanin,win32) && $(call cleanin,xlib)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

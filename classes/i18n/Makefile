@@ -8,5 +8,4 @@ OBJECTS	  = charsetdetector.o charsetdetector_internal.o language.o number.o sec
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

@@ -7,14 +7,13 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = mutexbackend.o semaphorebackend.o threadbackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd cocoa && $(MAKE)
-ALLCMD2   = cd posix && $(MAKE)
-ALLCMD3   = cd win32 && $(MAKE)
-CLEANCMD1 = cd cocoa && $(MAKE) clean
-CLEANCMD2 = cd posix && $(MAKE) clean
-CLEANCMD3 = cd win32 && $(MAKE) clean
+ALLCMD1   = $(call makein,cocoa)
+ALLCMD2   = $(call makein,posix)
+ALLCMD3   = $(call makein,win32)
+CLEANCMD1 = $(call cleanin,cocoa)
+CLEANCMD2 = $(call cleanin,posix)
+CLEANCMD3 = $(call cleanin,win32)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

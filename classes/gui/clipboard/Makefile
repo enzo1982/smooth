@@ -7,10 +7,9 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = clipboard.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd backends && $(MAKE)
-CLEANCMD1 = cd backends && $(MAKE) clean
+ALLCMD1   = $(call makein,backends)
+CLEANCMD1 = $(call cleanin,backends)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

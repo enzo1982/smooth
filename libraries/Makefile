@@ -1,63 +1,63 @@
 SMOOTH_PATH = ..
 
-include $(SMOOTH_PATH)/Makefile-options
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 all:
-	$(MAKE) -C fribidi2
-	$(MAKE) -C libcpuid
+	$(call makein,fribidi2)
+	$(call makein,libcpuid)
 ifeq ($(BUILD_LINUX),True)
-	$(MAKE) -C nsucd
+	$(call makein,nsucd)
 else ifeq ($(BUILD_OSX),True)
-	$(MAKE) -C libjpeg
+	$(call makein,libjpeg)
 ifneq ($(BUILD_XLIB),True)
-	$(MAKE) -C libpng
-	$(MAKE) -C libz
+	$(call makein,libpng)
+	$(call makein,libz)
 endif
-	$(MAKE) -C nsucd
+	$(call makein,nsucd)
 else ifeq ($(BUILD_QNX),True)
-	$(MAKE) -C libiconv
-	$(MAKE) -C libjpeg
-	$(MAKE) -C libpng
-	$(MAKE) -C libz
+	$(call makein,libiconv)
+	$(call makein,libjpeg)
+	$(call makein,libpng)
+	$(call makein,libz)
 else ifeq ($(BUILD_WIN32),True)
-	$(MAKE) -C bzlib
-	$(MAKE) -C libiconv
-	$(MAKE) -C libjpeg
-	$(MAKE) -C libpng
-	$(MAKE) -C libxml
-	$(MAKE) -C libz
-	$(MAKE) -C nsucd
+	$(call makein,bzlib)
+	$(call makein,libiconv)
+	$(call makein,libjpeg)
+	$(call makein,libpng)
+	$(call makein,libxml)
+	$(call makein,libz)
+	$(call makein,nsucd)
 endif
 ifeq ($(BUILD_V8),True)
-	$(MAKE) -C v8
+	$(call makein,v8)
 endif
 
 clean:
-	$(MAKE) -C fribidi2 clean
-	$(MAKE) -C libcpuid clean
+	$(call cleanin,fribidi2)
+	$(call cleanin,libcpuid)
 ifeq ($(BUILD_LINUX),True)
-	$(MAKE) -C nsucd clean
+	$(call cleanin,nsucd)
 else ifeq ($(BUILD_OSX),True)
-	$(MAKE) -C libjpeg clean
+	$(call cleanin,libjpeg)
 ifneq ($(BUILD_XLIB),True)
-	$(MAKE) -C libpng clean
-	$(MAKE) -C libz clean
+	$(call cleanin,libpng)
+	$(call cleanin,libz)
 endif
-	$(MAKE) -C nsucd clean
+	$(call cleanin,nsucd)
 else ifeq ($(BUILD_QNX),True)
-	$(MAKE) -C libiconv clean
-	$(MAKE) -C libjpeg clean
-	$(MAKE) -C libpng clean
-	$(MAKE) -C libz clean
+	$(call cleanin,libiconv)
+	$(call cleanin,libjpeg)
+	$(call cleanin,libpng)
+	$(call cleanin,libz)
 else ifeq ($(BUILD_WIN32),True)
-	$(MAKE) -C bzlib clean
-	$(MAKE) -C libiconv clean
-	$(MAKE) -C libjpeg clean
-	$(MAKE) -C libpng clean
-	$(MAKE) -C libxml clean
-	$(MAKE) -C libz clean
-	$(MAKE) -C nsucd clean
+	$(call cleanin,bzlib)
+	$(call cleanin,libiconv)
+	$(call cleanin,libjpeg)
+	$(call cleanin,libpng)
+	$(call cleanin,libxml)
+	$(call cleanin,libz)
+	$(call cleanin,nsucd)
 endif
 ifeq ($(BUILD_V8),True)
-	$(MAKE) -C v8 clean
+	$(call cleanin,v8)
 endif

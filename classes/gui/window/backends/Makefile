@@ -7,16 +7,15 @@ SMOOTH_PATH = ../../../..
 OBJECTS	  = windowbackend.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd cocoa && $(MAKE)
-ALLCMD2   = cd gdi && $(MAKE)
-ALLCMD3   = cd haiku && $(MAKE)
-ALLCMD4   = cd xlib && $(MAKE)
-CLEANCMD1 = cd cocoa && $(MAKE) clean
-CLEANCMD2 = cd gdi && $(MAKE) clean
-CLEANCMD3 = cd haiku && $(MAKE) clean
-CLEANCMD4 = cd xlib && $(MAKE) clean
+ALLCMD1   = $(call makein,cocoa)
+ALLCMD2   = $(call makein,gdi)
+ALLCMD3   = $(call makein,haiku)
+ALLCMD4   = $(call makein,xlib)
+CLEANCMD1 = $(call cleanin,cocoa)
+CLEANCMD2 = $(call cleanin,gdi)
+CLEANCMD3 = $(call cleanin,haiku)
+CLEANCMD4 = $(call cleanin,xlib)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

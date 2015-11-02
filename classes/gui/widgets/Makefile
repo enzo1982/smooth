@@ -7,16 +7,15 @@ SMOOTH_PATH = ../../..
 OBJECTS	  = layer.o widget.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = cd basic && $(MAKE)
-ALLCMD2   = cd hotspot && $(MAKE)
-ALLCMD3   = cd multi && $(MAKE)
-ALLCMD4   = cd special && $(MAKE)
-CLEANCMD1 = cd basic && $(MAKE) clean
-CLEANCMD2 = cd hotspot && $(MAKE) clean
-CLEANCMD3 = cd multi && $(MAKE) clean
-CLEANCMD4 = cd special && $(MAKE) clean
+ALLCMD1   = $(call makein,basic)
+ALLCMD2   = $(call makein,hotspot)
+ALLCMD3   = $(call makein,multi)
+ALLCMD4   = $(call makein,special)
+CLEANCMD1 = $(call cleanin,basic)
+CLEANCMD2 = $(call cleanin,hotspot)
+CLEANCMD3 = $(call cleanin,multi)
+CLEANCMD4 = $(call cleanin,special)
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

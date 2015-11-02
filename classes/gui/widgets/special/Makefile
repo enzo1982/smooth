@@ -8,5 +8,4 @@ OBJECTS	  = cursor.o dragcontrol.o droparea.o shortcut.o tooltip.o
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

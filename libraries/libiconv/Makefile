@@ -11,7 +11,7 @@ else
 	GLOBALLIB   = libiconv.a
 endif
 
-MYCCOPTS    = -DLIBICONV_PLUG -I.
+MYCCOPTS    = -I$(SRCDIR)
 
 ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS += -D_ICONVDLL_
@@ -24,5 +24,4 @@ OBJECTS	    = iconv.o localcharset.o
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
-include $(SMOOTH_PATH)/Makefile-commands
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands

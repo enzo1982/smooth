@@ -22,5 +22,4 @@ CLEANCMD3 =
 
 ## Do not change anything below this line. ##
 
-include $(SMOOTH_PATH)/Makefile-directories
 include $(SMOOTH_PATH)/Makefile-commands

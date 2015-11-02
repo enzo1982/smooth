@@ -1,13 +1,18 @@
 ########## smooth directory $(MAKE)file ##########
 
+# Change these variables to fit this location:
+SMOOTH_PATH = ../../../..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+
 all:
-	cd image && $(MAKE)
-	cd list && $(MAKE)
-	cd menu && $(MAKE)
-	cd tree && $(MAKE)
+	$(call makein,image)
+	$(call makein,list)
+	$(call makein,menu)
+	$(call makein,tree)
 
 clean:
-	cd image && $(MAKE) clean
-	cd list && $(MAKE) clean
-	cd menu && $(MAKE) clean
-	cd tree && $(MAKE) clean
+	$(call cleanin,image)
+	$(call cleanin,list)
+	$(call cleanin,menu)
+	$(call cleanin,tree)

@@ -1,33 +1,38 @@
 ########## smooth directory $(MAKE)file ##########
 
+# Change these variables to fit this location:
+SMOOTH_PATH = ..
+
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+
 all:
-	cd backends && $(MAKE)
-	cd basic && $(MAKE)
-	cd errors && $(MAKE)
-	cd files && $(MAKE)
-	cd graphics && $(MAKE)
-	cd gui && $(MAKE)
-	cd i18n && $(MAKE)
-	cd input && $(MAKE)
-	cd io && $(MAKE)
-	cd misc && $(MAKE)
-	cd net && $(MAKE)
-	cd system && $(MAKE)
-	cd threads && $(MAKE)
-	cd xml && $(MAKE)
+	$(call makein,backends)
+	$(call makein,basic)
+	$(call makein,errors)
+	$(call makein,files)
+	$(call makein,graphics)
+	$(call makein,gui)
+	$(call makein,i18n)
+	$(call makein,input)
+	$(call makein,io)
+	$(call makein,misc)
+	$(call makein,net)
+	$(call makein,system)
+	$(call makein,threads)
+	$(call makein,xml)
 
 clean:
-	cd backends && $(MAKE) clean
-	cd basic && $(MAKE) clean
-	cd errors && $(MAKE) clean
-	cd files && $(MAKE) clean
-	cd graphics && $(MAKE) clean
-	cd gui && $(MAKE) clean
-	cd i18n && $(MAKE) clean
-	cd input && $(MAKE) clean
-	cd io && $(MAKE) clean
-	cd misc && $(MAKE) clean
-	cd net && $(MAKE) clean
-	cd system && $(MAKE) clean
-	cd threads && $(MAKE) clean
-	cd xml && $(MAKE) clean
+	$(call cleanin,backends)
+	$(call cleanin,basic)
+	$(call cleanin,errors)
+	$(call cleanin,files)
+	$(call cleanin,graphics)
+	$(call cleanin,gui)
+	$(call cleanin,i18n)
+	$(call cleanin,input)
+	$(call cleanin,io)
+	$(call cleanin,misc)
+	$(call cleanin,net)
+	$(call cleanin,system)
+	$(call cleanin,threads)
+	$(call cleanin,xml)

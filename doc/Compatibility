@@ -1,7 +1,7 @@
 General requirements
 --------------------
 
-smooth can be compiled using GCC 4.0+ or MSVC 10.0.
+smooth can be compiled using GCC 4.0+ or Microsoft Visual C++ 2015.
 
 Supported operating systems
 ---------------------------

@@ -39,7 +39,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 	/* Show dialog.
 	 */
-	int	 result = PtFileSelection(NULL, NULL, caption, path, NULL, NULL, NULL, NULL, &info, ptlf);
+	int	 result = PtFileSelection(NULL, NULL, caption, path, NULL, NULL, NULL, NULL, &info, ptfl);
 
 	/* Check result and get file names.
 	 */

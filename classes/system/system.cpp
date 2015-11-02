@@ -209,11 +209,11 @@ S::Bool S::System::System::OpenURL(const String &url)
 #if defined __WIN32__
 	ShellExecute(NULL, (wchar_t *) L"open", url, NULL, NULL, 0);
 #elif defined __APPLE__
-	cosnt char	*args = url;
+	const char	*args = url;
 
 	if (!fork()) { execl("/usr/bin/open", "open", args, NULL); exit(0); }
 #elif defined __HAIKU__
-	cosnt char	*args = url;
+	const char	*args = url;
 
 	if (!fork()) { execl("/boot/system/bin/open", "open", args, NULL); exit(0); }
 #else

@@ -335,10 +335,7 @@ S::String S::IO::InStream::InputString(Int bytes)
 
 	while (bytesleft)
 	{
-		if (currentFilePos >= (origfilepos + packageSize))
-		{
-			{ lastError = IO_ERROR_UNKNOWN; return NIL; }
-		}
+		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return NIL; }
 
 		while (currentBufferPos >= packageSize)
 		{
@@ -421,7 +418,7 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 
 	while (bytesleft)
 	{
-		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return 0; }
+		if (currentFilePos >= (origfilepos + packageSize)) { lastError = IO_ERROR_UNKNOWN; return bytes - bytesleft; }
 
 		while (currentBufferPos >= packageSize)
 		{

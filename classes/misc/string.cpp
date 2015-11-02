@@ -918,13 +918,16 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	}
 	else if (Setup::useIconv)
 	{
-		iconv_t		 cd	= iconv_open(outEncoding, inEncoding);
+		iconv_t		 cd = iconv_open(outEncoding, inEncoding);
+		int		 on = 1;
 
 		if (cd == (iconv_t) -1) return -1;
 
-		size_t		 inBytesLeft	= inBytes;
-		size_t		 outBytesLeft	= outBytes;
-		char	       **outPointer	= &outBuffer;
+		iconvctl(cd, ICONV_SET_TRANSLITERATE, &on);
+
+		size_t		 inBytesLeft  = inBytes;
+		size_t		 outBytesLeft = outBytes;
+		char	       **outPointer   = &outBuffer;
 
 #if defined __FreeBSD__ || defined __NetBSD__ || defined __sun
 		const char     **inPointer	= &inBuffer;

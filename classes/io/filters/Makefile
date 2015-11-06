@@ -7,7 +7,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifeq ($(BUILD_WIN32),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/bzlib
+	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libbz2
 else
 	MYCCOPTS += -I/usr/local/include
 endif

@@ -17,6 +17,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/misc/binary.h>
 #include <smooth/input/keyboard.h>
+#include <smooth/system/screen.h>
 
 #ifdef __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
@@ -278,6 +279,17 @@ S::Void S::GUI::Titlebar::OnMouseDragStart(const Point &mousePos)
 S::Void S::GUI::Titlebar::OnMouseDrag(const Point &mousePos)
 {
 	Window	*window	= container->GetContainerWindow();
+
+	if (window->IsMaximized() && mousePos != startMousePos)
+	{
+		Rect	 nonMaxRect = window->GetRestoredWindowRect();
+		Rect	 workArea   = System::Screen::GetActiveScreenWorkArea();
+
+		window->Restore();
+		window->SetPosition(Point(workArea.left + Math::Max(0, Math::Min(mousePos.x - nonMaxRect.GetWidth() / 2, workArea.GetWidth() - nonMaxRect.GetWidth())), workArea.top + mousePos.y - startMousePos.y));
+
+		startMousePos.x -= window->GetX();
+	}
 
 	if (!window->IsMaximized()) window->SetPosition(window->GetPosition() - (Point((IsRightToLeft() ? window->GetWidth() - startMousePos.x : startMousePos.x), startMousePos.y) - Point((IsRightToLeft() ? window->GetWidth() - mousePos.x : mousePos.x), mousePos.y)));
 }

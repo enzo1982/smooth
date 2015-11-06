@@ -19,6 +19,7 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - surfacegdi.cpp	- added native Gradient() implementation
 - surfacegdiplus.cpp	- added native Gradient() implementation
 - titlebar.cpp		- do not close main windows when pressing escape
+			- allow dragging windows from maximized state
 			- use a flat titlebar style on Windows 8.x and 10
 - image.cpp		- cache scaled version of bitmap for display
 - list.cpp		- allow setting marked state when adding new text entries

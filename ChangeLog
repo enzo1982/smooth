@@ -36,6 +36,7 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - document.cpp		- added copy constructor for copying XML document objects
 
 - fixed blurry GUI on Windows with high resolution displays
+- reworked build system to support VPATH builds
 - reworked hash function API to allow stream processing
 - removed unused multiple document interface (MDI) code
 - removed support for Windows 9x/ME and NT 4.0
@@ -45,6 +46,6 @@ xx.xx.15 xx:xx - smooth alpha 0.8.72.0
 - upgraded V8 to version 3.22.24.21
 - upgraded libcpuid to version 0.2.1
 - upgraded libjpeg to version 9a
-- upgraded libpng to version 1.6.17
+- upgraded libpng to version 1.6.18
 - upgraded libxml2 to version 2.9.2
 - upgraded fribidi2 to version 0.19.7

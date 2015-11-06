@@ -52,14 +52,15 @@ typedef signed char		int8_t;
 typedef unsigned char		uint8_t;
 typedef signed short		int16_t;
 typedef unsigned short		uint16_t;
-
-#  if defined(__linux__) && defined(__x86_64__)
-typedef signed long int		int64_t;
-typedef unsigned long int	uint64_t;
-#  else
-typedef signed long long	int64_t;
-typedef unsigned long long	uint64_t;
-#  endif
+#if (defined _MSC_VER) && (_MSC_VER <= 1300)
+	/* MSVC 6.0: no long longs ... */
+	typedef signed __int64		int64_t;
+	typedef unsigned __int64	uint64_t;
+#else
+	/* all other sane compilers: */
+	typedef signed long long   int64_t;
+	typedef unsigned long long uint64_t;
+#endif
 
 #endif
 

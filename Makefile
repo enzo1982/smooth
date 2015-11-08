@@ -21,7 +21,7 @@ ifeq ($(BUILD_WIN32),True)
 		LIBS += -lcairo.dll
 	endif
 
-	LIBS += -lnsucd -lpng -lz -lws2_32 -limm32 -lole32 -luuid
+	LIBS += -lpng -lz -lws2_32 -limm32 -lole32 -luuid
 
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
@@ -36,7 +36,7 @@ else ifeq ($(BUILD_OSX),True)
 		LIBS += -lcairo
 	endif
 
-	LIBS += -lnsucd -liconv -lpthread
+	LIBS += -liconv -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
@@ -48,9 +48,7 @@ else ifeq ($(BUILD_QNX),True)
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else
-	ifeq ($(BUILD_LINUX),True)
-		LIBS += -lnsucd
-	else ifeq ($(BUILD_FREEBSD),True)
+	ifeq ($(BUILD_FREEBSD),True)
 		LIBS += -lrt
 	else ifeq ($(BUILD_OPENBSD),True)
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre

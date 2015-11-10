@@ -64,9 +64,12 @@ S::Int S::GUI::Text::SetText(const String &nText)
 {
 	if (text == nText) return Success();
 
-	Surface	*surface = GetDrawSurface();
+	Surface	*surface    = GetDrawSurface();
 
-	if (IsRegistered() && IsVisible())
+	Bool	 registered = IsRegistered();
+	Bool	 visible    = IsVisible();
+
+	if (registered && visible)
 	{
 		Rect	 oldRect = Rect(GetRealPosition(), GetRealSize());
 		Rect	 newRect = Rect(oldRect.GetPosition(), Size(font.GetScaledTextSizeX(nText), font.GetScaledTextSizeY(nText)));
@@ -80,7 +83,7 @@ S::Int S::GUI::Text::SetText(const String &nText)
 
 	Paint(SP_PAINT);
 
-	if (IsRegistered() && IsVisible()) surface->EndPaint();
+	if (registered && visible) surface->EndPaint();
 
 	return Success();
 }
@@ -89,9 +92,12 @@ S::Int S::GUI::Text::SetFont(const Font &nFont)
 {
 	if (font == nFont) return Success();
 
-	Surface	*surface = GetDrawSurface();
+	Surface	*surface    = GetDrawSurface();
 
-	if (IsRegistered() && IsVisible())
+	Bool	 registered = IsRegistered();
+	Bool	 visible    = IsVisible();
+
+	if (registered && visible)
 	{
 		Rect	 oldRect = Rect(GetRealPosition(), GetRealSize());
 		Rect	 newRect = Rect(oldRect.GetPosition(), Size(nFont.GetScaledTextSizeX(text), nFont.GetScaledTextSizeY(text)));
@@ -105,7 +111,7 @@ S::Int S::GUI::Text::SetFont(const Font &nFont)
 
 	Paint(SP_PAINT);
 
-	if (IsRegistered() && IsVisible()) surface->EndPaint();
+	if (registered && visible) surface->EndPaint();
 
 	return Success();
 }

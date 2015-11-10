@@ -572,7 +572,9 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
-	if (IsVisible()) surface->StartPaint(frame);
+	Bool	 visible = IsVisible();
+
+	if (visible) surface->StartPaint(frame);
 
 	ShowCursor(False);
 
@@ -595,7 +597,7 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 
 	AddHistoryEntry();
 
-	if (IsVisible()) surface->EndPaint();
+	if (visible) surface->EndPaint();
 
 	return Success();
 }

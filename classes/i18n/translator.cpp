@@ -18,29 +18,6 @@
 
 #ifdef __WIN32__
 #	include <windows.h>
-
-#	ifndef LANG_BANGLA
-#		define LANG_BANGLA			0x45
-
-#		define SUBLANG_BANGLA_BANGLADESH	0x02
-#		define SUBLANG_BANGLA_INDIA		0x01
-#	endif
-
-#	ifndef LANG_PULAR
-#		define LANG_PULAR			0x67
-#	endif
-
-#	ifndef LANG_TIGRINYA
-#		define LANG_TIGRINYA			0x73
-#	endif
-
-#	ifndef SUBLANG_PUNJABI_PAKISTAN
-#		define SUBLANG_PUNJABI_PAKISTAN		0x02
-#	endif
-
-#	ifndef SUBLANG_TAMIL_SRI_LANKA
-#		define SUBLANG_TAMIL_SRI_LANKA		0x02
-#	endif
 #else
 #	include <stdlib.h>
 #	include <unistd.h>
@@ -178,6 +155,9 @@ S::String S::I18n::Translator::GetUserDefaultLanguageCode()
 		case LANG_CATALAN:	code = "ca";	break;
 		case LANG_CHINESE:	code = "zh_TW";	if	(SUBLANGID(langid) == SUBLANG_CHINESE_SIMPLIFIED)	  code = "zh_CN";
 							else if (SUBLANGID(langid) == SUBLANG_CHINESE_TRADITIONAL)	  code = "zh_TW";
+							else if (SUBLANGID(langid) == SUBLANG_CHINESE_HONGKONG)		  code = "zh_HK";
+							else if (SUBLANGID(langid) == SUBLANG_CHINESE_MACAU)		  code = "zh_MO";
+							else if (SUBLANGID(langid) == SUBLANG_CHINESE_SINGAPORE)	  code = "zh_SG";
 							break;
 		case LANG_CZECH:	code = "cs";	break;
 		case LANG_DANISH:	code = "da";	break;

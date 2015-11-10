@@ -18,10 +18,24 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libraries\libbz2\blocksort.c" />
+    <ClCompile Include="..\..\libraries\libbz2\bzlib.c" />
+    <ClCompile Include="..\..\libraries\libbz2\compress.c" />
+    <ClCompile Include="..\..\libraries\libbz2\crctable.c" />
+    <ClCompile Include="..\..\libraries\libbz2\decompress.c" />
+    <ClCompile Include="..\..\libraries\libbz2\huffman.c" />
+    <ClCompile Include="..\..\libraries\libbz2\randtable.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\support\libbz2\bzlib.h" />
+    <ClInclude Include="..\..\include\support\libbz2\bzlib_private.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{601D2C29-07F2-4A25-AA49-3D703DB3CBE5}</ProjectGuid>
     <RootNamespace>libbzip2</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>libbz2</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -68,7 +82,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../include/support/bzlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -85,7 +99,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../include/support/bzlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -98,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include/support/bzlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -111,7 +125,7 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include/support/bzlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -119,19 +133,6 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\libraries\bzlib\blocksort.c" />
-    <ClCompile Include="..\..\libraries\bzlib\bzlib.c" />
-    <ClCompile Include="..\..\libraries\bzlib\compress.c" />
-    <ClCompile Include="..\..\libraries\bzlib\crctable.c" />
-    <ClCompile Include="..\..\libraries\bzlib\decompress.c" />
-    <ClCompile Include="..\..\libraries\bzlib\huffman.c" />
-    <ClCompile Include="..\..\libraries\bzlib\randtable.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\include\bzlib.h" />
-    <ClInclude Include="..\..\include\bzlib_private.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -18,10 +18,37 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libraries\zlib\adler32.c" />
+    <ClCompile Include="..\..\libraries\zlib\compress.c" />
+    <ClCompile Include="..\..\libraries\zlib\crc32.c" />
+    <ClCompile Include="..\..\libraries\zlib\deflate.c" />
+    <ClCompile Include="..\..\libraries\zlib\infback.c" />
+    <ClCompile Include="..\..\libraries\zlib\inffast.c" />
+    <ClCompile Include="..\..\libraries\zlib\inflate.c" />
+    <ClCompile Include="..\..\libraries\zlib\inftrees.c" />
+    <ClCompile Include="..\..\libraries\zlib\trees.c" />
+    <ClCompile Include="..\..\libraries\zlib\uncompr.c" />
+    <ClCompile Include="..\..\libraries\zlib\zutil.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\support\zlib\zconf.h" />
+    <ClInclude Include="..\..\include\support\zlib\zlib.h" />
+    <ClInclude Include="..\..\libraries\zlib\crc32.h" />
+    <ClInclude Include="..\..\libraries\zlib\deflate.h" />
+    <ClInclude Include="..\..\libraries\zlib\gzguts.h" />
+    <ClInclude Include="..\..\libraries\zlib\inffast.h" />
+    <ClInclude Include="..\..\libraries\zlib\inffixed.h" />
+    <ClInclude Include="..\..\libraries\zlib\inflate.h" />
+    <ClInclude Include="..\..\libraries\zlib\inftrees.h" />
+    <ClInclude Include="..\..\libraries\zlib\trees.h" />
+    <ClInclude Include="..\..\libraries\zlib\zutil.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{681CB867-A887-45E9-B339-B4B6B3CE8F20}</ProjectGuid>
     <RootNamespace>libz</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>zlib</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -68,7 +95,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../include/support/libz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -85,7 +112,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../include/support/libz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -101,7 +128,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>../../include/support/libz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -112,34 +139,9 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>../../include/support/libz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\libraries\libz\adler32.c" />
-    <ClCompile Include="..\..\libraries\libz\compress.c" />
-    <ClCompile Include="..\..\libraries\libz\crc32.c" />
-    <ClCompile Include="..\..\libraries\libz\deflate.c" />
-    <ClCompile Include="..\..\libraries\libz\infback.c" />
-    <ClCompile Include="..\..\libraries\libz\inffast.c" />
-    <ClCompile Include="..\..\libraries\libz\inflate.c" />
-    <ClCompile Include="..\..\libraries\libz\inftrees.c" />
-    <ClCompile Include="..\..\libraries\libz\trees.c" />
-    <ClCompile Include="..\..\libraries\libz\uncompr.c" />
-    <ClCompile Include="..\..\libraries\libz\zutil.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\libraries\libz\crc32.h" />
-    <ClInclude Include="..\..\libraries\libz\deflate.h" />
-    <ClInclude Include="..\..\libraries\libz\inffast.h" />
-    <ClInclude Include="..\..\libraries\libz\inffixed.h" />
-    <ClInclude Include="..\..\libraries\libz\inflate.h" />
-    <ClInclude Include="..\..\libraries\libz\inftrees.h" />
-    <ClInclude Include="..\..\libraries\libz\trees.h" />
-    <ClInclude Include="..\..\include\libz\zconf.h" />
-    <ClInclude Include="..\..\include\libz\zlib.h" />
-    <ClInclude Include="..\..\libraries\libz\zutil.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

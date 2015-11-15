@@ -918,21 +918,24 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	}
 	else if (Setup::useIconv)
 	{
-		iconv_t		 cd = iconv_open(outEncoding, inEncoding);
-		int		 on = 1;
+		iconv_t	 cd = iconv_open(outEncoding, inEncoding);
 
 		if (cd == (iconv_t) -1) return -1;
 
+#if _LIBICONV_VERSION >= 0x0108
+		int	 on = 1;
+
 		iconvctl(cd, ICONV_SET_TRANSLITERATE, &on);
+#endif
 
 		size_t		 inBytesLeft  = inBytes;
 		size_t		 outBytesLeft = outBytes;
 		char	       **outPointer   = &outBuffer;
 
 #if defined __FreeBSD__ || defined __NetBSD__ || defined __sun
-		const char     **inPointer	= &inBuffer;
+		const char     **inPointer    = &inBuffer;
 #else
-		char	       **inPointer	= const_cast<char **>(&inBuffer);
+		char	       **inPointer    = const_cast<char **>(&inBuffer);
 #endif
 
 		while (inBytesLeft)

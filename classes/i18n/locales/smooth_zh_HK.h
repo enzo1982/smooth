@@ -46,9 +46,9 @@ static const char *smooth_zh_HK =
 	     <entry string=\"Color selection\">選擇色彩</entry>				\
 	     <entry string=\"HTML code\">HTML代碼</entry>				\
 											\
-	     <entry string=\"Tip of the day\">每日小知識</entry>				\
-	     <entry string=\"Did you know...\">知不知...</entry>				\
-	     <entry string=\"Show tips on startup\">啟動時顯示小知識</entry>		\
+	     <entry string=\"Tip of the day\">每日提示</entry>				\
+	     <entry string=\"Did you know...\">提示</entry>				\
+	     <entry string=\"Show tips on startup\">啟動時顯示本提示</entry>		\
 	     <entry string=\"Next tip\">下一個</entry>					\
 	   </data>									\
 	 </LangFile>";

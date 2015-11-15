@@ -3,7 +3,7 @@ SMOOTH_PATH = ..
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 all:
-	$(call makein,fribidi2)
+	$(call makein,fribidi)
 	$(call makein,libcpuid)
 ifeq ($(BUILD_OSX),True)
 	$(call makein,libjpeg)
@@ -29,7 +29,7 @@ ifeq ($(BUILD_V8),True)
 endif
 
 clean:
-	$(call cleanin,fribidi2)
+	$(call cleanin,fribidi)
 	$(call cleanin,libcpuid)
 ifeq ($(BUILD_OSX),True)
 	$(call cleanin,libjpeg)

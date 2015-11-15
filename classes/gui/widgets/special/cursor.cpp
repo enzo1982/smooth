@@ -22,7 +22,7 @@
 #include <smooth/system/system.h>
 #include <smooth/system/timer.h>
 
-#include <fribidi.h>
+#include <fribidi/fribidi.h>
 
 const S::Short	 S::GUI::Cursor::classID = S::Object::RequestClassID();
 

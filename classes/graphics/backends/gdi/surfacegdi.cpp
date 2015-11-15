@@ -16,7 +16,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
 
-#include <fribidi.h>
+#include <fribidi/fribidi.h>
 
 S::GUI::SurfaceBackend *CreateSurfaceGDI(S::Void *iSurface, const S::GUI::Size &maxSize)
 {

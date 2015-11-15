@@ -19,7 +19,8 @@
 
 #include <unistd.h>
 #include <stdio.h>
-#include <fribidi.h>
+
+#include <fribidi/fribidi.h>
 
 using namespace X11;
 

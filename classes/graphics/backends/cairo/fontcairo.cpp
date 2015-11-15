@@ -15,7 +15,7 @@
 #	include <smooth/backends/win32/backendwin32.h>
 
 #	include <cairo/cairo-win32.h>
-#	include <fribidi.h>
+#	include <fribidi/fribidi.h>
 #else
 	using namespace X11;
 

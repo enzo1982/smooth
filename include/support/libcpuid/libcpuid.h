@@ -3,6 +3,6 @@
 
 #define HAVE_STDINT_H
 
-#include <../libraries/libcpuid/libcpuid.h>
+#include "../../../libraries/libcpuid/libcpuid.h"
 
 #endif

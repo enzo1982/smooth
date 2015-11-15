@@ -6,24 +6,20 @@ SMOOTH_PATH = ../../..
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
-ifeq ($(BUILD_WIN32),True)
+ifeq ($(USE_BUNDLED_LIBJPEG),True)
 	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libjpeg
+else ifeq ($(BUILD_NETBSD),True)
+	MYCCOPTS += -I/usr/pkg/include
+else
+	MYCCOPTS += -I/usr/local/include
+endif
+
+ifeq ($(USE_BUNDLED_LIBPNG),True)
 	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng
 else ifeq ($(BUILD_OSX),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libjpeg
-
-	ifneq ($(BUILD_XLIB),True)
-		MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng
-	else
-		MYCCOPTS += -I/usr/X11/include
-	endif
-else ifeq ($(BUILD_QNX),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libjpeg
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng
-else ifeq ($(BUILD_NETBSD),True)
-	MYCCOPTS += -I/usr/pkg/include $(shell pkg-config --cflags libpng)
+	MYCCOPTS += -I/usr/X11/include
 else
-	MYCCOPTS += -I/usr/local/include $(shell pkg-config --cflags libpng)
+	MYCCOPTS += $(shell pkg-config --cflags libpng)
 endif
 
 # Enter object files here:

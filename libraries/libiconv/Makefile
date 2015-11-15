@@ -11,7 +11,7 @@ else
 	GLOBALLIB   = libiconv.a
 endif
 
-MYCCOPTS    = -I$(SRCDIR)
+MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libiconv
 
 ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS += -D_ICONVDLL_

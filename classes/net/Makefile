@@ -5,8 +5,16 @@ SMOOTH_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
-all:
-	$(call makein,protocols)
+FOLDERS = protocols
 
-clean:
-	$(call cleanin,protocols)
+.PHONY: $(FOLDERS)
+
+all: $(FOLDERS)
+
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))

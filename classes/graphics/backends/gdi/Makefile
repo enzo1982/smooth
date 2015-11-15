@@ -5,6 +5,11 @@ SMOOTH_PATH = ../../../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
+# Change these variables to fit your project:
+ifeq ($(USE_BUNDLED_LIBFRIBIDI),True)
+	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
+endif
+
 # Enter object files here:
 OBJECTS	  = 
 

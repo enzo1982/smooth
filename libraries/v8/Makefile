@@ -142,8 +142,11 @@ endif
 
 # Additional things to do on clean:
 ALLCMD1	  = mkdir -p extensions platform utils arm ia32 mips x64
-CLEANCMD1 = rmdir extensions platform utils arm ia32 mips x64 || true
-CLEANCMD2 = rm -f experimental-libraries.cc libraries.cc jsmin.pyc
+CLEANCMD1 = rm -f experimental-libraries.cc libraries.cc jsmin.pyc
+
+ifneq ($(SRCDIR),$(CURDIR))
+CLEANCMD2 = rmdir extensions platform utils arm ia32 mips x64 || true
+endif
 
 ## Do not change anything below this line. ##
 

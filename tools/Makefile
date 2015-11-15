@@ -5,12 +5,16 @@ SMOOTH_PATH = ..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
-all:
-	$(call makein,designer)
-	$(call makein,pciffmanager)
-	$(call makein,translator)
+FOLDERS = designer pciffmanager translator
 
-clean:
-	$(call cleanin,designer)
-	$(call cleanin,pciffmanager)
-	$(call cleanin,translator)
+.PHONY: $(FOLDERS)
+
+all: $(FOLDERS)
+
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))

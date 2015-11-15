@@ -2,17 +2,10 @@
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
-CC	   = gcc
 CCOPTS	   = -I$(SRCDIR)/$(SMOOTH_PATH)/include $(MYCCOPTS)
 RC	   = windres
 RCOPTS	   = -DSMOOTH_DLL -O coff
-LD	   = gcc
 LDOPTS	   = -L$(SRCDIR)/$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
-
-ifeq ($(BUILD_FREEBSD),True)
-	CC = clang
-	LD = clang
-endif
 
 ifndef GLOBALDLL
 	CCOPTS += -fvisibility=hidden
@@ -25,7 +18,7 @@ endif
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	CCOPTS += -DUNICODE -D_UNICODE -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
+	CCOPTS += -DUNICODE -D_UNICODE
 	LDOPTS += -mwindows -Wl,--dynamicbase,--nxcompat
 
 	ifdef IMPORTLIB
@@ -50,10 +43,6 @@ else
 		CCOPTS += -pthread
 	endif
 	endif
-	endif
-
-	ifeq ($(BUILD_QNX),True)
-		CCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
 	endif
 
 	ifdef GLOBALDLL
@@ -117,10 +106,10 @@ endif
 all: allcmds $(OBJECTS) $(TARGETS)
 
 allcmds:
-	$(ALLCMD1)
-	$(ALLCMD2)
-	$(ALLCMD3)
-	$(ALLCMD4)
+	+ $(ALLCMD1)
+	+ $(ALLCMD2)
+	+ $(ALLCMD3)
+	+ $(ALLCMD4)
 
 clean:
 ifdef OBJECTS
@@ -138,16 +127,16 @@ endif
 	$(CC) $(CCOPTS) $(CFLAGS) -c $< -o $@
 
 .cc.o:
-	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
 
 .cpp.o:
-	$(CC) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CCOPTS) $(CXXFLAGS) -c $< -o $@
 
 .m.o:
-	$(CC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
+	$(OBJC) $(CCOPTS) $(OBJCFLAGS) -c $< -o $@
 
 .mm.o:
-	$(CC) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@
+	$(OBJCXX) $(CCOPTS) $(OBJCXXFLAGS) -c $< -o $@
 
 .rc.o:
 	$(RC) $(RCOPTS) $< -o $@

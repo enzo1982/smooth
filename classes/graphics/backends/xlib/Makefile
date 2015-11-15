@@ -18,6 +18,10 @@ endif
 endif
 endif
 
+ifeq ($(USE_BUNDLED_LIBFRIBIDI),True)
+	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
+endif
+
 # Enter object files here:
 OBJECTS	  = 
 

@@ -3,9 +3,15 @@
 # Change these variables to fit this location:
 SMOOTH_PATH = ../..
 
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+
 # Change these variables to fit your project:
 GLOBALLIB   = libpng.a
-MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/zlib
+MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng
+
+ifeq ($(USE_BUNDLED_ZLIB),True)
+MYCCOPTS   += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/zlib
+endif
 
 # Enter object files here:
 OBJECTS	    = png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o

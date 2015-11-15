@@ -5,16 +5,16 @@ SMOOTH_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
-all:
-	$(call makein,application)
-	$(call makein,clipboard)
-	$(call makein,dialogs)
-	$(call makein,widgets)
-	$(call makein,window)
+FOLDERS = application clipboard dialogs widgets window
 
-clean:
-	$(call cleanin,application)
-	$(call cleanin,clipboard)
-	$(call cleanin,dialogs)
-	$(call cleanin,widgets)
-	$(call cleanin,window)
+.PHONY: $(FOLDERS)
+
+all: $(FOLDERS)
+
+$(FOLDERS):
+	+ $(call makein,$@)
+
+clean: $(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean)
+
+$(foreach FOLDER,$(FOLDERS),$(FOLDER)##clean):
+	$(call cleanin,$(subst ##clean,,$@))

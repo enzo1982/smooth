@@ -6,14 +6,20 @@ SMOOTH_PATH = ../..
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
-ifneq ($(BUILD_WIN32),True)
-ifeq ($(BUILD_OSX),True)
+ifeq ($(USE_BUNDLED_LIBXML2),True)
+	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libxml2
+else ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I/usr/include/libxml2
 else ifeq ($(BUILD_HAIKU),True)
 	MYCCOPTS += -I/system/develop/headers/libxml2
 else ifneq ($(BUILD_QNX),True)
 	MYCCOPTS += $(shell pkg-config --cflags libxml-2.0)
 endif
+
+ifeq ($(USE_BUNDLED_LIBICONV),True)
+	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libiconv
+else
+	MYCCOPTS += -I/usr/local/include
 endif
 
 # Enter object files here:

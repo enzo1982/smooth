@@ -16,6 +16,10 @@ else
 	MYCCOPTS += $(shell pkg-config --cflags pangocairo)
 endif
 endif
+else
+ifeq ($(USE_BUNDLED_LIBFRIBIDI),True)
+	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
+endif
 endif
 
 # Enter object files here:

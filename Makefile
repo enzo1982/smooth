@@ -8,7 +8,65 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 OBJECTS = classes/*/*.o classes/*/*/*.o classes/*/*/*/*.o classes/*/*/*/*/*.o misc/*.o
 
-LIBS = -lfribidi -lcpuid -lbz2 -lxml2 -ljpeg -lstdc++
+LIBS = -lstdc++
+
+ifeq ($(USE_BUNDLED_LIBBZ2),True)
+	LIBS += $(LIBDIR)/libbz2.a
+else
+	LIBS += -lbz2
+endif
+
+ifeq ($(USE_BUNDLED_LIBCPUID),True)
+	LIBS += $(LIBDIR)/libcpuid.a
+else
+	LIBS += -lcpuid
+endif
+
+ifeq ($(USE_BUNDLED_LIBFRIBIDI),True)
+	LIBS += $(LIBDIR)/libfribidi.a
+else
+	LIBS += -lfribidi
+endif
+
+ifeq ($(USE_BUNDLED_LIBICONV),True)
+	LIBS += $(LIBDIR)/libiconv.a
+else ifeq ($(BUILD_OSX),True)
+	LIBS += -liconv
+else ifeq ($(BUILD_QNX),True)
+	LIBS += -liconv
+endif
+
+ifeq ($(USE_BUNDLED_LIBJPEG),True)
+	LIBS += $(LIBDIR)/libjpeg.a
+else
+	LIBS += -ljpeg
+endif
+
+ifeq ($(USE_BUNDLED_LIBPNG),True)
+	LIBS += $(LIBDIR)/libpng.a
+else ifeq ($(BUILD_WIN32),True)
+	LIBS += -lpng
+else ifeq ($(BUILD_OSX),True)
+	LIBS += -lpng
+else ifeq ($(BUILD_HAIKU),True)
+	LIBS += -lpng
+else ifeq ($(BUILD_QNX),True)
+	LIBS += -lpng
+else
+	LIBS += $(shell pkg-config --libs libpng)
+endif
+
+ifeq ($(USE_BUNDLED_LIBXML2),True)
+	LIBS += $(LIBDIR)/libxml2.a
+else
+	LIBS += -lxml2
+endif
+
+ifeq ($(USE_BUNDLED_ZLIB),True)
+	LIBS += $(LIBDIR)/libz.a
+else
+	LIBS += -lz
+endif
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources/*.o
@@ -21,30 +79,28 @@ ifeq ($(BUILD_WIN32),True)
 		LIBS += -lcairo.dll
 	endif
 
-	LIBS += -lpng -lz -lws2_32 -limm32 -lole32 -luuid
+	LIBS += -lws2_32 -limm32 -lole32 -luuid
 
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else ifeq ($(BUILD_OSX),True)
 	ifeq ($(BUILD_XLIB),True)
-		LIBS += -lpng -lz -lX11 -lXmu -lXft
-	else
-		LIBS += $(LIBDIR)/libpng.a $(LIBDIR)/libz.a
+		LIBS += -lX11 -lXmu -lXft
 	endif
 
 	ifeq ($(BUILD_CAIRO),True)
 		LIBS += -lcairo
 	endif
 
-	LIBS += -liconv -lpthread
+	LIBS += -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
-	LIBS += -lpng -lz -lbe -ltracker
+	LIBS += -lbe -ltracker
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_QNX),True)
-	LIBS += -liconv -lpng -lz -lsocket -lX11 -lXmu -lXft -lph
+	LIBS += -lsocket -lX11 -lXmu -lXft -lph
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else
@@ -54,7 +110,7 @@ else
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif
 
-	LIBS += $(shell pkg-config --libs libpng) $(shell pkg-config --libs xmu) $(shell pkg-config --libs xft)
+	LIBS += $(shell pkg-config --libs xmu) $(shell pkg-config --libs xft)
 	LIBS += -lpthread
 
 	ifeq ($(BUILD_SOLARIS),True)
@@ -68,14 +124,9 @@ endif
 
 ### Linker options ###
 
-LINKER	    = gcc
 REMOVE	    = rm
 LINKER_OPTS = -L$(LIBDIR) -o $(DLLNAME)
 REMOVE_OPTS = -f
-
-ifeq ($(BUILD_FREEBSD),True)
-	LINKER = clang
-endif
 
 ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += --shared -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
@@ -116,24 +167,25 @@ folders:
 	mkdir -p $(SMOOTH_PATH)/$(BINDIR) $(SMOOTH_PATH)/$(LIBDIR)
 
 objects:
-	$(call makein,classes)
-	$(call makein,misc)
-	$(call makein,resources)
+	+ $(call makein,classes)
+	+ $(call makein,misc)
+	+ $(call makein,resources)
 
 lib: $(DLLNAME)
 
 programs: lib
-	$(call makein,tools)
-	$(call makein,samples)
+	+ $(call makein,tools)
+	+ $(call makein,samples)
 
 libs:
-	$(call makein,libraries)
+	+ $(call makein,libraries)
 
 install: all
 ifneq ($(BUILD_WIN32),True)
-ifneq ($(BUILD_OSX),True)
 	$(INSTALL) -d $(DESTDIR)$(libdir)
-	$(INSTALL_DATA) $(LIBDIR)/libsmooth-$(VERSION)$(SHARED) $(DESTDIR)$(libdir)/libsmooth-$(VERSION)$(SHARED).$(REVISION)
+
+ifneq ($(BUILD_OSX),True)
+	$(INSTALL_DATA) $(DLLNAME) $(DESTDIR)$(libdir)/libsmooth-$(VERSION)$(SHARED).$(REVISION)
 	$(LINK) -fs libsmooth-$(VERSION)$(SHARED).$(REVISION) $(DESTDIR)$(libdir)/libsmooth-$(VERSION)$(SHARED)
 
 ifeq ($(BUILD_V8),True)
@@ -144,12 +196,13 @@ endif
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_QNX),True)
-	/sbin/ldconfig 2> /dev/null || true
+ifeq ($(DESTDIR),)
+	$(LDCONFIG) 2> /dev/null || true
+endif
 endif
 endif
 endif
 else
-	$(INSTALL) -d $(DESTDIR)$(libdir)
 	$(INSTALL_DATA) $(DLLNAME) $(DESTDIR)$(libdir)/libsmooth-$(VERSION).$(REVISION)$(SHARED)
 	$(LINK) -fs libsmooth-$(VERSION).$(REVISION)$(SHARED) $(DESTDIR)$(libdir)/libsmooth-$(VERSION)$(SHARED)
 
@@ -160,7 +213,7 @@ endif
 endif
 
 	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) $(BINDIR)/translator $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) $(BINDIR)/translator $(DESTDIR)$(bindir)/smooth-translator
 
 	$(INSTALL) -d $(DESTDIR)$(includedir)
 	$(COPY) -r $(SRCDIR)/include/smooth $(DESTDIR)$(includedir)
@@ -188,7 +241,9 @@ endif
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
 ifneq ($(BUILD_QNX),True)
-	/sbin/ldconfig 2> /dev/null || true
+ifeq ($(DESTDIR),)
+	$(LDCONFIG) 2> /dev/null || true
+endif
 endif
 endif
 endif
@@ -202,7 +257,7 @@ ifeq ($(BUILD_V8),True)
 endif
 endif
 
-	$(REMOVE) $(REMOVE_OPTS) $(DESTDIR)$(bindir)/translator
+	$(REMOVE) $(REMOVE_OPTS) $(DESTDIR)$(bindir)/smooth-translator
 
 	$(REMOVE) $(REMOVE_OPTS) -r $(DESTDIR)$(includedir)/smooth
 
@@ -225,7 +280,9 @@ clean:
 distclean: clean
 	$(call cleanin,libraries)
 
+ifneq ($(SRCDIR),$(CURDIR))
 	rmdir $(SMOOTH_PATH)/$(BINDIR) $(SMOOTH_PATH)/$(LIBDIR) || true
+endif
 
 doc: doc-clean
 	doxys
@@ -234,7 +291,7 @@ doc-clean:
 	rm -r -f doc/reference
 
 $(DLLNAME): objects libs
-	$(LINKER) $(OBJECTS) $(LINKER_OPTS) $(LDFLAGS) $(LIBS)
+	$(LD) $(OBJECTS) $(LINKER_OPTS) $(LDFLAGS) $(LIBS)
 ifeq ($(BUILD_WIN32),True)
 	countbuild BuildNumber
 endif

@@ -18,6 +18,10 @@ endif
 endif
 endif
 
+ifeq ($(USE_BUNDLED_LIBCPUID),True)
+	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
+endif
+
 # Enter object files here:
 OBJECTS	  = console.o cpu.o dynamicloader.o event.o screen.o system.o timer.o
 

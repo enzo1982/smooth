@@ -25,9 +25,9 @@ S::Bool	 S::System::CPU::hasSSSE3	= False;
 S::Bool	 S::System::CPU::hasSSE4_1	= False;
 S::Bool	 S::System::CPU::hasSSE4_2	= False;
 S::Bool	 S::System::CPU::hasSSE4a	= False;
-S::Bool	 S::System::CPU::hasSSE5	= False;
 
 S::Bool	 S::System::CPU::hasAVX		= False;
+S::Bool	 S::System::CPU::hasAVX2	= False;
 
 S::Bool	 S::System::CPU::has3DNow	= False;
 S::Bool	 S::System::CPU::has3DNowExt	= False;
@@ -99,9 +99,9 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 	hasSSE4_1   = data.flags[CPU_FEATURE_SSE4_1];
 	hasSSE4_2   = data.flags[CPU_FEATURE_SSE4_2];
 	hasSSE4a    = data.flags[CPU_FEATURE_SSE4A];
-	hasSSE5	    = data.flags[CPU_FEATURE_SSE5];
 
 	hasAVX	    = data.flags[CPU_FEATURE_AVX];
+	hasAVX	    = data.flags[CPU_FEATURE_AVX2];
 
 	has3DNow    = data.flags[CPU_FEATURE_3DNOW];
 	has3DNowExt = data.flags[CPU_FEATURE_3DNOWEXT];

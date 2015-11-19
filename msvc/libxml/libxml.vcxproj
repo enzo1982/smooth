@@ -69,7 +69,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../include/support;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libxml2;../../include/support/libiconv;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -86,7 +86,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../include/support;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libxml2;../../include/support/libiconv;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -99,7 +99,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include/support;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libxml2;../../include/support/libiconv;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -112,7 +112,7 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include/support;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include/support/libxml2;../../include/support/libiconv;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -121,40 +121,41 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\libxml.h" />
-    <ClInclude Include="..\..\include\win32config.h" />
-    <ClInclude Include="..\..\include\libxml\chvalid.h" />
-    <ClInclude Include="..\..\include\libxml\debugXML.h" />
-    <ClInclude Include="..\..\include\libxml\dict.h" />
-    <ClInclude Include="..\..\include\libxml\encoding.h" />
-    <ClInclude Include="..\..\include\libxml\entities.h" />
-    <ClInclude Include="..\..\include\libxml\globals.h" />
-    <ClInclude Include="..\..\include\libxml\hash.h" />
-    <ClInclude Include="..\..\include\libxml\HTMLparser.h" />
-    <ClInclude Include="..\..\include\libxml\HTMLtree.h" />
-    <ClInclude Include="..\..\include\libxml\list.h" />
-    <ClInclude Include="..\..\include\libxml\nanoftp.h" />
-    <ClInclude Include="..\..\include\libxml\nanohttp.h" />
-    <ClInclude Include="..\..\include\libxml\parser.h" />
-    <ClInclude Include="..\..\include\libxml\parserInternals.h" />
-    <ClInclude Include="..\..\include\libxml\SAX.h" />
-    <ClInclude Include="..\..\include\libxml\SAX2.h" />
-    <ClInclude Include="..\..\include\libxml\threads.h" />
-    <ClInclude Include="..\..\include\libxml\tree.h" />
-    <ClInclude Include="..\..\include\libxml\uri.h" />
-    <ClInclude Include="..\..\include\libxml\valid.h" />
-    <ClInclude Include="..\..\include\libxml\xlink.h" />
-    <ClInclude Include="..\..\include\libxml\xmlautomata.h" />
-    <ClInclude Include="..\..\include\libxml\xmlerror.h" />
-    <ClInclude Include="..\..\include\libxml\xmlexports.h" />
-    <ClInclude Include="..\..\include\libxml\xmlIO.h" />
-    <ClInclude Include="..\..\include\libxml\xmlmemory.h" />
-    <ClInclude Include="..\..\include\libxml\xmlreader.h" />
-    <ClInclude Include="..\..\include\libxml\xmlregexp.h" />
-    <ClInclude Include="..\..\include\libxml\xmlsave.h" />
-    <ClInclude Include="..\..\include\libxml\xmlstring.h" />
-    <ClInclude Include="..\..\include\libxml\xmlversion.h" />
-    <ClInclude Include="..\..\include\libxml\xmlwriter.h" />
+    <ClInclude Include="..\..\include\support\libxml2\config.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\chvalid.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\debugXML.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\dict.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\encoding.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\entities.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\globals.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\hash.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\HTMLparser.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\HTMLtree.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\list.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\nanoftp.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\nanohttp.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\parser.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\parserInternals.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\SAX.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\SAX2.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\threads.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\tree.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\uri.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\valid.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xlink.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlautomata.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlerror.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlexports.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlIO.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlmemory.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlreader.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlregexp.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlsave.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlstring.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlversion.h" />
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlwriter.h" />
+    <ClInclude Include="..\..\include\support\libxml2\win32config.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libraries\libxml2\buf.c" />

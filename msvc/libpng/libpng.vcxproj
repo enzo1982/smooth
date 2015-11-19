@@ -137,8 +137,9 @@
     <ClCompile Include="..\..\libraries\libpng\pngwutil.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\libpng\png.h" />
-    <ClInclude Include="..\..\include\libpng\pngconf.h" />
+    <ClInclude Include="..\..\include\support\libpng\png.h" />
+    <ClInclude Include="..\..\include\support\libpng\pngconf.h" />
+    <ClInclude Include="..\..\include\support\libpng\pnglibconf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

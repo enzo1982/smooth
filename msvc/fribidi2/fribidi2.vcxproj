@@ -22,6 +22,7 @@
     <ProjectGuid>{3F531A26-F2A2-42AA-BDE3-2332D76B0BE4}</ProjectGuid>
     <RootNamespace>fribidi2</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>fribidi</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -67,7 +68,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -85,7 +86,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -98,7 +99,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -111,7 +112,7 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include; ../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -120,20 +121,20 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-arabic.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-bidi-types.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-bidi.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-deprecated.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-joining-types.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-joining.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-mem.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-mirroring.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-run.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi-shape.c" />
-    <ClCompile Include="..\..\libraries\fribidi2\fribidi.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-arabic.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-bidi-types.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-bidi.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-deprecated.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-joining-types.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-joining.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-mem.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-mirroring.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-run.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi-shape.c" />
+    <ClCompile Include="..\..\libraries\fribidi\fribidi.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\fribidi.h" />
+    <ClInclude Include="..\..\include\support\fribidi\fribidi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

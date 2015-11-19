@@ -467,10 +467,14 @@ S::Int S::GUI::Widget::Paint(Int message)
 	switch (message)
 	{
 		case SP_PAINT:
+			widgets.LockForRead();
+
 			foreach (Widget *widget, widgets)
 			{
 				if (widget->IsAffected(window->GetUpdateRect())) widget->Paint(message);
 			}
+
+			widgets.Unlock();
 
 			break;
 	}
@@ -487,10 +491,14 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	if (window == NIL)   return Success();
 
+	widgets.LockForRead();
+
 	foreach (Widget *widget, widgets)
 	{
-		if (widget->Process(message, wParam, lParam) == Break) return Break;
+		if (widget->Process(message, wParam, lParam) == Break) { widgets.Unlock(); return Break; }
 	}
+
+	widgets.Unlock();
 
 	if (!IsVisible())    return Success();
 	if (!IsActive())     return Success();

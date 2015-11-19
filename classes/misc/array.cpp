@@ -180,14 +180,15 @@ S::Int S::IndexArray::GetEntryNumberByIndex(Int index) const
 
 	LockForRead();
 
-	Int	 entryNumber = -1;
+	Int	 entryNumber  = -1;
+	Int	 lastAccessed = lastAccessedEntry;
 
 	/* Check entries around last accessed entry.
 	 */
-	if	(lastAccessedEntry     <  nOfEntries && indices[lastAccessedEntry    ] == index) entryNumber =   lastAccessedEntry;
-	else if (lastAccessedEntry     >  0 &&
-		 lastAccessedEntry     <= nOfEntries && indices[lastAccessedEntry - 1] == index) entryNumber = --lastAccessedEntry;
-	else if (lastAccessedEntry + 1 <  nOfEntries && indices[lastAccessedEntry + 1] == index) entryNumber = ++lastAccessedEntry;
+	if	(lastAccessed     <  nOfEntries && indices[lastAccessed    ] == index) entryNumber = lastAccessed;
+	else if (lastAccessed     >  0 &&
+		 lastAccessed     <= nOfEntries && indices[lastAccessed - 1] == index) entryNumber = lastAccessed - 1;
+	else if (lastAccessed + 1 <  nOfEntries && indices[lastAccessed + 1] == index) entryNumber = lastAccessed + 1;
 
 	/* Binary search for sorted lists.
 	 */
@@ -201,7 +202,7 @@ S::Int S::IndexArray::GetEntryNumberByIndex(Int index) const
 			Int	 i = (top + bottom) / 2;
 			Int	 e = indices[i];
 
-			if (e == index) { entryNumber = lastAccessedEntry = i; break; }
+			if (e == index) { entryNumber = i; break; }
 
 			if (e < index) bottom = i + 1;
 			else	       top    = i - 1;
@@ -214,9 +215,11 @@ S::Int S::IndexArray::GetEntryNumberByIndex(Int index) const
 	{
 		for (Int i = 0; i < nOfEntries; i++)
 		{
-			if (indices[i] == index) { entryNumber = lastAccessedEntry = i; break; }
+			if (indices[i] == index) { entryNumber = i; break; }
 		}
 	}
+
+	if (entryNumber >= 0) lastAccessedEntry = entryNumber;
 
 	Unlock();
 

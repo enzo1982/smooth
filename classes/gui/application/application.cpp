@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,6 +37,8 @@ S::Array<S::String>	 S::GUI::Application::args;
 
 S::String		 S::GUI::Application::startupDirectory;
 S::String		 S::GUI::Application::applicationDirectory;
+
+S::Float		 S::GUI::Application::scaleFactor = 0.0;
 
 S::GUI::Application::Application(const String &name) : Widget(Point(0, 0), System::Screen::GetActiveScreenMetrics().GetSize())
 {
@@ -92,7 +94,16 @@ S::Int S::GUI::Application::Loop()
 
 S::Void S::GUI::Application::SetArguments(const Array<String> &nArgs)
 {
-	foreach (const String &arg, nArgs) args.Add(arg);
+	foreach (const String &arg, nArgs)
+	{
+		/* Filter out scale factor argument.
+		 */
+		if (arg.StartsWith("--scale:")) { scaleFactor = arg.Tail(arg.Length() - 8).ToFloat(); continue; }
+
+		/* Add to arguments array.
+		 */
+		args.Add(arg);
+	}
 }
 
 S::String S::GUI::Application::GetStartupDirectory()

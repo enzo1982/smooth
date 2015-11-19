@@ -12,6 +12,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/files/file.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
@@ -204,6 +205,8 @@ S::Void *S::GUI::SurfaceHaiku::GetSystemSurface() const
 
 S::Short S::GUI::SurfaceHaiku::GetSurfaceDPI() const
 {
+	if (Application::GetScaleFactor() != 0)	surfaceDPI = 96 * Application::GetScaleFactor();
+
 	if (surfaceDPI != -1) return surfaceDPI;
 
 	Short	 dpi = 96;

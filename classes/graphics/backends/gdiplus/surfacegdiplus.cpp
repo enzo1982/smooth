@@ -16,6 +16,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
 
@@ -181,6 +182,8 @@ S::Void *S::GUI::SurfaceGDIPlus::GetSystemSurface() const
 
 S::Short S::GUI::SurfaceGDIPlus::GetSurfaceDPI() const
 {
+	if (Application::GetScaleFactor() != 0)	surfaceDPI = 96 * Application::GetScaleFactor();
+
 	if (surfaceDPI != -1) return surfaceDPI;
 
 	HDC	 dc  = GetWindowDC(0);

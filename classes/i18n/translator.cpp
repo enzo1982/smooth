@@ -336,6 +336,12 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 		if (ActivateLanguage(String(appPrefix).Append("_").Append(code.Head(code.Find("_"))).Append(".xml")) == Success()) return Success();
 	}
 
+	/* Fall back to alternative language.
+	 */
+	if	(code.StartsWith("fil")	  && ActivateLanguage(String(appPrefix).Append("_tl.xml"))    == Success()) return Success(); // Fall back to Tagalog for Filipino
+	else if	(code.StartsWith("prs")	  && ActivateLanguage(String(appPrefix).Append("_fa.xml"))    == Success()) return Success(); // Fall back to Persian for Dari
+	else if (code.StartsWith("zh_MO") && ActivateLanguage(String(appPrefix).Append("_zh_HK.xml")) == Success()) return Success(); // Fall back to Cantonese (Hong Kong) for Cantonese (Macau)
+
 	/* Fall back to internal language.
 	 */
 	ActivateLanguage("internal");

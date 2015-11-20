@@ -594,7 +594,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				/* Get screen coordinates for window.
 				 */
-				if (wnd != NIL)
+				if (wnd != NIL && !e->xconfigure.send_event)
 				{
 					X11::Window	 child = 0;
 

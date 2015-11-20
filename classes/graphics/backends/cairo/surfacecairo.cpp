@@ -64,7 +64,7 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 
 	gdi_dc	     = NIL;
 #else
-	window	     = (Window) iWindow;
+	window	     = (X11::Window) iWindow;
 
 	paintBitmap  = NIL;
 

@@ -38,7 +38,7 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 {
 	type	= SURFACE_XLIB;
 
-	window	= (Window) iWindow;
+	window	= (X11::Window) iWindow;
 
 	bitmap	= NIL;
 	gc	= NIL;

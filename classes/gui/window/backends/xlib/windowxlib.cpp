@@ -157,7 +157,7 @@ S::Void *S::GUI::WindowXLib::GetSystemWindow() const
 	return (Void *) wnd;
 }
 
-S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(::Window wnd)
+S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(X11::Window wnd)
 {
 	if (wnd == 0) return NIL;
 
@@ -294,7 +294,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				/* Get screen coordinates for window.
 				 */
-				::Window	 child = 0;
+				X11::Window	 child = 0;
 
 				XTranslateCoordinates(display, wnd, RootWindow(display, DefaultScreen(display)), 0, 0, &attributes.x, &attributes.y, &child);
 
@@ -422,7 +422,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			 */
 			if (!(flags & WF_TOPMOST && flags & WF_NOTASKBUTTON && flags & WF_THINBORDER))
 			{
-				::Window	 focusWnd = None;
+				X11::Window	 focusWnd = None;
 				int		 revertTo = RevertToNone;
 
 				if (XGetInputFocus(display, &focusWnd, &revertTo) == 0)
@@ -596,7 +596,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				 */
 				if (wnd != NIL)
 				{
-					::Window	 child = 0;
+					X11::Window	 child = 0;
 
 					XTranslateCoordinates(display, wnd, RootWindow(display, DefaultScreen(display)), 0, 0, &e->xconfigure.x, &e->xconfigure.y, &child);
 				}
@@ -643,7 +643,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			/* Get the window that now has the focus.
 			 */
 			{
-				::Window	 focusWnd = None;
+				X11::Window	 focusWnd = None;
 				int		 revertTo = RevertToNone;
 
 				if (XGetInputFocus(display, &focusWnd, &revertTo) == 0)
@@ -682,7 +682,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			{
 				/* Check if the dropped item is a file.
 				 */
-				::Window	 sourceWnd = e->xclient.data.l[0];
+				X11::Window	 sourceWnd = e->xclient.data.l[0];
 
 				if (e->xclient.data.l[1] & 1)
 				{
@@ -718,7 +718,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				/* Send XdndStatus message.
 				 */
 				XEvent		 status;
-				::Window	 sourceWnd = e->xclient.data.l[0];
+				X11::Window	 sourceWnd = e->xclient.data.l[0];
 
 				status.xclient.type	    = ClientMessage;
 				status.xclient.display	    = display;
@@ -754,7 +754,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				/* Send XdndFinished message.
 				 */
 				XEvent		 finished;
-				::Window	 sourceWnd = e->xclient.data.l[0];
+				X11::Window	 sourceWnd = e->xclient.data.l[0];
 
 				finished.xclient.type	      = ClientMessage;
 				finished.xclient.display      = display;
@@ -934,7 +934,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 			Window		*parent = container->GetContainerWindow();
 			WindowXLib	*leader = FindLeaderWindow();
 
-			if	(parent != NIL) XSetTransientForHint(display, wnd, (::Window) parent->GetSystemWindow());
+			if	(parent != NIL) XSetTransientForHint(display, wnd, (X11::Window) parent->GetSystemWindow());
 			else if (leader != NIL) XSetTransientForHint(display, wnd, leader->wnd);
 		}
 
@@ -1320,7 +1320,7 @@ S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)
 
 		/* Set input focus on input window.
 		 */
-		::Window	 focusWnd = None;
+		X11::Window	 focusWnd = None;
 		int		 revertTo = RevertToNone;
 
 		XGetInputFocus(window->display, &focusWnd, &revertTo);

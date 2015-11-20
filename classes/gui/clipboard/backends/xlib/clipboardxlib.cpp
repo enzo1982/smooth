@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,7 +33,7 @@ S::GUI::ClipboardXLib::~ClipboardXLib()
 {
 }
 
-unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, ::Window self, Atom clipboard, Atom atom) const
+unsigned char *S::GUI::ClipboardXLib::QueryAtom(Display *display, X11::Window self, Atom clipboard, Atom atom) const
 {
 	XConvertSelection(display, clipboard, atom, atom, self, CurrentTime);
 	XFlush(display);
@@ -78,8 +78,8 @@ S::String S::GUI::ClipboardXLib::GetText(Atom clipboard) const
 	String		 text;
 
 	Display		*display = Backends::BackendXLib::GetDisplay();
-	::Window	 self	 = (::Window) window->GetSystemWindow();
-	::Window	 owner	 = XGetSelectionOwner(display, clipboard);
+	X11::Window	 self	 = (X11::Window) window->GetSystemWindow();
+	X11::Window	 owner	 = XGetSelectionOwner(display, clipboard);
 
 	if (owner != None)
 	{
@@ -112,7 +112,7 @@ S::Bool S::GUI::ClipboardXLib::SetText(Atom clipboard, const String &text)
 	if (window == NIL) return False;
 
 	Display		*display = Backends::BackendXLib::GetDisplay();
-	::Window	 self	 = (::Window) window->GetSystemWindow();
+	X11::Window	 self	 = (X11::Window) window->GetSystemWindow();
 	WindowXLib	*backend = GUI::WindowXLib::GetWindowBackend(self);
 
 	if (backend != NIL)

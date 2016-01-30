@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -429,7 +429,7 @@ S::Directory S::Directory::GetActiveDirectory()
 S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 {
 #ifdef __WIN32__
-	Bool	 result = SetCurrentDirectory(String(GetUnicodePathPrefix(directory)).Append(directory));
+	Bool	 result = SetCurrentDirectory(String(GetUnicodePathPrefix(directory)).Append(directory).Append("\\"));
 #else
 	Bool	 result = (chdir(String(directory).ConvertTo("UTF-8")) == 0);
 #endif

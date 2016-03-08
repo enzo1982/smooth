@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,11 +10,10 @@
 
 #include <smooth/graphics/imageloader/jpeg.h>
 #include <smooth/system/system.h>
-#include <smooth/io/outstream.h>
+#include <smooth/io/instream.h>
 #include <smooth/files/file.h>
 
 #include <stdio.h>
-#include <time.h>
 
 extern "C"
 {
@@ -46,30 +45,25 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 	 */
 	bitmap = NIL;
 
-	/* In this example we want to open the input file before doing anything else.
-	 * VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
-	 * requires it in order to read binary files.
+	/* Check magic number.
 	 */
-	if (gotBuffer)
-	{
-		/* Write buffer contents to a temporary file.
-		 */
-		fileName = System::System::GetTempDirectory().Append("tmpJpeg-").Append(String::FromInt(clock())).Append(".jpg");
+	if	( gotBuffer && (buffer[0] != 0xFF || buffer[1] != 0xD8))			     return bitmap;
+	else if (!gotBuffer && InStream(STREAM_FILE, fileName, IS_READ).InputNumberRaw(2) != 0xFFD8) return bitmap;
 
-		OutStream	 out(STREAM_FILE, fileName, OS_REPLACE);
-
-		out.OutputData(buffer, buffer.Size());
-	}
-
+	/* Open stream.
+	 */
 	FILE	 *stream = NIL;
 
+	if (!gotBuffer)
+	{
 #ifdef __WIN32__
-	stream = _wfopen(fileName, L"rb");
+		stream = _wfopen(fileName, L"rb");
 #else
-	stream = fopen(fileName.ConvertTo("UTF-8"), "rb");
+		stream = fopen(fileName.ConvertTo("UTF-8"), "rb");
 #endif
 
-	if (stream == NIL) return bitmap;
+		if (stream == NIL) return bitmap;
+	}
 
 	/* This struct contains the JPEG decompression parameters and pointers to
 	 * working space (which is allocated as needed by the JPEG library).
@@ -89,7 +83,8 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 
 	/* Specify data source (eg, a file)
 	 */
-	jpeg_stdio_src(&cinfo, stream);
+	if (gotBuffer) jpeg_mem_src(&cinfo, buffer, buffer.Size());
+	else	       jpeg_stdio_src(&cinfo, stream);
 
 	/* Read file parameters with jpeg_read_header()
 	 */
@@ -97,9 +92,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 	{
 		jpeg_destroy_decompress(&cinfo);
 
-		fclose(stream);
-
-		if (gotBuffer) File(fileName).Delete();
+		if (!gotBuffer) fclose(stream);
 
 		return bitmap;
 	}
@@ -168,14 +161,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 	 * so as to simplify the setjmp error logic above.  (Actually, I don't
 	 * think that jpeg_destroy can do an error exit, but why assume anything...)
 	 */
-	fclose(stream);
-
-	if (gotBuffer)
-	{
-		/* Delete our temporary file.
-		 */
-		File(fileName).Delete();
-	}
+	if (!gotBuffer) fclose(stream);
 
 	/* At this point you may want to check to see whether any corrupt-data
 	 * warnings occurred (test whether jerr.pub.num_warnings is nonzero).

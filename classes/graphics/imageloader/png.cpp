@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -82,7 +82,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	if	(gotFileName) in = new InStream(STREAM_FILE, fileName, IS_READ);
 	else if (gotBuffer)   in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
 
-	if (in->GetLastError() != IO_ERROR_OK)
+	if (in->GetLastError() != IO_ERROR_OK || in->InputNumberRaw(8) != (Int64) 0x89504E470D0A1A0A)
 	{
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
@@ -90,6 +90,8 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 
 		return bitmap;
 	}
+
+	in->Seek(0);
 
 	/* If you are using replacement read functions, instead of calling
 	 * png_init_io() here you would call:

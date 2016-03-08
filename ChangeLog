@@ -3,3 +3,5 @@ ChangeLog for smooth
 xx.yy.zz xx:yy - smooth alpha 0.8.72.1
 
 - windowgdi.cpp		- don't updates coordinates for minimized windows
+
+- upgraded libjpeg to version 9b

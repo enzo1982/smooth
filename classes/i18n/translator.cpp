@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -159,6 +159,7 @@ S::String S::I18n::Translator::GetUserDefaultLanguageCode()
 							else if (SUBLANGID(langid) == SUBLANG_CHINESE_MACAU)		  code = "zh_MO";
 							else if (SUBLANGID(langid) == SUBLANG_CHINESE_SINGAPORE)	  code = "zh_SG";
 							break;
+		case LANG_CORSICAN:	code = "co";	break;
 		case LANG_CZECH:	code = "cs";	break;
 		case LANG_DANISH:	code = "da";	break;
 		case LANG_DARI:		code = "prs";	break;

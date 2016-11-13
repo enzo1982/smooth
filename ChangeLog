@@ -9,3 +9,4 @@ xx.yy.zz xx:yy - smooth alpha 0.8.72.1
 
 - upgraded libjpeg to version 9b
 - upgraded libpng to version 1.6.26
+- upgraded libxml2 to version 2.9.4

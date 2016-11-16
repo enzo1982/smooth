@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 xx.yy.zz xx:yy - smooth alpha 0.8.72.1
 
+- surfacecocoa.mm	- fix hangs on OS X 10.11 El Capitan
 - windowgdi.cpp		- don't update coordinates for minimized windows
 - jpeg.cpp		- avoid temporary files when reading JPEG data from memory
 			- check for JPEG signature before trying to open files

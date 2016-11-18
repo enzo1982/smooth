@@ -565,11 +565,6 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 			DragFinish(hDrop);
 
 			return Success();
-
-		/* Other messages:
-		 */
-		case WM_TIMER:
-			return onEvent.Call(SM_TIMER, wParam, 0);
 	}
 
 	/* Call event for any other Windows messages.

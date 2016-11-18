@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -156,9 +156,10 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		if (Directory("/opt/local/lib").Exists())   directories.Add("/opt/local/lib");
 		if (Directory("/sw/lib").Exists())	    directories.Add("/sw/lib");
 #elif defined __HAIKU__
-		/* Haiku puts libraries into /boot/common/lib.
+		/* Haiku puts libraries into /system/[non-packaged/]lib.
 		 */
-							    directories.Add("/boot/common/lib");
+							    directories.Add("/system/lib");
+							    directories.Add("/system/non-packaged/lib");
 #elif defined __NetBSD__
 		/* Packages live in /usr/pkg on NetBSD.
 		 */

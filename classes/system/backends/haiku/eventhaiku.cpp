@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,6 +29,8 @@ S::Array<S::System::EventHaiku::Message *, S::Void *>	 S::System::EventHaiku::me
 S::System::EventHaiku::EventHaiku()
 {
 	type = EVENT_HAIKU;
+
+	messages.EnableLocking();
 }
 
 S::System::EventHaiku::~EventHaiku()
@@ -39,6 +41,19 @@ S::Void S::System::EventHaiku::EnqueueMessage(Void *window, const BMessage &curr
 {
 	messages.LockForWrite();
 
+	/* Process only the most recent B_MOUSE_MOVED and B_WINDOW_RESIZED message.
+	 */
+	if (messageID == B_MOUSE_MOVED || messageID == B_WINDOW_RESIZED)
+	{
+		for (Int i = message.Length() - 1; i >= 0; i--)
+		{
+			if (messages.GetNth(i)->window	  == window &&
+			    messages.GetNth(i)->messageID == messageID) messages.RemoveNth(i);
+		}
+	}
+
+	/* Add new message to queue.
+	 */
 	Message	*message = new Message();
 
 	message->window		= window;
@@ -97,18 +112,12 @@ S::Int S::System::EventHaiku::ProcessNextEvent()
 		{
 			messages.LockForWrite();
 
+			/* Get first message.
+			 */
 			Message	*message = messages.GetFirst();
 
-			/* Process only the most recent B_MOUSE_MOVED message.
-			 */
-			while (messages.Length() > 1 && message->messageID == B_MOUSE_MOVED && messages.GetNth(1)->messageID == B_MOUSE_MOVED)
-			{
-				delete message;
-
-				messages.RemoveNth(0);
-
-				message = messages.GetFirst();
-			}
+			messages.RemoveNth(0);
+			messages.Unlock();
 
 			/* Find window and process message.
 			 */
@@ -117,9 +126,6 @@ S::Int S::System::EventHaiku::ProcessNextEvent()
 			if (window != NIL) window->ProcessSystemMessages(message->messageID, message->param1, message->param2, message->currentMessage);
 
 			delete message;
-
-			messages.RemoveNth(0);
-			messages.Unlock();
 
 			break;
 		}

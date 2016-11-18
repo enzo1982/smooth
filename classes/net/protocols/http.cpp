@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,7 +29,7 @@ S::Net::Protocols::Protocol *CreateProtocolHTTP(const S::String &iURL)
 	return new S::Net::Protocols::HTTP(iURL);
 }
 
-S::Int	 protocolHTTPTmp = S::Net::Protocols::Protocol::AddProtocol(&CreateProtocolHTTP, "http://");
+S::Int	 protocolHTTPTmp = S::Net::Protocols::Protocol::AddProtocol(&CreateProtocolHTTP, L"http://");
 
 S::Net::Protocols::HTTP::HTTP(const String &iURL) : Protocol(iURL)
 {

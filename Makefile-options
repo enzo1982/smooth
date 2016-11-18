@@ -204,7 +204,7 @@ ifndef prefix
 	endif
 
 	ifeq ($(BUILD_HAIKU),True)
-		prefix = /boot/common
+		prefix = /system/non-packaged
 	endif
 endif
 
@@ -221,6 +221,7 @@ endif
 
 ifeq ($(BUILD_HAIKU),True)
 	includedir = $(prefix)/develop/headers
+	datadir	   = $(prefix)/data
 endif
 
 # Decide which libraries to use
@@ -250,6 +251,8 @@ else
 	ifeq ($(BUILD_OSX),True)
 		USE_BUNDLED_LIBFRIBIDI = True
 	else ifeq ($(BUILD_QNX),True)
+		USE_BUNDLED_LIBFRIBIDI = True
+	else ifeq ($(BUILD_HAIKU),True)
 		USE_BUNDLED_LIBFRIBIDI = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBFRIBIDI = True

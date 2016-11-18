@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,7 +31,6 @@ namespace smooth
 {
 	static multithread (char *)	 inputFormat	= NIL;
 	static multithread (char *)	 outputFormat	= NIL;
-	static multithread (char *)	 internalFormat	= NIL;
 
 	Int				 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
@@ -304,12 +303,13 @@ const char *S::String::SetOutputFormat(const char *oFormat)
 
 const char *S::String::GetInternalFormat()
 {
+	static char	*internalFormat = NIL;
+
 	if (internalFormat == NIL)
 	{
 		System::Endianness	 endianness = System::CPU().GetEndianness();
 
-		if	(sizeof(wchar_t) == 1) internalFormat = (char *) "UTF-8";
-		else if (sizeof(wchar_t) == 2) internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-16LE" : "UTF-16BE");
+		if	(sizeof(wchar_t) == 2) internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-16LE" : "UTF-16BE");
 		else if (sizeof(wchar_t) == 4) internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-32LE" : "UTF-32BE");
 	}
 

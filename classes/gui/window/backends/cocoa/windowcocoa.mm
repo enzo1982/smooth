@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -557,7 +557,7 @@ S::GUI::WindowCocoa::WindowCocoa(Void *iWindow)
 
 	flags		= 0;
 
-	pasteBoard	= NIL;
+	pasteBoard	= nil;
 	enableDropFiles	= False;
 }
 
@@ -1069,7 +1069,7 @@ S::Int S::GUI::WindowCocoa::EnableDropFiles(Bool nEnableDropFiles)
 
 const S::Array<S::String> &S::GUI::WindowCocoa::GetDroppedFiles() const
 {
-	if (pasteBoard == NIL) return WindowBackend::GetDroppedFiles();
+	if (pasteBoard == nil) return WindowBackend::GetDroppedFiles();
 
 	static Array<String>	 fileNames;
 

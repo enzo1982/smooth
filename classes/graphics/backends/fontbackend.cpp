@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,11 +9,56 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/fontbackend.h>
+#include <smooth/graphics/surface.h>
 #include <smooth/misc/math.h>
+#include <smooth/foreach.h>
+#include <smooth/init.h>
 
 #if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/graphics/backends/gdi/fontgdi.h>
 #endif
+
+/* Cache computed text extents as this is very slow on Haiku.
+ */
+namespace smooth
+{
+	class ExtentsCacheEntry
+	{
+		private:
+			String		 fontName;
+			Int		 fontSize;
+			Int		 fontWeight;
+			Int		 fontStyle;
+
+			GUI::Size	 extents;
+		public:
+					 ExtentsCacheEntry(const String &fnm, Int fsz, Int fwt, Int fst) : fontName(fnm),
+													   fontSize(fsz),
+													   fontWeight(fwt),
+													   fontStyle(fst) { }
+
+			const GUI::Size	&GetExtents() const			{ return extents; }
+			Void		 SetExtents(const GUI::Size &nExtents)	{ extents = nExtents; }
+
+			Int		 ComputeCRC32(const String &text) const { return String(text).Append(fontName)
+												     .Append(String::FromInt(fontSize	<< 16 |
+															     fontWeight <<  4 |
+															     fontStyle)).ComputeCRC32(); }
+	};
+
+	static Array<ExtentsCacheEntry *> extentsCache;
+
+	Int ExtentsCacheFree()
+	{
+		foreach (ExtentsCacheEntry *entry, extentsCache) delete entry;
+
+		extentsCache.RemoveAll();
+
+		return Success();
+	}
+};
+
+S::Int	 addExtentsCacheFreeTmp = S::AddFreeFunction(&S::ExtentsCacheFree);
 
 S::GUI::FontBackend *CreateFontBackend(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -126,6 +171,49 @@ S::Int S::GUI::FontBackend::GetTextSizeY(const String &text, Bool scaled) const
 }
 
 S::GUI::Size S::GUI::FontBackend::GetTextSize(const String &text, Bool scaled) const
+{
+	if (text == NIL) return Size();
+
+	/* Check for existing cache entry.
+	 */
+	ExtentsCacheEntry	 entry(fontName, fontSize, fontWeight, fontStyle);
+
+	Float			 dpi = Surface().GetSurfaceDPI();
+	Int			 crc = entry.ComputeCRC32(text);
+
+	if (extentsCache.Get(crc) != NIL)
+	{
+		if (scaled || Math::Abs(dpi - 96.0) < 0.1) return extentsCache.Get(crc)->GetExtents();
+		else					   return extentsCache.Get(crc)->GetExtents() * 96.0 / dpi;
+	}
+
+	/* Compute scaled text size.
+	 */
+	Size	 size = GetTextSize(text);
+
+	entry.SetExtents(size);
+
+	/* Save at most 2048 cache entries.
+	 */
+	if (extentsCache.Length() >= 2048)
+	{
+		for (Int i = 0; i < 1024; i++)
+		{
+			delete extentsCache.GetFirst();
+
+			extentsCache.RemoveNth(0);
+		}
+	}
+
+	extentsCache.Add(new ExtentsCacheEntry(entry), crc);
+
+	/* Return computed text size.
+	 */
+	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return size;
+	else					   return size * 96.0 / dpi;
+}
+
+S::GUI::Size S::GUI::FontBackend::GetTextSize(const String &text) const
 {
 	return Size();
 }

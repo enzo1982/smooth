@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -44,7 +44,7 @@ S::GUI::FontCairo::~FontCairo()
 {
 }
 
-S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) const
+S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 {
 	if (iText == NIL) return Size();
 
@@ -127,10 +127,8 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText, Bool scaled) co
 	cairo_surface_destroy(surface);
 
 #if defined __WIN32__ || defined __APPLE__
-	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(textExtents.x_advance, fontExtents.height);
-	else					   return Size(textExtents.x_advance, fontExtents.height) * 96.0 / dpi;
+	return Size(textExtents.x_advance, fontExtents.height);
 #else
-	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(x, y - 2);
-	else					   return Size(x, y - 2) * 96.0 / dpi;
+	return Size(x, y - 2);
 #endif
 }

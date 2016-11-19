@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,7 +28,7 @@ S::GUI::FontGDI::~FontGDI()
 {
 }
 
-S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text, Bool scaled) const
+S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text) const
 {
 	if (text == NIL) return Size();
 
@@ -60,6 +60,5 @@ S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text, Bool scaled) const
 
 	DeleteDC(dc);
 
-	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(tSize.cx, tSize.cy);
-	else					   return Size(tSize.cx, tSize.cy) * 96.0 / dpi;
+	return Size(tSize.cx, tSize.cy);
 }

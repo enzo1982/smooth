@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,7 +31,7 @@ S::GUI::FontGDIPlus::~FontGDIPlus()
 {
 }
 
-S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text, Bool scaled) const
+S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text) const
 {
 	if (text == NIL) return Size();
 
@@ -59,6 +59,5 @@ S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text, Bool scaled) c
 
 	gdip_context.MeasureString(text, -1, &gdip_font, Gdiplus::PointF(0.0, 0.0), &gdip_format, &gdip_rect);
 
-	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return Size(gdip_rect.Width, gdip_rect.Height - 2);
-	else					   return Size(gdip_rect.Width, gdip_rect.Height - 2) * 96.0 / dpi;
+	return Size(gdip_rect.Width, gdip_rect.Height - 2);
 }

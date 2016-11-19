@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,7 +53,7 @@ namespace smooth
 					 FontCairo(const String &, Short, Short, Short, const Color &);
 					~FontCairo();
 
-				Size	 GetTextSize(const String &, Bool) const;
+				Size	 GetTextSize(const String &) const;
 		};
 	};
 };

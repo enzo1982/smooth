@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,12 +32,10 @@ namespace smooth
 		class FontCocoa : public FontBackend
 		{
 			public:
-				static Int	 Free();
+					 FontCocoa(const String &, Short, Short, Short, const Color &);
+					~FontCocoa();
 
-						 FontCocoa(const String &, Short, Short, Short, const Color &);
-						~FontCocoa();
-
-				Size		 GetTextSize(const String &, Bool) const;
+				Size	 GetTextSize(const String &) const;
 		};
 	};
 };

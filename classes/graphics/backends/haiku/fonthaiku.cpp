@@ -33,11 +33,10 @@ S::GUI::Size S::GUI::FontHaiku::GetTextSize(const String &text, Bool scaled) con
 {
 	if (text == NIL) return Size();
 
-	Float	 dpi  = Surface().GetSurfaceDPI();
+	Float		 dpi = Surface().GetSurfaceDPI();
 
 	BFont		 font;
 	font_height	 height;
-	Size		 size;
 
 	font.SetFamilyAndStyle(fontName, NULL);
 	font.SetFace((fontStyle & Font::Italic ? B_ITALIC_FACE : 0) |
@@ -46,8 +45,5 @@ S::GUI::Size S::GUI::FontHaiku::GetTextSize(const String &text, Bool scaled) con
 
 	font.GetHeight(&height);
 
-	size = Size(font.StringWidth(text.ConvertTo("UTF-8")), Math::Ceil((height.ascent + height.descent + height.leading) * 96.0 / 72.0));
-
-	if (scaled || Math::Abs(dpi - 96.0) < 0.1) return size;
-	else					   return size * 96.0 / dpi;
+	return Size(font.StringWidth(text.ConvertTo("UTF-8")), Math::Ceil((height.ascent + height.descent + height.leading) * 96.0 / 72.0));
 }

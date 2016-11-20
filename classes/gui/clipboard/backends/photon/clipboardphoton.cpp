@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -68,7 +68,7 @@ S::Bool S::GUI::ClipboardPhoton::SetClipboardText(const String &text)
 	char		*string = text.ConvertTo("UTF-8");
 	PhClipboardHdr	 clip[1];
 
-	strcpy(clip[0].type, Ph_CLIPBOARD_TYPE_TEXT);
+	strncpy(clip[0].type, Ph_CLIPBOARD_TYPE_TEXT, sizeof(clip[0].type));
 
 	clip[0].data   = string;
 	clip[0].length = strlen(string);

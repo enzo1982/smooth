@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -60,12 +60,17 @@ S::Void *S::Threads::MutexBackend::GetSystemMutex() const
 	return NIL;
 }
 
-S::Int S::Threads::MutexBackend::Lock()
+S::Bool S::Threads::MutexBackend::Lock()
 {
-	return Error();
+	return False;
 }
 
-S::Int S::Threads::MutexBackend::Release()
+S::Bool S::Threads::MutexBackend::TryLock()
 {
-	return Error();
+	return False;
+}
+
+S::Bool S::Threads::MutexBackend::Release()
+{
+	return False;
 }

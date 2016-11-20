@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,20 +43,23 @@ S::Void *S::Threads::SemaphoreWin32::GetSystemSemaphore() const
 	return (Void *) semaphore;
 }
 
-S::Int S::Threads::SemaphoreWin32::Wait()
+S::Bool S::Threads::SemaphoreWin32::Wait()
 {
-	if (semaphore == NIL) return Error();
+	if (semaphore != NIL && WaitForSingleObject(semaphore, INFINITE) == WAIT_OBJECT_0) return True;
 
-	WaitForSingleObject(semaphore, INFINITE);
-
-	return Success();
+	return False;
 }
 
-S::Int S::Threads::SemaphoreWin32::Release()
+S::Bool S::Threads::SemaphoreWin32::TryWait()
 {
-	if (semaphore == NIL) return Error();
+	if (semaphore != NIL && WaitForSingleObject(semaphore, 0) == WAIT_OBJECT_0) return True;
 
-	ReleaseSemaphore(semaphore, 1, NULL);
+	return False;
+}
 
-	return Success();
+S::Bool S::Threads::SemaphoreWin32::Release()
+{
+	if (semaphore != NIL && ReleaseSemaphore(semaphore, 1, NULL) == 0) return True;
+
+	return False;
 }

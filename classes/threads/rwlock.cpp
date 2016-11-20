@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,7 +45,7 @@ S::Threads::RWLock &S::Threads::RWLock::operator =(const RWLock &oRWLock)
 	return *this;
 }
 
-S::Int S::Threads::RWLock::LockForRead()
+S::Bool S::Threads::RWLock::LockForRead()
 {
 	/* Acquire exclusive lock.
 	 */
@@ -63,10 +63,10 @@ S::Int S::Threads::RWLock::LockForRead()
 	 */
 	exclusiveAccessMutex->Release();
 
-	return Success();
+	return True;
 }
 
-S::Int S::Threads::RWLock::LockForWrite()
+S::Bool S::Threads::RWLock::LockForWrite()
 {
 	/* Acquire exclusive lock.
 	 */
@@ -80,10 +80,10 @@ S::Int S::Threads::RWLock::LockForWrite()
 	 */
 	writeLocked++;
 
-	return Success();
+	return True;
 }
 
-S::Int S::Threads::RWLock::Release()
+S::Bool S::Threads::RWLock::Release()
 {
 	/* Check if we are locked for write.
 	 */
@@ -97,7 +97,7 @@ S::Int S::Threads::RWLock::Release()
 		 */
 		exclusiveAccessMutex->Release();
 
-		return Success();
+		return True;
 	}
 
 	/* Decrease read lock counter by one.
@@ -108,5 +108,5 @@ S::Int S::Threads::RWLock::Release()
 
 	sharedAccessMutex->Release();
 
-	return Success();
+	return True;
 }

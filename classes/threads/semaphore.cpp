@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,12 +49,17 @@ S::Void *S::Threads::Semaphore::GetSystemSemaphore() const
 	return backend->GetSystemSemaphore();
 }
 
-S::Int S::Threads::Semaphore::Wait()
+S::Bool S::Threads::Semaphore::Wait()
 {
 	return backend->Wait();
 }
 
-S::Int S::Threads::Semaphore::Release()
+S::Bool S::Threads::Semaphore::TryWait()
+{
+	return backend->TryWait();
+}
+
+S::Bool S::Threads::Semaphore::Release()
 {
 	return backend->Release();
 }

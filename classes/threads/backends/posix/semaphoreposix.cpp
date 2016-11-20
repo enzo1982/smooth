@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,20 +55,23 @@ S::Void *S::Threads::SemaphorePOSIX::GetSystemSemaphore() const
 	return (Void *) semaphore;
 }
 
-S::Int S::Threads::SemaphorePOSIX::Wait()
+S::Bool S::Threads::SemaphorePOSIX::Wait()
 {
-	if (semaphore == NIL) return Error();
+	if (semaphore != NIL && sem_wait(semaphore) == 0) return True;
 
-	sem_wait(semaphore);
-
-	return Success();
+	return False;
 }
 
-S::Int S::Threads::SemaphorePOSIX::Release()
+S::Bool S::Threads::SemaphorePOSIX::TryWait()
 {
-	if (semaphore == NIL) return Error();
+	if (semaphore != NIL && sem_trywait(semaphore) == 0) return True;
 
-	sem_post(semaphore);
+	return False;
+}
 
-	return Success();
+S::Bool S::Threads::SemaphorePOSIX::Release()
+{
+	if (semaphore != NIL && sem_post(semaphore) == 0) return True;
+
+	return False;
 }

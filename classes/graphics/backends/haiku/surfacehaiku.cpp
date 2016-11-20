@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -84,29 +84,27 @@ S::GUI::SurfaceHaiku::~SurfaceHaiku()
 
 S::Int S::GUI::SurfaceHaiku::Lock()
 {
-	if (view != NIL)
+	SurfaceBackend::Lock();
+
+	if (view != NIL && !painting)
 	{
 		BWindow	*window = view->Window();
 
-		window->Lock();
 		bitmap->Lock();
-
-		return Success();
+		window->Lock();
 	}
 
-	return SurfaceBackend::Lock();
+	return Success();
 }
 
 S::Int S::GUI::SurfaceHaiku::Release()
 {
-	if (view != NIL)
+	if (view != NIL && !painting)
 	{
 		BWindow	*window = view->Window();
 
 		window->Unlock();
 		bitmap->Unlock();
-
-		return Success();
 	}
 
 	return SurfaceBackend::Release();
@@ -122,6 +120,7 @@ S::Int S::GUI::SurfaceHaiku::SetSize(const Size &nSize)
 
 	if (view != NIL && !painting)
 	{
+		bitmap->Unlock();
 		bitmap->RemoveChild(bitmapView);
 
 		delete bitmapView;
@@ -135,6 +134,7 @@ S::Int S::GUI::SurfaceHaiku::SetSize(const Size &nSize)
 		bitmapView = new BView(bitmap->Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
 
 		bitmap->AddChild(bitmapView);
+		bitmap->Lock();
 
 		paintRects.Add(new Rect(Point(0, 0), size));
 	}

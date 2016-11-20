@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,7 +49,15 @@ namespace smooth
 
 				void Draw(BRect updateRect)
 				{
-					System::EventHaiku::EnqueueMessage(Window(), *(Window()->CurrentMessage()), B_PAINT, 0, 0);
+					BRegion	 clippingRegion;
+
+					GetClippingRegion(&clippingRegion);
+
+					BRect	 clippingRect = clippingRegion.Frame();
+					Float	 fontSize     = Surface().GetSurfaceDPI() / 96.0;
+
+					System::EventHaiku::EnqueueMessage(Window(), *(Window()->CurrentMessage()), B_PAINT, ((	      (int) clippingRect.left			  + 32768) << 16) | (	    (int) clippingRect.top			 + 32768),
+															     ((Math::Floor((clippingRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Floor((clippingRect.Height() + 1) / fontSize) + 32768));
 				}
 
 				void MouseMoved(BPoint point, uint32 transit, const BMessage *message)
@@ -345,19 +353,10 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 		/* Paint messages:
 		 */
 		case B_PAINT:
-			{
-				BRegion	 clippingRegion;
+			updateRect = Rect(Point((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768),
+					   Size((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768) + Size(1, 1));
 
-				wnd->Lock();
-				view->GetClippingRegion(&clippingRegion);
-				wnd->Unlock();
-
-				BRect	 clippingRect = clippingRegion.Frame();
-
-				updateRect = Rect(Point(clippingRect.left, clippingRect.top), Size(clippingRect.Width(), clippingRect.Height()) + Size(1, 1));
-
-				onEvent.Call(SM_PAINT, 0, 0);
-			}
+			onEvent.Call(SM_PAINT, 0, 0);
 
 			break;
 
@@ -453,6 +452,13 @@ S::Int S::GUI::WindowHaiku::Open(const String &title, const Point &pos, const Si
 		else						      drawSurface = new Surface(view);
 
 		drawSurface->SetSize(size * fontSize + sizeModifier);
+
+		/* Set metrics to actually allocated window.
+		 */
+		BRect	 windowRect = wnd->Frame();
+
+		onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
+					       ((Math::Floor((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Floor((windowRect.Height() + 1) / fontSize) + 32768));
 
 		/* Set minimum and maximum size.
 		 */

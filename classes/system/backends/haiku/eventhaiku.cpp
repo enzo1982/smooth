@@ -74,33 +74,18 @@ S::Void S::System::EventHaiku::ProcessMessage(Void *window, const BMessage &curr
 	while (messages.Length() > 0) System::System::Sleep(0);
 }
 
-class HaikuEventDispatcher : public BApplication
+class HaikuApplication : public BApplication
 {
 	public:
-		HaikuEventDispatcher() : BApplication("application/x-vnd.smooth-haiku")
+		HaikuApplication() : BApplication("application/x-vnd.smooth-haiku")
 		{
-		}
-
-		void Start()
-		{
-			Lock();
-			Run();
 		}
 };
 
-static HaikuEventDispatcher	 app;
+static HaikuApplication	 app;
 
 S::Int S::System::EventHaiku::ProcessNextEvent()
 {
-	static Bool	 dispatcherStarted = False;
-
-	if (!dispatcherStarted)
-	{
-		NonBlocking0<Void>(&HaikuEventDispatcher::Start, &app).Call();
-
-		dispatcherStarted = True;
-	}
-
 	/* Emulate a timeout of ~100ms by trying to find a message
 	 * 10 times while sleeping for 10ms between trying.
 	 */

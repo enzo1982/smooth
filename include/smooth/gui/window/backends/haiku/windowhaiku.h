@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -46,6 +46,8 @@ namespace smooth
 				BWindow					*wnd;
 				BView					*view;
 
+				const BMessage				*dropMessage;
+
 				Float					 fontSize;
 
 				Size					 minSize;
@@ -70,6 +72,8 @@ namespace smooth
 				Int					 RequestClose();
 
 				Int					 SetTitle(const String &);
+
+				const Array<String>			&GetDroppedFiles() const;
 
 				Int					 SetMinimumSize(const Size &);
 				Int					 SetMaximumSize(const Size &);

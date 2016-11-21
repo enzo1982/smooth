@@ -20,6 +20,8 @@
 #include <Application.h>
 #include <Message.h>
 #include <Region.h>
+#include <Entry.h>
+#include <Path.h>
 
 S::GUI::WindowBackend *CreateWindowHaiku()
 {
@@ -123,7 +125,7 @@ namespace smooth
 				{
 					System::EventHaiku::EnqueueMessage(this, *CurrentMessage(), message->what, 0, 0);
 
-					BWindow::MessageReceived(message);
+					if (message->what != B_SIMPLE_DATA) BWindow::MessageReceived(message);
 				}
 		};
 	};
@@ -131,19 +133,21 @@ namespace smooth
 
 S::GUI::WindowHaiku::WindowHaiku(Void *iWindow)
 {
-	type	 = WINDOW_HAIKU;
+	type	    = WINDOW_HAIKU;
 
-	wnd	 = NIL;
-	view	 = NIL;
+	wnd	    = NIL;
+	view	    = NIL;
 
-	id	 = windowBackends.Add(this);
+	id	    = windowBackends.Add(this);
 
-	minSize	 = Size(160, 24);
-	maxSize	 = Size(32768, 32768);
+	minSize	    = Size(160, 24);
+	maxSize	    = Size(32768, 32768);
 
-	fontSize = Surface().GetSurfaceDPI() / 96.0;
+	fontSize    = Surface().GetSurfaceDPI() / 96.0;
 
-	flags	 = 0;
+	flags	    = 0;
+
+	dropMessage = NIL;
 }
 
 S::GUI::WindowHaiku::~WindowHaiku()
@@ -417,6 +421,22 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			}
 
 			break;
+
+		/* Drag & drop messages:
+		 */
+		case B_SIMPLE_DATA:
+			{
+				BPoint	 cursorPos;
+
+				currentMessage.FindPoint("_drop_point_", &cursorPos);
+
+				cursorPos   = wnd->ConvertFromScreen(cursorPos);
+				dropMessage = &currentMessage;
+
+				onEvent.Call(SM_DROPFILES, cursorPos.x, cursorPos.y);
+			}
+
+			break;
 	}
 
 	return Success();
@@ -513,6 +533,37 @@ S::Int S::GUI::WindowHaiku::SetTitle(const String &nTitle)
 	wnd->SetTitle(nTitle);
 
 	return Success();
+}
+
+const S::Array<S::String> &S::GUI::WindowHaiku::GetDroppedFiles() const
+{
+	if (dropMessage == NIL) return WindowBackend::GetDroppedFiles();
+
+	static Array<String>	 fileNames;
+
+	fileNames.RemoveAll();
+
+	/* Query number of files dropped.
+	 */
+	int32	 nOfFiles = 0;
+
+	dropMessage->GetInfo("refs", NIL, &nOfFiles);
+
+	/* Query dropped files.
+	 */
+	for (Int i = 0; i < nOfFiles; i++)
+	{
+		entry_ref	 ref;
+		BPath		 path;
+
+		dropMessage->FindRef("refs", i, &ref);
+
+		BEntry(&ref).GetPath(&path);
+
+		fileNames.Add(path.Path());
+	}
+
+	return fileNames;
 }
 
 S::Int S::GUI::WindowHaiku::SetMinimumSize(const Size &nMinSize)

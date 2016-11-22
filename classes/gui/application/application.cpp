@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,12 +10,10 @@
 
 #include <smooth/gui/application/application.h>
 #include <smooth/gui/window/window.h>
-#include <smooth/threads/thread.h>
 #include <smooth/system/event.h>
 #include <smooth/system/screen.h>
 #include <smooth/files/directory.h>
 #include <smooth/misc/math.h>
-#include <smooth/templates/nonblocking.h>
 #include <smooth/foreach.h>
 
 #ifdef __WIN32__
@@ -54,29 +52,19 @@ S::GUI::Application::~Application()
 
 S::Int S::GUI::Application::Loop()
 {
-	/* Do initialization if we are called for the first time.
-	 */
-	if (initializing)
-	{
-		initializing = False;
+	static Bool	 firstTime = True;
 
+	if (firstTime)
+	{
+		firstTime = False;
+
+		/* Show pending windows when we are called for the first time.
+		 */
 		for (Int i = 0; i < Window::GetNOfWindows(); i++)
 		{
 			Window	*window = Window::GetNthWindow(i);
 
 			if (window != NIL && !window->IsVisibilitySet()) window->Show();
-		}
-
-		/* Start waiting threads here.
-		 */
-		for (Int i = 0; i < Object::GetNOfObjects(); i++)
-		{
-			Object	*object = Object::GetNthObject(i);
-
-			if (object == NIL) continue;
-
-			if (object->GetObjectType() == Threads::Thread::classID &&
-			    ((Threads::Thread *) object)->GetStatus() == Threads::THREAD_STARTME) ((Threads::Thread *) object)->Start();
 		}
 	}
 

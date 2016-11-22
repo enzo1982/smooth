@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -122,6 +122,22 @@ S::Bool S::Init()
 	I18n::Translator::defaultTranslator->SelectUserDefaultLanguage();
 
 	Setup::rightToLeft = I18n::Translator::defaultTranslator->IsActiveLanguageRightToLeft();
+
+	/* Finished initializing.
+	 */
+	initializing = False;
+
+	/* Start waiting threads.
+	 */
+	for (Int i = 0; i < Object::GetNOfObjects(); i++)
+	{
+		Object	*object = Object::GetNthObject(i);
+
+		if (object == NIL) continue;
+
+		if (object->GetObjectType() == Threads::Thread::classID &&
+		    ((Threads::Thread *) object)->GetStatus() == Threads::THREAD_STARTME) ((Threads::Thread *) object)->Start();
+	}
 
 	return True;
 }

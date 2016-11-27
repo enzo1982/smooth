@@ -5,6 +5,7 @@ xx.yy.zz xx:yy - smooth alpha 0.8.73.0
 - surfacecocoa.mm	- fix hangs on OS X 10.11 El Capitan
 - fontbackend.cpp	- cache computed text extents
 - windowgdi.cpp		- don't update coordinates for minimized windows
+- system.cpp		- added GetResourcesDirectory() method
 - mutex.cpp		- added TryLock() method
 			- changed the return type of lock methods to Bool
 - semaphore.cpp		- added TryWait() method

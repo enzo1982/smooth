@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,7 @@
 #endif
 
 #include <smooth/system/system.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/files/directory.h>
 #include <smooth/io/instream.h>
 #include <smooth/version.h>
@@ -456,9 +457,31 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 #endif
 #endif
 
-	if (personalDir != NIL && !personalDir.EndsWith(Directory::GetDirectoryDelimiter())) personalDir.Append(Directory::GetDirectoryDelimiter());
+	if (!personalDir.EndsWith(Directory::GetDirectoryDelimiter())) personalDir.Append(Directory::GetDirectoryDelimiter());
+	if ( personalDir == Directory::GetDirectoryDelimiter())	       personalDir = NIL;
 
 	return personalDir;
+}
+
+S::String S::System::System::GetResourcesDirectory()
+{
+	String	 resourcesDir = GUI::Application::GetApplicationDirectory();
+
+#if !defined __WIN32__
+	resourcesDir[resourcesDir.Length() - 1]					    = 0;
+	resourcesDir[resourcesDir.FindLast(Directory::GetDirectoryDelimiter()) + 1] = 0;
+
+#if defined __HAIKU__
+	resourcesDir.Append("data");
+#else
+	resourcesDir.Append("share");
+#endif
+#endif
+
+	if (!resourcesDir.EndsWith(Directory::GetDirectoryDelimiter())) resourcesDir.Append(Directory::GetDirectoryDelimiter());
+	if ( resourcesDir == Directory::GetDirectoryDelimiter())	resourcesDir = NIL;
+
+	return resourcesDir;
 }
 
 S::String S::System::System::GetTempDirectory()

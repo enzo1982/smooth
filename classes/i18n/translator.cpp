@@ -12,6 +12,7 @@
 #include <smooth/i18n/language.h>
 
 #include <smooth/files/directory.h>
+#include <smooth/system/system.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
@@ -369,9 +370,9 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
 
 #ifndef __WIN32__
-	if (Directory(GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
+	if (Directory(S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
 	{
-		dir = GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
+		dir = S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
 	}
 #endif
 
@@ -524,9 +525,9 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 			Directory	 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
 
 #ifndef __WIN32__
-			if (Directory(GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
+			if (Directory(S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
 			{
-				dir = GUI::Application::GetApplicationDirectory().Append("..").Append(Directory::GetDirectoryDelimiter()).Append("share").Append(Directory::GetDirectoryDelimiter()).Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
+				dir = S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
 			}
 #endif
 

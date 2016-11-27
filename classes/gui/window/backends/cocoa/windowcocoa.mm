@@ -787,15 +787,15 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 			break;
 
 		case NSFlagsChanged:
-			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyShift, False);
-			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyControl, False);
-			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyCommand, False);
-			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyAlt, False);
+			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyShift,   [e modifierFlags] & NSShiftKeyMask);
+			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyControl, [e modifierFlags] & NSControlKeyMask);
+			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyCommand, [e modifierFlags] & NSCommandKeyMask);
+			Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyAlt,     [e modifierFlags] & NSAlternateKeyMask);
 
-			if ([e modifierFlags] & NSShiftKeyMask)     { Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyShift, True); onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyShift, 0); }
-			if ([e modifierFlags] & NSControlKeyMask)   { Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyControl, True); onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyControl, 0); }
-			if ([e modifierFlags] & NSCommandKeyMask)   { Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyCommand, True); onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyCommand, 0); }
-			if ([e modifierFlags] & NSAlternateKeyMask) { Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyAlt, True); onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyAlt, 0); }
+			if ([e modifierFlags] & NSShiftKeyMask)     onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyShift, 0);
+			if ([e modifierFlags] & NSControlKeyMask)   onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyControl, 0);
+			if ([e modifierFlags] & NSCommandKeyMask)   onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyCommand, 0);
+			if ([e modifierFlags] & NSAlternateKeyMask) onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyAlt, 0);
 
 			break;
 

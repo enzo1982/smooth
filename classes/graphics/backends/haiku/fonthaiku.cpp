@@ -29,7 +29,7 @@ S::GUI::FontHaiku::~FontHaiku()
 {
 }
 
-S::GUI::Size S::GUI::FontHaiku::GetTextSize(const String &text, Bool scaled) const
+S::GUI::Size S::GUI::FontHaiku::GetTextSize(const String &text) const
 {
 	if (text == NIL) return Size();
 

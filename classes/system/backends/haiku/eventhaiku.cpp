@@ -45,7 +45,7 @@ S::Void S::System::EventHaiku::EnqueueMessage(Void *window, const BMessage &curr
 	 */
 	if (messageID == B_MOUSE_MOVED || messageID == B_WINDOW_RESIZED)
 	{
-		for (Int i = message.Length() - 1; i >= 0; i--)
+		for (Int i = messages.Length() - 1; i >= 0; i--)
 		{
 			if (messages.GetNth(i)->window	  == window &&
 			    messages.GetNth(i)->messageID == messageID) messages.RemoveNth(i);

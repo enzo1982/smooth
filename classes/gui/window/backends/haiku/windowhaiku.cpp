@@ -229,7 +229,6 @@ S::Input::Keyboard::Key S::GUI::WindowHaiku::ConvertKey(Int keyCode, const BMess
 
 	if	(keyCode >= '0' && keyCode <= '9') key = (Input::Keyboard::Key)  keyCode;
 	else if	(keyCode >= 'a' && keyCode <= 'z') key = (Input::Keyboard::Key) (keyCode - 0x20);
-	else if	(keyCode >= 'A' && keyCode <= 'Z') key = (Input::Keyboard::Key)  keyCode;
 
 	return key;
 }
@@ -268,13 +267,10 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 		Input::Pointer::UpdatePosition(Window::GetWindow(wnd), point.x, point.y);
 	}
 
-	static int32	 buttons = -1;
+	static int32	 buttons   = -1;
 
-	int32		 clicks	 =  0;
-	float		 amount	 =  0;
-
-	const char	*bytes	 = NIL;
-	String		 string	 = NIL;
+	int32		 clicks	   =  0;
+	float		 amount	   =  0;
 
 	/* Convert Windows messages to smooth messages.
 	 */
@@ -325,34 +321,64 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 		/* Keyboard messages:
 		 */
 		case B_KEY_DOWN:
-			currentMessage.FindString("bytes", &bytes);
-
-			string.ImportFrom("UTF-8", bytes);
-
-			onEvent.Call(SM_CHAR, string[0], 0);
-
-			if (bytes[1] == 0)
 			{
-				Input::Keyboard::UpdateKeyState(ConvertKey(bytes[0], currentMessage), True);
+				int32		 raw   = 0;
+				const char	*bytes = NIL;
+				String		 string;
 
-				onEvent.Call(SM_KEYDOWN, ConvertKey(bytes[0], currentMessage), 0);
+				currentMessage.FindInt32("raw_char", &raw);
+				currentMessage.FindString("bytes", &bytes);
+
+				string.ImportFrom("UTF-8", bytes);
+
+				onEvent.Call(SM_CHAR, string[0], 0);
+
+				Input::Keyboard::UpdateKeyState(ConvertKey(raw, currentMessage), True);
+
+				onEvent.Call(SM_KEYDOWN, ConvertKey(raw, currentMessage), 0);
 			}
 
 			break;
 
 		case B_KEY_UP:
-			currentMessage.FindString("bytes", &bytes);
-
-			string.ImportFrom("UTF-8", bytes);
-
-			if (bytes[1] == 0)
 			{
-				Input::Keyboard::UpdateKeyState(ConvertKey(bytes[0], currentMessage), False);
+				int32	 raw = 0;
 
-				onEvent.Call(SM_KEYUP, ConvertKey(bytes[0], currentMessage), 0);
+				currentMessage.FindInt32("raw_char", &raw);
+
+				Input::Keyboard::UpdateKeyState(ConvertKey(raw, currentMessage), False);
+
+				onEvent.Call(SM_KEYUP, ConvertKey(raw, currentMessage), 0);
 			}
 
 			break;
+
+		case B_MODIFIERS_CHANGED:
+			{
+				int32	 modifiers = 0;
+
+				currentMessage.FindInt32("modifiers", &modifiers);
+
+				Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyShift,   modifiers & B_SHIFT_KEY);
+				Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyControl, modifiers & B_CONTROL_KEY);
+				Input::Keyboard::UpdateKeyState(Input::Keyboard::KeyAlt,     modifiers & B_COMMAND_KEY);
+
+				if (modifiers & B_SHIFT_KEY)   onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyShift, 0);
+				if (modifiers & B_CONTROL_KEY) onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyControl, 0);
+				if (modifiers & B_COMMAND_KEY) onEvent.Call(SM_KEYDOWN, Input::Keyboard::KeyAlt, 0);
+			}
+
+			break;
+
+		/* Clipboard messages:
+		 */
+		case B_COPY:	   onEvent.Call(SM_KEYDOWN, 'C', 0); break;
+		case B_CUT:	   onEvent.Call(SM_KEYDOWN, 'X', 0); break;
+		case B_PASTE:	   onEvent.Call(SM_KEYDOWN, 'V', 0); break;
+		case B_SELECT_ALL: onEvent.Call(SM_KEYDOWN, 'A', 0); break;
+
+		case B_UNDO:	   onEvent.Call(SM_KEYDOWN, 'Z', 0); break;
+		case B_REDO:	   onEvent.Call(SM_KEYDOWN, 'Y', 0); break;
 
 		/* Paint messages:
 		 */

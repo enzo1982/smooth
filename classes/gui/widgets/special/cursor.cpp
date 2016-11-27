@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -789,10 +789,12 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 	 */
 	if (!focussed) return False;
 
-#ifndef __APPLE__
-	Input::Keyboard::Key	 controlKey = Input::Keyboard::KeyControl;
+#if defined __APPLE__
+	Input::Keyboard::Key	 commandKey = Input::Keyboard::KeyCommand;
+#elif defined __HAIKU__
+	Input::Keyboard::Key	 commandKey = Input::Keyboard::KeyAlt;
 #else
-	Input::Keyboard::Key	 controlKey = Input::Keyboard::KeyCommand;
+	Input::Keyboard::Key	 commandKey = Input::Keyboard::KeyControl;
 #endif
 
 	Int	 newPos	 = 0;
@@ -808,7 +810,7 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			/* Calculate new cursor pos.
 			 */
-			if (Input::Keyboard::GetKeyState(controlKey))
+			if (Input::Keyboard::GetKeyState(commandKey))
 			{
 				Bool	 isLeft = ((keyCode == Input::Keyboard::KeyLeft  && !IsRightToLeft()) || (keyCode == Input::Keyboard::KeyRight && IsRightToLeft()));
 
@@ -861,7 +863,7 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			/* Calculate new cursor pos.
 			 */
-			if (Input::Keyboard::GetKeyState(controlKey))
+			if (Input::Keyboard::GetKeyState(commandKey))
 			{
 				if	(keyCode == Input::Keyboard::KeyHome)	{ if (promptPos == 0)		  break; newPos = 0;		 }
 				else if (keyCode == Input::Keyboard::KeyEnd)	{ if (promptPos >= text.Length()) break; newPos = text.Length(); }
@@ -992,12 +994,12 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			return True;
 		case Input::Keyboard::KeyInsert:
 #ifndef __APPLE__
-			if (		   Input::Keyboard::GetKeyState(controlKey) && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) CopyToClipboard();
-			if (IsActive() && !Input::Keyboard::GetKeyState(controlKey) &&  Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) InsertFromClipboard();
+			if (		   Input::Keyboard::GetKeyState(commandKey) && !Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) CopyToClipboard();
+			if (IsActive() && !Input::Keyboard::GetKeyState(commandKey) &&  Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) InsertFromClipboard();
 #endif
 			break;
 		case Input::Keyboard::KeyBack:
-			if (!IsActive() || Input::Keyboard::GetKeyState(controlKey) || Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) break;
+			if (!IsActive() || Input::Keyboard::GetKeyState(commandKey) || Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) break;
 
 			if (markStart != markEnd) { DeleteSelectedText(); break; }
 
@@ -1010,7 +1012,7 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			break;
 		case Input::Keyboard::KeyDelete:
-			if (!IsActive() || Input::Keyboard::GetKeyState(controlKey)) break;
+			if (!IsActive() || Input::Keyboard::GetKeyState(commandKey)) break;
 #ifdef __APPLE__
 			if (Input::Keyboard::GetKeyState(Input::Keyboard::KeyShift)) break;
 #endif
@@ -1034,28 +1036,28 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 
 			break;
 		case Input::Keyboard::KeyA:
-			if (		  Input::Keyboard::GetKeyState(controlKey))   MarkAll();
+			if (		  Input::Keyboard::GetKeyState(commandKey))   MarkAll();
 
 			break;
 		case Input::Keyboard::KeyC:
-			if (		  Input::Keyboard::GetKeyState(controlKey))   CopyToClipboard();
+			if (		  Input::Keyboard::GetKeyState(commandKey))   CopyToClipboard();
 
 			break;
 		case Input::Keyboard::KeyX:
-			if (IsActive() && Input::Keyboard::GetKeyState(controlKey)) { CopyToClipboard(); DeleteSelectedText(); }
+			if (IsActive() && Input::Keyboard::GetKeyState(commandKey)) { CopyToClipboard(); DeleteSelectedText(); }
 
 			break;
 		case Input::Keyboard::KeyV:
-			if (IsActive() && Input::Keyboard::GetKeyState(controlKey))   InsertFromClipboard();
+			if (IsActive() && Input::Keyboard::GetKeyState(commandKey))   InsertFromClipboard();
 
 			break;
 		case Input::Keyboard::KeyZ:
 
-			if (IsActive() && Input::Keyboard::GetKeyState(controlKey))   Undo();
+			if (IsActive() && Input::Keyboard::GetKeyState(commandKey))   Undo();
 
 			break;
 		case Input::Keyboard::KeyY:
-			if (IsActive() && Input::Keyboard::GetKeyState(controlKey))   Redo();
+			if (IsActive() && Input::Keyboard::GetKeyState(commandKey))   Redo();
 
 			break;
 	}

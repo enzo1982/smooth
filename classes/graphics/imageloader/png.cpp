@@ -82,7 +82,7 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderPNG::Load()
 	if	(gotFileName) in = new InStream(STREAM_FILE, fileName, IS_READ);
 	else if (gotBuffer)   in = new InStream(STREAM_BUFFER, buffer, buffer.Size());
 
-	if (in->GetLastError() != IO_ERROR_OK || in->InputNumberRaw(8) != (Int64) 0x89504E470D0A1A0A)
+	if (in->GetLastError() != IO_ERROR_OK || in->InputNumberRaw(8) != (Int64) 0x89504E470D0A1A0ALL)
 	{
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 

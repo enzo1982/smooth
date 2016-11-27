@@ -1036,7 +1036,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="smooth.natvis" />
+    <Natvis Include="smooth.natvis">
+      <SubType>Designer</SubType>
+    </Natvis>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -31,8 +31,6 @@ S::GUI::Size S::GUI::FontCocoa::GetTextSize(const String &text) const
 {
 	if (text == NIL) return Size();
 
-	ExtentsCacheEntry	 entry(fontName, fontSize, fontWeight, fontStyle);
-
 	Float			 dpi	    = Surface().GetSurfaceDPI();
 
 	NSAutoreleasePool	*pool	    = [[NSAutoreleasePool alloc] init];

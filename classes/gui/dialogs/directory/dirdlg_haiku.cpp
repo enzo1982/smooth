@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -82,7 +82,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 	BFilePanel		 panel(B_OPEN_PANEL, &messenger, NULL,
 				       B_DIRECTORY_NODE, False, NULL, &filter, True, True);
 
-	panel.SetPanelDirectory(directory);
+	if (directory != NIL) panel.SetPanelDirectory(directory);
 
 	panel.Show();
 

@@ -284,6 +284,17 @@ S::String S::I18n::Translator::GetUserDefaultLanguageCode()
 		case LANG_YORUBA:	code = "yo";	break;
 		case LANG_ZULU:		code = "zu";	break;
 	}
+#elif defined __APPLE__
+	FILE		*pstdin = popen("defaults read -g AppleLocale", "r");
+	Buffer<char>	 buffer(256);
+
+	buffer.Zero();
+
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(pstdin);
+
+	code = (char *) buffer;
 #elif defined __HAIKU__
 	FILE		*pstdin = popen("locale -l", "r");
 	Buffer<char>	 buffer(256);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,13 @@
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
 #include <smooth/misc/math.h>
+#include <smooth/misc/number.h>
 #include <smooth/init.h>
+
+#include <time.h>
+#include <stdlib.h>
+
+using namespace smooth::IO;
 
 S::Array<S::Net::Protocols::Protocol *(*)(const S::String &), S::Void *>	*S::Net::Protocols::Protocol::protocol_creators = NIL;
 S::Array<S::String>								*S::Net::Protocols::Protocol::protocol_magics = NIL;
@@ -68,29 +74,23 @@ S::Net::Protocols::Protocol::~Protocol()
 
 S::Int S::Net::Protocols::Protocol::DownloadToBuffer(Buffer<UnsignedByte> &destination)
 {
-	S::File	 downloadFile = S::System::System::GetTempDirectory().Append("download.temp");
+	static time_t	 timer = 0;
+
+	if (timer == 0) srand((unsigned) time(&timer));
+
+	S::File	 downloadFile = S::System::System::GetTempDirectory().Append("download-").Append(Number((Int64) rand()).ToHexString()).Append(".temp");
 	Bool	 error = DownloadToFile(downloadFile);
 
 	if (error) return Error();
 
-	IO::InStream	*f_in = new IO::InStream(IO::STREAM_FILE, downloadFile, IO::IS_READ);
+	InStream	 in(STREAM_FILE, downloadFile, IS_READ);
+	Int		 size = in.Size();
 
-	Int		 bytes = f_in->Size();
+	destination.Resize(size);
 
-	destination.Resize(bytes);
+	for (Int p = 0; p < size; p += 1024) in.InputData(destination + p, Math::Min(1024, size - p));
 
-	IO::OutStream	*b_out		= new IO::OutStream(IO::STREAM_BUFFER, destination, bytes);
-	UnsignedByte	*buffer		= new UnsignedByte [1024];
-
-	for (Int i = 0; i < bytes; i += 1024)
-	{
-		f_in->InputData(buffer, Math::Min(1024, bytes - i));
-		b_out->OutputData(buffer, Math::Min(1024, bytes - i));
-	}
-
-	delete [] buffer;
-	delete b_out;
-	delete f_in;
+	in.Close();
 
 	downloadFile.Delete();
 

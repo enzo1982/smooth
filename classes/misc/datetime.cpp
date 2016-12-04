@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,63 +10,105 @@
 
 #include <smooth/misc/datetime.h>
 
-S::DateTime::DateTime()
+#include <time.h>
+
+#ifdef __WIN32__
+#	define time_t	 __time64_t
+
+#	define time	 _time64
+#	define mktime	 _mktime64
+#	define localtime _localtime64
+#endif
+
+S::DateTime::DateTime(Void *iTime)
 {
-	days		= 0;
-	mseconds	= 0;
+	value = new time_t;
+
+	if (iTime != NIL) memcpy(value, iTime, sizeof(time_t));
 }
 
 S::DateTime::~DateTime()
 {
+	delete (time_t *) time;
+}
+
+S::DateTime S::DateTime::Current()
+{
+	time_t	 t = time(NIL);
+
+	return DateTime(&t);
 }
 
 S::Bool S::DateTime::SetYMD(Int year, Int month, Int day)
 {
-	if (year < 0)			return False;
-	if (month <= 0 || month > 12)	return False;
-	if (day <= 0 || day > 31)	return False;
+	if (year  <  1900	       ) return False;
+	if (month <=	0 || month > 12) return False;
+	if (day	  <=	0 || day   > 31) return False;
 
-	SetYear(year);
-	SetMonth(month);
-	SetDay(day);
+	tm	*lt = localtime((time_t *) value);
+
+	lt->tm_year = year - 1900;
+	lt->tm_mon  = month - 1;
+	lt->tm_mday = day;
+
+	time_t	 t  = mktime(lt);
+
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }
 
 S::Bool S::DateTime::SetHMS(Int hour, Int min, Int sec)
 {
-	if (hour < 0 || hour >= 24)	return False;
-	if (min < 0 || min >= 60)	return False;
-	if (sec < 0 || sec >= 60)	return False;
+	if (hour < 0 || hour >= 24) return False;
+	if (min	 < 0 || min  >= 60) return False;
+	if (sec	 < 0 || sec  >= 60) return False;
 
-	SetHour(hour);
-	SetMinute(min);
-	SetSecond(sec);
-	SetMSecond(0);
+	tm	*lt = localtime((time_t *) value);
+
+	lt->tm_hour = hour;
+	lt->tm_min  = min;
+	lt->tm_sec  = sec;
+
+	time_t	 t  = mktime(lt);
+
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }
 
 S::Int S::DateTime::GetYear() const
 {
-	return (Int) ((Float) days / (12 * 31));
+	tm	*lt = localtime((time_t *) value);
+
+	return lt->tm_year + 1900;
 }
 
 S::Int S::DateTime::GetMonth() const
 {
-	return (Int) ((Float) (days % (12 * 31)) / 31);
+	tm	*lt = localtime((time_t *) value);
+
+	return lt->tm_mon + 1;
 }
 
 S::Int S::DateTime::GetDay() const
 {
-	return days % (12 * 31) % 31;
+	tm	*lt = localtime((time_t *) value);
+
+	return lt->tm_mday;
 }
 
 S::Bool S::DateTime::SetYear(Int year)
 {
 	if (year < 0) return False;
 
-	days = days - 12 * 31 * GetYear() + 12 * 31 * year;
+	tm	*lt = localtime((time_t *) value);
+
+	lt->tm_year = year - 1900;
+
+	time_t	 t  = mktime(lt);
+
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }
@@ -75,7 +117,13 @@ S::Bool S::DateTime::SetMonth(Int month)
 {
 	if (month <= 0 || month > 12) return False;
 
-	days = days - 31 * GetMonth() + 31 * month;
+	tm	*lt = localtime((time_t *) value);
+
+	lt->tm_mon  = month - 1;
+
+	time_t	 t  = mktime(lt);
+
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }
@@ -84,36 +132,49 @@ S::Bool S::DateTime::SetDay(Int day)
 {
 	if (day <= 0 || day > 31) return False;
 
-	days = days - GetDay() + day;
+	tm	*lt = localtime((time_t *) value);
+
+	lt->tm_mday = day;
+
+	time_t	 t  = mktime(lt);
+
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }
 
 S::Int S::DateTime::GetHour() const
 {
-	return (Int) ((Float) mseconds / (60 * 60 * 1000));
+	tm	*lt = localtime((time_t *) value);
+
+	return lt->tm_hour;
 }
 
 S::Int S::DateTime::GetMinute() const
 {
-	return (Int) ((Float) (mseconds % (60 * 60 * 1000)) / (60 * 1000));
+	tm	*lt = localtime((time_t *) value);
+
+	return lt->tm_min;
 }
 
 S::Int S::DateTime::GetSecond() const
 {
-	return (Int) ((Float) (mseconds % (60 * 60 * 1000) % (60 * 1000)) / 1000);
-}
+	tm	*lt = localtime((time_t *) value);
 
-S::Int S::DateTime::GetMSecond() const
-{
-	return mseconds % (60 * 60 * 1000) % (60 * 1000) % 1000;
+	return lt->tm_sec;
 }
 
 S::Bool S::DateTime::SetHour(Int hour)
 {
 	if (hour < 0 || hour >= 24) return False;
 
-	mseconds = mseconds - 60 * 60 * 1000 * GetHour() + 60 * 60 * 1000 * hour;
+	tm	*lt = localtime((time_t *) value);
+
+	lt->tm_hour = hour;
+
+	time_t	 t  = mktime(lt);
+
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }
@@ -122,7 +183,13 @@ S::Bool S::DateTime::SetMinute(Int min)
 {
 	if (min < 0 || min >= 60) return False;
 
-	mseconds = mseconds - 60 * 1000 * GetMinute() + 60 * 1000 * min;
+	tm	*lt = localtime((time_t *) value);
+
+	lt->tm_min  = min;
+
+	time_t	 t  = mktime(lt);
+
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }
@@ -131,16 +198,13 @@ S::Bool S::DateTime::SetSecond(Int sec)
 {
 	if (sec < 0 || sec >= 60) return False;
 
-	mseconds = mseconds - 1000 * GetSecond() + 1000 * sec;
+	tm	*lt = localtime((time_t *) value);
 
-	return True;
-}
+	lt->tm_sec  = sec;
 
-S::Bool S::DateTime::SetMSecond(Int msec)
-{
-	if (msec < 0 || msec >= 1000) return False;
+	time_t	 t  = mktime(lt);
 
-	mseconds = mseconds - GetMSecond() + msec;
+	memcpy(value, &t, sizeof(time_t));
 
 	return True;
 }

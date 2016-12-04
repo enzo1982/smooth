@@ -48,6 +48,13 @@ namespace smooth
 
 	static Array<ExtentsCacheEntry *> extentsCache;
 
+	Int ExtentsCacheInit()
+	{
+		extentsCache.EnableLocking();
+
+		return Success();
+	}
+
 	Int ExtentsCacheFree()
 	{
 		foreach (ExtentsCacheEntry *entry, extentsCache) delete entry;
@@ -58,6 +65,7 @@ namespace smooth
 	}
 };
 
+S::Int	 addExtentsCacheInitTmp = S::AddInitFunction(&S::ExtentsCacheInit);
 S::Int	 addExtentsCacheFreeTmp = S::AddFreeFunction(&S::ExtentsCacheFree);
 
 S::GUI::FontBackend *CreateFontBackend(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)

@@ -215,7 +215,7 @@ S::Void S::GUI::Dialogs::TipOfTheDay::OnNext()
 			{
 				tip = tips.GetNth(rand() % tips.Length());
 			}
-			while (tip == txt_tip->GetText())
+			while (tip == txt_tip->GetText());
 
 			break;
 	}

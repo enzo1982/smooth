@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -145,6 +145,8 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 	 */
 	OnNext();
 
+	if (tips.Length() <= 1) btn_next->Deactivate();
+
 	dlgwnd->Show();
 	dlgwnd->WaitUntilClosed();
 
@@ -193,6 +195,8 @@ S::Void S::GUI::Dialogs::TipOfTheDay::OnOK()
 
 S::Void S::GUI::Dialogs::TipOfTheDay::OnNext()
 {
+	if (tips.Length() <= 1) return;
+
 	String	 tip;
 	time_t	 timer;
 
@@ -207,7 +211,11 @@ S::Void S::GUI::Dialogs::TipOfTheDay::OnNext()
 		case TIP_RANDOM:
 			srand((unsigned) time(&timer));
 
-			tip = tips.GetNth(rand() % tips.Length());
+			do
+			{
+				tip = tips.GetNth(rand() % tips.Length());
+			}
+			while (tip == txt_tip->GetText())
 
 			break;
 	}

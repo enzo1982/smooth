@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,18 +19,12 @@ S::Int	 threadPOSIXTmp = S::Threads::ThreadBackend::SetBackend(&CreateThreadPOSI
 
 S::Threads::ThreadPOSIX::ThreadPOSIX(Void *iThread)
 {
-	type = THREAD_POSIX;
+	type	 = THREAD_POSIX;
 
-	if (iThread != NIL)
-	{
-		thread		= (pthread_t *) iThread;
-		myThread	= False;
-	}
-	else
-	{
-		thread		= NIL;
-		myThread	= True;
-	}
+	thread	 = NIL;
+	myThread = False;
+
+	if (iThread != NIL) thread = (pthread_t *) iThread;
 }
 
 S::Threads::ThreadPOSIX::~ThreadPOSIX()
@@ -50,6 +44,8 @@ S::Int S::Threads::ThreadPOSIX::GetThreadID() const
 
 S::Bool S::Threads::ThreadPOSIX::IsCurrentThread() const
 {
+	if (thread == NIL) return False;
+
 	return pthread_equal(pthread_self(), *thread);
 }
 
@@ -57,7 +53,8 @@ S::Int S::Threads::ThreadPOSIX::Start(Void (*threadProc)(Void *), Void *threadPa
 {
 	Stop();
 
-	thread = new pthread_t;
+	thread	 = new pthread_t;
+	myThread = True;
 
 	pthread_create(thread, NULL, (void *(*)(void *)) threadProc, threadParam);
 
@@ -69,13 +66,9 @@ S::Int S::Threads::ThreadPOSIX::Stop()
 	if (thread == NIL) return Error();
 
 	pthread_cancel(*thread);
+	pthread_detach(*thread);
 
-	if (myThread)
-	{
-		delete thread;
-
-		myThread = False;
-	}
+	if (myThread) delete thread;
 
 	thread = NIL;
 
@@ -88,16 +81,16 @@ S::Int S::Threads::ThreadPOSIX::Wait()
 
 	pthread_join(*thread, NIL);
 
+	if (myThread) delete thread;
+
+	thread = NIL;
+
 	return Success();
 }
 
 S::Void S::Threads::ThreadPOSIX::Exit()
 {
-	if (thread == NIL) return;
-
-	delete thread;
-
-	thread = NIL;
+	if (!IsCurrentThread()) return;
 
 	pthread_exit(0);
 }

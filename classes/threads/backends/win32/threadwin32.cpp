@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,20 +19,13 @@ S::Int	 threadWin32Tmp = S::Threads::ThreadBackend::SetBackend(&CreateThreadWin3
 
 S::Threads::ThreadWin32::ThreadWin32(Void *iThread)
 {
-	type = THREAD_WIN32;
+	type	 = THREAD_WIN32;
 
-	if (iThread != NIL)
-	{
-		thread		= (HANDLE) iThread;
-		threadID	= -1;
-		myThread	= False;
-	}
-	else
-	{
-		thread		= NIL;
-		threadID	= -1;
-		myThread	= True;
-	}
+	thread	 = NIL;
+	threadID = -1;
+	myThread = False;
+
+	if (iThread != NIL) thread = (HANDLE) iThread;
 }
 
 S::Threads::ThreadWin32::~ThreadWin32()
@@ -59,7 +52,8 @@ S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadPa
 {
 	Stop();
 
-	thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) threadProc, threadParam, 0, (DWORD *) &threadID);
+	thread	 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) threadProc, threadParam, 0, (DWORD *) &threadID);
+	myThread = True;
 
 	return Success();
 }
@@ -68,19 +62,13 @@ S::Int S::Threads::ThreadWin32::Stop()
 {
 	if (thread == NIL) return Error();
 
-	HANDLE	 self = thread;
+	HANDLE	 self	 = thread;
 	Bool	 running = IsRunning();
 
 	thread = NIL;
 
-	if (running) TerminateThread(self, 0);
-
-	if (myThread)
-	{
-		CloseHandle(self);
-
-		myThread = False;
-	}
+	if (running)  TerminateThread(self, 0);
+	if (myThread) CloseHandle(self);
 
 	return Success();
 }
@@ -89,7 +77,12 @@ S::Int S::Threads::ThreadWin32::Wait()
 {
 	if (thread == NIL) return Error();
 
-	WaitForSingleObject(thread, INFINITE);
+	Bool	 running = IsRunning();
+
+	if (running)  WaitForSingleObject(thread, INFINITE);
+	if (myThread) CloseHandle(thread);
+
+	thread = NIL;
 
 	return Success();
 }
@@ -105,11 +98,7 @@ S::Bool S::Threads::ThreadWin32::IsRunning() const
 
 S::Void S::Threads::ThreadWin32::Exit()
 {
-	if (thread == NIL) return;
-
-	CloseHandle(thread);
-
-	thread = NIL;
+	if (!IsCurrentThread()) return;
 
 	ExitThread(0);
 }

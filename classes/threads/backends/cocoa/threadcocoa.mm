@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,18 +19,12 @@ S::Int	 threadCocoaTmp = S::Threads::ThreadBackend::SetBackend(&CreateThreadCoco
 
 S::Threads::ThreadCocoa::ThreadCocoa(Void *iThread)
 {
-	type = THREAD_COCOA;
+	type	 = THREAD_COCOA;
 
-	if (iThread != NIL)
-	{
-		thread		= (pthread_t *) iThread;
-		myThread	= False;
-	}
-	else
-	{
-		thread		= NIL;
-		myThread	= True;
-	}
+	thread	 = NIL;
+	myThread = False;
+
+	if (iThread != NIL) thread = (pthread_t *) iThread;
 }
 
 S::Threads::ThreadCocoa::~ThreadCocoa()
@@ -50,6 +44,8 @@ S::Int S::Threads::ThreadCocoa::GetThreadID() const
 
 S::Bool S::Threads::ThreadCocoa::IsCurrentThread() const
 {
+	if (thread == NIL) return False;
+
 	return pthread_equal(pthread_self(), *thread);
 }
 
@@ -60,7 +56,8 @@ S::Int S::Threads::ThreadCocoa::Start(Void (*threadProc)(Void *), Void *threadPa
 	info.threadProc	 = threadProc;
 	info.threadParam = threadParam;
 
-	thread = new pthread_t;
+	thread	 = new pthread_t;
+	myThread = True;
 
 	pthread_create(thread, NULL, (void *(*)(void *)) Caller, &info);
 
@@ -72,13 +69,9 @@ S::Int S::Threads::ThreadCocoa::Stop()
 	if (thread == NIL) return Error();
 
 	pthread_cancel(*thread);
+	pthread_detach(*thread);
 
-	if (myThread)
-	{
-		delete thread;
-
-		myThread = False;
-	}
+	if (myThread) delete thread;
 
 	thread = NIL;
 
@@ -91,16 +84,16 @@ S::Int S::Threads::ThreadCocoa::Wait()
 
 	pthread_join(*thread, NIL);
 
+	if (myThread) delete thread;
+
+	thread = NIL;
+
 	return Success();
 }
 
 S::Void S::Threads::ThreadCocoa::Exit()
 {
-	if (thread == NIL) return;
-
-	delete thread;
-
-	thread = NIL;
+	if (!IsCurrentThread()) return;
 
 	pthread_exit(0);
 }

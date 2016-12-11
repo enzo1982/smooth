@@ -29,7 +29,7 @@ S::DateTime::DateTime(Void *iTime)
 
 S::DateTime::~DateTime()
 {
-	delete (time_t *) time;
+	delete (time_t *) value;
 }
 
 S::DateTime S::DateTime::Current()

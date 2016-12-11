@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -114,15 +114,8 @@ Void BeatClock::Mode()
 {
 	if (modechange == 0)
 	{
-		switch (centi)
-		{
-			case True:
-				centi = False;
-				break;
-			case False:
-				centi = True;
-				break;
-		}
+		if (centi) centi = False;
+		else	   centi = True;
 	}
 	else if (modechange == 1)
 	{
@@ -391,7 +384,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2015\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Information);
+	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2016\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Information);
 }
 
 Void BeatClock::StoreConfig()

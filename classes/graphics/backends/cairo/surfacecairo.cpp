@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -553,8 +553,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	if (string == NIL) return Error();
 	if (shadow)	   return SurfaceBackend::SetText(string, iRect, iFont, shadow);
 
-	Int	 stringLength = string.Length();
-
 	Font	 font	      = iFont;
 	Rect	 rect	      = iRect;
 	Int	 lineHeight   = 0;
@@ -562,6 +560,8 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 #ifdef __WIN32__
 	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
 	 */
+	Int	 stringLength = string.Length();
+
 	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
 	{
 		for (Int i = 0; i < stringLength; i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }

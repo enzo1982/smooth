@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,7 +30,7 @@ TestKey::TestKey()
 	pos.x = 85;
 	pos.y = 28;
 
-	wnd	= new GUI::Window("TestKey - by Robert Kausch 2000-2014", Point(80, 80), Size(300, 160));
+	wnd	= new GUI::Window("TestKey - by Robert Kausch 2000-2016", Point(80, 80), Size(300, 160));
 	title	= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
 	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
 
@@ -56,11 +56,12 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 	wchar_t		 unicode	= 0;
 	Int		 scanCode	= 0;
 	Int		 vkCode		= 0;
-	Byte		 keys[256];
 
 	if (message == SM_KEYDOWN)
 	{
 #ifdef __WIN32__
+		Byte	 keys[256];
+
 		GetKeyboardState((UnsignedByte *) &keys);
 		ToAscii(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, (UnsignedShort *) &asciiCode, 0);
 		ToUnicode(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -175,7 +175,7 @@ S::Bool S::GUI::Bitmap::operator ==(const Bitmap &bitmap) const
 	Size	 size  = GetSize();
 	Int	 bpp   = GetBitsPerPixel();
 	Int	 align = GetLineAlignment();
-	Int	 bpl   = ((4 - ((size.cx * (bpp / 8)) & 3)) & 3) + size.cx * (bpp / 8);
+	Int	 bpl   = ((align - ((size.cx * (bpp / 8)) % align)) % align) + size.cx * (bpp / 8);
 	Int	 bytes = bpl * size.cy;
 
 	if (memcmp(GetBytes(), bitmap.GetBytes(), bytes) != 0) return False;

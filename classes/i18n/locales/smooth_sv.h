@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,28 +13,28 @@
 
 static const char *smooth_sv = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>			\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>			\
 	 <LangFile>								\
 	   <info>								\
 	     <property name=\"program\">smooth</property>			\
 	     <property name=\"language\">Swedish / Svenska</property>		\
 	     <property name=\"righttoleft\">false</property>			\
-	     <property name=\"encoding\">ISO-8859-1</property>			\
+	     <property name=\"encoding\">UTF-8</property>			\
 	   </info>								\
 	   <data>								\
 	     <entry string=\"OK\">Ok</entry>					\
 	     <entry string=\"Cancel\">Avbryt</entry>				\
 	     <entry string=\"Yes\">Ja</entry>					\
 	     <entry string=\"No\">Nej</entry>					\
-	     <entry string=\"Retry\">Försök igen</entry>			\
+	     <entry string=\"Retry\">FÃ¶rsÃ¶k igen</entry>			\
 	     <entry string=\"Abort\">Avbryt</entry>				\
 	     <entry string=\"Ignore\">Ignorera</entry>				\
 										\
-	     <entry string=\"Undo\">Ångra</entry>				\
+	     <entry string=\"Undo\">Ã…ngra</entry>				\
 	     <entry string=\"Cut\">Klipp ut</entry>				\
 	     <entry string=\"Copy\">Kopiera</entry>				\
 	     <entry string=\"Paste\">Klistra in</entry>				\
-	     <entry string=\"Clear\">Töm</entry>				\
+	     <entry string=\"Clear\">TÃ¶m</entry>				\
 	     <entry string=\"Select all\">Markera alla</entry>			\
 										\
 	     <entry string=\"Backspace\">Backsteg</entry>			\
@@ -42,27 +42,27 @@ static const char *smooth_sv =
 	     <entry string=\"Return\">Retur</entry>				\
 	     <entry string=\"Esc\">Esc</entry>					\
 	     <entry string=\"Space\">Mellanslag</entry>				\
-	     <entry string=\"Left\">Vänster</entry>				\
+	     <entry string=\"Left\">VÃ¤nster</entry>				\
 	     <entry string=\"Up\">Upp</entry>					\
-	     <entry string=\"Right\">Höger</entry>				\
+	     <entry string=\"Right\">HÃ¶ger</entry>				\
 	     <entry string=\"Down\">Ner</entry>					\
 	     <entry string=\"Ctrl\">Strg</entry>				\
 	     <entry string=\"Alt\">Alt</entry>					\
 	     <entry string=\"Shift\">Skift</entry>				\
 										\
-	     <entry string=\"Open file\">Öppna fil</entry>			\
+	     <entry string=\"Open file\">Ã–ppna fil</entry>			\
 	     <entry string=\"Save file\">Spara fil</entry>			\
 	     <entry string=\"Save file as\">Spara fil som</entry>		\
-	     <entry string=\"Select directory\">Välj katalog</entry>		\
-	     <entry string=\"Select font\">Välj teckensnitt</entry>		\
+	     <entry string=\"Select directory\">VÃ¤lj katalog</entry>		\
+	     <entry string=\"Select font\">VÃ¤lj teckensnitt</entry>		\
 										\
-	     <entry string=\"Color selection\">Välj färg</entry>		\
+	     <entry string=\"Color selection\">VÃ¤lj fÃ¤rg</entry>		\
 	     <entry string=\"HTML code\">HTML-kod</entry>			\
 										\
 	     <entry string=\"Tip of the day\">Dagens tips</entry>		\
 	     <entry string=\"Did you know...\">Visste du...</entry>		\
 	     <entry string=\"Show tips on startup\">Visa tips vid start</entry>	\
-	     <entry string=\"Next tip\">Nästa</entry>				\
+	     <entry string=\"Next tip\">NÃ¤sta</entry>				\
 	   </data>								\
 	 </LangFile>";
 

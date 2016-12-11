@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,19 +13,19 @@
 
 static const char *smooth_pt = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>				\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
 	 <LangFile>									\
 	   <info>									\
 	     <property name=\"program\">smooth</property>				\
-	     <property name=\"language\">Portuguese / Português</property>		\
+	     <property name=\"language\">Portuguese / PortuguÃªs</property>		\
 	     <property name=\"righttoleft\">false</property>				\
-	     <property name=\"encoding\">ISO-8859-1</property>				\
+	     <property name=\"encoding\">UTF-8</property>				\
 	   </info>									\
 	   <data>									\
 	     <entry string=\"OK\">OK</entry>						\
 	     <entry string=\"Cancel\">Cancelar</entry>					\
 	     <entry string=\"Yes\">Sim</entry>						\
-	     <entry string=\"No\">Não</entry>						\
+	     <entry string=\"No\">NÃ£o</entry>						\
 	     <entry string=\"Retry\">Repetir</entry>					\
 	     <entry string=\"Abort\">Interromper</entry>				\
 	     <entry string=\"Ignore\">Ignorar</entry>					\
@@ -37,7 +37,7 @@ static const char *smooth_pt =
 	     <entry string=\"Clear\">Limpar</entry>					\
 	     <entry string=\"Select all\">Seleccionar tudo</entry>			\
 											\
-	     <entry string=\"Space\">Espaço</entry>					\
+	     <entry string=\"Space\">EspaÃ§o</entry>					\
 	     <entry string=\"Left\">Esquerda</entry>					\
 	     <entry string=\"Up\">Cima</entry>						\
 	     <entry string=\"Right\">Direita</entry>					\
@@ -50,11 +50,11 @@ static const char *smooth_pt =
 	     <entry string=\"Select font\">Seleccione o tipo de letra</entry>		\
 											\
 	     <entry string=\"Color selection\">Seleccionar a cor</entry>		\
-	     <entry string=\"HTML code\">Código HTML</entry>				\
+	     <entry string=\"HTML code\">CÃ³digo HTML</entry>				\
 											\
 	     <entry string=\"Tip of the day\">Dica do dia</entry>			\
 	     <entry string=\"Did you know...\">Sabia que...</entry>			\
-	     <entry string=\"Show tips on startup\">Mostrar dicas no início</entry>	\
+	     <entry string=\"Show tips on startup\">Mostrar dicas no inÃ­cio</entry>	\
 	     <entry string=\"Next tip\">Seguinte</entry>				\
 	   </data>									\
 	 </LangFile>";

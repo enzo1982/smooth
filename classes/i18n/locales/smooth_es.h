@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,18 +13,18 @@
 
 static const char *smooth_es = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>					\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
 	 <LangFile>										\
 	   <info>										\
 	     <property name=\"program\">smooth</property>					\
-	     <property name=\"language\">Spanish / Español</property>				\
+	     <property name=\"language\">Spanish / EspaÃ±ol</property>				\
 	     <property name=\"righttoleft\">false</property>					\
-	     <property name=\"encoding\">ISO-8859-1</property>					\
+	     <property name=\"encoding\">UTF-8</property>					\
 	   </info>										\
 	   <data>										\
 	     <entry string=\"OK\">Aceptar</entry>						\
 	     <entry string=\"Cancel\">Cancelar</entry>						\
-	     <entry string=\"Yes\">Sí</entry>							\
+	     <entry string=\"Yes\">SÃ­</entry>							\
 	     <entry string=\"No\">No</entry>							\
 	     <entry string=\"Retry\">Reintentar</entry>						\
 	     <entry string=\"Abort\">Interrumpir</entry>					\
@@ -42,8 +42,8 @@ static const char *smooth_es =
 	     <entry string=\"Return\">Intro</entry>						\
 	     <entry string=\"Esc\">Esc</entry>							\
 	     <entry string=\"Space\">Espacio</entry>						\
-	     <entry string=\"PgUp\">RePág</entry>						\
-	     <entry string=\"PgDown\">AvPág</entry>						\
+	     <entry string=\"PgUp\">RePÃ¡g</entry>						\
+	     <entry string=\"PgDown\">AvPÃ¡g</entry>						\
 	     <entry string=\"End\">Fin</entry>							\
 	     <entry string=\"Home\">Inicio</entry>						\
 	     <entry string=\"Left\">Izquierda</entry>						\
@@ -54,7 +54,7 @@ static const char *smooth_es =
 	     <entry string=\"Del\">Supr</entry>							\
 	     <entry string=\"Ctrl\">Ctrl</entry>						\
 	     <entry string=\"Alt\">Alt</entry>							\
-	     <entry string=\"Shift\">Mayúsculas</entry>						\
+	     <entry string=\"Shift\">MayÃºsculas</entry>						\
 												\
 	     <entry string=\"Open file\">Abrir archivo</entry>					\
 	     <entry string=\"Save file\">Guardar archivo</entry>				\
@@ -63,10 +63,10 @@ static const char *smooth_es =
 	     <entry string=\"Select font\">Seleccionar tipo de letra</entry>			\
 												\
 	     <entry string=\"Color selection\">Seleccione un color</entry>			\
-	     <entry string=\"HTML code\">Código HTML</entry>					\
+	     <entry string=\"HTML code\">CÃ³digo HTML</entry>					\
 												\
-	     <entry string=\"Tip of the day\">Sugerencia del día</entry>			\
-	     <entry string=\"Did you know...\">Sabía...</entry>					\
+	     <entry string=\"Tip of the day\">Sugerencia del dÃ­a</entry>			\
+	     <entry string=\"Did you know...\">SabÃ­a...</entry>					\
 	     <entry string=\"Show tips on startup\">Mostrar sugerencias al inicio</entry>	\
 	     <entry string=\"Next tip\">Siguiente</entry>					\
 	   </data>										\

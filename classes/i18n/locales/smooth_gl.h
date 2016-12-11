@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,13 +13,13 @@
 
 static const char *smooth_gl = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>					\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
 	 <LangFile>										\
 	   <info>										\
 	     <property name=\"program\">smooth</property>					\
 	     <property name=\"language\">Galician / Galego</property>				\
 	     <property name=\"righttoleft\">false</property>					\
-	     <property name=\"encoding\">ISO-8859-1</property>					\
+	     <property name=\"encoding\">UTF-8</property>					\
 	   </info>										\
 	   <data>										\
 	     <entry string=\"OK\">Aceptar</entry>						\
@@ -39,8 +39,8 @@ static const char *smooth_gl =
 												\
 	     <entry string=\"Backspace\">Borrar</entry>						\
 	     <entry string=\"Space\">Espacio</entry>						\
-	     <entry string=\"PgUp\">Re. Páx</entry>						\
-	     <entry string=\"PgDown\">Av. Páx</entry>						\
+	     <entry string=\"PgUp\">Re. PÃ¡x</entry>						\
+	     <entry string=\"PgDown\">Av. PÃ¡x</entry>						\
 	     <entry string=\"End\">Fin</entry>							\
 	     <entry string=\"Home\">Inicio</entry>						\
 	     <entry string=\"Left\">Esquerda</entry>						\
@@ -54,13 +54,13 @@ static const char *smooth_gl =
 	     <entry string=\"Save file\">Gardar o ficheiro</entry>				\
 	     <entry string=\"Save file as\">Gardar o ficheiro como</entry>			\
 	     <entry string=\"Select directory\">Escoller un cartafol</entry>			\
-	     <entry string=\"Select font\">Escoller a fonte tipográfica</entry>			\
+	     <entry string=\"Select font\">Escoller a fonte tipogrÃ¡fica</entry>			\
 												\
 	     <entry string=\"Color selection\">Escoller unha cor</entry>			\
-	     <entry string=\"HTML code\">Código HTML</entry>					\
+	     <entry string=\"HTML code\">CÃ³digo HTML</entry>					\
 												\
-	     <entry string=\"Tip of the day\">Consello do día</entry>				\
-	     <entry string=\"Did you know...\">Sabía que...</entry>				\
+	     <entry string=\"Tip of the day\">Consello do dÃ­a</entry>				\
+	     <entry string=\"Did you know...\">SabÃ­a que...</entry>				\
 	     <entry string=\"Show tips on startup\">Mostrar os consellos ao iniciar</entry>	\
 	     <entry string=\"Next tip\">Seguinte</entry>					\
 	   </data>										\

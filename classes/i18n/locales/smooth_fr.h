@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,20 +13,20 @@
 
 static const char *smooth_fr = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>				\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
 	 <LangFile>									\
 	   <info>									\
 	     <property name=\"program\">smooth</property>				\
-	     <property name=\"language\">French / Français</property>			\
+	     <property name=\"language\">French / FranÃ§ais</property>			\
 	     <property name=\"righttoleft\">false</property>				\
-	     <property name=\"encoding\">ISO-8859-1</property>				\
+	     <property name=\"encoding\">UTF-8</property>				\
 	   </info>									\
 	   <data>									\
 	     <entry string=\"OK\">OK</entry>						\
 	     <entry string=\"Cancel\">Annuler</entry>					\
 	     <entry string=\"Yes\">Oui</entry>						\
 	     <entry string=\"No\">Non</entry>						\
-	     <entry string=\"Retry\">Réessayer</entry>					\
+	     <entry string=\"Retry\">RÃ©essayer</entry>					\
 	     <entry string=\"Abort\">Interrompre</entry>				\
 	     <entry string=\"Ignore\">Ignorer</entry>					\
 											\
@@ -35,17 +35,17 @@ static const char *smooth_fr =
 	     <entry string=\"Copy\">Copier</entry>					\
 	     <entry string=\"Paste\">Coller</entry>					\
 	     <entry string=\"Clear\">Effacer</entry>					\
-	     <entry string=\"Select all\">Tout sélectionner</entry>			\
+	     <entry string=\"Select all\">Tout sÃ©lectionner</entry>			\
 											\
 	     <entry string=\"Backspace\">Correction</entry>				\
 	     <entry string=\"Tab\">Tab.</entry>						\
-	     <entry string=\"Return\">Entrée</entry>					\
-	     <entry string=\"Esc\">Échap.</entry>					\
+	     <entry string=\"Return\">EntrÃ©e</entry>					\
+	     <entry string=\"Esc\">Ã‰chap.</entry>					\
 	     <entry string=\"Space\">Espace</entry>					\
-	     <entry string=\"PgUp\">Page préc</entry>					\
+	     <entry string=\"PgUp\">Page prÃ©c</entry>					\
 	     <entry string=\"PgDown\">Page suiv</entry>					\
 	     <entry string=\"End\">Fin</entry>						\
-	     <entry string=\"Home\">Début</entry>					\
+	     <entry string=\"Home\">DÃ©but</entry>					\
 	     <entry string=\"Left\">Gauche</entry>					\
 	     <entry string=\"Up\">Haut</entry>						\
 	     <entry string=\"Right\">Droite</entry>					\
@@ -73,7 +73,7 @@ static const char *smooth_fr =
 											\
 	     <entry string=\"Tip of the day\">Astuce du jour</entry>			\
 	     <entry string=\"Did you know...\">Saviez-vous que...</entry>		\
-	     <entry string=\"Show tips on startup\">Afficher au démarrage</entry>	\
+	     <entry string=\"Show tips on startup\">Afficher au dÃ©marrage</entry>	\
 	     <entry string=\"Next tip\">Suivant</entry>					\
 	   </data>									\
 	 </LangFile>";

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,29 +13,29 @@
 
 static const char *smooth_da = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>			\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 	 <LangFile>								\
 	   <info>								\
 	     <property name=\"program\">smooth</property>			\
 	     <property name=\"language\">Danish / Dansk</property>		\
 	     <property name=\"righttoleft\">false</property>			\
-	     <property name=\"encoding\">ISO-8859-1</property>			\
+	     <property name=\"encoding\">UTF-8</property>			\
 	   </info>								\
 	   <data>								\
 	     <entry string=\"OK\">O.k.</entry>					\
-	     <entry string=\"Cancel\">Annullér</entry>				\
+	     <entry string=\"Cancel\">AnnullÃ©r</entry>				\
 	     <entry string=\"Yes\">Ja</entry>					\
 	     <entry string=\"No\">Nej</entry>					\
-	     <entry string=\"Retry\">Forsøg igen</entry>			\
+	     <entry string=\"Retry\">ForsÃ¸g igen</entry>			\
 	     <entry string=\"Abort\">Afbryd</entry>				\
-	     <entry string=\"Ignore\">Ignorér</entry>				\
+	     <entry string=\"Ignore\">IgnorÃ©r</entry>				\
 										\
 	     <entry string=\"Undo\">Fortryd</entry>				\
 	     <entry string=\"Cut\">Klip</entry>					\
-	     <entry string=\"Copy\">Kopiér</entry>				\
-	     <entry string=\"Paste\">Indsæt</entry>				\
+	     <entry string=\"Copy\">KopiÃ©r</entry>				\
+	     <entry string=\"Paste\">IndsÃ¦t</entry>				\
 	     <entry string=\"Clear\">Ryd</entry>				\
-	     <entry string=\"Select all\">Markér alt</entry>			\
+	     <entry string=\"Select all\">MarkÃ©r alt</entry>			\
 										\
 	     <entry string=\"Backspace\">Backspace</entry>			\
 	     <entry string=\"Tab\">Tab</entry>					\
@@ -44,22 +44,22 @@ static const char *smooth_da =
 	     <entry string=\"Space\">Mellemrum</entry>				\
 	     <entry string=\"Left\">Venstre</entry>				\
 	     <entry string=\"Up\">Op</entry>					\
-	     <entry string=\"Right\">Højre</entry>				\
+	     <entry string=\"Right\">HÃ¸jre</entry>				\
 	     <entry string=\"Down\">Ned</entry>					\
 										\
-	     <entry string=\"Open file\">Åbn fil</entry>			\
+	     <entry string=\"Open file\">Ã…bn fil</entry>			\
 	     <entry string=\"Save file\">Gem fil</entry>			\
 	     <entry string=\"Save file as\">Gem fil som</entry>			\
-	     <entry string=\"Select directory\">Vælg mappe</entry>		\
-	     <entry string=\"Select font\">Vælg skrifttype</entry>		\
+	     <entry string=\"Select directory\">VÃ¦lg mappe</entry>		\
+	     <entry string=\"Select font\">VÃ¦lg skrifttype</entry>		\
 										\
-	     <entry string=\"Color selection\">Vælg farve</entry>		\
+	     <entry string=\"Color selection\">VÃ¦lg farve</entry>		\
 	     <entry string=\"HTML code\">HTML-kode</entry>			\
 										\
 	     <entry string=\"Tip of the day\">Dagens tip</entry>		\
 	     <entry string=\"Did you know...\">Vidste du...</entry>		\
 	     <entry string=\"Show tips on startup\">Vis tip ved opstart</entry>	\
-	     <entry string=\"Next tip\">Næste</entry>				\
+	     <entry string=\"Next tip\">NÃ¦ste</entry>				\
 	   </data>								\
 	 </LangFile>";
 

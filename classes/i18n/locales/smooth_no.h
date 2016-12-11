@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,20 +13,20 @@
 
 static const char *smooth_no = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>			\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>				\
 	 <LangFile>								\
 	   <info>								\
 	     <property name=\"program\">smooth</property>			\
 	     <property name=\"language\">Norwegian / Norsk</property>		\
 	     <property name=\"righttoleft\">false</property>			\
-	     <property name=\"encoding\">ISO-8859-1</property>			\
+	     <property name=\"encoding\">UTF-8</property>			\
 	   </info>								\
 	   <data>								\
 	     <entry string=\"OK\">OK</entry>					\
 	     <entry string=\"Cancel\">Avbryt</entry>				\
 	     <entry string=\"Yes\">Ja</entry>					\
 	     <entry string=\"No\">Nei</entry>					\
-	     <entry string=\"Retry\">Prøv igjen</entry>				\
+	     <entry string=\"Retry\">PrÃ¸v igjen</entry>				\
 	     <entry string=\"Abort\">Avbryt</entry>				\
 	     <entry string=\"Ignore\">Overse</entry>				\
 										\
@@ -34,17 +34,17 @@ static const char *smooth_no =
 	     <entry string=\"Cut\">Klipp ut</entry>				\
 	     <entry string=\"Copy\">Kopier</entry>				\
 	     <entry string=\"Paste\">Lim inn</entry>				\
-	     <entry string=\"Clear\">Tøm</entry>				\
+	     <entry string=\"Clear\">TÃ¸m</entry>				\
 	     <entry string=\"Select all\">Velg alt</entry>			\
 										\
 	     <entry string=\"Backspace\">Rettetast</entry>			\
 	     <entry string=\"Space\">Mellomrom</entry>				\
 	     <entry string=\"Left\">Venstre</entry>				\
 	     <entry string=\"Up\">Opp</entry>					\
-	     <entry string=\"Right\">Høyre</entry>				\
+	     <entry string=\"Right\">HÃ¸yre</entry>				\
 	     <entry string=\"Down\">Ned</entry>					\
 										\
-	     <entry string=\"Open file\">Åpne fil</entry>			\
+	     <entry string=\"Open file\">Ã…pne fil</entry>			\
 	     <entry string=\"Save file\">Lagre fil</entry>			\
 	     <entry string=\"Save file as\">Lagre fil som</entry>		\
 	     <entry string=\"Select directory\">Velg mappe</entry>		\

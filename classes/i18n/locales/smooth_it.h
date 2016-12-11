@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,18 +13,18 @@
 
 static const char *smooth_it = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>					\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
 	 <LangFile>										\
 	   <info>										\
 	     <property name=\"program\">smooth</property>					\
 	     <property name=\"language\">Italian / Italiano</property>				\
 	     <property name=\"righttoleft\">false</property>					\
-	     <property name=\"encoding\">ISO-8859-1</property>					\
+	     <property name=\"encoding\">UTF-8</property>					\
 	   </info>										\
 	   <data>										\
 	     <entry string=\"OK\">OK</entry>							\
 	     <entry string=\"Cancel\">Annulla</entry>						\
-	     <entry string=\"Yes\">Sì</entry>							\
+	     <entry string=\"Yes\">SÃ¬</entry>							\
 	     <entry string=\"No\">No</entry>							\
 	     <entry string=\"Retry\">Riprova</entry>						\
 	     <entry string=\"Abort\">Interrompi</entry>						\
@@ -43,13 +43,13 @@ static const char *smooth_it =
 	     <entry string=\"Esc\">Esc</entry>							\
 	     <entry string=\"Space\">Spazio</entry>						\
 	     <entry string=\"PgUp\">Pag su</entry>						\
-	     <entry string=\"PgDown\">Pag giù</entry>						\
+	     <entry string=\"PgDown\">Pag giÃ¹</entry>						\
 	     <entry string=\"End\">Fine</entry>							\
 	     <entry string=\"Home\">Inizio</entry>						\
 	     <entry string=\"Left\">Sinistra</entry>						\
 	     <entry string=\"Up\">Su</entry>							\
 	     <entry string=\"Right\">Destra</entry>						\
-	     <entry string=\"Down\">Giù</entry>							\
+	     <entry string=\"Down\">GiÃ¹</entry>							\
 	     <entry string=\"Ins\">Ins</entry>							\
 	     <entry string=\"Del\">Canc</entry>							\
 	     <entry string=\"Ctrl\">Ctrl</entry>						\

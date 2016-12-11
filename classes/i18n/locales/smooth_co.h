@@ -13,30 +13,30 @@
 
 static const char *smooth_co = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>					\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
 	 <LangFile>										\
 	   <info>										\
 	     <property name=\"program\">smooth</property>					\
 	     <property name=\"language\">Corsican / Corsu</property>				\
 	     <property name=\"righttoleft\">false</property>					\
-	     <property name=\"encoding\">ISO-8859-1</property>					\
+	     <property name=\"encoding\">UTF-8</property>					\
 	   </info>										\
 	   <data>										\
 	     <entry string=\"OK\">Vai</entry>							\
-	     <entry string=\"Cancel\">Abbandun‡</entry>						\
-	     <entry string=\"Yes\">IË</entry>							\
-	     <entry string=\"No\">InnÚ</entry>							\
+	     <entry string=\"Cancel\">Abbandun√†</entry>						\
+	     <entry string=\"Yes\">I√®</entry>							\
+	     <entry string=\"No\">Inn√≤</entry>							\
 	     <entry string=\"Retry\">Torna</entry>						\
 	     <entry string=\"Abort\">Interrompe</entry>						\
-	     <entry string=\"Ignore\">Ignur‡</entry>						\
+	     <entry string=\"Ignore\">Ignur√†</entry>						\
 												\
 	     <entry string=\"Open file\">Apre u schedariu</entry>				\
-	     <entry string=\"Save file\">Arregistr‡ u schedariu</entry>				\
-	     <entry string=\"Save file as\">Arregistr‡ u schedariu c˘ u nome</entry>		\
-	     <entry string=\"Select directory\">Selezziun‡ u cartulare</entry>			\
-	     <entry string=\"Select font\">Selezziun‡ a grafia</entry>				\
+	     <entry string=\"Save file\">Arregistr√† u schedariu</entry>				\
+	     <entry string=\"Save file as\">Arregistr√† u schedariu c√π u nome</entry>		\
+	     <entry string=\"Select directory\">Selezziun√† u cartulare</entry>			\
+	     <entry string=\"Select font\">Selezziun√† a grafia</entry>				\
 												\
-	     <entry string=\"Color selection\">Selezziun‡ u culore</entry>			\
+	     <entry string=\"Color selection\">Selezziun√† u culore</entry>			\
 	     <entry string=\"HTML code\">Codice HTML</entry>					\
 	     <entry string=\"R\">R</entry>							\
 	     <entry string=\"G\">V</entry>							\
@@ -46,8 +46,8 @@ static const char *smooth_co =
 	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Minichichja oghjinca</entry>			\
-	     <entry string=\"Did you know...\">A sapete chÏ...</entry>				\
-	     <entry string=\"Show tips on startup\">Affiss‡ e minichichje ‡ l'avvi‡</entry>	\
+	     <entry string=\"Did you know...\">A sapete ch√¨...</entry>				\
+	     <entry string=\"Show tips on startup\">Affiss√† e minichichje √† l'avvi√†</entry>	\
 	     <entry string=\"Next tip\">Minichichja seguente</entry>				\
 	   </data>										\
 	 </LangFile>";

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,13 +13,13 @@
 
 static const char *smooth_nl = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>					\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>						\
 	 <LangFile>										\
 	   <info>										\
 	     <property name=\"program\">smooth</property>					\
 	     <property name=\"language\">Dutch / Nederlands</property>				\
 	     <property name=\"righttoleft\">false</property>					\
-	     <property name=\"encoding\">ISO-8859-1</property>					\
+	     <property name=\"encoding\">UTF-8</property>					\
 	   </info>										\
 	   <data>										\
 	     <entry string=\"OK\">OK</entry>							\
@@ -32,7 +32,7 @@ static const char *smooth_nl =
 												\
 	     <entry string=\"Undo\">Ongedaan maken</entry>					\
 	     <entry string=\"Cut\">Knippen</entry>						\
-	     <entry string=\"Copy\">Kopiëren</entry>						\
+	     <entry string=\"Copy\">KopiÃ«ren</entry>						\
 	     <entry string=\"Paste\">Plakken</entry>						\
 	     <entry string=\"Clear\">Wissen</entry>						\
 	     <entry string=\"Select all\">Alles selecteren</entry>				\

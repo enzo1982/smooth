@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,24 +13,24 @@
 
 static const char *smooth_ca = 
 
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>				\
+	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
 	 <LangFile>									\
 	   <info>									\
 	     <property name=\"program\">smooth</property>				\
-	     <property name=\"language\">Catalan / Català</property>			\
+	     <property name=\"language\">Catalan / CatalÃ </property>			\
 	     <property name=\"righttoleft\">false</property>				\
-	     <property name=\"encoding\">ISO-8859-1</property>				\
+	     <property name=\"encoding\">UTF-8</property>				\
 	   </info>									\
 	   <data>									\
 	     <entry string=\"OK\">D'acord</entry>					\
-	     <entry string=\"Cancel\">Cancel·la</entry>					\
-	     <entry string=\"Yes\">Sí</entry>						\
+	     <entry string=\"Cancel\">CancelÂ·la</entry>					\
+	     <entry string=\"Yes\">SÃ­</entry>						\
 	     <entry string=\"No\">No</entry>						\
 	     <entry string=\"Retry\">Reintenta</entry>					\
 	     <entry string=\"Abort\">Interromp</entry>					\
 	     <entry string=\"Ignore\">Ignora</entry>					\
 											\
-	     <entry string=\"Undo\">Desfés</entry>					\
+	     <entry string=\"Undo\">DesfÃ©s</entry>					\
 	     <entry string=\"Cut\">Talla</entry>					\
 	     <entry string=\"Copy\">Copia</entry>					\
 	     <entry string=\"Paste\">Enganxa</entry>					\
@@ -42,8 +42,8 @@ static const char *smooth_ca =
 	     <entry string=\"Return\">Intro</entry>					\
 	     <entry string=\"Esc\">Esc</entry>						\
 	     <entry string=\"Space\">Espai</entry>					\
-	     <entry string=\"PgUp\">RePàg</entry>					\
-	     <entry string=\"PgDown\">AvPàg</entry>					\
+	     <entry string=\"PgUp\">RePÃ g</entry>					\
+	     <entry string=\"PgDown\">AvPÃ g</entry>					\
 	     <entry string=\"End\">Fi</entry>						\
 	     <entry string=\"Home\">Inici</entry>					\
 	     <entry string=\"Left\">Esquerra</entry>					\
@@ -54,7 +54,7 @@ static const char *smooth_ca =
 	     <entry string=\"Del\">Supr</entry>						\
 	     <entry string=\"Ctrl\">Ctrl</entry>					\
 	     <entry string=\"Alt\">Alt</entry>						\
-	     <entry string=\"Shift\">Majús</entry>					\
+	     <entry string=\"Shift\">MajÃºs</entry>					\
 											\
 	     <entry string=\"Open file\">Obre fitxer</entry>				\
 	     <entry string=\"Save file\">Desa el fitxer</entry>				\
@@ -62,13 +62,13 @@ static const char *smooth_ca =
 	     <entry string=\"Select directory\">Tria carpeta</entry>			\
 	     <entry string=\"Select font\">Trieu tipus de lletra</entry>		\
 											\
-	     <entry string=\"Color selection\">Selecció de color</entry>		\
+	     <entry string=\"Color selection\">SelecciÃ³ de color</entry>		\
 	     <entry string=\"HTML code\">Codi HTML</entry>				\
 											\
 	     <entry string=\"Tip of the day\">Pista del dia</entry>			\
-	     <entry string=\"Did you know...\">Sabíeu que...</entry>			\
+	     <entry string=\"Did you know...\">SabÃ­eu que...</entry>			\
 	     <entry string=\"Show tips on startup\">Mostra pistes en engegar</entry>	\
-	     <entry string=\"Next tip\">Següent</entry>					\
+	     <entry string=\"Next tip\">SegÃ¼ent</entry>					\
 	   </data>									\
 	 </LangFile>";
 

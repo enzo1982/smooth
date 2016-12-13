@@ -52,7 +52,10 @@ S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadPa
 {
 	Stop();
 
-	thread	 = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) threadProc, threadParam, 0, (DWORD *) &threadID);
+	info.threadProc	 = threadProc;
+	info.threadParam = threadParam;
+
+	thread	 = CreateThread(NULL, 0, Caller, &info, 0, (DWORD *) &threadID);
 	myThread = True;
 
 	return Success();
@@ -100,5 +103,20 @@ S::Void S::Threads::ThreadWin32::Exit()
 {
 	if (!IsCurrentThread()) return;
 
-	ExitThread(0);
+	CloseHandle(thread);
+
+	thread = NIL;
+}
+
+DWORD WINAPI S::Threads::ThreadWin32::Caller(LPVOID param)
+{
+	ThreadInfo	*info = (ThreadInfo *) param;
+
+	CoInitialize(NIL);
+
+	info->threadProc(info->threadParam);
+
+	CoUninitialize();
+
+	return 0;
 }

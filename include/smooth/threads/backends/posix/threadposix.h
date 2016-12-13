@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,8 +29,18 @@ namespace smooth
 	{
 		const Short	 THREAD_POSIX	= 1;
 
+		struct ThreadInfo
+		{
+			Void	 (*threadProc)(Void *);
+			Void	*threadParam;
+		};
+
 		class ThreadPOSIX : public ThreadBackend
 		{
+			private:
+				static void	*Caller(void *);
+
+				ThreadInfo	 info;
 			protected:
 				pthread_t	*thread;
 				Bool		 myThread;

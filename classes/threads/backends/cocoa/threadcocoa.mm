@@ -59,7 +59,7 @@ S::Int S::Threads::ThreadCocoa::Start(Void (*threadProc)(Void *), Void *threadPa
 	thread	 = new pthread_t;
 	myThread = True;
 
-	pthread_create(thread, NULL, (void *(*)(void *)) Caller, &info);
+	pthread_create(thread, NULL, Caller, &info);
 
 	return Success();
 }
@@ -95,14 +95,21 @@ S::Void S::Threads::ThreadCocoa::Exit()
 {
 	if (!IsCurrentThread()) return;
 
-	pthread_exit(0);
+	pthread_detach(*thread);
+
+	delete thread;
+
+	thread = NIL;
 }
 
-S::Void S::Threads::ThreadCocoa::Caller(ThreadInfo *info)
+void *S::Threads::ThreadCocoa::Caller(void *param)
 {
+	ThreadInfo		*info = (ThreadInfo *) param;
 	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
 
 	info->threadProc(info->threadParam);
 
 	[pool release];
+
+	return NULL;
 }

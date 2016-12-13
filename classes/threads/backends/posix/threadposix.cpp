@@ -53,10 +53,13 @@ S::Int S::Threads::ThreadPOSIX::Start(Void (*threadProc)(Void *), Void *threadPa
 {
 	Stop();
 
+	info.threadProc	 = threadProc;
+	info.threadParam = threadParam;
+
 	thread	 = new pthread_t;
 	myThread = True;
 
-	pthread_create(thread, NULL, (void *(*)(void *)) threadProc, threadParam);
+	pthread_create(thread, NULL, Caller, &info);
 
 	return Success();
 }
@@ -92,5 +95,18 @@ S::Void S::Threads::ThreadPOSIX::Exit()
 {
 	if (!IsCurrentThread()) return;
 
-	pthread_exit(0);
+	pthread_detach(*thread);
+
+	delete thread;
+
+	thread = NIL;
+}
+
+void *S::Threads::ThreadPOSIX::Caller(void *param)
+{
+	ThreadInfo	*info = (ThreadInfo *) param;
+
+	info->threadProc(info->threadParam);
+
+	return NULL;
 }

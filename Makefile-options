@@ -116,10 +116,6 @@ else
 #		Disable XLib and Cairo backends
 		BUILD_XLIB = False
 		BUILD_CAIRO = False
-
-# 		Enable threads based timers
-		BUILD_POSIXTIMER = False
-		BUILD_THREADSTIMER = True
 	else ifeq ($(UNAME),GNU)
 		BUILD_GNU = True
 

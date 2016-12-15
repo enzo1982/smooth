@@ -17,6 +17,9 @@
 #include <Application.h>
 #include <Window.h>
 
+#include <pthread.h>
+#include <signal.h>
+
 S::System::EventBackend *CreateEventHaiku()
 {
 	return new S::System::EventHaiku();
@@ -115,9 +118,22 @@ S::Int S::System::EventHaiku::ProcessNextEvent()
 			break;
 		}
 
+		/* Unblock SIGALRM so timeouts will be processed.
+		 */
+		sigset_t	 ss;
+
+		sigemptyset(&ss);
+		sigaddset(&ss, SIGALRM);
+
+		pthread_sigmask(SIG_UNBLOCK, &ss, NIL);
+
 		/* Now sleep for 10ms.
 		 */
 		System::System::Sleep(10);
+
+		/* Block SIGALRM again.
+		 */
+		pthread_sigmask(SIG_BLOCK, &ss, NIL);
 	}
 
 	return Success();

@@ -96,7 +96,7 @@ else ifeq ($(BUILD_OSX),True)
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_HAIKU),True)
-	LIBS += -lbe -ltracker
+	LIBS += -lbe -ltracker -lnetwork
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else ifeq ($(BUILD_QNX),True)

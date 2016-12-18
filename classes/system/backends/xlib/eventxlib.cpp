@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,9 +13,6 @@
 #include <smooth/system/backends/xlib/eventxlib.h>
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
 #include <smooth/backends/xlib/backendxlib.h>
-
-#include <pthread.h>
-#include <signal.h>
 
 using namespace X11;
 
@@ -85,22 +82,17 @@ S::Int S::System::EventXLib::ProcessNextEvent()
 			break;
 		}
 
-		/* Unblock SIGALRM so timeouts will be processed.
+		/* Allow timeouts to be processed.
 		 */
-		sigset_t	 ss;
-
-		sigemptyset(&ss);
-		sigaddset(&ss, SIGALRM);
-
-		pthread_sigmask(SIG_UNBLOCK, &ss, NIL);
+		EventProcessor::allowTimerInterrupts.Call();
 
 		/* Now sleep for 10ms.
 		 */
 		System::System::Sleep(10);
 
-		/* Block SIGALRM again.
+		/* Prevent timeouts from being processed.
 		 */
-		pthread_sigmask(SIG_BLOCK, &ss, NIL);
+		EventProcessor::denyTimerInterrupts.Call();
 	}
 
 	return Success();

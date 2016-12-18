@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,7 +9,12 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/timer.h>
+#include <smooth/system/event.h>
 #include <smooth/system/backends/posix/timerposix.h>
+#include <smooth/init.h>
+
+S::Int	 addTimerPOSIXInitTmp = S::AddInitFunction(&S::System::TimerPOSIX::Initialize);
+S::Int	 addTimerPOSIXFreeTmp = S::AddFreeFunction(&S::System::TimerPOSIX::Free);
 
 S::System::TimerBackend *CreateTimerPOSIX(S::System::Timer *timer)
 {
@@ -30,6 +35,59 @@ S::System::TimerPOSIX::~TimerPOSIX()
 	Stop();
 }
 
+S::Int S::System::TimerPOSIX::Initialize()
+{
+	/* Deny timer interrupts outside of the event loop to
+	 * prevent interruption of sensitive code.
+	 */
+	DenyTimerInterrupts();
+
+	EventProcessor::allowTimerInterrupts.Connect(&AllowTimerInterrupts);
+	EventProcessor::denyTimerInterrupts.Connect(&DenyTimerInterrupts);
+
+	return Success();
+}
+
+S::Int S::System::TimerPOSIX::Free()
+{
+	/* Allow timer interrupts again before leaving the program.
+	 */
+	AllowTimerInterrupts();
+
+	EventProcessor::allowTimerInterrupts.Disconnect(&AllowTimerInterrupts);
+	EventProcessor::denyTimerInterrupts.Disconnect(&DenyTimerInterrupts);
+
+	return Success();
+}
+
+S::Int S::System::TimerPOSIX::AllowTimerInterrupts()
+{
+	/* Unblock SIGALRM so timeouts can be processed.
+	 */
+	sigset_t	 ss;
+
+	sigemptyset(&ss);
+	sigaddset(&ss, SIGALRM);
+
+	pthread_sigmask(SIG_UNBLOCK, &ss, NIL);
+
+	return Success();
+}
+
+S::Int S::System::TimerPOSIX::DenyTimerInterrupts()
+{
+	/* Block SIGALRM again.
+	 */
+	sigset_t	 ss;
+
+	sigemptyset(&ss);
+	sigaddset(&ss, SIGALRM);
+
+	pthread_sigmask(SIG_BLOCK, &ss, NIL);
+
+	return Success();
+}
+
 S::Int S::System::TimerPOSIX::Start(Int nInterval)
 {
 	if (timer != NIL) return Error();
@@ -37,16 +95,6 @@ S::Int S::System::TimerPOSIX::Start(Int nInterval)
 	if (nInterval <= 0) nInterval = 1;
 
 	timer = new timer_t;
-
-	/* Block SIGALRM here; it will be unblocked only by the
-	 * event loop to prevent interruption of sensitive code.
-	 */
-	sigset_t		 ss;
-
-	sigemptyset(&ss);
-	sigaddset(&ss, SIGALRM);
-
-	pthread_sigmask(SIG_BLOCK, &ss, NIL);
 
 	/* Set handler function.
 	 */

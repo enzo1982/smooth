@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,11 +9,14 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/timer.h>
+#include <smooth/system/event.h>
 #include <smooth/system/system.h>
 #include <smooth/system/backends/threads/timerthreads.h>
 #include <smooth/templates/nonblocking.h>
+#include <smooth/init.h>
 
-using namespace smooth::Threads;
+S::Int	 addTimerThreadsInitTmp = S::AddInitFunction(&S::System::TimerThreads::Initialize);
+S::Int	 addTimerThreadsFreeTmp = S::AddFreeFunction(&S::System::TimerThreads::Free);
 
 S::System::TimerBackend *CreateTimerThreads(S::System::Timer *timer)
 {
@@ -21,6 +24,10 @@ S::System::TimerBackend *CreateTimerThreads(S::System::Timer *timer)
 }
 
 S::Int	 timerThreadsTmp = S::System::TimerBackend::SetBackend(&CreateTimerThreads);
+
+using namespace smooth::Threads;
+
+S::Threads::Mutex	*S::System::TimerThreads::timerMutex = NIL;
 
 S::System::TimerThreads::TimerThreads(Timer *iTimer) : TimerBackend(iTimer)
 {
@@ -35,6 +42,49 @@ S::System::TimerThreads::TimerThreads(Timer *iTimer) : TimerBackend(iTimer)
 S::System::TimerThreads::~TimerThreads()
 {
 	Stop();
+}
+
+S::Int S::System::TimerThreads::Initialize()
+{
+	/* Deny timer interrupts outside of the event loop to
+	 * prevent interruption of sensitive code.
+	 */
+	timerMutex = new Mutex();
+
+	DenyTimerInterrupts();
+
+	EventProcessor::allowTimerInterrupts.Connect(&AllowTimerInterrupts);
+	EventProcessor::denyTimerInterrupts.Connect(&DenyTimerInterrupts);
+
+	return Success();
+}
+
+S::Int S::System::TimerThreads::Free()
+{
+	/* Allow timer interrupts again before leaving the program.
+	 */
+	AllowTimerInterrupts();
+
+	EventProcessor::allowTimerInterrupts.Disconnect(&AllowTimerInterrupts);
+	EventProcessor::denyTimerInterrupts.Disconnect(&DenyTimerInterrupts);
+
+	delete timerMutex;
+
+	return Success();
+}
+
+S::Int S::System::TimerThreads::AllowTimerInterrupts()
+{
+	/* Unlock mutex so timeouts can be processed.
+	 */
+	return timerMutex->Release();
+}
+
+S::Int S::System::TimerThreads::DenyTimerInterrupts()
+{
+	/* Lock mutex again.
+	 */
+	return timerMutex->Lock();
 }
 
 S::Int S::System::TimerThreads::Start(Int nInterval)
@@ -101,8 +151,11 @@ S::Int S::System::TimerThreads::TimerProc(Int handle)
 		{
 			Timer	*timer = (Timer *) Object::GetObject(handle, Timer::classID);
 
-			if (timer != NIL) timer->onInterval.Emit();
-			else		  cancel = True;
+			if (timer == NIL) break;
+
+			timerMutex->Lock();
+			timer->onInterval.Emit();
+			timerMutex->Release();
 
 			while (timeout <= System::System::Clock()) timeout += interval;
 		}

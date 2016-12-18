@@ -131,7 +131,7 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	buffer.Zero();
 
 #if defined __APPLE__
-	/* In Mac OS X, lsof -p <pid> always returns the path to the current binary in the first txt section.
+	/* In macOS, lsof -p <pid> always returns the path to the current binary in the first txt section.
 	 */
 	FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print substr($0, index($0, $9)) }'"), "r");
 
@@ -214,7 +214,7 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	applicationDirectory[applicationDirectory.FindLast(Directory::GetDirectoryDelimiter()) + 1] = 0;
 
 #if defined __APPLE__
-	/* Change the returned path to Resources for Mac OS X application bundles.
+	/* Change the returned path to Resources for macOS application bundles.
 	 */
 	if (applicationDirectory.EndsWith(".app/Contents/MacOS/")) applicationDirectory.Replace(".app/Contents/MacOS/", ".app/Contents/Resources/");
 #endif

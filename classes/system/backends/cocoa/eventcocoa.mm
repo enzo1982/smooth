@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -54,7 +54,7 @@ S::Int S::System::EventCocoa::ProcessNextEvent()
 		}
 
 		/* The first loop invocation must not be modal
-		 * to prevent problems on OS X 10.9 Mavericks.
+		 * to prevent problems on macOS 10.9 Mavericks.
 		 */
 		static Bool	 ranNonModal = False;
 

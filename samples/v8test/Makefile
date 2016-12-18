@@ -5,7 +5,7 @@ SMOOTH_PATH = ../..
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
-# Disable PowerPC builds of V8 on OS X for now.
+# Disable PowerPC builds of V8 on macOS for now.
 ifeq ($(BUILD_OSX),True)
 	BUILD_PPC   = False
 	BUILD_PPC64 = False

@@ -15,9 +15,9 @@ echo "        - smooth uses a bundled version of libcpuid by default. To use"
 echo "          the library installed on your system, please build with"
 echo "          \"make config=systemlibcpuid\"."
 echo
-echo "    On OS X:"
+echo "    On macOS:"
 echo
-echo "        - Building smooth is tested on OS X Leopard 10.5.8 only using"
+echo "        - Building smooth is tested on macOS 10.5.8 Leopard only using"
 echo "          the Xcode 3.1 Command Line Tools (no Xcode project file provided)"
 echo
 echo "    On Windows:"

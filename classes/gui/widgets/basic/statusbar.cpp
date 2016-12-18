@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -52,7 +52,7 @@ S::Int S::GUI::Statusbar::Paint(Int message)
 	Int	 occupied_left	= 5;
 
 #ifdef __APPLE__
-	/* Check if OS X version is lower than 10.7 (Darwin 11.0) and
+	/* Check if macOS version is lower than 10.7 (Darwin 11.0) and
 	 * occupy ten pixels for the handle at the right in that case.
 	 */
 	Int	 resizeGripSize = (Backends::BackendCocoa::IsOSXVersionAtLeast(10, 7, 0) ? 0 : 10);

@@ -47,26 +47,10 @@ namespace smooth
 	};
 
 	static Array<ExtentsCacheEntry *> extentsCache;
-
-	Int ExtentsCacheInit()
-	{
-		extentsCache.EnableLocking();
-
-		return Success();
-	}
-
-	Int ExtentsCacheFree()
-	{
-		foreach (ExtentsCacheEntry *entry, extentsCache) delete entry;
-
-		extentsCache.RemoveAll();
-
-		return Success();
-	}
 };
 
-S::Int	 addExtentsCacheInitTmp = S::AddInitFunction(&S::ExtentsCacheInit);
-S::Int	 addExtentsCacheFreeTmp = S::AddFreeFunction(&S::ExtentsCacheFree);
+S::Int	 addFontBackendInitTmp = S::AddInitFunction(&S::GUI::FontBackend::Initialize);
+S::Int	 addFontBackendFreeTmp = S::AddFreeFunction(&S::GUI::FontBackend::Free);
 
 S::GUI::FontBackend *CreateFontBackend(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -108,6 +92,22 @@ S::GUI::FontBackend::FontBackend(const String &iFontName, Short iFontSize, Short
 
 S::GUI::FontBackend::~FontBackend()
 {
+}
+
+S::Int S::GUI::FontBackend::Initialize()
+{
+	extentsCache.EnableLocking();
+
+	return Success();
+}
+
+S::Int S::GUI::FontBackend::Free()
+{
+	foreach (ExtentsCacheEntry *entry, extentsCache) delete entry;
+
+	extentsCache.RemoveAll();
+
+	return Success();
 }
 
 S::Short S::GUI::FontBackend::GetFontType() const

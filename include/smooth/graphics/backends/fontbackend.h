@@ -48,6 +48,9 @@ namespace smooth
 
 				static FontBackend	*CreateBackendInstance(const String &, Short, Short, Short, const Color &);
 
+				static Int		 Initialize();
+				static Int		 Free();
+
 							 FontBackend(const String &, Short, Short, Short, const Color &);
 				virtual			~FontBackend();
 

@@ -522,6 +522,127 @@ const int	 NSApplicationDropFiles	 = 9;
 	}
 @end
 
+@interface CocoaCircularProgress : NSView
+{
+	BOOL	 hidden;
+	float	 progress;
+}
+
+	- (id)	 init;
+
+	- (void) setHidden:   (BOOL) value;
+	- (void) setProgress: (float) value;
+@end
+
+@implementation CocoaCircularProgress
+	- (id) init
+	{
+		[super init];
+
+		hidden	 = NO;
+		progress = 0.0;
+
+		return self;
+	}
+
+	- (void) drawRect: (NSRect) dirtyRect
+	{
+		[[NSApp applicationIconImage] drawInRect: [self bounds]
+						fromRect: NSZeroRect
+					       operation: NSCompositeSourceOver
+						fraction: 1.0];
+
+		if (hidden) return;
+
+		NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
+
+		NSRect	 badgeRect = [self bounds];
+
+		badgeRect.origin.x    = NSWidth(badgeRect) - 0.4 * NSWidth(badgeRect) - 5.0;
+		badgeRect.origin.y    = badgeRect.origin.y + 5.0;
+		badgeRect.size.width  = 0.4 * NSWidth(badgeRect);
+  		badgeRect.size.height = (int) (0.4 * badgeRect.size.height);
+
+		CGFloat	 badgeRadius = NSMidY(badgeRect);
+		NSPoint	 badgeCenter = NSMakePoint(NSMidX(badgeRect), NSMidY(badgeRect));
+
+		/* Draw the background.
+		 */
+		[NSGraphicsContext saveGraphicsState];
+
+		NSColor		*bgrdColor	= [NSColor colorWithCalibratedRed: 0.85 green: 0.85 blue: 0.85 alpha: 1.0];
+		NSColor		*bgrdHighlight	= [bgrdColor blendedColorWithFraction: 0.85 ofColor: [NSColor whiteColor]];
+		NSGradient	*bgrdGradient	= [[[NSGradient alloc] initWithStartingColor: bgrdHighlight
+										 endingColor: bgrdColor] autorelease];
+		NSBezierPath	*badgeEdge	= [NSBezierPath bezierPathWithOvalInRect: badgeRect];
+
+		[badgeEdge addClip];
+		[bgrdGradient drawFromCenter: badgeCenter radius: 0.0
+				    toCenter: badgeCenter radius: badgeRadius
+				     options: 0];
+
+		[NSGraphicsContext restoreGraphicsState];
+
+		/* Compute the slice.
+		 */
+		NSColor		*sliceColor	= [NSColor colorWithCalibratedRed: 0.3 green: 0.55 blue: 0.8 alpha: 1.0];
+		NSColor		*sliceHighlight	= [sliceColor blendedColorWithFraction: 0.4 ofColor: [NSColor whiteColor]];
+		NSGradient	*sliceGradient	= [[[NSGradient alloc] initWithStartingColor: sliceHighlight
+										 endingColor: sliceColor] autorelease];
+		NSBezierPath	*progressSlice	= [NSBezierPath bezierPathWithOvalInRect: badgeRect];
+
+		if (progress < 1.0)
+		{
+			CGFloat	 endAngle = 90.0 - 360.0 * progress;
+
+			if (endAngle < 0.0) endAngle += 360.0;
+
+			progressSlice = [NSBezierPath bezierPath];
+
+			[progressSlice moveToPoint: badgeCenter];
+			[progressSlice appendBezierPathWithArcWithCenter: badgeCenter
+								  radius: badgeRadius
+							      startAngle: 90.0
+								endAngle: endAngle
+							       clockwise: YES];
+			[progressSlice closePath];
+		}
+
+		/* Draw the slice.
+		 */
+		[NSGraphicsContext saveGraphicsState];
+
+		[progressSlice addClip];
+		[sliceGradient drawFromCenter: badgeCenter radius: 0.0
+				     toCenter: badgeCenter radius: badgeRadius
+				      options: 0];
+
+		[NSGraphicsContext restoreGraphicsState];
+
+		/* Draw the edge.
+		 */
+		[NSGraphicsContext saveGraphicsState];
+
+		[[NSColor whiteColor] set];
+
+		NSShadow	*shadow = [[[NSShadow alloc] init] autorelease];
+
+		[shadow setShadowOffset: NSMakeSize(0, -2)];
+		[shadow setShadowBlurRadius: 2];
+		[shadow set];
+
+		[badgeEdge setLineWidth: 2];
+		[badgeEdge stroke];
+
+		[NSGraphicsContext restoreGraphicsState];
+
+		[pool release];
+ 	}
+
+	- (void) setHidden:   (BOOL)  value { hidden   = value; }
+	- (void) setProgress: (float) value { progress = value; }
+@end
+
 S::Int S::GUI::WindowCocoa::Initialize()
 {
 	/* Register for cursor events.
@@ -544,26 +665,30 @@ S::Int S::GUI::WindowCocoa::Free()
 
 S::GUI::WindowCocoa::WindowCocoa(Void *iWindow)
 {
-	type		= WINDOW_COCOA;
+	type		 = WINDOW_COCOA;
 
-	wnd		= nil;
+	wnd		 = nil;
 
-	wid		= windowBackends.Add(this);
+	progressView	 = nil;
 
-	minSize		= Size(160, 24);
-	maxSize		= Size(32768, 32768);
+	wid		 = windowBackends.Add(this);
 
-	fontSize	= Surface().GetSurfaceDPI() / 96.0;
+	minSize		 = Size(160, 24);
+	maxSize		 = Size(32768, 32768);
 
-	flags		= 0;
+	fontSize	 = Surface().GetSurfaceDPI() / 96.0;
 
-	pasteBoard	= nil;
-	enableDropFiles	= False;
+	flags		 = 0;
+
+	pasteBoard	 = nil;
+	enableDropFiles	 = False;
 }
 
 S::GUI::WindowCocoa::~WindowCocoa()
 {
 	if (wnd != nil) [wnd release];
+
+	if (progressView != nil) [progressView release];
 
 	windowBackends.Remove(wid);
 }
@@ -1189,6 +1314,37 @@ S::Int S::GUI::WindowCocoa::Raise()
 	if (wnd == nil) return Success();
 
 	[wnd makeKeyAndOrderFront: nil];
+
+	return Success();
+}
+
+S::Int S::GUI::WindowCocoa::SetProgressIndicator(Window::ProgressIndicatorState state, Float value)
+{
+	if (progressView == nil)
+	{
+		progressView = [[CocoaCircularProgress alloc] init];
+
+		[[NSApp dockTile] setContentView: progressView];
+	}
+
+	CocoaCircularProgress	*circularProgress = (CocoaCircularProgress *) progressView;
+
+	switch (state)
+	{
+		case Window::ProgressIndicatorNone:
+			[circularProgress setHidden: YES];
+
+			break;
+		case Window::ProgressIndicatorNormal:
+		case Window::ProgressIndicatorPaused:
+			if (value >= 0) [circularProgress setProgress: value / 100];
+
+			[circularProgress setHidden: NO];
+
+			break;
+	}
+
+	[[NSApp dockTile] display];
 
 	return Success();
 }

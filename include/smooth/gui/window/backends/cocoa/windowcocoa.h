@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,6 +45,8 @@ namespace smooth
 				NSPasteboard				*pasteBoard;
 				Bool					 enableDropFiles;
 
+				NSView					*progressView;
+
 				Float					 fontSize;
 
 				Size					 minSize;
@@ -75,6 +77,8 @@ namespace smooth
 				Int					 RequestClose();
 
 				Int					 SetTitle(const String &);
+
+				Int					 SetProgressIndicator(Window::ProgressIndicatorState, Float);
 
 				Int					 EnableDropFiles(Bool);
 				const Array<String>			&GetDroppedFiles() const;

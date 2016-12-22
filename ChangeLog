@@ -16,6 +16,7 @@ xx.yy.zz xx:yy - smooth alpha 0.8.73.0
 			- check for JPEG signature before trying to open files
 - png.cpp		- check for PNG signature before trying to open files
 - crc64.cpp		- added Hash::CRC64 class to calculate 64 bit CRCs
+- string.cpp		- added ComputeCRC64() method
 - datetime.cpp		- reworked DateTime interface and implementation
 
 - upgraded libjpeg to version 9b

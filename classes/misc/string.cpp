@@ -13,6 +13,7 @@
 #include <smooth/misc/math.h>
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
+#include <smooth/misc/hash/crc64.h>
 #include <smooth/system/cpu.h>
 #include <smooth/threads/mutex.h>
 #include <smooth/templates/buffer.h>
@@ -147,7 +148,7 @@ S::Void S::String::Clean()
 	wString.Resize(0);
 }
 
-S::Int S::String::ComputeCRC32() const
+S::UnsignedInt32 S::String::ComputeCRC32() const
 {
 	if (wString.Size() == 0) return 0;
 
@@ -158,6 +159,19 @@ S::Int S::String::ComputeCRC32() const
 	wcsncpy((wchar_t *) (UnsignedByte *) buffer, wString, length);
 
 	return Hash::CRC32::Compute(buffer);
+}
+
+S::UnsignedInt64 S::String::ComputeCRC64() const
+{
+	if (wString.Size() == 0) return 0;
+
+	Int			 length = Length();
+
+	Buffer<UnsignedByte>	 buffer(length * sizeof(wchar_t));
+
+	wcsncpy((wchar_t *) (UnsignedByte *) buffer, wString, length);
+
+	return Hash::CRC64::Compute(buffer);
 }
 
 S::String S::String::EncodeBase64() const

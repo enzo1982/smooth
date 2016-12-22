@@ -68,12 +68,15 @@ S::Int S::Threads::ThreadPOSIX::Stop()
 {
 	if (thread == NIL) return Error();
 
+	pthread_t	*thread	  = this->thread;
+	Bool		 myThread = this->myThread;
+
+	this->thread = NIL;
+
 	pthread_cancel(*thread);
 	pthread_detach(*thread);
 
 	if (myThread) delete thread;
-
-	thread = NIL;
 
 	return Success();
 }
@@ -82,11 +85,14 @@ S::Int S::Threads::ThreadPOSIX::Wait()
 {
 	if (thread == NIL) return Error();
 
+	pthread_t	*thread	  = this->thread;
+	Bool		 myThread = this->myThread;
+
+	this->thread = NIL;
+
 	pthread_join(*thread, NIL);
 
 	if (myThread) delete thread;
-
-	thread = NIL;
 
 	return Success();
 }
@@ -95,11 +101,14 @@ S::Void S::Threads::ThreadPOSIX::Exit()
 {
 	if (!IsCurrentThread()) return;
 
+	pthread_t	*thread	  = this->thread;
+	Bool		 myThread = this->myThread;
+
+	this->thread = NIL;
+
 	pthread_detach(*thread);
 
-	delete thread;
-
-	thread = NIL;
+	if (myThread) delete thread;
 }
 
 void *S::Threads::ThreadPOSIX::Caller(void *param)

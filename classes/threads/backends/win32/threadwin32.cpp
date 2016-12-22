@@ -65,13 +65,15 @@ S::Int S::Threads::ThreadWin32::Stop()
 {
 	if (thread == NIL) return Error();
 
-	HANDLE	 self	 = thread;
-	Bool	 running = IsRunning();
+	Bool	 running  = IsRunning();
 
-	thread = NIL;
+	HANDLE	 thread	  = this->thread;
+	Bool	 myThread = this->myThread;
 
-	if (running)  TerminateThread(self, 0);
-	if (myThread) CloseHandle(self);
+	this->thread = NIL;
+
+	if (running)  TerminateThread(thread, 0);
+	if (myThread) CloseHandle(thread);
 
 	return Success();
 }
@@ -80,12 +82,15 @@ S::Int S::Threads::ThreadWin32::Wait()
 {
 	if (thread == NIL) return Error();
 
-	Bool	 running = IsRunning();
+	Bool	 running  = IsRunning();
+
+	HANDLE	 thread	  = this->thread;
+	Bool	 myThread = this->myThread;
+
+	this->thread = NIL;
 
 	if (running)  WaitForSingleObject(thread, INFINITE);
 	if (myThread) CloseHandle(thread);
-
-	thread = NIL;
 
 	return Success();
 }
@@ -103,9 +108,12 @@ S::Void S::Threads::ThreadWin32::Exit()
 {
 	if (!IsCurrentThread()) return;
 
-	CloseHandle(thread);
+	HANDLE	 thread	  = this->thread;
+	Bool	 myThread = this->myThread;
 
-	thread = NIL;
+	this->thread = NIL;
+
+	if (myThread) CloseHandle(thread);
 }
 
 DWORD WINAPI S::Threads::ThreadWin32::Caller(LPVOID param)

@@ -40,7 +40,7 @@ namespace smooth
 			const GUI::Size	&GetExtents() const			{ return extents; }
 			Void		 SetExtents(const GUI::Size &nExtents)	{ extents = nExtents; }
 
-			Int		 ComputeCRC32(const String &text) const { return String(text).Append(fontName)
+			UnsignedInt32	 ComputeCRC32(const String &text) const { return String(text).Append(fontName)
 												     .Append(String::FromInt(fontSize	<< 16 |
 															     fontWeight <<  4 |
 															     fontStyle)).ComputeCRC32(); }

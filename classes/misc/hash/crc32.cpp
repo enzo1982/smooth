@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,13 +23,13 @@ S::Hash::CRC32::~CRC32()
 
 S::Void S::Hash::CRC32::InitTable()
 {
-	UnsignedInt32	 ulPolynomial = 0x04c11db7;
+	UnsignedInt32	 polynomial = 0x04C11DB7;
 
 	for (Int i = 0; i <= 0xFF; i++)
 	{
 		table[i] = Reflect(i, 8) << 24;
 
-		for (Int j = 0; j < 8; j++) table[i] = (table[i] << 1) ^ (table[i] & (1 << 31) ? ulPolynomial : 0);
+		for (Int j = 0; j < 8; j++) table[i] = (table[i] << 1) ^ (table[i] & (1 << 31) ? polynomial : 0);
 
 		table[i] = Reflect(table[i], 32);
 	}
@@ -55,11 +55,11 @@ S::UnsignedInt32 S::Hash::CRC32::Compute(const Buffer<UnsignedByte> &buffer)
 {
 	if (!initialized) InitTable();
 
-	UnsignedInt32	 ulCRC(0xffffffff);
-	Int		 len = buffer.Size();
-	UnsignedByte	*pBuffer = buffer;
+	UnsignedInt32	 crc(0xFFFFFFFF);
+	UnsignedByte	*ptr  = buffer;
+	Int		 size = buffer.Size();
 
-	while (len--) ulCRC = (ulCRC >> 8) ^ table[(ulCRC & 0xFF) ^ *pBuffer++];
+	while (size--) crc = (crc >> 8) ^ table[(crc & 0xFF) ^ *ptr++];
 
-	return ulCRC ^ 0xffffffff;
+	return crc ^ 0xFFFFFFFF;
 }

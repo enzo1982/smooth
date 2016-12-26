@@ -122,11 +122,6 @@ else
 # 		Enable threads based timers
 		BUILD_POSIXTIMER = False
 		BUILD_THREADSTIMER = True
-	else ifeq ($(UNAME),QNX)
-		BUILD_QNX = True
-
-#		Disable Cairo graphics backend
-		BUILD_CAIRO = False
 	else ifeq ($(UNAME),Darwin)
 #		Set shared object extension
 		SHARED = .dylib
@@ -246,8 +241,6 @@ else ifeq ($(findstring systemlibfribidi,$(config)),systemlibfribidi)
 else
 	ifeq ($(BUILD_OSX),True)
 		USE_BUNDLED_LIBFRIBIDI = True
-	else ifeq ($(BUILD_QNX),True)
-		USE_BUNDLED_LIBFRIBIDI = True
 	else ifeq ($(BUILD_HAIKU),True)
 		USE_BUNDLED_LIBFRIBIDI = True
 	else ifeq ($(BUILD_WIN32),True)
@@ -260,9 +253,7 @@ ifeq ($(findstring bundledlibiconv,$(config)),bundledlibiconv)
 else ifeq ($(findstring systemlibiconv,$(config)),systemlibiconv)
 	USE_BUNDLED_LIBICONV = False
 else
-	ifeq ($(BUILD_QNX),True)
-		USE_BUNDLED_LIBICONV = True
-	else ifeq ($(BUILD_WIN32),True)
+	ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBICONV = True
 	endif
 endif
@@ -273,8 +264,6 @@ else ifeq ($(findstring systemlibjpeg,$(config)),systemlibjpeg)
 	USE_BUNDLED_LIBJPEG = False
 else
 	ifeq ($(BUILD_OSX),True)
-		USE_BUNDLED_LIBJPEG = True
-	else ifeq ($(BUILD_QNX),True)
 		USE_BUNDLED_LIBJPEG = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBJPEG = True
@@ -290,8 +279,6 @@ else
 		ifneq ($(BUILD_XLIB),True)
 			USE_BUNDLED_LIBPNG = True
 		endif
-	else ifeq ($(BUILD_QNX),True)
-		USE_BUNDLED_LIBPNG = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBPNG = True
 	endif
@@ -316,8 +303,6 @@ else
 		ifneq ($(BUILD_XLIB),True)
 			USE_BUNDLED_ZLIB = True
 		endif
-	else ifeq ($(BUILD_QNX),True)
-		USE_BUNDLED_ZLIB = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_ZLIB = True
 	endif

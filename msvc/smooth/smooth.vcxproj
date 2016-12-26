@@ -162,12 +162,6 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\classes\backends\photon\backendphoton.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\classes\basic\object.cpp" />
     <ClCompile Include="..\..\classes\basic\objecttype.cpp" />
     <ClCompile Include="..\..\classes\basic\setup.cpp" />
@@ -276,31 +270,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\classes\gui\clipboard\backends\photon\clipboardphoton.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_haiku.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_photon.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_haiku.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_photon.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -694,7 +670,6 @@
     <ClInclude Include="..\..\include\smooth.h" />
     <ClInclude Include="..\..\include\smooth\args.h" />
     <ClInclude Include="..\..\include\smooth\backends\cocoa\backendcocoa.h" />
-    <ClInclude Include="..\..\include\smooth\backends\photon\backendphoton.h" />
     <ClInclude Include="..\..\include\smooth\codecs.h" />
     <ClInclude Include="..\..\include\smooth\definitions.h" />
     <ClInclude Include="..\..\include\smooth\dll.h" />
@@ -707,13 +682,10 @@
     <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\surfacehaiku.h" />
     <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\cocoa\clipboardcocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\haiku\clipboardhaiku.h" />
-    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\photon\clipboardphoton.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_cocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_haiku.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_photon.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_cocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_haiku.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_photon.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\cocoa\windowcocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\haiku\windowhaiku.h" />
     <ClInclude Include="..\..\include\smooth\init.h" />

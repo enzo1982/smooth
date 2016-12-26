@@ -36,9 +36,7 @@
 #include <signal.h>
 #include <sys/time.h>
 #if !V8_OS_HAIKU
-#if !V8_OS_QNX
 #include <sys/syscall.h>
-#endif
 
 #if V8_OS_MACOSX
 #include <mach/mach.h>
@@ -74,10 +72,6 @@
 #include "simulator.h"
 #include "v8threads.h"
 #include "vm-state-inl.h"
-
-#if V8_OS_QNX
-#define SA_RESTART 0
-#endif
 
 
 #if V8_OS_ANDROID && !defined(__BIONIC_HAVE_UCONTEXT_T)
@@ -418,20 +412,6 @@ void SignalHandler::HandleProfilerSignal(int signal, siginfo_t* info,
   state.pc = reinterpret_cast<Address>(ucontext->sc_rip);
   state.sp = reinterpret_cast<Address>(ucontext->sc_rsp);
   state.fp = reinterpret_cast<Address>(ucontext->sc_rbp);
-#endif  // V8_HOST_ARCH_*
-#elif V8_OS_QNX
-#if V8_HOST_ARCH_IA32
-  state.pc = reinterpret_cast<Address>(mcontext.cpu.eip);
-  state.sp = reinterpret_cast<Address>(mcontext.cpu.esp);
-  state.fp = reinterpret_cast<Address>(mcontext.cpu.ebp);
-#elif V8_HOST_ARCH_ARM
-  state.pc = reinterpret_cast<Address>(mcontext.cpu.grp[ARM_REG_PC]);
-  state.sp = reinterpret_cast<Address>(mcontext.cpu.grp[ARM_REG_SP]);
-  state.fp = reinterpret_cast<Address>(mcontext.cpu.grp[ARM_REG_FP]);
-#elif V8_HOST_ARCH_MIPS
-  state.pc = reinterpret_cast<Address>(mcontext.cpu.regs[MIPS_REG_EPC]);
-  state.sp = reinterpret_cast<Address>(mcontext.cpu.regs[MIPS_REG_SP]);
-  state.fp = reinterpret_cast<Address>(mcontext.cpu.regs[MIPS_REG_S8]);
 #endif  // V8_HOST_ARCH_*
 #elif V8_OS_HAIKU
 #if V8_HOST_ARCH_IA32

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,7 +31,7 @@
 #else
 #	include <unistd.h>
 
-#	if !defined __linux__ && !defined __sun && !defined __GNU__ && !defined __QNXNTO__
+#	if !defined __linux__ && !defined __sun && !defined __GNU__
 #		define lseek64 lseek
 #	endif
 

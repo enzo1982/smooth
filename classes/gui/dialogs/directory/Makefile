@@ -10,9 +10,7 @@ ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
-ifneq ($(BUILD_QNX),True)
 	MYCCOPTS += $(shell pkg-config --cflags gtk+-3.0)
-endif
 endif
 endif
 endif
@@ -31,8 +29,6 @@ else ifeq ($(BUILD_OSX),True)
 	OBJECTS += dirdlg_cocoa.o
 else ifeq ($(BUILD_HAIKU),True)
 	OBJECTS += dirdlg_haiku.o
-else ifeq ($(BUILD_QNX),True)
-	OBJECTS += dirdlg_photon.o
 else
 	OBJECTS += dirdlg_gtk.o
 endif

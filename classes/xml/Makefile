@@ -10,7 +10,7 @@ ifeq ($(USE_BUNDLED_LIBXML2),True)
 	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libxml2
 else ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I$(shell xcodebuild -sdk macosx -version | grep "^Path: " | head -n 1 | tail -c +7)/usr/include/libxml2
-else ifneq ($(BUILD_QNX),True)
+else
 	MYCCOPTS += $(shell pkg-config --cflags libxml-2.0)
 endif
 

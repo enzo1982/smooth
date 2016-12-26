@@ -32,8 +32,6 @@ ifeq ($(USE_BUNDLED_LIBICONV),True)
 	LIBS += $(LIBDIR)/libiconv.a
 else ifeq ($(BUILD_OSX),True)
 	LIBS += -liconv
-else ifeq ($(BUILD_QNX),True)
-	LIBS += -liconv
 endif
 
 ifeq ($(USE_BUNDLED_LIBJPEG),True)
@@ -49,8 +47,6 @@ else ifeq ($(BUILD_WIN32),True)
 else ifeq ($(BUILD_OSX),True)
 	LIBS += -lpng
 else ifeq ($(BUILD_HAIKU),True)
-	LIBS += -lpng
-else ifeq ($(BUILD_QNX),True)
 	LIBS += -lpng
 else
 	LIBS += $(shell pkg-config --libs libpng)
@@ -99,10 +95,6 @@ else ifeq ($(BUILD_HAIKU),True)
 	LIBS += -lbe -ltracker -lnetwork
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
-else ifeq ($(BUILD_QNX),True)
-	LIBS += -lsocket -lX11 -lXmu -lXft -lph
-
-	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 else
 	ifeq ($(BUILD_FREEBSD),True)
 		LIBS += -lrt
@@ -147,8 +139,6 @@ else
 		LINKER_OPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,/usr/X11R7/lib -L/usr/X11R7/lib
 	else ifeq ($(BUILD_HAIKU),True)
 		LINKER_OPTS += -L/boot/common/lib
-	else ifeq ($(BUILD_QNX),True)
-		LINKER_OPTS += -L/usr/X11R6/lib
 	endif
 endif
 
@@ -195,10 +185,8 @@ endif
 
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
-ifneq ($(BUILD_QNX),True)
 ifeq ($(DESTDIR),)
 	$(LDCONFIG) 2> /dev/null || true
-endif
 endif
 endif
 endif
@@ -240,10 +228,8 @@ endif
 
 ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
-ifneq ($(BUILD_QNX),True)
 ifeq ($(DESTDIR),)
 	$(LDCONFIG) 2> /dev/null || true
-endif
 endif
 endif
 endif

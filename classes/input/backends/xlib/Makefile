@@ -10,8 +10,6 @@ ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_HAIKU),True)
 ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I/usr/X11/include
-else ifeq ($(BUILD_QNX),True)
-	MYCCOPTS += -I/usr/X11R6/include
 else
 	MYCCOPTS += $(shell pkg-config --cflags x11)
 endif

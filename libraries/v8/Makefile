@@ -73,10 +73,6 @@ ifeq ($(BUILD_OSX),True)
 	OBJECTS += platform-macos.o platform-posix.o
 endif
 
-ifeq ($(BUILD_QNX),True)
-	OBJECTS += platform-qnx.o platform-posix.o
-endif
-
 ifeq ($(BUILD_HAIKU),True)
 	OBJECTS += platform-haiku.o platform-posix.o
 endif

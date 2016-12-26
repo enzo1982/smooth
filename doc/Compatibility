@@ -20,7 +20,6 @@ OpenBSD	5.1+		complete support
 
 GNU Hurd		complete support
 
-QNX 6.5			X11 GUI only
 Haiku OS		complete support
 
 Discontinued operating systems
@@ -28,3 +27,5 @@ Discontinued operating systems
 
 Windows NT 4.0		no longer supported
 Windows 9x/ME		no longer supported
+
+QNX 6.5			no longer supported

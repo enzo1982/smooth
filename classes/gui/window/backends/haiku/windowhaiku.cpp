@@ -36,10 +36,9 @@ namespace smooth
 {
 	namespace GUI
 	{
-		const Int	 B_WINDOW_CREATED     = 'WCRE';
-		const Int	 B_WINDOW_DESTROYED   = 'WDES';
-		const Int	 B_WINDOW_DEACTIVATED = 'WDEA';
-		const Int	 B_PAINT	      = 'PINT';
+		const Int	 B_WINDOW_CREATED   = 'WCRE';
+		const Int	 B_WINDOW_DESTROYED = 'WDES';
+		const Int	 B_PAINT	    = 'PINT';
 
 		class HaikuView : public BView
 		{
@@ -92,8 +91,7 @@ namespace smooth
 
 				void WindowActivated(bool active)
 				{
-					if (active) System::EventHaiku::EnqueueMessage(this, *CurrentMessage(), B_WINDOW_ACTIVATED, 0, 0);
-					else	    System::EventHaiku::EnqueueMessage(this, *CurrentMessage(), B_WINDOW_DEACTIVATED, 0, 0);
+					System::EventHaiku::EnqueueMessage(this, *CurrentMessage(), B_WINDOW_ACTIVATED, active, 0);
 				}
 
 				void FrameMoved(BPoint origin)
@@ -428,18 +426,18 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			return Success();
 
 		case B_WINDOW_ACTIVATED:
-			onEvent.Call(SM_GETFOCUS, 0, 0);
-
-			break;
-
-		case B_WINDOW_DEACTIVATED:
-			Input::Keyboard::ResetKeyState();
-
-			System::System::Sleep(50);
-
-			/* Get the window that now has the focus.
-			 */
+			if (wParam == True)
 			{
+				onEvent.Call(SM_GETFOCUS, 0, 0);
+			}
+			else
+			{
+				Input::Keyboard::ResetKeyState();
+
+				System::System::Sleep(50);
+
+				/* Get the window that now has the focus.
+				 */
 				Window	*focusWnd = NIL;
 
 				foreach (WindowHaiku *backend, windowBackends)

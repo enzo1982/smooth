@@ -635,7 +635,7 @@ S::Int S::GUI::WindowHaiku::Show()
 {
 	if (wnd == NIL) return Success();
 
-	wnd->Show();
+	if (wnd->IsHidden()) wnd->Show();
 
 	return Success();
 }
@@ -644,7 +644,7 @@ S::Int S::GUI::WindowHaiku::Hide()
 {
 	if (wnd == NIL) return Success();
 
-	wnd->Hide();
+	if (!wnd->IsHidden()) wnd->Hide();
 
 	return Success();
 }

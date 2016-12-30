@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,7 +26,7 @@ S::String S::Encoding::URLEncode::Encode(const String &string, Bool encodeReserv
 
 	for (Int i = 0, e = 0; i < length; i++)
 	{
-		wchar_t	 value = utf8[i];							
+		wchar_t	 value = utf8[i];
 
 		if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9') ||
 		    (value == '-' || value == '_' || value == '.' || value == '~') ||

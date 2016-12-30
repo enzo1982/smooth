@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -119,7 +119,7 @@ S::Bool S::GUI::BitmapCocoa::DeleteBitmap()
 
 			image = nil;
 		}
-	
+
 		[bitmap release];
 
 		bitmap	= nil;
@@ -245,7 +245,7 @@ S::GUI::Color S::GUI::BitmapCocoa::GetPixel(const Point &point) const
 	{
 		case 24:
 			return Color(			      data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0]);
- 		case 32:
+		case 32:
 			return Color(data[offset + 3] << 24 | data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0]);
 	}
 

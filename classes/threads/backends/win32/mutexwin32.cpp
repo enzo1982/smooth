@@ -28,7 +28,7 @@ S::Threads::MutexWin32::MutexWin32(Void *iMutex)
 	}
 	else
 	{
- 		mutex	= new CRITICAL_SECTION;
+		mutex	= new CRITICAL_SECTION;
 		myMutex	= True;
 
 		InitializeCriticalSection(mutex);

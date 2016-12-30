@@ -475,7 +475,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 									j--;
 								}
 								else if (markRegionStarts.GetNth(j) < markRegionStarts.GetNth(i) &&
-								    	 markRegionEnds.GetNth(j) >= markRegionStarts.GetNth(i))
+									 markRegionEnds.GetNth(j) >= markRegionStarts.GetNth(i))
 								{
 									markRegionStarts.SetNth(i, markRegionStarts.GetNth(j));
 

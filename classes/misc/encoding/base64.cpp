@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -66,7 +66,7 @@ S::Int S::Encoding::Base64::Decode(const String &string)
 
 		for (Int j = 0; j < 4; j++)
 		{
-			wchar_t	 value = string[i + j];							
+			wchar_t	 value = string[i + j];
 
 			if	(value >= 'A' && value <= 'Z')	val[j] = value - 'A' +  0;
 			else if (value >= 'a' && value <= 'z')	val[j] = value - 'a' + 26;

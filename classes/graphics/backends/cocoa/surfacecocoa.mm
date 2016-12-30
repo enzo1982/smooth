@@ -378,7 +378,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	}
 
 	[NSGraphicsContext restoreGraphicsState];
-	
+
 	[window flushWindow];
 
 	String::ExplodeFinish();

@@ -561,7 +561,7 @@ const int	 NSApplicationDropFiles	 = 9;
 		badgeRect.origin.x    = NSWidth(badgeRect) - 0.4 * NSWidth(badgeRect) - 5.0;
 		badgeRect.origin.y    = badgeRect.origin.y + 5.0;
 		badgeRect.size.width  = 0.4 * NSWidth(badgeRect);
-  		badgeRect.size.height = (int) (0.4 * badgeRect.size.height);
+		badgeRect.size.height = (int) (0.4 * badgeRect.size.height);
 
 		CGFloat	 badgeRadius = NSMidY(badgeRect);
 		NSPoint	 badgeCenter = NSMakePoint(NSMidX(badgeRect), NSMidY(badgeRect));
@@ -637,7 +637,7 @@ const int	 NSApplicationDropFiles	 = 9;
 		[NSGraphicsContext restoreGraphicsState];
 
 		[pool release];
- 	}
+	}
 
 	- (void) setHidden:   (BOOL)  value { hidden   = value; }
 	- (void) setProgress: (float) value { progress = value; }
@@ -1200,7 +1200,7 @@ const S::Array<S::String> &S::GUI::WindowCocoa::GetDroppedFiles() const
 
 	fileNames.RemoveAll();
 
- 	/* Query dropped files.
+	/* Query dropped files.
 	 */
 	NSArray	*files = [pasteBoard propertyListForType: NSFilenamesPboardType];
 

@@ -19,6 +19,7 @@
 #include "locales/smooth_ar.h"
 #include "locales/smooth_bg.h"
 #include "locales/smooth_ca.h"
+#include "locales/smooth_ca@valencia.h"
 #include "locales/smooth_co.h"
 #include "locales/smooth_cs.h"
 #include "locales/smooth_da.h"
@@ -59,7 +60,6 @@
 #include "locales/smooth_th.h"
 #include "locales/smooth_tr.h"
 #include "locales/smooth_uk.h"
-#include "locales/smooth_va.h"
 #include "locales/smooth_vi.h"
 #include "locales/smooth_zh_CN.h"
 #include "locales/smooth_zh_HK.h"
@@ -69,8 +69,8 @@ namespace smooth
 {
 	namespace I18n
 	{
-		static const char	*languageXMLs[]   = { smooth_af, smooth_ar, smooth_bg, smooth_ca, smooth_co, smooth_cs, smooth_da, smooth_de, smooth_el, smooth_eo, smooth_es, smooth_et, smooth_eu, smooth_fa, smooth_fi, smooth_fr, smooth_gl, smooth_he, smooth_hi, smooth_hr, smooth_hu, smooth_id, smooth_it, smooth_ja, smooth_ko, smooth_lt, smooth_lv, smooth_ms, smooth_nl, smooth_no, smooth_pa, smooth_pl, smooth_pt, smooth_pt_BR, smooth_ro, smooth_ru, smooth_sk, smooth_sl, smooth_sr, smooth_sr_cyrl, smooth_sv, smooth_th, smooth_tr, smooth_uk, smooth_va, smooth_vi, smooth_zh_CN, smooth_zh_HK, smooth_zh_TW, NIL };
-		static const char	*languageMagics[] = { "smooth_af.xml", "smooth_ar.xml", "smooth_bg.xml", "smooth_ca.xml", "smooth_co.xml", "smooth_cs.xml", "smooth_da.xml", "smooth_de.xml", "smooth_el.xml", "smooth_eo.xml", "smooth_es.xml", "smooth_et.xml", "smooth_eu.xml", "smooth_fa.xml", "smooth_fi.xml", "smooth_fr.xml", "smooth_gl.xml", "smooth_he.xml", "smooth_hi.xml", "smooth_hr.xml", "smooth_hu.xml", "smooth_id.xml", "smooth_it.xml", "smooth_ja.xml", "smooth_ko.xml", "smooth_lt.xml", "smooth_lv.xml", "smooth_ms.xml", "smooth_nl.xml", "smooth_no.xml", "smooth_pa.xml", "smooth_pl.xml", "smooth_pt.xml", "smooth_pt_BR.xml", "smooth_ro.xml", "smooth_ru.xml", "smooth_sk.xml", "smooth_sl.xml", "smooth_sr.xml", "smooth_sr@Cyrl.xml", "smooth_sv.xml", "smooth_th.xml", "smooth_tr.xml", "smooth_uk.xml", "smooth_va.xml", "smooth_vi.xml", "smooth_zh_CN.xml", "smooth_zh_HK.xml", "smooth_zh_TW.xml", NIL };
+		static const char	*languageXMLs[]   = { smooth_af, smooth_ar, smooth_bg, smooth_ca, smooth_ca_valencia, smooth_co, smooth_cs, smooth_da, smooth_de, smooth_el, smooth_eo, smooth_es, smooth_et, smooth_eu, smooth_fa, smooth_fi, smooth_fr, smooth_gl, smooth_he, smooth_hi, smooth_hr, smooth_hu, smooth_id, smooth_it, smooth_ja, smooth_ko, smooth_lt, smooth_lv, smooth_ms, smooth_nl, smooth_no, smooth_pa, smooth_pl, smooth_pt, smooth_pt_BR, smooth_ro, smooth_ru, smooth_sk, smooth_sl, smooth_sr, smooth_sr_cyrl, smooth_sv, smooth_th, smooth_tr, smooth_uk, smooth_vi, smooth_zh_CN, smooth_zh_HK, smooth_zh_TW, NIL };
+		static const char	*languageMagics[] = { "smooth_af.xml", "smooth_ar.xml", "smooth_bg.xml", "smooth_ca.xml", "smooth_ca@valencia.xml", "smooth_co.xml", "smooth_cs.xml", "smooth_da.xml", "smooth_de.xml", "smooth_el.xml", "smooth_eo.xml", "smooth_es.xml", "smooth_et.xml", "smooth_eu.xml", "smooth_fa.xml", "smooth_fi.xml", "smooth_fr.xml", "smooth_gl.xml", "smooth_he.xml", "smooth_hi.xml", "smooth_hr.xml", "smooth_hu.xml", "smooth_id.xml", "smooth_it.xml", "smooth_ja.xml", "smooth_ko.xml", "smooth_lt.xml", "smooth_lv.xml", "smooth_ms.xml", "smooth_nl.xml", "smooth_no.xml", "smooth_pa.xml", "smooth_pl.xml", "smooth_pt.xml", "smooth_pt_BR.xml", "smooth_ro.xml", "smooth_ru.xml", "smooth_sk.xml", "smooth_sl.xml", "smooth_sr.xml", "smooth_sr@Cyrl.xml", "smooth_sv.xml", "smooth_th.xml", "smooth_tr.xml", "smooth_uk.xml", "smooth_vi.xml", "smooth_zh_CN.xml", "smooth_zh_HK.xml", "smooth_zh_TW.xml", NIL };
 	};
 };
 

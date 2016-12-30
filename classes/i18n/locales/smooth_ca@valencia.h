@@ -8,10 +8,10 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_I18N_VA
-#define H_OBJSMOOTH_I18N_VA
+#ifndef H_OBJSMOOTH_I18N_CA_VALENCIA
+#define H_OBJSMOOTH_I18N_CA_VALENCIA
 
-static const char *smooth_va = 
+static const char *smooth_ca_valencia = 
 
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>					\
 	 <LangFile>									\

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -54,7 +54,21 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		GtkFileFilter		*filter = gtk_file_filter_new();
 		const Array<String>	&patterns = filters.GetNth(i).Explode(";");
 
-		foreach (const String &pattern, patterns) gtk_file_filter_add_pattern(filter, pattern.Trim());
+		foreach (const String &pattern, patterns)
+		{
+			/* Make patterns case insensitive.
+			 */
+			String	 converted = pattern.Head(		     pattern.FindLast(".") + 1);
+			String	 extension = pattern.Tail(pattern.Length() - pattern.FindLast(".") - 1).ToLower();
+
+			for (Int i = 0; i < extension.Length(); i++)
+			{
+				if (extension[i] >= 'a' && extension[i] <= 'z') converted.Append("[").Append(extension.SubString(i, 1)).Append(extension.SubString(i, 1).ToUpper()).Append("]");
+				else						converted.Append(extension.SubString(i, 1));
+			}
+
+			gtk_file_filter_add_pattern(filter, converted.Trim());
+		}
 
 		String::ExplodeFinish();
 

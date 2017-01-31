@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,7 @@
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/cursor.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/encoding/urlencode.h>
@@ -887,6 +888,28 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		else						      drawSurface = new Surface((Void *) wnd);
 
 		drawSurface->SetSize(size * fontSize + sizeModifier);
+
+		/* Set application name.
+		 */
+		Widget	*widget = Window::GetWindow((Void *) wnd);
+
+		while (widget->GetObjectType() != Application::classID)
+		{
+			if (widget->GetContainer() == NIL) break;
+
+			widget = widget->GetContainer();
+		}
+
+		if (widget->GetObjectType() == Application::classID)
+		{
+			XClassHint	*classHint = XAllocClassHint();
+
+			classHint->res_name  = widget->GetText();
+			classHint->res_class = widget->GetText();
+
+			XSetClassHint(display, wnd, classHint);
+			XFree(classHint);
+		}
 
 		/* Set window title.
 		 */

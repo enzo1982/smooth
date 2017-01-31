@@ -32,7 +32,7 @@ Int smooth::Main(const Array<String> &args)
 	return 0;
 }
 
-Translator::Translator(const String &openFile)
+Translator::Translator(const String &openFile) : Application("smooth Translator")
 {
 	fileName     = NIL;
 	templateName = NIL;

@@ -23,7 +23,7 @@ Int smooth::Main()
 	return 0;
 }
 
-PCIFFManager::PCIFFManager()
+PCIFFManager::PCIFFManager() : Application("smooth PCIFF Manager")
 {
 	filename = "";
 

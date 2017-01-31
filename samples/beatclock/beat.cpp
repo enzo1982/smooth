@@ -28,7 +28,7 @@ Int smooth::Main()
 	return 0;
 }
 
-BeatClock::BeatClock()
+BeatClock::BeatClock() : Application("BeatClock")
 {
 	actbeats    = -1;
 	actcbeats   = -1;

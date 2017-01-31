@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,7 +24,7 @@ Int smooth::Main()
 	return 0;
 }
 
-Designer::Designer()
+Designer::Designer() : Application("smooth Designer")
 {
 	dlgcounter = 1;
 	active_dlg = NIL;

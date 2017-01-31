@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -67,26 +67,19 @@ Void PCIFFManager::Close()
 
 Void PCIFFManager::OpenFile()
 {
-	FileSelection	*dialog = new FileSelection();
+	FileSelection	 dialog;
 
-	dialog->SetParentWindow(wnd);
+	dialog.SetParentWindow(wnd);
 
-	dialog->AddFilter("PCI Image Files", "*.pci");
-	dialog->AddFilter("All Files", "*.*");
+	dialog.AddFilter("PCI Image Files", "*.pci");
+	dialog.AddFilter("All Files", "*.*");
 
-	if (dialog->ShowDialog() == Success())
+	if (dialog.ShowDialog() == Success())
 	{
-		filename = dialog->GetFileName();
+		filename = dialog.GetFileName();
 
-		String	 file = "";
-		Int	 lastBs = -1;
-
-		for (int i = 0; i < filename.Length(); i++) if (filename[i] == '\\') lastBs = i;
-
-		for (int j = ++lastBs; j < filename.Length(); j++) file[j - lastBs] = filename[j];
+		String	 file = filename.Tail(filename.Length() - filename.FindLast(Directory::GetDirectoryDelimiter()) - 1);
 
 		wnd->SetText(String("smooth PCIFF Manager v").Append(SMOOTH_VERSION).Append(" - ").Append(file));
 	}
-
-	DeleteObject(dialog);
 }

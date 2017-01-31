@@ -445,19 +445,17 @@ Void Translator::OpenFile()
 {
 	if (!ExitProc()) return;
 
-	FileSelection	*dialog = new FileSelection();
+	FileSelection	 dialog;
 
-	dialog->SetParentWindow(wnd);
+	dialog.SetParentWindow(wnd);
 
-	dialog->AddFilter("XML Language Files", "*.xml");
-	dialog->AddFilter("All Files", "*.*");
+	dialog.AddFilter("XML Language Files", "*.xml");
+	dialog.AddFilter("All Files", "*.*");
 
-	if (dialog->ShowDialog() == Success())
+	if (dialog.ShowDialog() == Success())
 	{
-		OpenFileName(dialog->GetFileName());
+		OpenFileName(dialog.GetFileName());
 	}
-
-	DeleteObject(dialog);
 }
 
 Int Translator::OpenTemplate(const String &fileName)
@@ -584,25 +582,23 @@ Void Translator::SaveFileAs()
 {
 	if (fileName == NIL) return;
 
-	FileSelection	*dialog = new FileSelection();
+	FileSelection	 dialog;
 
-	dialog->SetParentWindow(wnd);
-	dialog->SetMode(SFM_SAVE);
-	dialog->SetDefaultExtension("xml");
+	dialog.SetParentWindow(wnd);
+	dialog.SetMode(SFM_SAVE);
+	dialog.SetDefaultExtension("xml");
 
-	dialog->AddFilter("XML Language Files", "*.xml");
-	dialog->AddFilter("All Files", "*.*");
+	dialog.AddFilter("XML Language Files", "*.xml");
+	dialog.AddFilter("All Files", "*.*");
 
-	if (dialog->ShowDialog() == Success())
+	if (dialog.ShowDialog() == Success())
 	{
-		fileName = dialog->GetFileName();
+		fileName = dialog.GetFileName();
 
 		SaveFileName(fileName);
 
 		wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(GetShortFileName(fileName)));
 	}
-
-	DeleteObject(dialog);
 }
 
 Void Translator::SaveFileName(const String &file)

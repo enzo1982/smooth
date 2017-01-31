@@ -462,20 +462,13 @@ Int Translator::OpenTemplate(const String &fileName)
 {
 	if (!File(fileName).Exists()) return Error();
 
-	XML::Document	*doc = new XML::Document();
+	XML::Document	 doc;
 
-	if (doc->LoadFile(fileName) == Error())
-	{
-		delete doc;
+	if (doc.LoadFile(fileName) == Error()) return Error();
 
-		return Error();
-	}
-
-	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
+	XML::Node	*data = doc.GetRootNode()->GetNodeByName("data");
 
 	dataSection->Parse(data, list_entries, entries);
-
-	delete doc;
 
 	return Success();
 }
@@ -488,12 +481,10 @@ Void Translator::OpenFileName(const String &openFile)
 
 	wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(GetShortFileName(fileName)));
 
-	XML::Document	*doc = new XML::Document();
+	XML::Document	 doc;
 
-	if (doc->LoadFile(fileName) == Error())
+	if (doc.LoadFile(fileName) == Error())
 	{
-		delete doc;
-
 		CloseFile();
 
 		QuickMessage(String("Invalid file format: ").Append(GetShortFileName(openFile)), "smooth Translator", Message::Buttons::Ok, Message::Icon::Error);
@@ -501,7 +492,7 @@ Void Translator::OpenFileName(const String &openFile)
 		return;
 	}
 
-	XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
+	XML::Node	*info = doc.GetRootNode()->GetNodeByName("info");
 
 	for (Int k = 0; k < info->GetNOfNodes(); k++)
 	{
@@ -534,11 +525,9 @@ Void Translator::OpenFileName(const String &openFile)
 		}
 	}
 
-	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
+	XML::Node	*data = doc.GetRootNode()->GetNodeByName("data");
 
 	dataSection->Parse(data, list_entries, entries);
-
-	delete doc;
 
 	/* Look for entries with the same original text and suggest a translation.
 	 */

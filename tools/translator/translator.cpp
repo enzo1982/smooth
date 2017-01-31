@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -466,7 +466,12 @@ Int Translator::OpenTemplate(const String &fileName)
 
 	XML::Document	*doc = new XML::Document();
 
-	doc->LoadFile(fileName);
+	if (doc->LoadFile(fileName) == Error())
+	{
+		delete doc;
+
+		return Error();
+	}
 
 	XML::Node	*data = doc->GetRootNode()->GetNodeByName("data");
 
@@ -487,7 +492,16 @@ Void Translator::OpenFileName(const String &openFile)
 
 	XML::Document	*doc = new XML::Document();
 
-	doc->LoadFile(fileName);
+	if (doc->LoadFile(fileName) == Error())
+	{
+		delete doc;
+
+		CloseFile();
+
+		QuickMessage(String("Invalid file format: ").Append(GetShortFileName(openFile)), "smooth Translator", Message::Buttons::Ok, Message::Icon::Error);
+
+		return;
+	}
 
 	XML::Node	*info = doc->GetRootNode()->GetNodeByName("info");
 

@@ -10,7 +10,7 @@
 
 #include <gtk/gtk.h>
 
-#include <smooth/gui/dialogs/file/filedlg_gtk.h>
+#include <smooth/gui/dialogs/filedlg.h>
 #include <smooth/files/file.h>
 #include <smooth/misc/number.h>
 #include <smooth/foreach.h>

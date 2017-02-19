@@ -682,10 +682,8 @@
     <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\surfacehaiku.h" />
     <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\cocoa\clipboardcocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\haiku\clipboardhaiku.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_cocoa.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_haiku.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_cocoa.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_haiku.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\dirdlg.h" />
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\filedlg.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\cocoa\windowcocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\haiku\windowhaiku.h" />
     <ClInclude Include="..\..\include\smooth\init.h" />
@@ -800,12 +798,6 @@
     <ClInclude Include="..\..\include\smooth\gui\dialogs\messagebox.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\splashscreen.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\tipodaydlg.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_gtk.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\file\filedlg_win32.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_gtk.h" />
-    <ClInclude Include="..\..\include\smooth\gui\dialogs\directory\dirdlg_win32.h" />
     <ClInclude Include="..\..\include\smooth\gui\application\application.h" />
     <ClInclude Include="..\..\include\smooth\gui\application\xulloader.h" />
     <ClInclude Include="..\..\include\smooth\gui\clipboard\clipboard.h" />

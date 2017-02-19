@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smooth", "smooth.vcxproj", "{CD9FE2EC-DF4C-4139-9C0F-6236BB55153B}"
 EndProject
@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxml2", "..\libxml\libxml
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbz2", "..\libbzip2\libbzip2.vcxproj", "{601D2C29-07F2-4A25-AA49-3D703DB3CBE5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fribidi2", "..\fribidi2\fribidi2.vcxproj", "{3F531A26-F2A2-42AA-BDE3-2332D76B0BE4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fribidi", "..\fribidi2\fribidi2.vcxproj", "{3F531A26-F2A2-42AA-BDE3-2332D76B0BE4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Translator", "..\Translator\Translator.vcxproj", "{051AF328-A71B-4D07-A76A-BAEAE9108266}"
 EndProject

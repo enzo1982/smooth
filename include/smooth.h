@@ -8,10 +8,6 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#if defined __WIN32__ && (!defined UNICODE || !defined _UNICODE)
-#error Both, UNICODE and _UNICODE, must be defined to compile smooth applications!
-#endif
-
 #ifndef H_OBJSMOOTH
 #define H_OBJSMOOTH
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,7 +30,7 @@ StringItem::~StringItem()
 
 Int StringItem::UpdateText()
 {
-	SetText(String::FromInt(id).Append("\t").Append(original).Append("\t").Append(translation));
+	SetText(String::FromInt(id).Append(ListEntry::tabDelimiter).Append(original).Append(ListEntry::tabDelimiter).Append(translation));
 
 	return Success();
 }

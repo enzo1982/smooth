@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,8 @@
 S::Signal2<S::Void, S::Int, S::Int>	 S::GUI::ListEntry::internalOnSelectEntry;
 
 const S::Short	 S::GUI::ListEntry::classID = S::Object::RequestClassID();
+
+const S::String	 S::GUI::ListEntry::tabDelimiter = "\v";
 
 S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 16))
 {
@@ -77,7 +79,7 @@ S::Int S::GUI::ListEntry::Paint(Int message)
 			if (mouseOver) nFont.SetColor(Setup::GradientTextColor);
 			if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
 
-			gotTabs = text.Contains("\t");
+			gotTabs = text.Contains(tabDelimiter);
 
 			surface->StartPaint(GetVisibleArea());
 
@@ -186,7 +188,7 @@ S::String S::GUI::ListEntry::GetNthTabText(Int i) const
 		{
 			for (Int q = p; q < text.Length(); q++)
 			{
-				if (text[q] == '\t') break;
+				if (text[q] == tabDelimiter[0]) break;
 
 				tabText[q - p] = text[q];
 			}
@@ -194,7 +196,7 @@ S::String S::GUI::ListEntry::GetNthTabText(Int i) const
 			break;
 		}
 
-		if (text[p] == '\t') tabCount++;
+		if (text[p] == tabDelimiter[0]) tabCount++;
 	}
 
 	return tabText;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -191,7 +191,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 	if (!active)	nFont.SetColor(Setup::InactiveTextColor);
 	else		nFont.SetColor(color);
 
-	for (Int r = 0; r < text.Length(); r++) if (text[r] == '\t') { gotTabs = True; break; }
+	if (text.Contains(ListEntry::tabDelimiter)) gotTabs = True;
 
 	surface->StartPaint(GetVisibleArea());
 

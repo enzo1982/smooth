@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -90,9 +90,9 @@ S::Int S::I18n::TranslatorInternal::GetSupportedLanguages()
 	for (Int i = 0; languageXMLs[i] != NIL; i++)
 	{
 		const char	*xml = languageXMLs[i];
-		XML::Document	*doc = new XML::Document();
+		XML::Document	 doc;
 
-		if (doc->ParseMemory((void *) xml, strlen(xml)) == Success())
+		if (doc.ParseMemory((void *) xml, strlen(xml)) == Success())
 		{
 			Language	*language = new Language();
 
@@ -100,8 +100,6 @@ S::Int S::I18n::TranslatorInternal::GetSupportedLanguages()
 
 			if (LoadDescription(doc, language) == Success()) AddLanguage(language);
 		}
-
-		delete doc;
 	}
 
 	return Success();
@@ -123,11 +121,9 @@ S::Int S::I18n::TranslatorInternal::ActivateLanguage(const String &magic)
 			{
 				if (magic != languageMagics[i]) continue;
 
-				XML::Document	*doc = new XML::Document();
+				XML::Document	 doc;
 
-				if (doc->ParseMemory((void *) languageXMLs[i], strlen(languageXMLs[i])) == Success()) LoadData(doc, activeLanguage);
-
-				delete doc;
+				if (doc.ParseMemory((void *) languageXMLs[i], strlen(languageXMLs[i])) == Success()) LoadData(doc, activeLanguage);
 			}
 		}
 

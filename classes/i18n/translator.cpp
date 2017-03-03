@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,10 +38,7 @@ S::I18n::Translator::Translator(const String &iAppPrefix)
 
 S::I18n::Translator::~Translator()
 {
-	for (int i = 0; i < languages.Length(); i++)
-	{
-		delete languages.GetNth(i);
-	}
+	foreach (Language *language, languages) delete language;
 
 	languages.RemoveAll();
 }
@@ -66,41 +63,11 @@ S::Int S::I18n::Translator::SetInternalLanguageInfo(const String &langName, cons
 	{
 		iLang->SetName(langName);
 
-		iLang->author = author;
-		iLang->url = url;
+		iLang->author	   = author;
+		iLang->url	   = url;
 		iLang->rightToLeft = rightToLeft;
 
-		Bool	 done = false;
-
-		for (Int i = 0; i <= languages.Length(); i++)
-		{
-			if (i == languages.Length())
-			{
-				languages.Add(iLang);
-
-				break;
-			}
-
-			Language	*lang = languages.GetNth(i);
-
-			for (Int j = 0; j < Math::Max(iLang->GetName().Length(), lang->GetName().Length()); j++)
-			{
-				if (iLang->GetName()[j] < lang->GetName()[j])
-				{
-					languages.InsertAtPos(i, iLang);
-
-					done = True;
-
-					break;
-				}
-				else if (iLang->GetName()[j] > lang->GetName()[j])
-				{
-					break;
-				}
-			}
-
-			if (done) break;
-		}
+		AddLanguage(iLang);
 	}
 
 	return Success();
@@ -389,20 +356,18 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 
 	const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).Append("_*.xml"));
 
-	for (Int i = 0; i < files.Length(); i++)
+	foreach (const File &file, files)
 	{
-		XML::Document	*doc = new XML::Document();
+		XML::Document	 doc;
 
-		if (doc->LoadFile(files.GetNth(i)) == Success())
+		if (doc.LoadFile(file) == Success())
 		{
 			Language	*language = new Language();
 
-			language->magic = files.GetNth(i).GetFileName();
+			language->magic = file.GetFileName();
 
 			if (LoadDescription(doc, language) == Success()) AddLanguage(language);
 		}
-
-		delete doc;
 	}
 
 	return Success();
@@ -543,11 +508,9 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 #endif
 
 			String		 file = String(dir).Append(Directory::GetDirectoryDelimiter()).Append(magic);
-			XML::Document	*doc  = new XML::Document();
+			XML::Document	 doc;
 
-			if (doc->LoadFile(file) == Success()) LoadData(doc, activeLanguage);
-
-			delete doc;
+			if (doc.LoadFile(file) == Success()) LoadData(doc, activeLanguage);
 		}
 
 		return Success();
@@ -558,7 +521,7 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 
 const S::String &S::I18n::Translator::TranslateString(const String &string, const String &context)
 {
-	String	prevContext = activeLanguage->GetContext();
+	String	 prevContext = activeLanguage->GetContext();
 
 	if (context != NIL) activeLanguage->SetContext(context);
 
@@ -576,48 +539,37 @@ S::Int S::I18n::Translator::AddLanguage(Language *language)
 	 */
 	if (language == NIL) return Error();
 
-	Bool	 done = False;
+	const String	&langName = language->GetName();
 
-	for (Int j = 0; j < languages.Length(); j++)
+	for (Int i = 0; i < languages.Length(); i++)
 	{
-		Language	*lang = languages.GetNth(j);
+		const String	&compName = languages.GetNth(i)->GetName();
 
-		for (Int k = 0; k < Math::Max(language->GetName().Length(), lang->GetName().Length()); k++)
+		for (Int j = 0; j < Math::Max(langName.Length(), compName.Length()); j++)
 		{
-			if ((language->GetName()[k] < lang->GetName()[k] && !(language->GetName()[k] == '(' && lang->GetName()[k] == '/')) || (language->GetName()[k] == '/' && lang->GetName()[k] == '('))
+			if ((langName[j] < compName[j] && !(langName[j] == '(' && compName[j] == '/')) || (langName[j] == '/' && compName[j] == '('))
 			{
-				languages.InsertAtPos(j, language);
+				languages.InsertAtPos(i, language);
 
-				done = True;
-
-				break;
+				return Success();
 			}
-			else if ((language->GetName()[k] > lang->GetName()[k] && !(language->GetName()[k] == '/' && lang->GetName()[k] == '(')) || (language->GetName()[k] == '(' && lang->GetName()[k] == '/'))
-			{
-				break;
-			}
+
+			if ((langName[j] > compName[j] && !(langName[j] == '/' && compName[j] == '(')) || (langName[j] == '(' && compName[j] == '/')) break;
 		}
-
-		if (j == languages.Length() - 1)
-		{
-			languages.Add(language);
-
-			done = True;
-		}
-
-		if (done) break;
 	}
+
+	languages.Add(language);
 
 	return Success();
 }
 
-S::Int S::I18n::Translator::LoadDescription(XML::Document *doc, Language *language)
+S::Int S::I18n::Translator::LoadDescription(const XML::Document &doc, Language *language)
 {
 	/* Check arguments and return an error if they are not sane.
 	 */
-	if (doc == NIL || doc->GetRootNode() == NIL || language == NIL) return Error();
+	if (doc.GetRootNode() == NIL || language == NIL) return Error();
 
-	XML::Node	*root = doc->GetRootNode();
+	XML::Node	*root	= doc.GetRootNode();
 	Error		 result = language->ParseHeader(root);
 
 	if (result != Success()) return Error();
@@ -625,13 +577,13 @@ S::Int S::I18n::Translator::LoadDescription(XML::Document *doc, Language *langua
 	return Success();
 }
 
-S::Int S::I18n::Translator::LoadData(XML::Document *doc, Language *language)
+S::Int S::I18n::Translator::LoadData(const XML::Document &doc, Language *language)
 {
 	/* Check arguments and return an error if they are not sane.
 	 */
-	if (doc == NIL || doc->GetRootNode() == NIL || language == NIL) return Error();
+	if (doc.GetRootNode() == NIL || language == NIL) return Error();
 
-	XML::Node	*root = doc->GetRootNode();
+	XML::Node	*root	= doc.GetRootNode();
 	Error		 result = language->Parse(root);
 
 	if (result != Success()) return Error();

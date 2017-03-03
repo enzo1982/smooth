@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -359,11 +359,8 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	Int	 size = ConvertString(str, len, format, NIL, 0, GetInternalFormat());
 
-	if ((size < 0) && (strcmp(format, "ISO-8859-1") != 0))
-	{
-		return ImportFrom("ISO-8859-1", str);
-	}
-	else if (size < 0) return Error();
+	if	(size < 0 && strcmp(format, "ISO-8859-1") != 0) return ImportFrom("ISO-8859-1", str);
+	else if (size < 0)					return Error();
 
 	size = size / sizeof(wchar_t) + 1;
 
@@ -897,41 +894,36 @@ S::String S::String::Implode(const Array<String> &array, const String &delimiter
 
 S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)
 {
-	Int		 size = 0;
-	Buffer<char>	 buffer;
-
-	if (outBuffer == NIL)
-	{
-		buffer.Resize(inBytes * 8);
-
-		outBytes  = buffer.Size();
-		outBuffer = buffer;
-	}
+	/* Convert string to requested format.
+	 */
+	Int	 size = 0;
 
 	if (strcmp(inEncoding, outEncoding) == 0)
 	{
 		size = inBytes;
 
-		if (size < outBytes && size > 0)
+		if (outBuffer != NIL)
 		{
-			wcsncpy((wchar_t *) outBuffer, (wchar_t *) inBuffer, size / sizeof(wchar_t));
-		}
+			if (size < outBytes && size > 0) wcsncpy((wchar_t *) outBuffer, (wchar_t *) inBuffer, size / sizeof(wchar_t));
 
-		if (size >= outBytes) size = 0;
+			if (size >= outBytes) size = 0;
+		}
 	}
 	else if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
 	{
 		size = inBytes;
 
-		if (size < outBytes && size > 0)
+		if (outBuffer != NIL)
 		{
-			for (UnsignedInt i = 0; i < size / sizeof(wchar_t); i++) ((wchar_t *) outBuffer)[i] = ((((wchar_t *) inBuffer)[i] & 255) << 8) | (((wchar_t *) inBuffer)[i] >> 8);
-		}
+			if (size < outBytes && size > 0) for (UnsignedInt i = 0; i < size / sizeof(wchar_t); i++) ((wchar_t *) outBuffer)[i] = ((((wchar_t *) inBuffer)[i] & 255) << 8) | (((wchar_t *) inBuffer)[i] >> 8);
 
-		if (size >= outBytes) size = 0;
+			if (size >= outBytes) size = 0;
+		}
 	}
 	else if (Setup::useIconv)
 	{
+		/* Open and configure iconv.
+		 */
 		iconv_t	 cd = iconv_open(outEncoding, inEncoding);
 
 		if (cd == (iconv_t) -1) return -1;
@@ -942,6 +934,24 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		iconvctl(cd, ICONV_SET_TRANSLITERATE, &on);
 #endif
 
+		/* Assign output buffer if not provided.
+		 */
+		if (outBuffer == NIL)
+		{
+			static multithread (Buffer<char> *)	 buffer = NIL;
+
+			if (buffer == NIL) buffer = new Buffer<char>();
+
+			if (buffer->Size() > 4096 && inBytes * 8 < 256) buffer->Free();
+
+			buffer->Resize(inBytes * 8);
+
+			outBytes  = buffer->Size();
+			outBuffer = *buffer;
+		}
+
+		/* Perform actual conversion.
+		 */
 		size_t		 inBytesLeft  = inBytes;
 		size_t		 outBytesLeft = outBytes;
 		char	       **outPointer   = &outBuffer;
@@ -997,8 +1007,12 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		 */
 		if (size == 0 && GetLastError() == ERROR_INVALID_PARAMETER) size = MultiByteToWideChar(codePage = CP_ACP, 0, inBuffer, -1, NIL, 0) * sizeof(wchar_t);
 
-		if (size < outBytes && size > 0) MultiByteToWideChar(codePage, 0, inBuffer, -1, (wchar_t *) outBuffer, size / sizeof(wchar_t));
-		else if (size >= outBytes)	 size = 0;
+		if (outBuffer != NIL)
+		{
+			if (size < outBytes && size > 0) MultiByteToWideChar(codePage, 0, inBuffer, -1, (wchar_t *) outBuffer, size / sizeof(wchar_t));
+
+			if (size >= outBytes) size = 0;
+		}
 	}
 	else if (strcmp(inEncoding, "UTF-16LE") == 0)
 	{
@@ -1033,8 +1047,12 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 		 */
 		if (size == 0 && GetLastError() == ERROR_INVALID_PARAMETER) size = WideCharToMultiByte(codePage = CP_ACP, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 
-		if (size < outBytes && size > 0) WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, outBuffer, size, NIL, NIL);
-		else if (size >= outBytes)	 size = 0;
+		if (outBuffer != NIL)
+		{
+			if (size < outBytes && size > 0) WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, outBuffer, size, NIL, NIL);
+
+			if (size >= outBytes) size = 0;
+		}
 	}
 #endif
 

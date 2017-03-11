@@ -18,6 +18,8 @@ xx.yy.zz xx:yy - smooth alpha 0.8.73.0
 - crc64.cpp		- added Hash::CRC64 class to calculate 64 bit CRCs
 - string.cpp		- added ComputeCRC64() method
 - datetime.cpp		- reworked DateTime interface and implementation
+- http.cpp		- use libcurl for HTTP transport
+			- added support for HTTPS
 - listentry.cpp		- added static member: tabDelimiter, use it to delimit list entry tabs
 			- tab delimiter changed from horizontal to vertical tab character
 

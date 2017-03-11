@@ -5,6 +5,7 @@ echo
 echo "    On Linux, *BSD, Solaris, Hurd:"
 echo
 echo "        - libbz2 development package"
+echo "        - libcurl development package"
 echo "        - libfribidi development package"
 echo "        - libgtk-3 development package"
 echo "        - libjpeg development package"

@@ -22,6 +22,20 @@ else
 	LIBS += -lcpuid
 endif
 
+ifeq ($(USE_BUNDLED_LIBCURL),True)
+	LIBS += $(LIBDIR)/libcurl.a
+
+	ifeq ($(BUILD_WIN32),True)
+		LIBS += -lwldap32 -lcrypt32
+	else ifeq ($(BUILD_OSX),True)
+		LIBS += -framework Security -lldap
+	endif
+else ifeq ($(BUILD_OSX),True)
+	LIBS += -lcurl
+else
+	LIBS += $(shell pkg-config --libs libcurl)
+endif
+
 ifeq ($(USE_BUNDLED_LIBFRIBIDI),True)
 	LIBS += $(LIBDIR)/libfribidi.a
 else

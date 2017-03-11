@@ -234,6 +234,16 @@ else
 	USE_BUNDLED_LIBCPUID = True
 endif
 
+ifeq ($(findstring bundledlibcurl,$(config)),bundledlibcurl)
+	USE_BUNDLED_LIBCURL = True
+else ifeq ($(findstring systemlibcurl,$(config)),systemlibcurl)
+	USE_BUNDLED_LIBCURL = False
+else
+	ifeq ($(BUILD_WIN32),True)
+		USE_BUNDLED_LIBCURL = True
+	endif
+endif
+
 ifeq ($(findstring bundledlibfribidi,$(config)),bundledlibfribidi)
 	USE_BUNDLED_LIBFRIBIDI = True
 else ifeq ($(findstring systemlibfribidi,$(config)),systemlibfribidi)

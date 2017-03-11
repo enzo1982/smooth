@@ -16,6 +16,10 @@ ifeq ($(USE_BUNDLED_LIBCPUID),True)
 	FOLDERS += libcpuid
 endif
 
+ifeq ($(USE_BUNDLED_LIBCURL),True)
+	FOLDERS += libcurl
+endif
+
 ifeq ($(USE_BUNDLED_LIBICONV),True)
 	FOLDERS += libiconv
 endif

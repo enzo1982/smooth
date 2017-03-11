@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,22 +22,43 @@
 #include <smooth/foreach.h>
 #include <smooth/version.h>
 
+#include <curl/curl.h>
+
 #include <time.h>
+#include <stdlib.h>
+
+namespace smooth
+{
+	namespace Net
+	{
+		namespace Protocols
+		{
+			size_t	 httpHeader(char *, size_t, size_t, void *);
+			size_t	 httpWrite(char *, size_t, size_t, void *);
+			int	 httpProgress(void *, double, double, double, double);
+		};
+	};
+};
 
 S::Net::Protocols::Protocol *CreateProtocolHTTP(const S::String &iURL)
 {
 	return new S::Net::Protocols::HTTP(iURL);
 }
 
-S::Int	 protocolHTTPTmp = S::Net::Protocols::Protocol::AddProtocol(&CreateProtocolHTTP, L"http://");
+S::Int	 protocolHTTPTmp  = S::Net::Protocols::Protocol::AddProtocol(&CreateProtocolHTTP, L"http://");
+S::Int	 protocolHTTPSTmp = S::Net::Protocols::Protocol::AddProtocol(&CreateProtocolHTTP, L"https://");
 
 S::Net::Protocols::HTTP::HTTP(const String &iURL) : Protocol(iURL)
 {
 	mode	  = HTTP_METHOD_GET;
-	port	  = 80;
 
 	proxyMode = HTTP_PROXY_NONE;
 	proxyPort = 0;
+
+	out	  = NIL;
+
+	ulStart	  = 0;
+	dlStart	  = 0;
 }
 
 S::Net::Protocols::HTTP::~HTTP()
@@ -145,211 +166,15 @@ S::String S::Net::Protocols::HTTP::GetResponseHeaderField(const String &key) con
 
 S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 {
-	if (DecodeURL() == Error()) return Error();
-
-	Bool		 error	= False;
-	Bool		 cancel	= False;
-	IO::Driver	*socket	= NIL;
-
-	/* Create a connection to the server or proxy
+	/* Create a cURL context.
 	 */
-	if	(proxyMode == HTTP_PROXY_NONE)	 socket = new IO::DriverSocket(server, port);
-	else if (proxyMode == HTTP_PROXY_HTTP)	 socket = new IO::DriverSocket(proxy, proxyPort);
-	else if (proxyMode == HTTP_PROXY_HTTPS)	 socket = new IO::DriverHTTPS(proxy, proxyPort, server, port, proxyUser, proxyPass);
-	else if (proxyMode == HTTP_PROXY_SOCKS4) socket = new IO::DriverSOCKS4(proxy, proxyPort, server, port);
-	else if (proxyMode == HTTP_PROXY_SOCKS5) socket = new IO::DriverSOCKS5(proxy, proxyPort, server, port, proxyUser, proxyPass);
+	Bool	 error = False;
+	CURL	*curl  = curl_easy_init();
 
-	if (socket == NIL) return Error();
+	if (!curl) return Error();
 
-	IO::InStream	*in	= new IO::InStream(IO::STREAM_DRIVER, socket);
-	IO::OutStream	*out	= new IO::OutStream(IO::STREAM_STREAM, in);
-
-	out->SetPackageSize(1024);
-
-	downloadProgress.Emit(0);
-	downloadSpeed.Emit(NIL);
-
-	if (in->GetLastError() != IO::IO_ERROR_OK) { delete in; delete out; delete socket; return Error(); }
-
-	Buffer<UnsignedByte>	&buffer = ComposeHTTPRequest();
-
-	uploadProgress.Emit(0);
-	uploadSpeed.Emit(NIL);
-
-	Int	 startTicks	= clock();
-	Int	 percent	= 0;
-
-	for (Int i = 0; i < buffer.Size(); i += 1024)
-	{
-		if (doCancelDownload.Call())								 { cancel = True; break; }
-		if (!out->OutputData(((UnsignedByte *) buffer) + i, Math::Min(1024, buffer.Size() - i))) { error  = True; break; }
-
-		if (Math::Round(1000.0 * i / buffer.Size()) != percent)
-		{
-			percent = Math::Round(1000.0 * i / buffer.Size());
-
-			uploadProgress.Emit(percent);
-			uploadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
-		}
-	}
-
-	out->Flush();
-
-	uploadProgress.Emit(1000);
-
-	if (error)  { delete in; delete out; delete socket; return Error(); }
-	if (cancel) { delete in; delete out; delete socket; return Success(); }
-
-	S::File(fileName).Delete();
-
-	/* Read header fields first.
+	/* Set HTTP method.
 	 */
-	Int	 responseCode = -1;
-
-	while (true)
-	{
-		String	 str = in->InputLine();
-
-		if (str.StartsWith("HTTP/1."))
-		{
-			responseCode = str.SubString(9, 3).ToInt();
-		}
-		else if (str.Contains(":"))
-		{
-			Parameter	 field;
-			Int		 colon	= str.Find(":");
-
-			field.key	= str.Head(colon);
-			field.value	= str.Tail(str.Length() - colon - 2);
-
-			responseFields.Add(field);
-		}
-
-		if (str == NIL) break;
-	}
-
-	if (responseCode >= 100 && responseCode <= 199)  { delete in; delete out; delete socket; return Success(); }
-	if (responseCode >= 300 && responseCode <= 399)  { delete in; delete out; delete socket; return Success(); }
-	if (responseCode >= 400 && responseCode <= 599)  { delete in; delete out; delete socket; return Error(); }
-
-	String	 encoding = GetResponseHeaderField("Transfer-Encoding");
-	Int	 bytes = GetResponseHeaderField("Content-Length").ToInt();
-
-	/* Continue to read data.
-	 */
-	while (true)
-	{
-		if (encoding == "chunked")
-		{
-			String	 str = in->InputLine();
-
-			bytes = (Int64) Number::FromHexString(str);
-
-			if (bytes == 0) break;
-		}
-
-		IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, fileName, IO::OS_APPEND);
-		UnsignedByte	*buffer		= new UnsignedByte [1024];
-		Int		 startTicks	= clock();
-
-		if (bytes > 0)
-		{
-			Int	 percent = 0;
-
-			for (Int i = 0; i < bytes; i += 1024)
-			{
-				if (doCancelDownload.Call()) { cancel = True; break; }
-
-				in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
-				fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
-
-				if (Math::Round(1000.0 * i / bytes) != percent)
-				{
-					percent = Math::Round(1000.0 * i / bytes);
-
-					downloadProgress.Emit(percent);
-					downloadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
-				}
-			}
-		}
-		else
-		{
-			Int	 total = 0;
-
-			do
-			{
-				if (doCancelDownload.Call()) { cancel = True; break; }
-
-				bytes = in->InputData((Void *) buffer, 1024);
-				fOut->OutputData((Void *) buffer, bytes);
-
-				total += bytes;
-
-				downloadSpeed.Emit(String::FromInt(Math::Round((total / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
-			}
-			while (bytes > 0);
-		}
-
-		delete [] buffer;
-		delete fOut;
-
-		if (cancel) break;
-
-		if (encoding == "chunked") in->InputLine();
-		else			   break;
-	}
-
-	downloadProgress.Emit(1000);
-
-	delete in;
-	delete out;
-	delete socket;
-
-	if (!error) return Success();
-	else	    return Error();
-}
-
-S::Errors::Error S::Net::Protocols::HTTP::DecodeURL()
-{
-	if (!url.StartsWith("http://")) return Error();
-
-	server	= NIL;
-	path	= NIL;
-	port	= 80;
-
-	Int	 i, j;
-
-	for (i = 7; i < url.Length(); i++)
-	{
-		if (url[i] == '/' || url[i] == ':') break;
-
-		server[i - 7] = url[i];
-	}
-
-	if (url[i] == ':')
-	{
-		String	 portString;
-
-		for (i = i + 1; i < url.Length(); i++)
-		{
-			if (url[i] == '/') break;
-
-			portString[i - server.Length() - 8] = url[i];
-		}
-
-		port = portString.ToInt();
-	}
-
-	for (j = i; j < url.Length(); j++)
-	{
-		path[j - i] = url[j];
-	}
-
-	return Success();
-}
-
-S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest()
-{
 	for (Int i = 0; i < requestParameters.Length(); i++)
 	{
 		if (requestParameters.GetNth(i).isFile) { mode = HTTP_METHOD_POST; break; }
@@ -357,23 +182,26 @@ S::Buffer<S::UnsignedByte> &S::Net::Protocols::HTTP::ComposeHTTPRequest()
 
 	if (content != NIL) mode = HTTP_METHOD_POST;
 
-	if	(mode == HTTP_METHOD_GET)  ComposeGETRequest();
-	else if (mode == HTTP_METHOD_POST) ComposePOSTRequest();
+	if	(mode == HTTP_METHOD_POST) curl_easy_setopt(curl, CURLOPT_POST, 1L);
+	else if (mode == HTTP_METHOD_GET)  curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
 
-	return requestBuffer;
-}
+	/* Set parameters.
+	 */
+	String		 url	 = this->url;
+	curl_slist	*headers = NULL;
 
-S::Void S::Net::Protocols::HTTP::ComposeGETRequest()
-{
-	String	 header = ComposeHeader();
+	if (requestParameters.Length() > 0)
+	{
+		if	(mode == HTTP_METHOD_GET)  url.Append("?").Append(GetParametersURLEncoded());
+		else if (mode == HTTP_METHOD_POST) curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (char *) GetParametersURLEncoded());
+	}
 
-	requestBuffer.Resize(header.Length());
+	/* Set headers.
+	 */
+	foreach (const Parameter &field, requestFields) headers = curl_slist_append(headers, String(field.key).Append(": ").Append(field.value));
 
-	for (Int i = 0; i < header.Length(); i++) requestBuffer[i] = header[i];
-}
-
-S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
-{
+	/* Check to see if we are to transfer any files.
+	 */
 	Bool	 haveFiles = False;
 
 	for (Int i = 0; i < requestParameters.Length(); i++)
@@ -381,132 +209,147 @@ S::Void S::Net::Protocols::HTTP::ComposePOSTRequest()
 		if (requestParameters.GetNth(i).isFile) { haveFiles = True; break; }
 	}
 
-	S::File		 tempFile = S::System::System::GetTempDirectory().Append("httprequest.temp");
-	IO::OutStream	*out = new IO::OutStream(IO::STREAM_FILE, tempFile, IO::OS_REPLACE);
-
-	String		 contentType;
+	/* Set content.
+	 */
+	Buffer<UnsignedByte>	 postBuffer;
 
 	if (content != NIL)
 	{
-		contentType = "text/plain; charset=UTF-8";
+		headers = curl_slist_append(headers, "Content-Type: text/plain; charset=UTF-8");
 
-		String	 outputFormat = String::SetOutputFormat("UTF-8");
-
-		out->OutputString(content);
-
-		String::SetOutputFormat(outputFormat);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (char *) content.ConvertTo("UTF-8"));
 	}
-	else if (!haveFiles)
-	{
-		contentType = "application/x-www-form-urlencoded";
-
-		out->OutputString(GetParametersURLEncoded());
-	}
-	else
+	else if (haveFiles)
 	{
 		String	 separator = "THIS_STRING_SEPARATES";
 
-		contentType = String("multipart/form-data; boundary=").Append(separator);
+		headers = curl_slist_append(headers, String("Content-Type: multipart/form-data; boundary=").Append(separator));
 
-		out->OutputString(String("--").Append(separator).Append("\r\n"));
-		out->OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\r\n\r\n");
-		out->OutputString("1000000\r\n");
+		/* Write contents to temporary output file.
+		 */
+		static time_t	 timer = 0;
 
-		for (Int i = 0; i < requestParameters.Length(); i++)
+		if (timer == 0) srand((unsigned) time(&timer));
+
+		S::File			 tempFile = S::System::System::GetTempDirectory().Append("httprequest-").Append(Number((Int64) rand()).ToHexString()).Append(".temp");
+		IO::OutStream		 out(IO::STREAM_FILE, tempFile, IO::OS_REPLACE);
+
+		out.OutputString(String("--").Append(separator).Append("\r\n"));
+		out.OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\r\n\r\n");
+		out.OutputString("1000000\r\n");
+
+		foreach (const Parameter &parameter, requestParameters)
 		{
-			out->OutputString(String("--").Append(separator).Append("\r\n"));
-
-			const Parameter	&parameter = requestParameters.GetNth(i);
+			out.OutputString(String("--").Append(separator).Append("\r\n"));
 
 			if (!parameter.isFile)
 			{
-				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"\r\n\r\n"));
-				out->OutputString(String(parameter.value).Append("\r\n"));
+				out.OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"\r\n\r\n"));
+				out.OutputString(String(parameter.value).Append("\r\n"));
 			}
 			else
 			{
-				out->OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"; filename=\"").Append(parameter.value).Append("\"\r\n\r\n"));
+				out.OutputString(String("Content-Disposition: form-data; name=\"").Append(parameter.key).Append("\"; filename=\"").Append(parameter.value).Append("\"\r\n\r\n"));
 
-				IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, parameter.value, IO::IS_READ);
+				IO::InStream	 in(IO::STREAM_FILE, parameter.value, IO::IS_READ);
 
-				for (Int j = 0; j < in->Size(); j++) out->OutputNumber(in->InputNumber(1), 1);
+				for (Int i = 0; i < in.Size(); i++) out.OutputNumber(in.InputNumber(1), 1);
 
-				delete in;
-
-				out->OutputString("\r\n");
+				out.OutputString("\r\n");
 			}
 		}
 
-		out->OutputString(String("--").Append(separator).Append("--"));
+		out.OutputString(String("--").Append(separator).Append("--"));
+
+		out.Close();
+
+		/* Read contents into buffer.
+		 */
+		IO::InStream		 in(IO::STREAM_FILE, tempFile, IO::IS_READ);
+
+		postBuffer.Resize(in.Size());
+
+		for (Int i = 0; i < in.Size(); i++) postBuffer[i] = in.InputNumber(1);
+
+		in.Close();
+
+		tempFile.Delete();
+
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, postBuffer.Size());
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (char *) (UnsignedByte *) postBuffer);
 	}
+
+	/* Set URL and basic parameters.
+	 */
+	curl_easy_setopt(curl, CURLOPT_URL, (char *) url);
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+
+	/* Set proxy information.
+	 */
+	if (proxyMode != HTTP_PROXY_NONE)
+	{
+		curl_easy_setopt(curl, CURLOPT_PROXY, (char *) proxy);
+		curl_easy_setopt(curl, CURLOPT_PROXYPORT, proxyPort);
+
+		char	*curlProxyUser = curl_easy_escape(curl, proxyUser, 0);
+		char	*curlProxyPass = curl_easy_escape(curl, proxyPass, 0);
+
+		curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, (char *) String(curlProxyUser).Append(":").Append(curlProxyPass));
+
+		curl_free(curlProxyUser);
+		curl_free(curlProxyPass);
+
+		if	(proxyMode == HTTP_PROXY_HTTP)	 curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+
+#if defined CURLPROXY_HTTPS
+		else if (proxyMode == HTTP_PROXY_HTTPS)	 curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTPS);
+#endif
+
+#if defined CURLPROXY_SOCKS4A
+		else if (proxyMode == HTTP_PROXY_SOCKS4) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4A);
+#else
+		else if (proxyMode == HTTP_PROXY_SOCKS4) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4);
+#endif
+
+#if defined CURLPROXY_SOCKS5_HOSTNAME
+		else if (proxyMode == HTTP_PROXY_SOCKS5) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5_HOSTNAME);
+#else
+		else if (proxyMode == HTTP_PROXY_SOCKS5) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+#endif
+	}
+
+	/* Set callback functions.
+	 */
+	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &httpHeader);
+	curl_easy_setopt(curl, CURLOPT_HEADERDATA, this);
+
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &httpWrite);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+
+	curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, &httpProgress);
+	curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, this);
+
+	/* Setup files and issue request.
+	 */
+	ulStart	= 0;
+	dlStart	= 0;
+
+	file	= fileName;
+	out	= new IO::OutStream(IO::STREAM_FILE, fileName, IO::OS_REPLACE);
+
+	if (curl_easy_perform(curl) != CURLE_OK) error = True;
 
 	delete out;
 
-	IO::InStream	*in = new IO::InStream(IO::STREAM_FILE, tempFile, IO::IS_READ);
-
-	SetHeaderField("Content-Length", String::FromInt(in->Size()));
-	SetHeaderField("Content-Type", contentType);
-
-	String	 header = ComposeHeader();
-
-	requestBuffer.Resize(header.Length() + in->Size());
-
-	for (Int i = 0; i < header.Length(); i++) requestBuffer[i] = header[i];
-	for (Int i = 0; i < in->Size(); i++) requestBuffer[header.Length() + i] = in->InputNumber(1);
-
-	delete in;
-
-	tempFile.Delete();
-}
-
-S::String S::Net::Protocols::HTTP::ComposeHeader()
-{
-	String	 str;
-
-	if	(mode == HTTP_METHOD_GET)  str.Append("GET ");
-	else if (mode == HTTP_METHOD_POST) str.Append("POST ");
-
-	/* Prepend http:// prefix and server domain to path if an HTTP proxy is used
+	/* Clean up.
 	 */
-	if (proxyMode == HTTP_PROXY_HTTP)
-	{
-		str.Append("http://").Append(server);
+	curl_slist_free_all(headers);
+	curl_easy_cleanup(curl);
 
-		if (port != 80) str.Append(":").Append(String::FromInt(port));
-	}
-
-	str.Append(path);
-
-	if (mode == HTTP_METHOD_GET && requestParameters.Length() > 0)
-	{
-		str.Append("?");
-		str.Append(GetParametersURLEncoded());
-	}
-
-	str.Append(" HTTP/1.1\r\n");
-
-	if (port == 80)	SetHeaderField("Host", server);
-	else		SetHeaderField("Host", String(server).Append(":").Append(String::FromInt(port)));
-
-	if (GetHeaderField("User-Agent") == NIL) SetHeaderField("User-Agent", String("smooth/").Append(SMOOTH_VERSION));
-
-	/* Add proxy authorization if requested
-	 */
-	if (proxyMode == HTTP_PROXY_HTTP && proxyUser != NIL)
-	{
-		SetHeaderField("Proxy-Authorization", String("Basic ").Append(String(String(proxyUser).Append(":").Append(proxyPass)).EncodeBase64()));
-	}
-
-	for (Int i = 0; i < requestFields.Length(); i++)
-	{
-		const Parameter	&field = requestFields.GetNth(i);
-
-		str.Append(field.key).Append(": ").Append(field.value).Append("\r\n");
-	}
-
-	str.Append("\r\n");
-
-	return str;
+	if (!error) return Success();
+	else	    return Error();
 }
 
 S::String S::Net::Protocols::HTTP::GetParametersURLEncoded() const
@@ -523,4 +366,80 @@ S::String S::Net::Protocols::HTTP::GetParametersURLEncoded() const
 	}
 
 	return str;
+}
+
+size_t S::Net::Protocols::httpHeader(char *buffer, size_t size, size_t n, void *data)
+{
+	HTTP	*http = (HTTP *) data;
+
+	/* Cancel request if requested.
+	 */
+	if (http->doCancelDownload.Call()) return 0;
+
+	/* Get data as string.
+	 */
+	String	 header;
+
+	for (UnsignedInt i = 0; i < size * n; i++) header[i] = buffer[i];
+
+	/* Handle headers.
+	 */
+	if (header.StartsWith("HTTP/1."))
+	{
+		/* Reset output stream when we get a new HTTP response.
+		 */
+		delete http->out;
+
+		http->out = new IO::OutStream(IO::STREAM_FILE, http->file, IO::OS_REPLACE);
+
+		http->responseFields.RemoveAll();
+	}
+	else if (header.Contains(": "))
+	{
+		Parameter	 field;
+		Int		 colon	= header.Find(": ");
+
+		field.key	= header.Head(colon);
+		field.value	= header.Tail(header.Length() - colon - 2);
+
+		http->responseFields.Add(field);
+	}
+
+	return size * n;
+}
+
+size_t S::Net::Protocols::httpWrite(char *buffer, size_t size, size_t n, void *data)
+{
+	HTTP	*http = (HTTP *) data;
+
+	/* Cancel download if requested.
+	 */
+	if (http->doCancelDownload.Call()) return 0;
+
+	/* Write data to output file.
+	 */
+	http->out->OutputData(buffer, size * n);
+
+	return size * n;
+}
+
+int S::Net::Protocols::httpProgress(void *data, double dlTotal, double dlNow, double ulTotal, double ulNow)
+{
+	HTTP	*http = (HTTP *) data;
+
+	if (ulNow > 0 && http->ulStart == 0) http->ulStart = System::System::Clock();
+	if (dlNow > 0 && http->dlStart == 0) http->dlStart = System::System::Clock();
+
+	if (http->dlStart == 0)
+	{
+		if (ulTotal > 0) http->uploadProgress.Emit(Math::Round(1000.0 * ulNow / ulTotal));
+		if (ulNow   > 0) http->uploadSpeed.Emit(String::FromInt(Math::Round((ulNow / 1024) / (Float(System::System::Clock() - http->ulStart) / 1000))).Append(" kB/s"));
+	}
+	else
+	{
+		if (dlTotal > 0) http->downloadProgress.Emit(Math::Round(1000.0 * dlNow / dlTotal));
+		if (dlNow   > 0) http->downloadSpeed.Emit(String::FromInt(Math::Round((dlNow / 1024) / (Float(System::System::Clock() - http->dlStart) / 1000))).Append(" kB/s"));
+	}
+
+	return 0;
 }

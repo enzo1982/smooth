@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -240,8 +240,7 @@ S::Int64 S::IO::InStream::InputNumber(Int bytes)	// Intel byte order DCBA
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		if (bytes > 4) rval += dataBuffer[currentBufferPos] * (1LL << (i * 8));
-		else	       rval += dataBuffer[currentBufferPos] * (1   << (i * 8));
+		rval += dataBuffer[currentBufferPos] * (1LL << (i * 8));
 
 		currentBufferPos++;
 		currentFilePos++;
@@ -268,8 +267,7 @@ S::Int64 S::IO::InStream::InputNumberRaw(Int bytes)	// Raw byte order ABCD
 			if (!ReadData()) { lastError = IO_ERROR_NODATA; return -1; }
 		}
 
-		if (bytes > 4) rval += dataBuffer[currentBufferPos] * (1LL << (i * 8));
-		else	       rval += dataBuffer[currentBufferPos] * (1   << (i * 8));
+		rval += dataBuffer[currentBufferPos] * (1LL << (i * 8));
 
 		currentBufferPos++;
 		currentFilePos++;

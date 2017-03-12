@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -101,7 +101,7 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 	hasSSE4a    = data.flags[CPU_FEATURE_SSE4A];
 
 	hasAVX	    = data.flags[CPU_FEATURE_AVX];
-	hasAVX	    = data.flags[CPU_FEATURE_AVX2];
+	hasAVX2	    = data.flags[CPU_FEATURE_AVX2];
 
 	has3DNow    = data.flags[CPU_FEATURE_3DNOW];
 	has3DNowExt = data.flags[CPU_FEATURE_3DNOWEXT];

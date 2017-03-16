@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -86,16 +86,25 @@ S::Bool S::GUI::BitmapXLib::CreateBitmap(const Size &nSize, Int nDepth)
 	if (nDepth == -1)		  nDepth = XDefaultDepth(display, XDefaultScreen(display));
 	if (nDepth != 24 && nDepth != 32) nDepth = 24;
 
+	/* Find best fit for pixel format.
+	 */
 	int			 count	 = 0;
-	int			 index	 = -1;
+	int			 index	 = 0;
 	XPixmapFormatValues	*formats = XListPixmapFormats(display, &count);
 
-	for (int i = 0; i < count; i++) if (formats[i].depth == nDepth) { index = i; break; }
+	for (Int i = 0; i < count; i++)
+	{
+		if (Math::Abs(formats[i].depth - nDepth) < Math::Abs(formats[index].depth - nDepth)) index = i;
 
+		if (formats[i].depth == nDepth) break;
+	}
+
+	/* Allocate and create image.
+	 */
 	bytes	= new UnsignedByte [nSize.cy * nSize.cx * (formats[index].bits_per_pixel / 8) + nSize.cy * (((nSize.cx * formats[index].bits_per_pixel) % formats[index].scanline_pad) / 8)];
 	bitmap	= XCreateImage(display, XDefaultVisual(display, XDefaultScreen(display)), formats[index].depth, ZPixmap, 0, (char *) bytes, nSize.cx, nSize.cy, formats[index].scanline_pad, 0);
 
-	if (bitmap == NIL) { delete [] (UnsignedByte *) bytes; return False; }
+	if (bitmap == NIL) { delete [] (UnsignedByte *) bytes; XFree(formats); return False; }
 
 	size	= nSize;
 	depth	= formats[index].depth;

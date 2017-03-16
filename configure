@@ -4,10 +4,10 @@ echo "the following prerequisites are met before running make:"
 echo
 echo "    On Linux, *BSD, Solaris, Hurd:"
 echo
-echo "        - libbz2 development package"
+echo "        - libbz2 / libbzip2 development package"
 echo "        - libcurl development package"
 echo "        - libfribidi development package"
-echo "        - libgtk-3 development package"
+echo "        - libgtk+3.0 development package"
 echo "        - libjpeg development package"
 echo "        - libxml2 development package"
 echo "        - libxmu development package"

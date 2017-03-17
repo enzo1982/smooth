@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -168,7 +168,7 @@ S::DateTime S::File::GetCreationTime() const
 	SYSTEMTIME	 time;
 #else
 	time_t		 fileTime;
-	tm		*time;
+	tm		 time;
 #endif
 
 	if (GetFileTime(*this, &fileTime, NIL, NIL) == Error()) return dateTime;
@@ -179,10 +179,10 @@ S::DateTime S::File::GetCreationTime() const
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
 #else
-	time = localtime(&fileTime);
+	localtime_r(&fileTime, &time);
 
-	dateTime.SetYMD(time->tm_year, time->tm_mon, time->tm_mday);
-	dateTime.SetHMS(time->tm_hour, time->tm_min, time->tm_sec);
+	dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
+	dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
 #endif
 
 	return dateTime;
@@ -197,7 +197,7 @@ S::DateTime S::File::GetAccessTime() const
 	SYSTEMTIME	 time;
 #else
 	time_t		 fileTime;
-	tm		*time;
+	tm		 time;
 #endif
 
 	if (GetFileTime(*this, NIL, &fileTime, NIL) == Error()) return dateTime;
@@ -208,10 +208,10 @@ S::DateTime S::File::GetAccessTime() const
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
 #else
-	time = localtime(&fileTime);
+	localtime_r(&fileTime, &time);
 
-	dateTime.SetYMD(time->tm_year, time->tm_mon, time->tm_mday);
-	dateTime.SetHMS(time->tm_hour, time->tm_min, time->tm_sec);
+	dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
+	dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
 #endif
 
 	return dateTime;
@@ -226,7 +226,7 @@ S::DateTime S::File::GetWriteTime() const
 	SYSTEMTIME	 time;
 #else
 	time_t		 fileTime;
-	tm		*time;
+	tm		 time;
 #endif
 
 	if (GetFileTime(*this, NIL, NIL, &fileTime) == Error()) return dateTime;
@@ -237,10 +237,10 @@ S::DateTime S::File::GetWriteTime() const
 	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
 	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
 #else
-	time = localtime(&fileTime);
+	localtime_r(&fileTime, &time);
 
-	dateTime.SetYMD(time->tm_year, time->tm_mon, time->tm_mday);
-	dateTime.SetHMS(time->tm_hour, time->tm_min, time->tm_sec);
+	dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
+	dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
 #endif
 
 	return dateTime;

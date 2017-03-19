@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -347,14 +347,14 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 					 (font.GetStyle() & Font::Underline ? B_UNDERSCORE_FACE : 0) |
 					 (font.GetStyle() & Font::StrikeOut ? B_STRIKEOUT_FACE  : 0) |
 					 (font.GetWeight() >= Font::Bold    ? B_BOLD_FACE       : 0));
-			viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0));
+			viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
 
 			view->SetFont(&viewFont);
 			view->GetFontHeight(&height);
 
 			view->SetDrawingMode(B_OP_OVER);
 			view->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
-			view->MovePenTo(BPoint(tRect.left, tRect.top + height.ascent * fontSize.TranslateY(96) / 72.0));
+			view->MovePenTo(BPoint(tRect.left, tRect.top + height.ascent));
 			view->DrawString(line.ConvertTo("UTF-8"));
 			view->SetDrawingMode(B_OP_COPY);
 		}
@@ -367,14 +367,14 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 				 (font.GetStyle() & Font::Underline ? B_UNDERSCORE_FACE : 0) |
 				 (font.GetStyle() & Font::StrikeOut ? B_STRIKEOUT_FACE  : 0) |
 				 (font.GetWeight() >= Font::Bold    ? B_BOLD_FACE       : 0));
-		viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0));
+		viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
 
 		bitmapView->SetFont(&viewFont);
 		bitmapView->GetFontHeight(&height);
 
 		bitmapView->SetDrawingMode(B_OP_OVER);
 		bitmapView->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
-		bitmapView->MovePenTo(BPoint(tRect.left, tRect.top + height.ascent * fontSize.TranslateY(96) / 72.0));
+		bitmapView->MovePenTo(BPoint(tRect.left, tRect.top + height.ascent));
 		bitmapView->DrawString(line.ConvertTo("UTF-8"));
 		bitmapView->SetDrawingMode(B_OP_COPY);
 

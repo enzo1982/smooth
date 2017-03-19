@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,9 +41,9 @@ S::GUI::Size S::GUI::FontHaiku::GetTextSize(const String &text) const
 	font.SetFamilyAndStyle(fontName, NULL);
 	font.SetFace((fontStyle & Font::Italic ? B_ITALIC_FACE : 0) |
 		     (fontWeight >= Font::Bold ? B_BOLD_FACE   : 0));
-	font.SetSize(Math::Round(fontSize * dpi / 96.0));
+	font.SetSize(Math::Round(fontSize * dpi / 72.0));
 
 	font.GetHeight(&height);
 
-	return Size(font.StringWidth(text.ConvertTo("UTF-8")), Math::Ceil((height.ascent + height.descent + height.leading) * 96.0 / 72.0));
+	return Size(font.StringWidth(text.ConvertTo("UTF-8")), Math::Ceil(height.ascent + height.descent));
 }

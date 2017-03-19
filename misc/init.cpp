@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -26,6 +26,7 @@
 #	include <smooth/backends/win32/backendwin32.h>
 #elif defined __HAIKU__
 #	include <interface/InterfaceDefs.h>
+#	include <interface/Font.h>
 #else
 #	include <unistd.h>
 #	include <stdio.h>
@@ -284,7 +285,11 @@ S::Void S::GetDefaultFont()
 #elif defined __APPLE__
 	GUI::Font::Default = "Arial";
 #elif defined __HAIKU__
-	GUI::Font::Default = "DejaVu Sans";
+	font_family	 family;
+
+	be_plain_font->GetFamilyAndStyle(&family, NIL);
+
+	GUI::Font::Default = family;
 #else
 	GUI::Font::Default = "Helvetica";
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,7 @@
 #include <smooth/system/backends/haiku/eventhaiku.h>
 #include <smooth/gui/window/backends/haiku/windowhaiku.h>
 #include <smooth/templates/nonblocking.h>
+#include <smooth/foreach.h>
 
 #include <Application.h>
 #include <Window.h>
@@ -45,10 +46,10 @@ S::Void S::System::EventHaiku::EnqueueMessage(Void *window, const BMessage &curr
 	 */
 	if (messageID == B_MOUSE_MOVED || messageID == B_WINDOW_RESIZED)
 	{
-		for (Int i = messages.Length() - 1; i >= 0; i--)
+		foreachreverse (Message *message, messages)
 		{
-			if (messages.GetNth(i)->window	  == window &&
-			    messages.GetNth(i)->messageID == messageID) messages.RemoveNth(i);
+			if (message->window    == window &&
+			    message->messageID == messageID) { messages.RemoveNth(foreachindex); delete message; }
 		}
 	}
 
@@ -93,10 +94,10 @@ S::Int S::System::EventHaiku::ProcessNextEvent()
 	{
 		/* Check for a message and process it.
 		 */
+		messages.LockForWrite();
+
 		if (messages.Length() > 0)
 		{
-			messages.LockForWrite();
-
 			/* Get first message.
 			 */
 			Message	*message = messages.GetFirst();
@@ -114,6 +115,8 @@ S::Int S::System::EventHaiku::ProcessNextEvent()
 
 			break;
 		}
+
+		messages.Unlock();
 
 		/* Allow timeouts to be processed.
 		 */

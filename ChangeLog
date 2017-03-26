@@ -22,6 +22,7 @@ xx.yy.zz xx:yy - smooth alpha 0.8.73.0
 			- added support for HTTPS
 - listentry.cpp		- added static member: tabDelimiter, use it to delimit list entry tabs
 			- tab delimiter changed from horizontal to vertical tab character
+- cursor.cpp		- performance improvements
 
 - ported to Haiku OS
 - removed support for QNX

@@ -519,15 +519,23 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 	return Error();
 }
 
+const S::String &S::I18n::Translator::TranslateString(const String &string)
+{
+	const String	&translation = activeLanguage->GetString(string);
+
+	if (translation == NIL)	return string;
+	else			return translation;
+}
+
 const S::String &S::I18n::Translator::TranslateString(const String &string, const String &context)
 {
 	String	 prevContext = activeLanguage->GetContext();
 
-	if (context != NIL) activeLanguage->SetContext(context);
+	activeLanguage->SetContext(context);
 
 	const String	&translation = activeLanguage->GetString(string);
 
-	if (context != NIL) activeLanguage->SetContext(prevContext);
+	activeLanguage->SetContext(prevContext);
 
 	if (translation == NIL)	return string;
 	else			return translation;

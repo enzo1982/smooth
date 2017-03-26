@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -122,17 +122,17 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 					for (Int i = 0; i <= length; i++)
 					{
+						wText[i - wPromptPos] = text[i];
+
 						if (text[i] == '\n' || text[i] == 0)
 						{
 							wText[i - wPromptPos] = 0;
 
 							if (lineCount - scrollPos == line) break;
 
-							wPromptPos = i;
+							wPromptPos = i + 1;
 							lineCount++;
 						}
-
-						wText[i - wPromptPos] = text[i];
 					}
 				}
 
@@ -314,17 +314,17 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 						for (Int i = 0; i <= length; i++)
 						{
+							wText[i - wPromptPos] = text[i];
+
 							if (text[i] == '\n' || text[i] == 0)
 							{
 								wText[i - wPromptPos] = 0;
 
 								if (lineCount - scrollPos == line) break;
 
-								wPromptPos = i;
+								wPromptPos = i + 1;
 								lineCount++;
 							}
-
-							wText[i - wPromptPos] = text[i];
 						}
 
 						if (lineCount - scrollPos != line) wPromptPos = -1;
@@ -368,6 +368,20 @@ S::Int S::GUI::Cursor::DrawWidget()
 		onScroll.Emit(scrollPos, maxScrollPos);
 	}
 
+	Int	 textLength = text.Length();
+
+	if (lineIndices.Length() == 0)
+	{
+		lineIndices.Add(0);
+
+		for (Int i = 0; i <= textLength; i++)
+		{
+			if (text[i] != '\n' && text[i] != 0) continue;
+
+			lineIndices.Add(i + 1);
+		}
+	}
+
 	Surface	*surface = GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 	Rect	 frame	 = Rect(realPos, GetRealSize());
@@ -376,151 +390,117 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 	surface->Box(frame, GetBackgroundColor(), Rect::Filled);
 
-	String	 line;
+	Int	 lineNumber = scrollPos;
 
-	Bool	 fillLineIndices = (lineIndices.Length() == 0);
-	Int	 lineNumber	 = (fillLineIndices ? 0 : scrollPos);
-	Int	 lineStart	 = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos));
-
-	Int	 textLength	 = text.Length();
-
-	if (fillLineIndices) lineIndices.Add(0);
-
-	for (Int i = (fillLineIndices ? 0 : lineIndices.GetNth(scrollPos)); i <= textLength; i++)
+	for (Int lineStart = lineIndices.GetNth(lineNumber); lineStart <= textLength; lineStart = lineIndices.GetNth(++lineNumber))
 	{
-		/* Check if the line is above the first visible line due to scrolling
-		 */
-		if (lineNumber < scrollPos)
+		if ((lineNumber - scrollPos) * (font.GetUnscaledTextSizeY() + 3) >= frame.GetHeight()) break;
+
+		Int	 lineLength = lineIndices.GetNth(lineNumber + 1) - lineStart - 1;
+		String	 line	    = text.SubString(lineStart, lineLength);
+
+		if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
+		else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
+
+		if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
 		{
-			if (text[i] == '\n' || text[i] == 0)
+			Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
+			Int	 lineMarkEnd   = Math::Min(lineLength, Math::Max(markStart, markEnd) - lineStart);
+
+			if (lineMarkStart < lineLength && lineMarkEnd > 0)
 			{
-				lineStart = i + 1;
-				lineNumber++;
+				Array<Int>	 markRegionStarts;
+				Array<Int>	 markRegionEnds;
 
-				lineIndices.Add(lineStart);
-			}
-
-			continue;
-		}
-
-		line[i - lineStart] = text[i];
-
-		if (text[i] == '\n' || text[i] == 0)
-		{
-			line[i - lineStart] = 0;
-
-			Int	 lineLength = line.Length();
-
-			if ((lineNumber - scrollPos) * (font.GetUnscaledTextSizeY() + 3) >= frame.GetHeight() && !fillLineIndices) break;
-
-			if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
-			else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
-
-			if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
-			{
-				Int	 lineMarkStart = Math::Max(0, Math::Min(markStart, markEnd) - lineStart);
-				Int	 lineMarkEnd   = Math::Min(lineLength, Math::Max(markStart, markEnd) - lineStart);
-
-				if (lineMarkStart < lineLength && lineMarkEnd > 0)
+				if (Setup::useIconv && ContainsRTLCharacters(line))
 				{
-					Array<Int>	 markRegionStarts;
-					Array<Int>	 markRegionEnds;
+					FriBidiStrIndex	 length = lineLength;
 
-					if (Setup::useIconv && ContainsRTLCharacters(line))
-					{
-						FriBidiStrIndex	 length = lineLength;
-
-						/* Get visual positions.
-						 */
-						FriBidiStrIndex	*positions = new FriBidiStrIndex [length + 1];
-						FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
-
-						fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, &type, NIL, positions, NIL, NIL);
-
-						/* Find marked regions in visual string.
-						 */
-						for (Int i = lineMarkStart; i < lineMarkEnd; i++)
-						{
-							Bool	 done = False;
-
-							for (Int j = 0; j < markRegionStarts.Length(); j++)
-							{
-								if	(markRegionStarts.GetNth(j) == positions[i] + 1) { markRegionStarts.SetNth(j, markRegionStarts.GetNth(j) - 1); done = True; break; }
-								else if (markRegionEnds.GetNth(j)   == positions[i]    ) { markRegionEnds.SetNth(j, markRegionEnds.GetNth(j) + 1);     done = True; break; }
-							}
-
-							if (!done)
-							{
-								markRegionStarts.Add(positions[i]);
-								markRegionEnds.Add(positions[i] + 1);
-							}
-						}
-
-						delete [] positions;
-
-						/* Consolidate adjacent regions into one.
-						 */
-						for (Int i = 0; i < markRegionStarts.Length() - 1; i++)
-						{
-							for (Int j = i + 1; j < markRegionStarts.Length(); j++)
-							{
-								if (markRegionStarts.GetNth(i) < markRegionStarts.GetNth(j) &&
-								    markRegionEnds.GetNth(i) >= markRegionStarts.GetNth(j))
-								{
-									markRegionEnds.SetNth(i, markRegionEnds.GetNth(j));
-
-									markRegionStarts.RemoveNth(j);
-									markRegionEnds.RemoveNth(j);
-
-									j--;
-								}
-								else if (markRegionStarts.GetNth(j) < markRegionStarts.GetNth(i) &&
-									 markRegionEnds.GetNth(j) >= markRegionStarts.GetNth(i))
-								{
-									markRegionStarts.SetNth(i, markRegionStarts.GetNth(j));
-
-									markRegionStarts.RemoveNth(j);
-									markRegionEnds.RemoveNth(j);
-
-									j--;
-								}
-							}
-						}
-					}
-					else
-					{
-						markRegionStarts.Add(lineMarkStart);
-						markRegionEnds.Add(lineMarkEnd);
-					}
-
-					/* Draw marked regions.
+					/* Get visual positions.
 					 */
-					for (Int i = 0; i < markRegionStarts.Length(); i++)
+					FriBidiStrIndex	*positions = new FriBidiStrIndex [length + 1];
+					FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+
+					fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, &type, NIL, positions, NIL, NIL);
+
+					/* Find marked regions in visual string.
+					 */
+					for (Int i = lineMarkStart; i < lineMarkEnd; i++)
 					{
-						Int	 markRegionStart = GetDisplayCursorPositionFromVisual(line, markRegionStarts.GetNth(i));
-						Int	 markRegionEnd	 = GetDisplayCursorPositionFromVisual(line, markRegionEnds.GetNth(i));
+						Bool	 done = False;
 
-						Rect	 markRect = Rect(realPos + Point(markRegionStart, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), Size(markRegionEnd - markRegionStart, font.GetScaledTextSizeY() + 3));
-						Font	 nFont = font;
+						for (Int j = 0; j < markRegionStarts.Length(); j++)
+						{
+							if	(markRegionStarts.GetNth(j) == positions[i] + 1) { markRegionStarts.SetNth(j, markRegionStarts.GetNth(j) - 1); done = True; break; }
+							else if (markRegionEnds.GetNth(j)   == positions[i]    ) { markRegionEnds.SetNth(j, markRegionEnds.GetNth(j) + 1);     done = True; break; }
+						}
 
-						nFont.SetColor(Setup::HighlightTextColor);
+						if (!done)
+						{
+							markRegionStarts.Add(positions[i]);
+							markRegionEnds.Add(positions[i] + 1);
+						}
+					}
 
-						surface->StartPaint(markRect);
+					delete [] positions;
 
-						surface->Box(markRect, Setup::HighlightColor, Rect::Filled);
+					/* Consolidate adjacent regions into one.
+					 */
+					for (Int i = 0; i < markRegionStarts.Length() - 1; i++)
+					{
+						for (Int j = i + 1; j < markRegionStarts.Length(); j++)
+						{
+							if (markRegionStarts.GetNth(i) < markRegionStarts.GetNth(j) &&
+							    markRegionEnds.GetNth(i) >= markRegionStarts.GetNth(j))
+							{
+								markRegionEnds.SetNth(i, markRegionEnds.GetNth(j));
 
-						if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
-						else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+								markRegionStarts.RemoveNth(j);
+								markRegionEnds.RemoveNth(j);
 
-						surface->EndPaint();
+								j--;
+							}
+							else if (markRegionStarts.GetNth(j) < markRegionStarts.GetNth(i) &&
+								 markRegionEnds.GetNth(j) >= markRegionStarts.GetNth(i))
+							{
+								markRegionStarts.SetNth(i, markRegionStarts.GetNth(j));
+
+								markRegionStarts.RemoveNth(j);
+								markRegionEnds.RemoveNth(j);
+
+								j--;
+							}
+						}
 					}
 				}
+				else
+				{
+					markRegionStarts.Add(lineMarkStart);
+					markRegionEnds.Add(lineMarkEnd);
+				}
+
+				/* Draw marked regions.
+				 */
+				for (Int i = 0; i < markRegionStarts.Length(); i++)
+				{
+					Int	 markRegionStart = GetDisplayCursorPositionFromVisual(line, markRegionStarts.GetNth(i));
+					Int	 markRegionEnd	 = GetDisplayCursorPositionFromVisual(line, markRegionEnds.GetNth(i));
+
+					Rect	 markRect = Rect(realPos + Point(markRegionStart, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), Size(markRegionEnd - markRegionStart, font.GetScaledTextSizeY() + 3));
+					Font	 nFont = font;
+
+					nFont.SetColor(Setup::HighlightTextColor);
+
+					surface->StartPaint(markRect);
+
+					surface->Box(markRect, Setup::HighlightColor, Rect::Filled);
+
+					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+					else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+
+					surface->EndPaint();
+				}
 			}
-
-			lineStart = i + 1;
-			lineNumber++;
-
-			if (fillLineIndices) lineIndices.Add(lineStart);
 		}
 	}
 
@@ -1325,6 +1305,10 @@ S::Void S::GUI::Cursor::SetIMECursor(Bool newIMECursor)
  */
 S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(Int promptPos) const
 {
+	FriBidiStrIndex	 length = text.Length();
+
+	if (length == 0) return 0;
+
 	String	 wText = text;
 	Int	 wPromptPos = promptPos;
 
@@ -1333,8 +1317,8 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromLogical(Int promptPos) const
 		Int	 lineStart  = promptPos;
 		Int	 lineLength = 0;
 
-		for (Int i = promptPos - 1; i >= 0;		i--) { if (text[i] == '\n')		    break; lineStart--;	 }
-		for (Int i = lineStart;	    i <  text.Length();	i++) { if (text[i] == '\n' || text[i] == 0) break; lineLength++; }
+		for (Int i = promptPos - 1; i >= 0;	 i--) { if (text[i] == '\n')		     break; lineStart--;  }
+		for (Int i = lineStart;	    i <  length; i++) { if (text[i] == '\n' || text[i] == 0) break; lineLength++; }
 
 		wText = text.SubString(lineStart, lineLength);
 		wPromptPos = promptPos - lineStart;
@@ -1416,20 +1400,19 @@ S::Int S::GUI::Cursor::GetLogicalCursorPositionFromDisplay(const String &line, I
 
 	if (length == 0) return 0;
 
-	Int		 bestPos = 0;
-	Int		 bestPosValue = 100000;
+	Int	 bestPos      = 0;
+	Int	 bestPosValue = 100000;
 
 	for (Int i = 0; i <= length; i++)
 	{
 		Int	 pos = GetDisplayCursorPositionFromLogical(line, i);
 
-		if (Math::Abs(pos - displayPos) < bestPosValue)
-		{
-			bestPos = i;
-			bestPosValue = Math::Abs(pos - displayPos);
+		if (Math::Abs(pos - displayPos) >= bestPosValue) continue;
 
-			if (bestPosValue == 0) return i;
-		}
+		bestPos	     = i;
+		bestPosValue = Math::Abs(pos - displayPos);
+
+		if (bestPosValue == 0) break;
 	}
 
 	return bestPos;

@@ -8,6 +8,12 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+/* Define to get 64 bit stat call.
+ */
+#ifndef __WIN32__
+#	define _FILE_OFFSET_BITS 64
+#endif
+
 #include <smooth/files/file.h>
 #include <smooth/files/directory.h>
 #include <smooth/misc/math.h>

@@ -21,6 +21,7 @@
 #include <smooth/init.h>
 
 #include <iconv.h>
+#include <wchar.h>
 #include <memory.h>
 #include <stdlib.h>
 

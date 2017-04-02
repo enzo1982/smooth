@@ -20,6 +20,7 @@
 #ifdef __WIN32__
 #	include <windows.h>
 #else
+#	include <stdio.h>
 #	include <stdlib.h>
 #	include <unistd.h>
 #endif

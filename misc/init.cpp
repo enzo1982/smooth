@@ -30,6 +30,7 @@
 #else
 #	include <unistd.h>
 #	include <stdio.h>
+#	include <stdlib.h>
 #endif
 
 #include <iconv.h>

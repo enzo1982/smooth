@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,8 +16,12 @@
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
 
-#ifdef __WIN32__
+#if defined __WIN32__
 #	include <windows.h>
+#elif defined __HAIKU__
+#	include <Application.h>
+#	include <Roster.h>
+#	include <Path.h>
 #else
 #	include <unistd.h>
 #	include <stdio.h>
@@ -121,16 +125,17 @@ S::String S::GUI::Application::GetApplicationDirectory()
 
 #if defined __WIN32__
 	Buffer<wchar_t>	 buffer(32768 + 1);
-
-	buffer.Zero();
-
-	if (GetModuleFileName(NIL, buffer, buffer.Size() - 1)) applicationDirectory = buffer;
 #else
 	Buffer<char>	 buffer(PATH_MAX + 1);
+#endif
 
 	buffer.Zero();
 
-#if defined __APPLE__
+#if defined __WIN32__
+	/* In Windows, use GetModuleFileName to get the exe file name.
+	 */
+	GetModuleFileName(NIL, buffer, buffer.Size() - 1);
+#elif defined __APPLE__
 	/* In macOS, lsof -p <pid> always returns the path to the current binary in the first txt section.
 	 */
 	FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print substr($0, index($0, $9)) }'"), "r");
@@ -166,13 +171,11 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	 */
 	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
 #elif defined __HAIKU__
-	/* In Haiku, ps lists all processes with full path.
+	/* In Haiku, get the path from application info.
 	 */
-	FILE	*pstdin = popen(String("ps | awk '$2 == \"").Append(String::FromInt(getpid())).Append("\" { print $1 }'"), "r");
+	app_info	 ai;
 
-	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
-
-	pclose(pstdin);
+	if (be_app->GetAppInfo(&ai) == B_OK) applicationDirectory.ImportFrom("UTF-8", BPath(&ai.ref).Path());
 #else
 	/* No system specific way to get the current binary path.
 	 * Try concatenating the startup directory and command.
@@ -201,15 +204,10 @@ S::String S::GUI::Application::GetApplicationDirectory()
 		String::ExplodeFinish();
 	}
 
-	Int	 length	= Math::Min(buffer.Size(), binary.Length() + 1);
-
-	memcpy(buffer, (char *) binary, length);
-
-	buffer[length - 1] = 0;
+	applicationDirectory = binary;
 #endif
 
-	applicationDirectory = buffer;
-#endif
+	if (applicationDirectory == NIL) applicationDirectory = buffer;
 
 	applicationDirectory[applicationDirectory.FindLast(Directory::GetDirectoryDelimiter()) + 1] = 0;
 

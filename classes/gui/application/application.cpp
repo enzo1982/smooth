@@ -13,7 +13,6 @@
 #include <smooth/system/event.h>
 #include <smooth/system/screen.h>
 #include <smooth/files/directory.h>
-#include <smooth/misc/math.h>
 #include <smooth/foreach.h>
 
 #if defined __WIN32__
@@ -22,9 +21,12 @@
 #	include <Application.h>
 #	include <Roster.h>
 #	include <Path.h>
+
+#	include <stdlib.h>
 #else
 #	include <unistd.h>
 #	include <stdio.h>
+#	include <stdlib.h>
 #	include <limits.h>
 
 #	ifndef PATH_MAX
@@ -135,6 +137,8 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	/* In Windows, use GetModuleFileName to get the exe file name.
 	 */
 	GetModuleFileName(NIL, buffer, buffer.Size() - 1);
+
+	applicationDirectory = buffer;
 #elif defined __APPLE__
 	/* In macOS, lsof -p <pid> always returns the path to the current binary in the first txt section.
 	 */
@@ -143,6 +147,8 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
 
 	pclose(pstdin);
+
+	applicationDirectory = buffer;
 #elif defined __FreeBSD__
 	/* In FreeBSD, procfs is not necessarily available, so check if it's there first.
 	 */
@@ -162,52 +168,59 @@ S::String S::GUI::Application::GetApplicationDirectory()
 
 		pclose(pstdin);
 	}
+
+	applicationDirectory = buffer;
 #elif defined __sun
 	/* In Solaris, /proc/<pid>/path/a.out links to the current binary.
 	 */
 	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/path/a.out"), buffer, buffer.Size() - 1);
+
+	applicationDirectory = buffer;
 #elif defined __linux__ || defined __NetBSD__
 	/* In Linux and NetBSD, /proc/<pid>/exe links to the current binary.
 	 */
 	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
+
+	applicationDirectory = buffer;
 #elif defined __HAIKU__
 	/* In Haiku, get the path from application info.
 	 */
 	app_info	 ai;
 
 	if (be_app->GetAppInfo(&ai) == B_OK) applicationDirectory.ImportFrom("UTF-8", BPath(&ai.ref).Path());
-#else
-	/* No system specific way to get the current binary path.
-	 * Try concatenating the startup directory and command.
-	 */
-	String	 binary	= (command.StartsWith("/") ? String() : GetStartupDirectory()).Append(command).Replace("/./", "/");
-
-	if (!File(binary).Exists())
-	{
-		/* Search the path for command.
-		 */
-		String			 path  = getenv("PATH");
-		const Array<String>	&paths = path.Explode(":");
-
-		foreach (const String &path, paths)
-		{
-			/* Check for command in this path.
-			 */
-			if (File(String(path).Append("/").Append(command)).Exists())
-			{
-				binary = String(path).Append("/").Append(command);
-
-				break;
-			}
-		}
-
-		String::ExplodeFinish();
-	}
-
-	applicationDirectory = binary;
 #endif
 
-	if (applicationDirectory == NIL) applicationDirectory = buffer;
+	if (applicationDirectory == NIL)
+	{
+		/* No system specific way to get the current binary path.
+		 * Try concatenating the startup directory and command.
+		 */
+		String	 binary	= (command.StartsWith("/") ? String() : GetStartupDirectory()).Append(command).Replace("/./", "/");
+
+		if (!File(binary).Exists())
+		{
+			/* Search the path for command.
+			 */
+			String			 path  = getenv("PATH");
+			const Array<String>	&paths = path.Explode(":");
+
+			foreach (const String &path, paths)
+			{
+				/* Check for command in this path.
+				 */
+				if (File(String(path).Append("/").Append(command)).Exists())
+				{
+					binary = String(path).Append("/").Append(command);
+
+					break;
+				}
+			}
+
+			String::ExplodeFinish();
+		}
+
+		applicationDirectory = binary;
+	}
 
 	applicationDirectory[applicationDirectory.FindLast(Directory::GetDirectoryDelimiter()) + 1] = 0;
 

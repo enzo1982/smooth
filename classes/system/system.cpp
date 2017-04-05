@@ -217,10 +217,10 @@ S::Bool S::System::System::OpenURL(const String &url)
 
 	if (!fork()) { execl("/boot/system/bin/open", "open", args, NULL); exit(0); }
 #else
-	/* Try the open commands from freedesktop.org and the Gnome and
-	 * KDE desktops first, then try some widely used browsers.
+	/* Try the open commands from freedesktop.org and the Gnome, KDE
+	 * and Xfce desktops first, then try some widely used browsers.
 	 */
-	static const char	*browsers[] = { "xdg-open", "gnome-open", "kde-open",
+	static const char	*browsers[] = { "xdg-open", "gnome-open", "kde-open", "exo-open",
 						"firefox", "safari", "chrome", "opera", "mozilla", "netscape", "epiphany", "konqueror",
 						NIL };
 

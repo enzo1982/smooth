@@ -32,10 +32,19 @@ S::System::EventHaiku::EventHaiku()
 	type = EVENT_HAIKU;
 
 	messages.EnableLocking();
+
+	/* Deny timer interrupts outside of the event loop
+	 * to prevent interruption of sensitive code.
+	 */
+	EventProcessor::denyTimerInterrupts.Call();
 }
 
 S::System::EventHaiku::~EventHaiku()
 {
+	/* Allow timer interrupts again before deleting the
+	 * event processor.
+	 */
+	EventProcessor::allowTimerInterrupts.Call();
 }
 
 S::Void S::System::EventHaiku::EnqueueMessage(Void *window, const BMessage &currentMessage, Int messageID, Int param1, Int param2)

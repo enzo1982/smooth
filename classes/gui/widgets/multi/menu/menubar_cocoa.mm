@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -48,9 +48,9 @@ class CocoaMenuEntryDelegate;
 @interface CocoaMenu : NSMenu
 {
 	@private
-		const S::GUI::Menu	*menu;
+		const S::GUI::Menu		*menu;
 	@protected
-		S::Array<NSMenuItem *>	 menuItems;
+		S::Array<NSMenuItem *, Void *>	 menuItems;
 }
 
 	- (id)		initWithMenu:	(const S::GUI::Menu *) iMenu

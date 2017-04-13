@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,9 @@
 
 #include <smooth/graphics/backends/cairo/fontcairo.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/files/file.h>
+#include <smooth/foreach.h>
+#include <smooth/init.h>
 
 #ifdef __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
@@ -18,6 +21,10 @@
 #	include <fribidi/fribidi.h>
 #else
 	using namespace X11;
+
+#	include <unistd.h>
+#	include <stdio.h>
+#	include <stdlib.h>
 
 #	include <cairo/cairo-xlib.h>
 
@@ -34,6 +41,60 @@ S::GUI::FontBackend *CreateFontCairo(const S::String &iFontName, S::Short iFontS
 }
 
 S::Int	 fontCairoTmp = S::GUI::FontBackend::SetBackend(&CreateFontCairo);
+
+S::Int	 addFontCairoInitTmp = S::AddInitFunction(&S::GUI::FontCairo::Initialize);
+
+S::Int S::GUI::FontCairo::Initialize()
+{
+#ifdef __WIN32__
+	NONCLIENTMETRICS	 ncm;
+
+	ncm.cbSize = sizeof(ncm);
+
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
+
+	Font::Default = ncm.lfMessageFont.lfFaceName;
+#else
+	Font::Default = "Helvetica";
+
+	/* Search the path for gsettings.
+	 */
+	String			 path  = getenv("PATH");
+	const Array<String>	&paths = path.Explode(":");
+
+	foreach (const String &path, paths)
+	{
+		/* Check for gsettings in this path.
+		 */
+		if (File(String(path).Append("/").Append("gsettings")).Exists())
+		{
+			/* If gsettings exists, use it to get the default font.
+			 */
+			FILE	*pstdin = popen("gsettings get org.gnome.desktop.interface font-name", "r");
+
+			if (pstdin != NIL)
+			{
+				char	 fontName[256];
+
+				if (fgets(fontName, 256, pstdin) != NIL)
+				{
+					String	 font = fontName;
+
+					Font::Default = font.SubString(1, font.FindLast(" ") - 1);
+				}
+
+				pclose(pstdin);
+			}
+
+			break;
+		}
+	}
+
+	String::ExplodeFinish();
+#endif
+
+	return Success();
+}
 
 S::GUI::FontCairo::FontCairo(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {

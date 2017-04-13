@@ -10,6 +10,7 @@
 
 #include <smooth/graphics/backends/haiku/fonthaiku.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/init.h>
 
 #include <Font.h>
 
@@ -19,6 +20,19 @@ S::GUI::FontBackend *CreateFontHaiku(const S::String &iFontName, S::Short iFontS
 }
 
 S::Int	 fontHaikuTmp = S::GUI::FontBackend::SetBackend(&CreateFontHaiku);
+
+S::Int	 addFontHaikuInitTmp = S::AddInitFunction(&S::GUI::FontHaiku::Initialize);
+
+S::Int S::GUI::FontHaiku::Initialize()
+{
+	font_family	 family;
+
+	be_plain_font->GetFamilyAndStyle(&family, NIL);
+
+	Font::Default = family;
+
+	return Success();
+}
 
 S::GUI::FontHaiku::FontHaiku(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,19 +8,34 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <windows.h>
-#include <gdiplus.h>
-
 #include <smooth/backends/win32/backendwin32.h>
 #include <smooth/graphics/backends/gdiplus/fontgdiplus.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/init.h>
+
+#include <gdiplus.h>
 
 S::GUI::FontBackend *CreateFontGDIPlus(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
 	return new S::GUI::FontGDIPlus(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
-S::Int	 fontGDITmp = S::GUI::FontBackend::SetBackend(&CreateFontGDIPlus);
+S::Int	 fontGDIPlusTmp = S::GUI::FontBackend::SetBackend(&CreateFontGDIPlus);
+
+S::Int	 addFontGDIPlusInitTmp = S::AddInitFunction(&S::GUI::FontGDIPlus::Initialize);
+
+S::Int S::GUI::FontGDIPlus::Initialize()
+{
+	NONCLIENTMETRICS	 ncm;
+
+	ncm.cbSize = sizeof(ncm);
+
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
+
+	Font::Default = ncm.lfMessageFont.lfFaceName;
+
+	return Success();
+}
 
 S::GUI::FontGDIPlus::FontGDIPlus(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {

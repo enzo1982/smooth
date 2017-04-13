@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,7 @@
 
 #include <smooth/graphics/backends/cocoa/fontcocoa.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/init.h>
 
 S::GUI::FontBackend *CreateFontCocoa(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -17,6 +18,15 @@ S::GUI::FontBackend *CreateFontCocoa(const S::String &iFontName, S::Short iFontS
 }
 
 S::Int	 fontCocoaTmp = S::GUI::FontBackend::SetBackend(&CreateFontCocoa);
+
+S::Int	 addFontCocoaInitTmp = S::AddInitFunction(&S::GUI::FontCocoa::Initialize);
+
+S::Int S::GUI::FontCocoa::Initialize()
+{
+	Font::Default.ImportFrom("UTF-8", [[[NSFont systemFontOfSize: [NSFont systemFontSize]] familyName] UTF8String]);
+
+	return Success();
+}
 
 S::GUI::FontCocoa::FontCocoa(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {

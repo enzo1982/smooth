@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,7 @@
 #include <smooth/backends/win32/backendwin32.h>
 #include <smooth/graphics/backends/gdi/fontgdi.h>
 #include <smooth/graphics/surface.h>
+#include <smooth/init.h>
 
 S::GUI::FontBackend *CreateFontGDI(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -18,6 +19,21 @@ S::GUI::FontBackend *CreateFontGDI(const S::String &iFontName, S::Short iFontSiz
 }
 
 S::Int	 fontGDITmp = S::GUI::FontBackend::SetBackend(&CreateFontGDI);
+
+S::Int	 addFontGDIInitTmp = S::AddInitFunction(&S::GUI::FontGDI::Initialize);
+
+S::Int S::GUI::FontGDI::Initialize()
+{
+	NONCLIENTMETRICS	 ncm;
+
+	ncm.cbSize = sizeof(ncm);
+
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
+
+	Font::Default = ncm.lfMessageFont.lfFaceName;
+
+	return Success();
+}
 
 S::GUI::FontGDI::FontGDI(const String &iFontName, Short iFontSize, Short iFontWeight, Short iFontStyle, const Color &iFontColor) : FontBackend(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor)
 {

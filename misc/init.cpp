@@ -11,9 +11,7 @@
 #include <smooth/backends/backend.h>
 #include <smooth/templates/nonblocking.h>
 #include <smooth/i18n/translator_internal.h>
-#include <smooth/files/file.h>
 #include <smooth/threads/thread.h>
-#include <smooth/graphics/font.h>
 #include <smooth/init.h>
 #include <smooth/foreach.h>
 #include <smooth/resources.h>
@@ -21,16 +19,9 @@
 #if defined __WIN32__
 #	include <smooth/init.win32.h>
 
-#	include <wtypes.h>
-
 #	include <smooth/backends/win32/backendwin32.h>
 #elif defined __HAIKU__
 #	include <interface/InterfaceDefs.h>
-#	include <interface/Font.h>
-#else
-#	include <unistd.h>
-#	include <stdio.h>
-#	include <stdlib.h>
 #endif
 
 #include <iconv.h>
@@ -43,11 +34,6 @@ __declspec (dllexport) HINSTANCE	 S::hInstance	  = NIL;
 __declspec (dllexport) HINSTANCE	 S::hPrevInstance = NIL;
 
 __declspec (dllexport) HICON		 S::SMOOTHICON	  = NIL;
-
-int CALLBACK EnumFontProc(const LOGFONTW *lpelfe, const TEXTMETRICW *lpntme, DWORD fontType, LPARAM lParam)
-{
-	return 0;
-}
 #endif
 
 namespace smooth
@@ -113,10 +99,9 @@ S::Bool S::Init()
 	use_iconv = (Setup::useIconv ? 1 : 0);
 #endif
 
-	/* Get default colors and fonts.
+	/* Get default colors.
 	 */
 	GetColors();
-	GetDefaultFont();
 
 	/* Init internationalization system.
 	 */
@@ -258,75 +243,5 @@ S::Void S::GetColors()
 	Setup::InactiveGradientTextColor  = GUI::Color(windowInactiveText.red, windowInactiveText.green, windowInactiveText.blue);
 	Setup::TooltipColor		  = GUI::Color(tooltipBackground.red, tooltipBackground.green, tooltipBackground.blue);
 	Setup::TooltipTextColor		  = GUI::Color(tooltipText.red, tooltipText.green, tooltipText.blue);
-#endif
-}
-
-S::Void S::GetDefaultFont()
-{
-#if defined __WIN32__
-	static const wchar_t	*fonts[5] = { L"Segoe UI", L"Tahoma", L"Microsoft Sans Serif", L"MS Sans Serif", NIL };
-
-	HDC	 dc = GetWindowDC(0);
-
-	for (Int i = 0; fonts[i] != NIL; i++)
-	{
-		LOGFONTW	 fontInfo;
-
-		ZeroMemory(&fontInfo, sizeof(fontInfo));
-
-		fontInfo.lfCharSet	  = DEFAULT_CHARSET;
-		fontInfo.lfPitchAndFamily = 0;
-
-		wcsncpy(fontInfo.lfFaceName, fonts[i], LF_FACESIZE - 1);
-
-		if (EnumFontFamiliesExW(dc, &fontInfo, &EnumFontProc, 0, 0) == 0) { GUI::Font::Default = fonts[i]; break; }
-	}
-
-	ReleaseDC(0, dc);
-#elif defined __APPLE__
-	GUI::Font::Default = "Arial";
-#elif defined __HAIKU__
-	font_family	 family;
-
-	be_plain_font->GetFamilyAndStyle(&family, NIL);
-
-	GUI::Font::Default = family;
-#else
-	GUI::Font::Default = "Helvetica";
-
-	/* Search the path for gsettings.
-	 */
-	String			 path  = getenv("PATH");
-	const Array<String>	&paths = path.Explode(":");
-
-	foreach (const String &path, paths)
-	{
-		/* Check for gsettings in this path.
-		 */
-		if (File(String(path).Append("/").Append("gsettings")).Exists())
-		{
-			/* If gsettings exists, use it to get the default font.
-			 */
-			FILE	*pstdin = popen("gsettings get org.gnome.desktop.interface font-name", "r");
-
-			if (pstdin != NIL)
-			{
-				char	 fontName[256];
-
-				if (fgets(fontName, 256, pstdin) != NIL)
-				{
-					String	 font = fontName;
-
-					GUI::Font::Default = font.SubString(1, font.FindLast(" ") - 1);
-				}
-
-				pclose(pstdin);
-			}
-
-			break;
-		}
-	}
-
-	String::ExplodeFinish();
 #endif
 }

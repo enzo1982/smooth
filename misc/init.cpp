@@ -208,10 +208,10 @@ S::Void S::GetColors()
 	Setup::HighlightColor		  = GetSysColor(COLOR_HIGHLIGHT);
 	Setup::HighlightTextColor	  = GetSysColor(COLOR_HIGHLIGHTTEXT);
 	Setup::GradientStartColor	  = GetSysColor(COLOR_ACTIVECAPTION);
-	Setup::GradientEndColor		  = GetSysColor(27);
+	Setup::GradientEndColor		  = GetSysColor(COLOR_GRADIENTACTIVECAPTION);
 	Setup::GradientTextColor	  = GetSysColor(COLOR_CAPTIONTEXT);
 	Setup::InactiveGradientStartColor = GetSysColor(COLOR_INACTIVECAPTION);
-	Setup::InactiveGradientEndColor	  = GetSysColor(28);
+	Setup::InactiveGradientEndColor	  = GetSysColor(COLOR_GRADIENTINACTIVECAPTION);
 	Setup::InactiveGradientTextColor  = GetSysColor(COLOR_INACTIVECAPTIONTEXT);
 	Setup::TooltipColor		  = GetSysColor(COLOR_INFOBK);
 	Setup::TooltipTextColor		  = GetSysColor(COLOR_INFOTEXT);

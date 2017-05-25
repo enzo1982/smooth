@@ -15,7 +15,6 @@
 #include <smooth/misc/hash/crc32.h>
 #include <smooth/misc/hash/crc64.h>
 #include <smooth/system/cpu.h>
-#include <smooth/threads/mutex.h>
 #include <smooth/templates/buffer.h>
 #include <smooth/templates/threadlocal.h>
 #include <smooth/init.h>
@@ -31,17 +30,17 @@
 
 namespace smooth
 {
-	static multithread (char *)	 inputFormat	= NIL;
-	static multithread (char *)	 outputFormat	= NIL;
+	typedef Array<char *, Void *>		 BufferArray;
+	typedef Array<Array<String> *, Void *>	 ExplodeArray;
 
-	Int				 ConvertString(const char *, Int, const char *, char *, Int, const char *);
+	static multithread (BufferArray *)	 allocatedBuffers = NIL;
+	static multithread (ExplodeArray *)	 explodeBuffers	  = NIL;
+
+	static multithread (char *)		 inputFormat	  = NIL;
+	static multithread (char *)		 outputFormat	  = NIL;
+
+	Int					 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
-
-S::Array<S::Array<S::String> *, void *>	 S::String::explodeBuffers;
-S::Threads::Mutex			*S::String::explodeBuffersMutex	  = NIL;
-
-S::Array<char *, void *>		 S::String::allocatedBuffers;
-S::Threads::Mutex			*S::String::allocatedBuffersMutex = NIL;
 
 S::Int	 addStringInitTmp = S::AddInitFunction(&S::String::Initialize);
 S::Int	 addStringFreeTmp = S::AddFreeFunction(&S::String::Free);
@@ -67,16 +66,10 @@ S::String::String(const String &iString)
 
 S::String::~String()
 {
-	Clean();
 }
 
 S::Int S::String::Initialize()
 {
-	/* Create static mutexes.
-	 */
-	explodeBuffersMutex   = new Threads::Mutex();
-	allocatedBuffersMutex = new Threads::Mutex();
-
 	return Success();
 }
 
@@ -85,14 +78,6 @@ S::Int S::String::Free()
 	/* Delete all temporarily allocated string buffers.
 	 */
 	DeleteTemporaryBuffers(True);
-
-	/* Free static mutexes.
-	 */
-	delete explodeBuffersMutex;
-	delete allocatedBuffersMutex;
-
-	explodeBuffersMutex   = NIL;
-	allocatedBuffersMutex = NIL;
 
 	return Success();
 }
@@ -119,19 +104,42 @@ const char *S::String::GetDefaultEncoding()
 #endif
 }
 
+S::Void S::String::AddTemporaryBuffer(char *buffer)
+{
+	/* Free old buffers and add new.
+	 */
+	if (allocatedBuffers == NIL) allocatedBuffers = new BufferArray();
+
+	if (allocatedBuffers->Length() >= 8) DeleteTemporaryBuffers();
+
+	allocatedBuffers->Add(buffer);
+}
+
 S::Void S::String::DeleteTemporaryBuffers(Bool all)
 {
-	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
-
-	Int	 nOfEntries = allocatedBuffers.Length();
-
-	for (Int i = 0; i < nOfEntries - (all ? 0 : 32); i++)
+	/* Free all but the most recent 8 buffers.
+	 */
+	if (allocatedBuffers != NIL)
 	{
-		delete [] allocatedBuffers.GetFirst();
+		Int	 nOfEntries = allocatedBuffers->Length();
 
-		allocatedBuffers.RemoveNth(0);
+		for (Int i = 0; i < nOfEntries - (all ? 0 : 8); i++)
+		{
+			delete [] allocatedBuffers->GetFirst();
+
+			allocatedBuffers->RemoveNth(0);
+		}
+
+		if (all)
+		{
+			delete allocatedBuffers;
+
+			allocatedBuffers = NIL;
+		}
 	}
 
+	/* When purging all, also free I/O format strings.
+	 */
 	if (all)
 	{
 		if (inputFormat	 != NIL) delete [] inputFormat;
@@ -140,8 +148,6 @@ S::Void S::String::DeleteTemporaryBuffers(Bool all)
 		inputFormat  = NIL;
 		outputFormat = NIL;
 	}
-
-	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
 }
 
 S::Void S::String::Clean()
@@ -250,17 +256,11 @@ const char *S::String::SetInputFormat(const char *iFormat)
 		strncpy(inputFormat, iFormat, length);
 	}
 
-	/* Add previous format to allocated buffers list.
+	/* Add previous format to temporary buffers list.
 	 */
 	if (previousInputFormat != NIL)
 	{
-		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
-
-		if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
-
-		allocatedBuffers.Add(previousInputFormat);
-
-		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
+		AddTemporaryBuffer(previousInputFormat);
 
 		return previousInputFormat;
 	}
@@ -298,17 +298,11 @@ const char *S::String::SetOutputFormat(const char *oFormat)
 		strncpy(outputFormat, oFormat, length);
 	}
 
-	/* Add previous format to allocated buffers list.
+	/* Add previous format to temporary buffers list.
 	 */
 	if (previousOutputFormat != NIL)
 	{
-		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
-
-		if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
-
-		allocatedBuffers.Add(previousOutputFormat);
-
-		if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
+		AddTemporaryBuffer(previousOutputFormat);
 
 		return previousOutputFormat;
 	}
@@ -403,13 +397,7 @@ char *S::String::ConvertTo(const char *encoding) const
 		ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), buffer, bufferSize + 1, encoding);
 	}
 
-	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Lock();
-
-	if (allocatedBuffers.Length() >= 64) DeleteTemporaryBuffers();
-
-	allocatedBuffers.Add(buffer);
-
-	if (allocatedBuffersMutex != NIL) allocatedBuffersMutex->Release();
+	AddTemporaryBuffer(buffer);
 
 	return buffer;
 }
@@ -846,12 +834,16 @@ S::String S::String::FromFloat(Float value)
 
 const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 {
-	if (explodeBuffersMutex != NIL) explodeBuffersMutex->Lock();
+	if (explodeBuffers == NIL) explodeBuffers = new ExplodeArray();
 
+	/* Create array and add to buffer list.
+	 */
 	Array<String>	*array = new Array<String>();
 
-	explodeBuffers.Add(array);
+	explodeBuffers->Add(array);
 
+	/* Split string and add entries to array.
+	 */
 	for (Int i = 0; i < Length(); )
 	{
 		Int	 index = SubString(i, Length() - i).Find(delimiter);
@@ -870,11 +862,22 @@ const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 
 S::Int S::String::ExplodeFinish()
 {
-	delete explodeBuffers.GetLast();
+	if (explodeBuffers == NIL) return Error();
 
-	explodeBuffers.RemoveNth(explodeBuffers.Length() - 1);
+	/* Remove most recently added buffer.
+	 */
+	delete explodeBuffers->GetLast();
 
-	if (explodeBuffersMutex != NIL) explodeBuffersMutex->Release();
+	explodeBuffers->RemoveNth(explodeBuffers->Length() - 1);
+
+	/* Clear buffers for this thread.
+	 */
+	if (explodeBuffers->Length() == 0)
+	{
+		delete explodeBuffers;
+
+		explodeBuffers = NIL;
+	}
 
 	return Success();
 }

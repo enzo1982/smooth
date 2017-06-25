@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -299,9 +299,13 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 		textRect.left += icon->GetRealSize().cx + Math::Round(20 * surface->GetSurfaceDPI() / 96.0);
 	}
 
+	Font	 font;
+
+	font.SetColor(Setup::TextColor);
+
 	for (int i = 0; i < lines; i++)
 	{
-		surface->SetText(line[i], textRect, Font());
+		surface->SetText(line[i], textRect, font);
 
 		textRect.top += Math::Round(16 * surface->GetSurfaceDPI() / 96.0);
 	}

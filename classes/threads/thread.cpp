@@ -144,10 +144,12 @@ S::Int S::Threads::Thread::Wait()
 S::Void S::Threads::Thread::MainCaller(Thread *thread)
 {
 	thread->threadMain.Call(thread);
+
+	String::DeleteTemporaryBuffers(True);
+
 	thread->status = THREAD_STOPPED;
 
 	Access::Decrement(nOfRunningThreads);
-	String::DeleteTemporaryBuffers(True);
 
 	thread->backend->Exit();
 }

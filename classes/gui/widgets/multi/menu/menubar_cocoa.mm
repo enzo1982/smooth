@@ -48,9 +48,9 @@ class CocoaMenuEntryDelegate;
 @interface CocoaMenu : NSMenu
 {
 	@private
-		const S::GUI::Menu		*menu;
+		const S::GUI::Menu			*menu;
 	@protected
-		S::Array<NSMenuItem *, Void *>	 menuItems;
+		S::Array<NSMenuItem *, S::Void *>	 menuItems;
 }
 
 	- (id)		initWithMenu:	(const S::GUI::Menu *) iMenu

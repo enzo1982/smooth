@@ -26,6 +26,8 @@
 #include <smooth/gui/widgets/basic/checkbox.h>
 #include <smooth/gui/widgets/basic/image.h>
 
+#include <smooth/gui/widgets/special/cursor.h>
+
 #include <smooth/gui/widgets/layer.h>
 
 #include <smooth/misc/string.h>
@@ -79,7 +81,9 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(8 + bmp.GetSize().cx, 7));
 	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold));
 
-	txt_tip		= new Text(NIL, Point(6, 5));
+	txt_tip		= new Cursor(Point(6, 4), Size(328, 182));
+	txt_tip->SetFlags(CF_MULTILINE);
+	txt_tip->Deactivate();
 
 	layer_inner	= new Layer();
 	layer_inner->SetMetrics(Point(8, 39), Size(328, 182));

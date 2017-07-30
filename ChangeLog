@@ -23,6 +23,7 @@ xx.yy.zz xx:yy - smooth alpha 0.8.73.0
 - listentry.cpp		- added static member: tabDelimiter, use it to delimit list entry tabs
 			- tab delimiter changed from horizontal to vertical tab character
 - cursor.cpp		- performance improvements
+- tipodaydlg.cpp	- tips can now be marked and copied
 
 - ported to Haiku OS
 - removed support for QNX

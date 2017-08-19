@@ -11,19 +11,110 @@
 #import <Cocoa/Cocoa.h>
 
 #include <smooth/gui/dialogs/filedlg.h>
-#include <smooth/files/file.h>
-#include <smooth/misc/number.h>
 #include <smooth/foreach.h>
 
-namespace smooth
+using namespace smooth;
+using namespace smooth::GUI::Dialogs;
+
+@interface CocoaFilePanel : NSObject
 {
-	static Bool SetFileSelectionFilters(NSSavePanel *savePanel, const Array<String> &filters)
+	@private
+		Short			 mode;
+
+		NSInteger		 response;
+
+		NSURL			*url;
+		NSArray			*urls;
+
+		BOOL			 multiSelect;
+
+		const Array<String>	*filters;
+
+		String			 defaultPath;
+		String			 defaultFile;
+}
+
+	/* CocoaFilePanel methods.
+	 */
+	+ (CocoaFilePanel *)	panelWithMode: (Short) mode;
+
+	- (id)			init;
+	- (void)		dealloc;
+
+	- (void)		setMultiSelect: (BOOL) val;
+
+	- (void)		setFilters: (const Array<String> *) arr;
+
+	- (void)		setDefaultPath: (String) path;
+	- (void)		setDefaultFile: (String) file;
+
+	- (void)		runModal;
+	
+	- (NSInteger)		response;
+
+	- (NSURL *)		URL;
+	- (NSArray *)		URLs;
+@end
+
+@implementation CocoaFilePanel
+	+ (CocoaFilePanel *) panelWithMode: (Short) mode
 	{
+		CocoaFilePanel *panel = [[[CocoaFilePanel alloc] init] autorelease];
+
+		panel->mode = mode;
+
+		return panel;
+	}
+
+	- (id) init
+	{
+		[super init];
+
+		mode	    = SFM_OPEN;
+
+		response    = 0;
+
+		url	    = nil;
+		urls	    = nil;
+
+		multiSelect = false;
+
+		return self;
+	}
+
+	- (void) dealloc
+	{
+		if (url	 != NIL) [url release];
+		if (urls != NIL) [urls release];
+
+		[super dealloc];
+	}
+
+	- (void)	setMultiSelect: (BOOL) val		{ multiSelect = val; }
+
+	- (void)	setFilters: (const Array<String> *) arr	{ filters = arr; }
+
+	- (void)	setDefaultPath: (String) path		{ defaultPath = path; }
+	- (void)	setDefaultFile: (String) file		{ defaultFile = file; }
+
+	- (void) runModal
+	{
+		/* Create and configure panel.
+		 */
+		NSSavePanel	*panel = nil;
+
+		if	(mode == SFM_OPEN) panel = [NSOpenPanel openPanel];
+		else if (mode == SFM_SAVE) panel = [NSSavePanel savePanel];
+
+		[panel setFloatingPanel: YES];
+
+		if (mode == SFM_OPEN) [(NSOpenPanel *) panel setAllowsMultipleSelection: multiSelect];
+
 		/* Add file filters.
 		 */
-		NSMutableArray	*fileTypes = [NSMutableArray arrayWithCapacity: filters.Length()];
+		NSMutableArray	*fileTypes = [NSMutableArray arrayWithCapacity: filters->Length()];
 
-		foreach (const String &filter, filters)
+		foreach (const String &filter, *filters)
 		{
 			const Array<String>	&patterns = filter.Explode(";");
 
@@ -37,11 +128,25 @@ namespace smooth
 			String::ExplodeFinish();
 		}
 
-		[savePanel setAllowedFileTypes: fileTypes];
+		[panel setAllowedFileTypes: fileTypes];
 
-		return True;
+		/* Run the panel.
+		 */
+		response = [panel runModalForDirectory: defaultPath != NIL ? [NSString stringWithUTF8String: defaultPath.ConvertTo("UTF-8")] : nil
+						  file: defaultFile != NIL ? [NSString stringWithUTF8String: defaultFile.ConvertTo("UTF-8")] : nil];
+
+		/* Get selected URLs.
+		 */
+		url  = [[panel URL] retain];
+
+		if (mode == SFM_OPEN) urls = [[(NSOpenPanel *) panel URLs] retain];
 	}
-};
+
+	- (NSInteger)	response	{ return response; }
+
+	- (NSURL *)	URL		{ return url; }
+	- (NSArray *)	URLs		{ return urls; }
+@end
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
@@ -49,20 +154,23 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 	/* Create file chooser dialog.
 	 */
-	if (mode == SFM_OPEN)
+	CocoaFilePanel	*panel = [CocoaFilePanel panelWithMode: mode];
+
+	[panel setFilters: &filters];
+
+	if (flags & SFD_ALLOWMULTISELECT) [panel setMultiSelect: true];
+
+	[panel setDefaultPath: defPath];
+	[panel setDefaultFile: defFile];
+
+	if ([NSThread isMainThread]) [panel runModal];
+	else			     [panel performSelectorOnMainThread: @selector(runModal) withObject: nil waitUntilDone: YES];
+
+	if ([panel response] == NSFileHandlingPanelOKButton)
 	{
-		NSOpenPanel	*openPanel = [NSOpenPanel openPanel];
-
-		[openPanel setFloatingPanel: YES];
-
-		if (flags & SFD_ALLOWMULTISELECT) [openPanel setAllowsMultipleSelection: true];
-
-		SetFileSelectionFilters(openPanel, filters);
-
-		if ([openPanel runModalForDirectory: defPath != NIL ? [NSString stringWithUTF8String: defPath.ConvertTo("UTF-8")] : nil
-					       file: defFile != NIL ? [NSString stringWithUTF8String: defFile.ConvertTo("UTF-8")] : nil] == NSFileHandlingPanelOKButton)
+		if (mode == SFM_OPEN)
 		{
-			for (NSURL *url in [openPanel URLs])
+			for (NSURL *url in [panel URLs])
 			{
 				String	 file;
 
@@ -70,21 +178,11 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 				files.Add(file);
 			}
 		}
-	}
-	else if (mode == SFM_SAVE)
-	{
-		NSSavePanel	*savePanel = [NSSavePanel savePanel];
-
-		[savePanel setFloatingPanel: YES];
-
-		SetFileSelectionFilters(savePanel, filters);
-
-		if ([savePanel runModalForDirectory: defPath != NIL ? [NSString stringWithUTF8String: defPath.ConvertTo("UTF-8")] : nil
-					       file: defFile != NIL ? [NSString stringWithUTF8String: defFile.ConvertTo("UTF-8")] : nil] == NSFileHandlingPanelOKButton)
+		else if (mode == SFM_SAVE)
 		{
 			String	 file;
 
-			file.ImportFrom("UTF-8", [[[savePanel URL] path] UTF8String]);
+			file.ImportFrom("UTF-8", [[[panel URL] path] UTF8String]);
 			files.Add(file);
 		}
 	}

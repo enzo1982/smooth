@@ -13,20 +13,91 @@
 #include <smooth/gui/dialogs/dirdlg.h>
 #include <smooth/files/directory.h>
 
+@interface CocoaFolderPanel : NSObject
+{
+	@private
+		NSInteger	 response;
+
+		NSURL		*url;
+}
+
+	/* CocoaFolderPanel methods.
+	 */
+	+ (CocoaFolderPanel *)	panel;
+
+	- (id)			init;
+	- (void)		dealloc;
+
+	- (void)		runModal;
+	
+	- (NSInteger)		response;
+
+	- (NSURL *)		URL;
+@end
+
+@implementation CocoaFolderPanel
+	+ (CocoaFolderPanel *) panel
+	{
+		CocoaFolderPanel *panel = [[[CocoaFolderPanel alloc] init] autorelease];
+
+		return panel;
+	}
+
+	- (id) init
+	{
+		[super init];
+
+		response    = 0;
+
+		url	    = nil;
+
+		return self;
+	}
+
+	- (void) dealloc
+	{
+		if (url	 != NIL) [url release];
+
+		[super dealloc];
+	}
+
+	- (void) runModal
+	{
+		/* Create and configure panel.
+		 */
+		NSOpenPanel	*panel = [NSOpenPanel openPanel];
+
+		[panel setFloatingPanel: YES];
+
+		[panel setCanChooseDirectories: true];
+		[panel setCanChooseFiles: false];
+
+		/* Run the panel.
+		 */
+		response = [panel runModal];
+
+		/* Get selected URL.
+		 */
+		url  = [[panel URL] retain];
+	}
+
+	- (NSInteger)	response	{ return response; }
+
+	- (NSURL *)	URL		{ return url; }
+@end
+
 const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
 	NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
 
 	/* Create file chooser dialog
 	 */
-	NSOpenPanel	*openPanel = [NSOpenPanel openPanel];
+	CocoaFolderPanel	*panel = [CocoaFolderPanel panel];
 
-	[openPanel setFloatingPanel: YES];
+	if ([NSThread isMainThread]) [panel runModal];
+	else			     [panel performSelectorOnMainThread: @selector(runModal) withObject: nil waitUntilDone: YES];
 
-	[openPanel setCanChooseDirectories: true];
-	[openPanel setCanChooseFiles: false];
-
-	if ([openPanel runModal] == NSOKButton) directory.ImportFrom("UTF-8", [[[openPanel URL] path] UTF8String]);
+	if ([panel response] == NSOKButton) directory.ImportFrom("UTF-8", [[[panel URL] path] UTF8String]);
 
 	[pool release];
 

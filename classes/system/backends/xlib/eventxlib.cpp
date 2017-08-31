@@ -23,24 +23,26 @@ S::System::EventBackend *CreateEventXLib()
 
 S::Int	 eventXLibTmp = S::System::EventBackend::SetBackend(&CreateEventXLib);
 
+S::Int	 S::System::EventXLib::nested = 0;
+
 S::System::EventXLib::EventXLib()
 {
 	type = EVENT_XLIB;
 
 	display	= Backends::BackendXLib::GetDisplay();
 
-	/* Deny timer interrupts outside of the event loop
+	/* Deny timer interrupts outside of any event loops
 	 * to prevent interruption of sensitive code.
 	 */
-	EventProcessor::denyTimerInterrupts.Call();
+	if (!nested++) EventProcessor::denyTimerInterrupts.Call();
 }
 
 S::System::EventXLib::~EventXLib()
 {
-	/* Allow timer interrupts again before deleting the
-	 * event processor.
+	/* Allow timer interrupts again before leaving the
+	 * outermost event processor.
 	 */
-	EventProcessor::allowTimerInterrupts.Call();
+	if (!--nested) EventProcessor::allowTimerInterrupts.Call();
 }
 
 /* Predicate function to find MotionNotify events.

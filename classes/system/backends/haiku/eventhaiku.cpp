@@ -25,6 +25,8 @@ S::System::EventBackend *CreateEventHaiku()
 
 S::Int	 eventHaikuTmp = S::System::EventBackend::SetBackend(&CreateEventHaiku);
 
+S::Int							 S::System::EventHaiku::nested = 0;
+
 S::Array<S::System::EventHaiku::Message *, S::Void *>	 S::System::EventHaiku::messages;
 
 S::System::EventHaiku::EventHaiku()
@@ -33,18 +35,18 @@ S::System::EventHaiku::EventHaiku()
 
 	messages.EnableLocking();
 
-	/* Deny timer interrupts outside of the event loop
+	/* Deny timer interrupts outside of any event loops
 	 * to prevent interruption of sensitive code.
 	 */
-	EventProcessor::denyTimerInterrupts.Call();
+	if (!nested++) EventProcessor::denyTimerInterrupts.Call();
 }
 
 S::System::EventHaiku::~EventHaiku()
 {
-	/* Allow timer interrupts again before deleting the
-	 * event processor.
+	/* Allow timer interrupts again before leaving the
+	 * outermost event processor.
 	 */
-	EventProcessor::allowTimerInterrupts.Call();
+	if (!--nested) EventProcessor::allowTimerInterrupts.Call();
 }
 
 S::Void S::System::EventHaiku::EnqueueMessage(Void *window, const BMessage &currentMessage, Int messageID, Int param1, Int param2)

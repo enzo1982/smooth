@@ -268,12 +268,12 @@ S::String S::System::System::GetProgramFilesDirectory()
 
 	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion", 0, KEY_QUERY_VALUE, &currentVersion) == ERROR_SUCCESS)
 	{
-		DWORD		 size = 32768 + 1;
-		Buffer<char>	 buffer(size);
+		DWORD		 size = (32768 + 1) * sizeof(wchar_t);
+		Buffer<BYTE>	 buffer(size);
 
-		RegQueryValueEx(currentVersion, L"ProgramFilesDir", 0, NIL, (BYTE *) (char *) buffer, &size);
+		RegQueryValueEx(currentVersion, L"ProgramFilesDir", 0, NIL, buffer, &size);
 
-		programsDir = buffer;
+		programsDir = (wchar_t *) (BYTE *) buffer;
 
 		RegCloseKey(currentVersion);
 	}

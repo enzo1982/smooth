@@ -2311,7 +2311,7 @@ xmlSAX2StartElementNs(void *ctx,
 	} else {
             /*
              * any out of memory error would already have been raised
-             * but we can't be garanteed it's the actual error due to the
+             * but we can't be guaranteed it's the actual error due to the
              * API, best is to skip in this case
              */
 	    continue;
@@ -2805,7 +2805,8 @@ xmlSAX2CDataBlock(void *ctx, const xmlChar *value, int len)
 	xmlTextConcat(lastChild, value, len);
     } else {
 	ret = xmlNewCDataBlock(ctxt->myDoc, value, len);
-	xmlAddChild(ctxt->node, ret);
+	if (xmlAddChild(ctxt->node, ret) == NULL)
+		xmlFreeNode(ret);
     }
 }
 

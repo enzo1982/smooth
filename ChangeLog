@@ -8,10 +8,13 @@ xx.yy.zz xx:yy - smooth alpha 0.8.73.0
 - windowcocoa.mm	- added support for SetProgressIndicator()
 - system.cpp		- added GetResourcesDirectory() method
 - mutex.cpp		- added TryLock() method
+			- added scoped locker class Lock
 			- changed the return type of lock methods to Bool
 - semaphore.cpp		- added TryWait() method
+			- added scoped locker class Wait
 			- changed the return type of lock methods to Bool
-- rwlock.cpp		- changed the return type of lock methods to Bool
+- rwlock.cpp		- added scoped locker classes LockForRead/LockForWrite
+			- changed the return type of lock methods to Bool
 - jpeg.cpp		- avoid temporary files when reading JPEG data from memory
 			- check for JPEG signature before trying to open files
 - png.cpp		- check for PNG signature before trying to open files

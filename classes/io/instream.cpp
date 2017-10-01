@@ -42,8 +42,6 @@ S::IO::InStream::InStream(Int type, Driver *iDriver)
 
 	currentBufferPos = defaultPackageSize;
 	origsize	 = size;
-
-	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, const String &fileName, Int mode)
@@ -65,8 +63,6 @@ S::IO::InStream::InStream(Int type, const String &fileName, Int mode)
 
 	currentBufferPos = defaultPackageSize;
 	origsize	 = size;
-
-	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, FILE *openFile)
@@ -88,8 +84,6 @@ S::IO::InStream::InStream(Int type, FILE *openFile)
 	origpacksize	 = packageSize;
 	currentBufferPos = defaultPackageSize;
 	origsize	 = size;
-
-	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, Void *inBuffer, Long bufferSize)
@@ -110,8 +104,6 @@ S::IO::InStream::InStream(Int type, Void *inBuffer, Long bufferSize)
 	origpacksize	 = packageSize;
 	currentBufferPos = packageSize;
 	origsize	 = size;
-
-	dataBuffer.Resize(packageSize);
 }
 
 S::IO::InStream::InStream(Int type, OutStream *out)
@@ -142,8 +134,6 @@ S::IO::InStream::InStream(Int type, OutStream *out)
 		origpacksize	 = packageSize;
 		currentBufferPos = packageSize;
 		origsize	 = size;
-
-		dataBuffer.Resize(packageSize);
 	}
 }
 
@@ -172,8 +162,6 @@ S::Bool S::IO::InStream::ReadData()
 			/* Read unfiltered data.
 			 */
 			packageSize = stdpacksize;
-
-			dataBuffer.Resize(packageSize);
 
 			driver->Seek(currentFilePos);
 
@@ -466,8 +454,6 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 	if (newPackageSize <= 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive) CompleteBitstream();
-
-	if (filter == NIL) dataBuffer.Resize(newPackageSize);
 
 	packageSize = newPackageSize;
 	stdpacksize = packageSize;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,15 +35,18 @@ S::Void S::Hash::CRC64::InitTable()
 	initialized = True;
 }
 
-S::UnsignedInt64 S::Hash::CRC64::Compute(const Buffer<UnsignedByte> &buffer)
+S::UnsignedInt64 S::Hash::CRC64::Compute(const UnsignedByte *ptr, Int size)
 {
 	if (!initialized) InitTable();
 
-	UnsignedInt64	 crc  = 0xFFFFFFFFFFFFFFFFULL;
-	UnsignedByte	*ptr  = buffer;
-	Int		 size = buffer.Size();
+	UnsignedInt64	 crc = 0xFFFFFFFFFFFFFFFFULL;
 
 	while (size--) crc = (crc >> 8) ^ table[(crc & 0xFF) ^ *ptr++];
 
 	return crc ^ 0xFFFFFFFFFFFFFFFFULL;
+}
+
+S::UnsignedInt64 S::Hash::CRC64::Compute(const Buffer<UnsignedByte> &buffer)
+{
+	return Compute(buffer, buffer.Size());
 }

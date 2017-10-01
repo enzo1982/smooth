@@ -159,26 +159,14 @@ S::UnsignedInt32 S::String::ComputeCRC32() const
 {
 	if (wString.Size() == 0) return 0;
 
-	Int			 length = Length();
-
-	Buffer<UnsignedByte>	 buffer(length * sizeof(wchar_t));
-
-	wcsncpy((wchar_t *) (UnsignedByte *) buffer, wString, length);
-
-	return Hash::CRC32::Compute(buffer);
+	return Hash::CRC32::Compute((UnsignedByte *) (wchar_t *) wString, Length() * sizeof(wchar_t));
 }
 
 S::UnsignedInt64 S::String::ComputeCRC64() const
 {
 	if (wString.Size() == 0) return 0;
 
-	Int			 length = Length();
-
-	Buffer<UnsignedByte>	 buffer(length * sizeof(wchar_t));
-
-	wcsncpy((wchar_t *) (UnsignedByte *) buffer, wString, length);
-
-	return Hash::CRC64::Compute(buffer);
+	return Hash::CRC64::Compute((UnsignedByte *) (wchar_t *) wString, Length() * sizeof(wchar_t));
 }
 
 S::String S::String::EncodeBase64() const

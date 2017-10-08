@@ -37,6 +37,8 @@
 
 									~ThreadLocal()			{ pthread_key_delete(key); }
 
+					inline operator			 t() const			{ return (t) pthread_getspecific(key); }
+
 					ThreadLocal<t> &operator	 =(const t &value)		{ pthread_setspecific(key, (const void *) value); return *this; }
 
 					ThreadLocal<t>  operator	 +(const t &value) const	{ return t(*this) + value; }
@@ -55,7 +57,11 @@
 					ThreadLocal<t> &operator	 <<=(int value)			{ return *this = t(*this) << value; }
 					ThreadLocal<t> &operator	 >>=(int value)			{ return *this = t(*this) >> value; }
 
-					inline operator			 t() const			{ return (t) pthread_getspecific(key); }
+					ThreadLocal<t> &operator	 ++()				{ return *this = t(*this) + 1; }
+					ThreadLocal<t> &operator	 --()				{ return *this = t(*this) - 1; }
+
+					t		operator	 ++(int)			{ t r = *this; ++(*this); return r; }
+					t		operator	 --(int)			{ t r = *this; --(*this); return r; }
 
 					inline t operator		 ->()				{ return t(*this); }
 					inline const t operator		 ->() const			{ return t(*this); }

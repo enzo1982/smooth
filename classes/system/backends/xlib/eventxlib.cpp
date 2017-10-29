@@ -59,7 +59,7 @@ int FindConfigureEvent(Display *d, XEvent *e, XPointer arg)
 	return (e->type == ConfigureNotify && e->xany.window == (X11::Window) arg);
 }
 
-S::Int S::System::EventXLib::ProcessNextEvent()
+S::Bool S::System::EventXLib::ProcessNextEvent()
 {
 	/* Emulate a timeout of ~100ms by trying to find a message
 	 * 10 times while sleeping for 10ms between trying.
@@ -106,5 +106,5 @@ S::Int S::System::EventXLib::ProcessNextEvent()
 		EventProcessor::denyTimerInterrupts.Call();
 	}
 
-	return Success();
+	return True;
 }

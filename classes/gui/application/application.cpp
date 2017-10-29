@@ -80,7 +80,7 @@ S::Int S::GUI::Application::Loop()
 
 	while (GUI::Window::nOfActiveWindows > 0)
 	{
-		if (event.ProcessNextEvent() == Break) break;
+		if (!event.ProcessNextEvent()) break;
 	}
 
 	return Success();

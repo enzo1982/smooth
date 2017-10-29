@@ -54,7 +54,7 @@ namespace smooth
 								 EventHaiku();
 								~EventHaiku();
 
-				Int				 ProcessNextEvent();
+				Bool				 ProcessNextEvent();
 		};
 	};
 };

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,7 +28,7 @@ S::System::EventWin32::~EventWin32()
 {
 }
 
-S::Int S::System::EventWin32::ProcessNextEvent()
+S::Bool S::System::EventWin32::ProcessNextEvent()
 {
 	/* Look for and process a message or wait up
 	 * to 100ms if no message is available.
@@ -49,7 +49,7 @@ S::Int S::System::EventWin32::ProcessNextEvent()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
-		if (msg.message == WM_QUIT) return Break;
+		if (msg.message == WM_QUIT) return False;
 	}
 	else
 	{
@@ -58,5 +58,5 @@ S::Int S::System::EventWin32::ProcessNextEvent()
 		MsgWaitForMultipleObjects(0, NIL, False, 100, QS_ALLEVENTS);
 	}
 
-	return Success();
+	return True;
 }

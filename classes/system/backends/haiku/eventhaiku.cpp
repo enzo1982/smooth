@@ -96,7 +96,7 @@ class HaikuApplication : public BApplication
 
 static HaikuApplication	 app;
 
-S::Int S::System::EventHaiku::ProcessNextEvent()
+S::Bool S::System::EventHaiku::ProcessNextEvent()
 {
 	/* Emulate a timeout of ~100ms by trying to find a message
 	 * 10 times while sleeping for 10ms between trying.
@@ -142,5 +142,5 @@ S::Int S::System::EventHaiku::ProcessNextEvent()
 		EventProcessor::denyTimerInterrupts.Call();
 	}
 
-	return Success();
+	return True;
 }

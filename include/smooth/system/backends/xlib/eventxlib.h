@@ -55,7 +55,7 @@ namespace smooth
 						 EventXLib();
 						~EventXLib();
 
-				Int		 ProcessNextEvent();
+				Bool		 ProcessNextEvent();
 		};
 	};
 };

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -510,7 +510,7 @@ S::Void S::GUI::Window::OnRestore()
 
 S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 {
-	if (!created) return Success();
+	if (!created) return MessageUnknown;
 
 	EnterProtectedRegion();
 
@@ -520,7 +520,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	/* Process events we are interested in.
 	 */
-	Int	 rVal = Success();
+	Int	 rVal = MessageUnknown;
 
 	switch (message)
 	{
@@ -544,7 +544,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 					{
 						LeaveProtectedRegion();
 
-						return Success();
+						return MessageProcessed;
 					}
 				}
 
@@ -570,7 +570,7 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				visible = prevVisible;
 
-				rVal = Break;
+				rVal = MessageProcessed;
 			}
 
 			break;
@@ -586,12 +586,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				updateRect = Rect(Point(0, 0), realSize);
 			}
 
-			rVal = Break;
+			rVal = MessageProcessed;
 
 			break;
 	}
 
-	if (rVal != Success())
+	if (rVal != MessageUnknown)
 	{
 		LeaveProtectedRegion();
 
@@ -600,11 +600,11 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 	/* Delegate event to main layer.
 	 */
-	if (mainLayer->Process(message, wParam, lParam) == Break)
+	if (mainLayer->Process(message, wParam, lParam) == MessageProcessed)
 	{
 		LeaveProtectedRegion();
 
-		return Break;
+		return MessageProcessed;
 	}
 
 	/* Delegate event to other widgets.
@@ -615,9 +615,9 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 		if (object == NIL || object == mainLayer) continue;
 
-		if (object->Process(message, wParam, lParam) == Break)
+		if (object->Process(message, wParam, lParam) == MessageProcessed)
 		{
-			rVal = Break;
+			rVal = MessageProcessed;
 
 			break;
 		}

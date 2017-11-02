@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -53,7 +53,10 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 
 	if (smoothWindow != NIL)
 	{
-		if (smoothWindow->ProcessSystemMessages(message, wParam, lParam) == Break) return 0;
+		Int	 result = smoothWindow->ProcessSystemMessages(message, wParam, lParam);
+
+		if	(result == MessageProcessed) return 0;
+		else if (result != MessageUnknown)   return result;
 	}
 
 	return DefWindowProc(window, message, wParam, lParam);
@@ -224,17 +227,17 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 		case WM_CLOSE:
 			if (doClose.Call()) Close();
 
-			return Break;
+			return MessageProcessed;
 
 		case WM_CREATE:
 			onCreate.Emit();
 
-			return Break;
+			return MessageProcessed;
 
 		case WM_DESTROY:
 			onDestroy.Emit();
 
-			return Break;
+			return MessageProcessed;
 
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) == WA_INACTIVE && IsWindowEnabled(hwnd))
@@ -252,7 +255,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 				}
 			}
 
-			return Break;
+			return MessageProcessed;
 
 		case WM_ACTIVATEAPP:
 			if (wParam == True && GetForegroundWindow() == hwnd && !IsWindowEnabled(hwnd))
@@ -293,7 +296,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 				SetMetrics(Point(workArea.left - (frameSize.cx - 2), workArea.top - (frameSize.cy - 2)), Size(workArea.GetWidth() + (2 * frameSize.cx - 4), workArea.GetHeight() + (2 * frameSize.cy - 4)) / fontSize);
 			}
 
-			return Break;
+			return MessageProcessed;
 
 		case WM_GETMINMAXINFO:
 			{
@@ -321,7 +324,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 				}
 			}
 
-			return Break;
+			return MessageProcessed;
 
 		case WM_SYSCOLORCHANGE:
 			GetColors();
@@ -421,7 +424,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 			 */
 			onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
-			return Success();
+			return MessageProcessed;
 
 		/* Keyboard messages:
 		 */
@@ -465,11 +468,11 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 				prevSize = size;
 			}
 
-			return Break;
+			return MessageProcessed;
 
 		case WM_PAINT:
 			{
-				Int	 rVal = Break;
+				Int	 rVal  = MessageProcessed;
 				RECT	 uRect = { 0, 0, 0, 0 };
 
 				updateRect = Rect();
@@ -526,7 +529,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 				}
 			}
 
-			return Success();
+			return MessageProcessed;
 
 		case WM_SETFOCUS:
 			return onEvent.Call(SM_GETFOCUS, 0, 0);
@@ -564,14 +567,16 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 
 			DragFinish(hDrop);
 
-			return Success();
+			return MessageProcessed;
 	}
 
 	/* Call event for any other Windows messages.
 	 *
 	 * FixMe: Windows messages should not be propagated to smooth applications.
 	 *	  Define a smooth message for every Windows message we need and
-	 *	  replace the next line with return Success();.
+	 *	  replace the next line with return MessageUnknown;.
+	 *	  Then add a different way to pass system specific messages to the
+	 *	  application, like a special onSystemMessage callback.
 	 */
 	return onEvent.Call(message, wParam, lParam);
 }

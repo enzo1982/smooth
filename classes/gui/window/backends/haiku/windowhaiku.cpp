@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -241,17 +241,17 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 		case B_QUIT_REQUESTED:
 			if (doClose.Call()) Close();
 
-			return Break;
+			return MessageProcessed;
 
 		case B_WINDOW_CREATED:
 			onCreate.Emit();
 
-			return Break;
+			return MessageProcessed;
 
 		case B_WINDOW_DESTROYED:
 			onDestroy.Emit();
 
-			return Break;
+			return MessageProcessed;
 	}
 
 	/* Update cursor position when receiving mouse messages.

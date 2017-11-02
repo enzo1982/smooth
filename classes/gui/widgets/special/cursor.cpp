@@ -343,7 +343,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_KEYDOWN:
-			if (OnSpecialKey(wParam)) return Break;
+			if (OnSpecialKey(wParam)) return MessageProcessed;
 
 			break;
 		case SM_CHAR:

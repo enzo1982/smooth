@@ -495,7 +495,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 	foreach (Widget *widget, widgets)
 	{
-		if (widget->Process(message, wParam, lParam) == Break) { widgets.Unlock(); return Break; }
+		if (widget->Process(message, wParam, lParam) == MessageProcessed) { widgets.Unlock(); return MessageProcessed; }
 	}
 
 	widgets.Unlock();
@@ -683,7 +683,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 					widget->SetFocusByKeyboard();
 				}
 
-				returnValue = Break;
+				returnValue = MessageProcessed;
 			}
 
 			break;

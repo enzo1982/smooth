@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,8 +42,6 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 	if (!IsRegistered())		 return Error();
 	if (!IsActive() || !IsVisible()) return Success();
 
-	Int	 retVal = Success();
-
 	switch (message)
 	{
 		case SM_DROPFILES:
@@ -65,12 +63,12 @@ S::Int S::GUI::DropArea::Process(Int message, Int wParam, Int lParam)
 
 					LeaveProtectedRegion();
 
-					retVal = Break;
+					return MessageProcessed;
 				}
 			}
 
 			break;
 	}
 
-	return retVal;
+	return Widget::Process(message, wParam, lParam);
 }

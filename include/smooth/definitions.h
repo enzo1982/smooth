@@ -46,8 +46,6 @@ namespace S = smooth;
 
 namespace smooth
 {
-	const Short	 Break	= 1;
-
 	const Bool	 True	= (Bool) -1;
 	const Bool	 False	= (Bool) 0;
 };
@@ -63,6 +61,9 @@ using namespace smooth::Errors;
 
 namespace smooth
 {
+	const Short	 MessageProcessed = -1;
+	const Short	 MessageUnknown	  = -2;
+
 	enum Messages
 	{
 		SM_MOUSEMOVE		= 1024,

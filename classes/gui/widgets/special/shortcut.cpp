@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,8 +39,6 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 
 	if (ref != NIL && !ref->IsActive()) return Success();
 
-	Int	 retVal = Success();
-
 	switch (message)
 	{
 		case SM_KEYDOWN:
@@ -53,14 +51,14 @@ S::Int S::GUI::Shortcut::Process(Int message, Int wParam, Int lParam)
 				{
 					onKeyDown.Emit(param);
 
-					retVal = Break;
+					return MessageProcessed;
 				}
 			}
 
 			break;
 	}
 
-	return retVal;
+	return Widget::Process(message, wParam, lParam);
 }
 
 S::Int S::GUI::Shortcut::SetShortcut(Int nFlags, Int nKey, Widget *nRef, Int nParam)

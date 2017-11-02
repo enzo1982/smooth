@@ -66,7 +66,7 @@ namespace smooth
 
 	enum Messages
 	{
-		SM_MOUSEMOVE		= 1024,
+		SM_MOUSEMOVE		= 30720,
 		SM_LBUTTONDOWN,
 		SM_LBUTTONUP,
 		SM_RBUTTONDOWN,

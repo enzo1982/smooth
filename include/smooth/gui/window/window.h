@@ -206,6 +206,8 @@ namespace smooth
 				Signal3<Void, Int, Int, Int>	 onEvent;
 			callbacks:
 				Callback0<Bool>			 doClose;
+
+				Callback3<Int, Int, Int, Int>	 handleSystemMessage;
 		};
 	};
 };

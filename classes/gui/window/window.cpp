@@ -99,6 +99,8 @@ S::GUI::Window::Window(const String &title, const Point &iPos, const Size &iSize
 	onCreate.SetParentObject(this);
 	onPaint.SetParentObject(this);
 	onEvent.SetParentObject(this);
+
+	handleSystemMessage.Connect(MessageUnknown);
 }
 
 S::GUI::Window::~Window()
@@ -622,6 +624,10 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			break;
 		}
 	}
+
+	/* Invoke callback for application message handling.
+	 */
+	if (rVal == MessageUnknown) rVal = handleSystemMessage.Call(message, wParam, lParam);
 
 	LeaveProtectedRegion();
 

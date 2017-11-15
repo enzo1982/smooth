@@ -1,0 +1,20 @@
+# Ignore artifacts created during build.
+BuildNumber
+*.[oa]
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pyc
+bin/*
+bin64/*
+lib/*
+lib64/*
+libraries/v8/libraries.cc
+libraries/v8/experimental-libraries.cc
+msvc/**/.vs/*
+msvc/**/Debug/*
+msvc/**/Release/*
+msvc/**/*.VC.*
+msvc/**/*.vcxproj.user

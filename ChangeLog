@@ -1,6 +1,10 @@
 ChangeLog for smooth
 
-xx.yy.zz xx:yy - smooth alpha 0.8.73.0
+dd.mm.17 hh:mm - smooth alpha 0.8.73.1
+
+- upgraded libcurl to version 7.56.1
+
+19.11.17 17:34 - smooth alpha 0.8.73.0
 
 - surfacecocoa.mm	- fix hangs on macOS 10.11 El Capitan
 - fontbackend.cpp	- cache computed text extents

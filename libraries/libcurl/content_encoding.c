@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -130,8 +130,7 @@ inflate_stream(struct connectdata *conn,
         free(decomp);
         if(inflateEnd(z) == Z_OK)
           return exit_zlib(z, &k->zlib_init, result);
-        else
-          return exit_zlib(z, &k->zlib_init, process_zlib_error(conn, z));
+        return exit_zlib(z, &k->zlib_init, process_zlib_error(conn, z));
       }
 
       /* Done with these bytes, exit */
@@ -228,7 +227,7 @@ static enum {
 
     extra_len = (data[1] << 8) | data[0];
 
-    if(len < (extra_len+2))
+    if(len < (extra_len + 2))
       return GZIP_UNDERFLOW;
 
     len -= (extra_len + 2);
@@ -289,7 +288,7 @@ Curl_unencode_gzip_write(struct connectdata *conn,
 
     if(strcmp(zlibVersion(), "1.2.0.4") >= 0) {
       /* zlib ver. >= 1.2.0.4 supports transparent gzip decompressing */
-      if(inflateInit2(z, MAX_WBITS+32) != Z_OK) {
+      if(inflateInit2(z, MAX_WBITS + 32) != Z_OK) {
         return process_zlib_error(conn, z);
       }
       k->zlib_init = ZLIB_INIT_GZIP; /* Transparent gzip decompress state */
@@ -314,7 +313,7 @@ Curl_unencode_gzip_write(struct connectdata *conn,
 #ifndef OLD_ZLIB_SUPPORT
   /* Support for old zlib versions is compiled away and we are running with
      an old version, so return an error. */
-  return exit_zlib(z, &k->zlib_init, CURLE_FUNCTION_NOT_FOUND);
+  return exit_zlib(z, &k->zlib_init, CURLE_WRITE_ERROR);
 
 #else
   /* This next mess is to get around the potential case where there isn't

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -78,7 +78,7 @@ int Curl_wait_ms(int timeout_ms)
 #ifndef HAVE_POLL_FINE
   struct timeval pending_tv;
 #endif
-  struct timeval initial_tv;
+  struct curltime initial_tv;
   int pending_ms;
   int error;
 #endif
@@ -129,7 +129,7 @@ int Curl_wait_ms(int timeout_ms)
  * and a file descriptor is too large for FD_SETSIZE.
  *
  * A negative timeout value makes this function wait indefinitely,
- * unles no valid file descriptor is given, when this happens the
+ * unless no valid file descriptor is given, when this happens the
  * negative timeout is ignored and the function times out immediately.
  *
  * Return values:
@@ -158,13 +158,13 @@ int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
   fd_set fds_err;
   curl_socket_t maxfd;
 #endif
-  struct timeval initial_tv = {0, 0};
+  struct curltime initial_tv = {0, 0};
   int pending_ms = 0;
   int error;
   int r;
   int ret;
 
-#if SIZEOF_LONG != SIZEOF_INT
+#if SIZEOF_TIME_T != SIZEOF_INT
   /* wrap-around precaution */
   if(timeout_ms >= INT_MAX)
     timeout_ms = INT_MAX;
@@ -380,7 +380,7 @@ int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
  * select() is used instead.  An error is returned if select() is
  * being used and a file descriptor is too large for FD_SETSIZE.
  * A negative timeout value makes this function wait indefinitely,
- * unles no valid file descriptor is given, when this happens the
+ * unless no valid file descriptor is given, when this happens the
  * negative timeout is ignored and the function times out immediately.
  *
  * Return values:
@@ -398,7 +398,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms)
   fd_set fds_err;
   curl_socket_t maxfd;
 #endif
-  struct timeval initial_tv = {0, 0};
+  struct curltime initial_tv = {0, 0};
   bool fds_none = TRUE;
   unsigned int i;
   int pending_ms = 0;
@@ -571,8 +571,8 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms)
  *
  * Return values are the same as select's.
  */
-int tpf_select_libcurl(int maxfds, fd_set* reads, fd_set* writes,
-                       fd_set* excepts, struct timeval* tv)
+int tpf_select_libcurl(int maxfds, fd_set *reads, fd_set *writes,
+                       fd_set *excepts, struct timeval *tv)
 {
    int rc;
 

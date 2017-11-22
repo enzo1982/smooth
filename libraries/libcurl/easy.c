@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -179,7 +179,7 @@ curl_wcsdup_callback Curl_cwcsdup = (curl_wcsdup_callback)_wcsdup;
 #endif
 #else
 /*
- * Symbian OS doesn't support initialization to code in writeable static data.
+ * Symbian OS doesn't support initialization to code in writable static data.
  * Initialization will occur in the curl_global_init() call.
  */
 curl_malloc_callback Curl_cmalloc;
@@ -433,7 +433,7 @@ static int events_timer(struct Curl_multi *multi,    /* multi handle */
  */
 static int poll2cselect(int pollmask)
 {
-  int omask=0;
+  int omask = 0;
   if(pollmask & POLLIN)
     omask |= CURL_CSELECT_IN;
   if(pollmask & POLLOUT)
@@ -450,7 +450,7 @@ static int poll2cselect(int pollmask)
  */
 static short socketcb2poll(int pollmask)
 {
-  short omask=0;
+  short omask = 0;
   if(pollmask & CURL_POLL_IN)
     omask |= POLLIN;
   if(pollmask & CURL_POLL_OUT)
@@ -473,7 +473,7 @@ static int events_socket(struct Curl_easy *easy,      /* easy handle */
 {
   struct events *ev = userp;
   struct socketmonitor *m;
-  struct socketmonitor *prev=NULL;
+  struct socketmonitor *prev = NULL;
 
 #if defined(CURL_DISABLE_VERBOSE_STRINGS)
   (void) easy;
@@ -561,7 +561,7 @@ static void events_setup(struct Curl_multi *multi, struct events *ev)
 static CURLcode wait_or_timeout(struct Curl_multi *multi, struct events *ev)
 {
   bool done = FALSE;
-  CURLMcode mcode;
+  CURLMcode mcode = CURLM_OK;
   CURLcode result = CURLE_OK;
 
   while(!done) {
@@ -569,14 +569,14 @@ static CURLcode wait_or_timeout(struct Curl_multi *multi, struct events *ev)
     struct socketmonitor *m;
     struct pollfd *f;
     struct pollfd fds[4];
-    int numfds=0;
+    int numfds = 0;
     int pollrc;
     int i;
-    struct timeval before;
-    struct timeval after;
+    struct curltime before;
+    struct curltime after;
 
     /* populate the fds[] array */
-    for(m = ev->list, f=&fds[0]; m; m = m->next) {
+    for(m = ev->list, f = &fds[0]; m; m = m->next) {
       f->fd = m->socket.fd;
       f->events = m->socket.events;
       f->revents = 0;
@@ -615,12 +615,18 @@ static CURLcode wait_or_timeout(struct Curl_multi *multi, struct events *ev)
         }
       }
 
-      if(!ev->msbump)
+      if(!ev->msbump) {
         /* If nothing updated the timeout, we decrease it by the spent time.
          * If it was updated, it has the new timeout time stored already.
          */
-        ev->ms += curlx_tvdiff(after, before);
-
+        time_t timediff = curlx_tvdiff(after, before);
+        if(timediff > 0) {
+          if(timediff > ev->ms)
+            ev->ms = 0;
+          else
+            ev->ms -= (long)timediff;
+        }
+      }
     }
     else
       return CURLE_RECV_ERROR;
@@ -647,7 +653,9 @@ static CURLcode wait_or_timeout(struct Curl_multi *multi, struct events *ev)
  */
 static CURLcode easy_events(struct Curl_multi *multi)
 {
-  struct events evs= {2, FALSE, 0, NULL, 0};
+  /* this struct is made static to allow it to be used after this function
+     returns and curl_multi_remove_handle() is called */
+  static struct events evs = {2, FALSE, 0, NULL, 0};
 
   /* if running event-based, do some further multi inits */
   events_setup(multi, &evs);
@@ -664,7 +672,7 @@ static CURLcode easy_transfer(struct Curl_multi *multi)
   bool done = FALSE;
   CURLMcode mcode = CURLM_OK;
   CURLcode result = CURLE_OK;
-  struct timeval before;
+  struct curltime before;
   int without_fds = 0;  /* count number of consecutive returns from
                            curl_multi_wait() without any filedescriptors */
 
@@ -677,7 +685,7 @@ static CURLcode easy_transfer(struct Curl_multi *multi)
 
     if(!mcode) {
       if(!rc) {
-        struct timeval after = curlx_tvnow();
+        struct curltime after = curlx_tvnow();
 
         /* If it returns without any filedescriptor instantly, we need to
            avoid busy-looping during periods where it has nothing particular
@@ -773,8 +781,7 @@ static CURLcode easy_perform(struct Curl_easy *data, bool events)
     curl_multi_cleanup(multi);
     if(mcode == CURLM_OUT_OF_MEMORY)
       return CURLE_OUT_OF_MEMORY;
-    else
-      return CURLE_FAILED_INIT;
+    return CURLE_FAILED_INIT;
   }
 
   sigpipe_ignore(data, &pipe_st);
@@ -870,6 +877,11 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
    * get setup on-demand in the code, as that would probably decrease
    * the likeliness of us forgetting to init a buffer here in the future.
    */
+  outcurl->set.buffer_size = data->set.buffer_size;
+  outcurl->state.buffer = malloc(outcurl->set.buffer_size + 1);
+  if(!outcurl->state.buffer)
+    goto fail;
+
   outcurl->state.headerbuff = malloc(HEADERSIZE);
   if(!outcurl->state.headerbuff)
     goto fail;
@@ -940,6 +952,7 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
   if(outcurl) {
     curl_slist_free_all(outcurl->change.cookielist);
     outcurl->change.cookielist = NULL;
+    Curl_safefree(outcurl->state.buffer);
     Curl_safefree(outcurl->state.headerbuff);
     Curl_safefree(outcurl->change.url);
     Curl_safefree(outcurl->change.referer);
@@ -975,6 +988,10 @@ void curl_easy_reset(struct Curl_easy *data)
 
   data->progress.flags |= PGRS_HIDE;
   data->state.current_speed = -1; /* init to negative == impossible */
+
+  /* zero out authentication data: */
+  memset(&data->state.authhost, 0, sizeof(struct auth));
+  memset(&data->state.authproxy, 0, sizeof(struct auth));
 }
 
 /*
@@ -1002,19 +1019,32 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
   /* put it back in the keepon */
   k->keepon = newstate;
 
-  if(!(newstate & KEEP_RECV_PAUSE) && data->state.tempwrite) {
-    /* we have a buffer for sending that we now seem to be able to deliver
-       since the receive pausing is lifted! */
+  if(!(newstate & KEEP_RECV_PAUSE) && data->state.tempcount) {
+    /* there are buffers for sending that can be delivered as the receive
+       pausing is lifted! */
+    unsigned int i;
+    unsigned int count = data->state.tempcount;
+    struct tempbuf writebuf[3]; /* there can only be three */
 
-    /* get the pointer in local copy since the function may return PAUSE
-       again and then we'll get a new copy allocted and stored in
-       the tempwrite variables */
-    char *tempwrite = data->state.tempwrite;
+    /* copy the structs to allow for immediate re-pausing */
+    for(i = 0; i < data->state.tempcount; i++) {
+      writebuf[i] = data->state.tempwrite[i];
+      data->state.tempwrite[i].buf = NULL;
+    }
+    data->state.tempcount = 0;
 
-    data->state.tempwrite = NULL;
-    result = Curl_client_chop_write(data->easy_conn, data->state.tempwritetype,
-                                    tempwrite, data->state.tempwritesize);
-    free(tempwrite);
+    for(i = 0; i < count; i++) {
+      /* even if one function returns error, this loops through and frees all
+         buffers */
+      if(!result)
+        result = Curl_client_chop_write(data->easy_conn,
+                                        writebuf[i].type,
+                                        writebuf[i].buf,
+                                        writebuf[i].len);
+      free(writebuf[i].buf);
+    }
+    if(result)
+      return result;
   }
 
   /* if there's no error and we're not pausing both directions, we want
@@ -1022,7 +1052,7 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
   if(!result &&
      ((newstate&(KEEP_RECV_PAUSE|KEEP_SEND_PAUSE)) !=
       (KEEP_RECV_PAUSE|KEEP_SEND_PAUSE)) )
-    Curl_expire(data, 0); /* get this handle going again */
+    Curl_expire(data, 0, EXPIRE_RUN_NOW); /* get this handle going again */
 
   return result;
 }

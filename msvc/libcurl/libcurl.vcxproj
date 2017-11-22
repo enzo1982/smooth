@@ -172,6 +172,7 @@
     <ClCompile Include="..\..\libraries\libcurl\md4.c" />
     <ClCompile Include="..\..\libraries\libcurl\md5.c" />
     <ClCompile Include="..\..\libraries\libcurl\memdebug.c" />
+    <ClCompile Include="..\..\libraries\libcurl\mime.c" />
     <ClCompile Include="..\..\libraries\libcurl\mprintf.c" />
     <ClCompile Include="..\..\libraries\libcurl\multi.c" />
     <ClCompile Include="..\..\libraries\libcurl\netrc.c" />
@@ -301,6 +302,7 @@
     <ClInclude Include="..\..\libraries\libcurl\inet_pton.h" />
     <ClInclude Include="..\..\libraries\libcurl\llist.h" />
     <ClInclude Include="..\..\libraries\libcurl\memdebug.h" />
+    <ClInclude Include="..\..\libraries\libcurl\mime.h" />
     <ClInclude Include="..\..\libraries\libcurl\multihandle.h" />
     <ClInclude Include="..\..\libraries\libcurl\multiif.h" />
     <ClInclude Include="..\..\libraries\libcurl\netrc.h" />

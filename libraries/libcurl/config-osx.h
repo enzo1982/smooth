@@ -10,6 +10,9 @@
 /* Location of default ca path */
 /* #undef CURL_CA_PATH */
 
+/* Default SSL backend */
+/* #undef CURL_DEFAULT_SSL_BACKEND */
+
 /* to disable cookies support */
 /* #undef CURL_DISABLE_COOKIES */
 
@@ -73,6 +76,9 @@
 /* Definition to make a library symbol externally visible. */
 #define CURL_EXTERN_SYMBOL __attribute__ ((__visibility__ ("default")))
 
+/* built with multiple SSL backends */
+/* #undef CURL_WITH_MULTI_SSL */
+
 /* your Entropy Gathering Daemon socket pathname */
 /* #undef EGD_SOCKET */
 
@@ -127,6 +133,9 @@
 /* Define to 1 if using BoringSSL. */
 /* #undef HAVE_BORINGSSL */
 
+/* Define to 1 if you have the __builtin_available function. */
+/* #undef HAVE_BUILTIN_AVAILABLE */
+
 /* Define to 1 if you have the clock_gettime function and monotonic timer. */
 /* #undef HAVE_CLOCK_GETTIME_MONOTONIC */
 
@@ -180,9 +189,6 @@
 
 /* Define to 1 if you have the fdopen function. */
 #define HAVE_FDOPEN 1
-
-/* Define to 1 if you have the `fork' function. */
-#define HAVE_FORK 1
 
 /* Define to 1 if you have the freeaddrinfo function. */
 #define HAVE_FREEADDRINFO 1
@@ -259,9 +265,6 @@
 /* Define to 1 if you have the `getppid' function. */
 #define HAVE_GETPPID 1
 
-/* Define to 1 if you have the `getprotobyname' function. */
-#define HAVE_GETPROTOBYNAME 1
-
 /* Define to 1 if you have the `getpwuid' function. */
 #define HAVE_GETPWUID 1
 
@@ -283,9 +286,15 @@
 /* Define to 1 if you have a working gmtime_r function. */
 #define HAVE_GMTIME_R 1
 
+/* Define to 1 if you have the `gnutls_alpn_set_protocols' function. */
+/* #undef HAVE_GNUTLS_ALPN_SET_PROTOCOLS */
+
 /* Define to 1 if you have the `gnutls_certificate_set_x509_key_file2'
    function. */
 /* #undef HAVE_GNUTLS_CERTIFICATE_SET_X509_KEY_FILE2 */
+
+/* Define to 1 if you have the `gnutls_ocsp_req_init' function. */
+/* #undef HAVE_GNUTLS_OCSP_REQ_INIT */
 
 /* if you have the function gnutls_srp_verifier */
 /* #undef HAVE_GNUTLS_SRP */
@@ -319,9 +328,6 @@
 
 /* Define to 1 if you have the `if_nametoindex' function. */
 #define HAVE_IF_NAMETOINDEX 1
-
-/* Define to 1 if you have the `inet_addr' function. */
-#define HAVE_INET_ADDR 1
 
 /* Define to 1 if you have the inet_ntoa_r function. */
 /* #undef HAVE_INET_NTOA_R */
@@ -472,9 +478,6 @@
 /* Define to 1 if you have the <openssl/pem.h> header file. */
 /* #undef HAVE_OPENSSL_PEM_H */
 
-/* Define to 1 if you have the <openssl/pkcs12.h> header file. */
-/* #undef HAVE_OPENSSL_PKCS12_H */
-
 /* Define to 1 if you have the <openssl/rsa.h> header file. */
 /* #undef HAVE_OPENSSL_RSA_H */
 
@@ -489,9 +492,6 @@
 
 /* Define to 1 if you have the <pem.h> header file. */
 /* #undef HAVE_PEM_H */
-
-/* Define to 1 if you have the `perror' function. */
-#define HAVE_PERROR 1
 
 /* Define to 1 if you have the `pipe' function. */
 #define HAVE_PIPE 1
@@ -709,14 +709,14 @@
 /* Define to 1 if you have the <time.h> header file. */
 #define HAVE_TIME_H 1
 
-/* Define to 1 if you have the `uname' function. */
-#define HAVE_UNAME 1
-
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `utime' function. */
 #define HAVE_UTIME 1
+
+/* Define to 1 if you have the `utimes' function. */
+/* #undef HAVE_UTIMES */
 
 /* Define to 1 if you have the <utime.h> header file. */
 #define HAVE_UTIME_H 1
@@ -871,6 +871,9 @@
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV ssize_t
 
+/* The size of `curl_off_t', as computed by sizeof. */
+#define SIZEOF_CURL_OFF_T 8
+
 /* The size of `int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
@@ -891,9 +894,6 @@
 
 /* The size of `time_t', as computed by sizeof. */
 #define SIZEOF_TIME_T 4
-
-/* The size of `void*', as computed by sizeof. */
-#define SIZEOF_VOIDP 4
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -961,6 +961,9 @@
 /* if you want POSIX threaded DNS lookup */
 /* #undef USE_THREADS_POSIX */
 
+/* if you want Win32 threaded DNS lookup */
+/* #undef USE_THREADS_WIN32 */
+
 /* Use TLS-SRP authentication */
 /* #undef USE_TLS_SRP */
 
@@ -989,9 +992,6 @@
 
 /* Define to 1 to provide own prototypes. */
 /* #undef WANT_IDN_PROTOTYPES */
-
-/* Define to avoid automatic inclusion of winsock.h */
-/* #undef WIN32_LEAN_AND_MEAN */
 
 /* Define to 1 if OS is AIX. */
 #ifndef _ALL_SOURCE

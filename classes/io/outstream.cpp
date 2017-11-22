@@ -146,7 +146,8 @@ S::IO::OutStream::~OutStream()
 
 S::Bool S::IO::OutStream::Flush()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
 
 	if (currentBufferPos <= 0) return True;
 
@@ -179,7 +180,8 @@ S::Bool S::IO::OutStream::Flush()
 
 S::Bool S::IO::OutStream::WriteData()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
 
 	if (currentBufferPos < packageSize) return True;
 
@@ -223,6 +225,7 @@ S::Bool S::IO::OutStream::WriteData()
 S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
 	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
@@ -251,6 +254,7 @@ S::Bool S::IO::OutStream::OutputNumber(Int64 number, Int bytes)
 S::Bool S::IO::OutStream::OutputNumberRaw(Int64 number, Int bytes)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
 	if (bytes > 8 || bytes < 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
@@ -279,6 +283,7 @@ S::Bool S::IO::OutStream::OutputNumberRaw(Int64 number, Int bytes)
 S::Bool S::IO::OutStream::OutputBits(Int64 number, Int bits)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
 	if (bits > 64 || bits < 0)	{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (!bitstreamActive) InitBitstream();
@@ -318,6 +323,7 @@ S::Bool S::IO::OutStream::OutputBits(Int64 number, Int bits)
 S::Bool S::IO::OutStream::OutputString(const String &string)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
 	if (string == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
@@ -351,7 +357,7 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 
 S::Bool S::IO::OutStream::OutputLine(const String &string)
 {
-	OutputString(string);
+	if (!OutputString(string)) return False;
 
 #if (defined __WIN32__ || defined MSDOS) && !defined __CYGWIN32__
 	OutputNumber(13, 1);
@@ -365,6 +371,7 @@ S::Bool S::IO::OutStream::OutputLine(const String &string)
 S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
 	if (pointer == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
 	if (bytes < 0)			{ lastError = IO_ERROR_BADPARAM; return False; }
 
@@ -502,7 +509,7 @@ S::Bool S::IO::OutStream::RemoveFilter()
 
 S::Bool S::IO::OutStream::Close()
 {
-	if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return False; }
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
 	while (filter != NIL) RemoveFilter();
 

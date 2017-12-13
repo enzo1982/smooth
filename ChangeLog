@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 dd.mm.17 hh:mm - smooth alpha 0.8.73.1
 
+- added Float32 and Float64 type defintions
 - upgraded libcurl to version 7.56.1
 
 19.11.17 17:34 - smooth alpha 0.8.73.0

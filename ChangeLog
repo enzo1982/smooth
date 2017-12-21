@@ -2,6 +2,8 @@ ChangeLog for smooth
 
 dd.mm.17 hh:mm - smooth alpha 0.8.73.1
 
+- combobox.cpp		- fixed selected entry not being updated when new entry has the same memory address
+
 - added Float32 and Float64 type defintions
 - upgraded libcurl to version 7.56.1
 

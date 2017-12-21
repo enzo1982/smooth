@@ -28,7 +28,7 @@ S::GUI::ComboBox::ComboBox(const Point &iPos, const Size &iSize)
 
 	listBoxClosed	  = 0;
 
-	prevSelectedEntry = NIL;
+	prevSelectedEntry = 0;
 
 	SetFont(Font(font.GetName(), Font::DefaultSize, Font::Normal, Font::Normal, Setup::ClientTextColor));
 
@@ -140,13 +140,13 @@ S::Void S::GUI::ComboBox::OnSelectEntry(ListEntry *entry)
 {
 	if (listBox != NIL) CloseListBox();
 
-	if (prevSelectedEntry != entry)
+	if (prevSelectedEntry != entry->GetHandle())
 	{
 		Paint(SP_PAINT);
 
 		if (flags & CB_HOTSPOTONLY) entry->Deselect();
 
-		prevSelectedEntry = entry;
+		prevSelectedEntry = entry->GetHandle();
 	}
 }
 
@@ -179,7 +179,9 @@ S::Void S::GUI::ComboBox::OpenListBox()
 	listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
 	listBox->AddTab(NIL, 32768);
 
-	prevSelectedEntry = GetSelectedEntry();
+	ListEntry	*selectedEntry = GetSelectedEntry();
+
+	if (selectedEntry != NIL) prevSelectedEntry = selectedEntry->GetHandle();
 
 	for (Int i = 0; i < Length(); i++)
 	{

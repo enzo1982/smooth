@@ -12,7 +12,7 @@
 #define H_OBJSMOOTH_VERSION
 
 #define SMOOTH_VERSION	  "0.8.73.1"
-#define SMOOTH_APIVERSION "0.8.73.0"
+#define SMOOTH_APIVERSION "0.8.73.1"
 
 #ifdef SMOOTH_DLL
 # define SMOOTH_RESVERS	   0,8,73,1

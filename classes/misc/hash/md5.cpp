@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -81,10 +81,10 @@ static unsigned char PADDING[64] = {
 
 /* REVERSE_INT32 changes the byte order of an integer.
  */
-#define REVERSE_INT32(x) (( (x)	       & 0xFF) << 24 |			\
-			  (((x) >>  8) & 0xFF) << 16 |			\
-			  (((x) >> 16) & 0xFF) <<  8 |			\
-			   ((x) >> 24) & 0xFF )
+#define REVERSE_INT32(x) ((( (x)	& 0xFF) << 24) |			\
+			  ((((x) >>  8) & 0xFF) << 16) |			\
+			  ((((x) >> 16) & 0xFF) <<  8) |			\
+			   (((x) >> 24) & 0xFF)	      )
 
 S::Hash::MD5::MD5()
 {

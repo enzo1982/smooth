@@ -301,7 +301,7 @@ S::Int S::Directory::Create()
 #ifdef __WIN32__
 			result = CreateDirectory(String(GetUnicodePathPrefix(path)).Append(path), NIL);
 #else
-			if (mkdir(path.ConvertTo("UTF-8"), 0755) == 0) result = True;
+			if (mkdir(path.ConvertTo("UTF-8"), 0777) == 0) result = True;
 			else					       result = False;
 #endif
 		}

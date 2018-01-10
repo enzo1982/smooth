@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,7 +37,7 @@ namespace smooth
 			static Int			 nextObjectHandle;
 
 			static Array<Object *, Void *>	 objects;
-			static Array<Object *, Void *>	 deleteable;
+			static Array<Object *, Void *>	 deletable;
 
 			static System::Timer		*cleanupTimer;
 
@@ -46,7 +46,7 @@ namespace smooth
 
 			Bool				 lockingEnabled;
 
-			Bool				 isDeleteable;
+			Bool				 isDeletable;
 			mutable Int			 isObjectInUse;
 		protected:
 			ObjectType			 type;

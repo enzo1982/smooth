@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,7 +18,7 @@ S::Short	 S::Object::nextClassID		= 0;
 S::Int		 S::Object::nextObjectHandle	= 0;
 
 S::Array<S::Object *, S::Void *>	 S::Object::objects;
-S::Array<S::Object *, S::Void *>	 S::Object::deleteable;
+S::Array<S::Object *, S::Void *>	 S::Object::deletable;
 
 S::System::Timer	*S::Object::cleanupTimer = NIL;
 
@@ -29,7 +29,7 @@ S::Object::Object() : type(this)
 	if (objects.Length() == 0)
 	{
 		objects.EnableLocking();
-		deleteable.EnableLocking();
+		deletable.EnableLocking();
 	}
 
 	type	       = classID;
@@ -39,7 +39,7 @@ S::Object::Object() : type(this)
 
 	lockingEnabled = False;
 
-	isDeleteable   = False;
+	isDeletable    = False;
 	isObjectInUse  = 0;
 
 	flags	       = 0;
@@ -63,7 +63,7 @@ S::Object::~Object()
 	/* Try to remove ourself from the object list
 	 * as DeleteObject might not have been called.
 	 */
-	if (!isDeleteable) objects.Remove(handle);
+	if (!isDeletable) objects.Remove(handle);
 
 	/* Free periodical cleanup timer if the timer
 	 * itself is the only remaining object.
@@ -152,54 +152,44 @@ S::Int S::Object::RequestObjectHandle()
 
 S::Int S::Object::DeleteObject(Object *object)
 {
-	if (object != NIL)
+	if (object == NIL || objects.Get(object->handle) == NIL) return Error();
+
+	/* Notify object that it will be deleted soon.
+	 */
+	object->EnqueueForDeletion();
+	object->isDeletable = True;
+
+	if (!object->IsObjectInUse())
 	{
-		if (objects.Get(object->handle) == NIL) return Error();
-
-		/* Notify object that it will be deleted soon.
+		/* Delete object immediately if
+		 * it is not currently in use.
 		 */
-		object->EnqueueForDeletion();
-		object->isDeleteable = True;
-
-		if (!object->IsObjectInUse())
-		{
-			/* Delete object immediately if
-			 * it is not currently in use.
-			 */
-			objects.Remove(object->handle);
-			delete object;
-		}
-		else
-		{
-			/* Remove object from object list and add
-			 * it to the list of objects to delete.
-			 */
-			objects.Remove(object->handle);
-			deleteable.Add(object, object->handle);
-		}
-
-		return Success();
+		objects.Remove(object->handle);
+		delete object;
+	}
+	else
+	{
+		/* Remove object from object list and add
+		 * it to the list of objects to delete.
+		 */
+		objects.Remove(object->handle);
+		deletable.Add(object, object->handle);
 	}
 
-	return Error();
+	return Success();
 }
 
 S::Void S::Object::ObjectCleanup()
 {
-	/* Loop through all deleteable objects...
+	/* Loop through all deletable objects...
 	 */
-	for (Int i = 0; i < deleteable.Length(); i++)
+	for (Int i = 0; i < deletable.Length(); i++)
 	{
-		Object	*object = deleteable.GetNth(i);
+		Object	*object = deletable.GetNth(i);
 
-		if (!object->IsObjectInUse())
-		{
-			deleteable.RemoveNth(i);
-			delete object;
+		if (object->IsObjectInUse()) continue;
 
-			i -= 1;
-
-			continue;
-		}
+		deletable.RemoveNth(i--);
+		delete object;
 	}
 }

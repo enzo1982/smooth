@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -364,12 +364,31 @@ S::Int S::GUI::Widget::Show()
 {
 	if (visible) return Success();
 
+	/* Show ourself.
+	 */
 	visible = True;
 
 	if (!registered) return Success();
 
 	if (IsVisible()) Paint(SP_PAINT);
 
+	/* Show child widgets.
+	 */
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*object = GetNthObject(i);
+
+		if (object == NIL || !object->IsVisible()) continue;
+
+		visible = False;
+		object->Hide();
+
+		visible = True;
+		object->Show();
+	}
+
+	/* Notify listeners.
+	 */
 	onShow.Emit();
 
 	return Success();
@@ -379,6 +398,23 @@ S::Int S::GUI::Widget::Hide()
 {
 	if (!visible) return Success();
 
+	/* Hide child widgets.
+	 */
+	for (Int i = 0; i < GetNOfObjects(); i++)
+	{
+		Widget	*object = GetNthObject(i);
+
+		if (object == NIL || !object->IsVisible()) continue;
+
+		object->Hide();
+		visible = False;
+
+		object->Show();
+		visible = True;
+	}
+
+	/* Hide ourself.
+	 */
 	Bool	 wasVisible = IsVisible();
 
 	visible = False;
@@ -387,12 +423,7 @@ S::Int S::GUI::Widget::Hide()
 
 	if (wasVisible)
 	{
-		if (focussed)
-		{
-			focussed = False;
-
-			onLoseFocus.Emit();
-		}
+		if (focussed) { focussed = False; onLoseFocus.Emit(); }
 
 		Rect	 rect	 = GetVisibleArea();
 		Surface	*surface = GetDrawSurface();
@@ -402,6 +433,8 @@ S::Int S::GUI::Widget::Hide()
 		DeactivateTooltip();
 	}
 
+	/* Notify listeners.
+	 */
 	onHide.Emit();
 
 	return Success();

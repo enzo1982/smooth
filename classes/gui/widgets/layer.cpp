@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,84 +28,6 @@ S::GUI::Layer::Layer(const String &name) : Widget(Point(0, 0), Size(32768, 32768
 
 S::GUI::Layer::~Layer()
 {
-}
-
-S::Int S::GUI::Layer::Show()
-{
-	if (visible) return Success();
-
-	visible = True;
-
-	if (!IsRegistered()) return Success();
-
-	if (IsBackgroundColorSet() && IsVisible())
-	{
-		Surface	*surface	= GetDrawSurface();
-		Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
-
-		surface->Box(frame, GetBackgroundColor(), Rect::Filled);
-	}
-
-	for (Int i = 0; i < GetNOfObjects(); i++)
-	{
-		Widget	*object = GetNthObject(i);
-
-		if (object != NIL)
-		{
-			if (object->IsVisible())
-			{
-				visible = False;
-				object->Hide();
-
-				visible = True;
-				object->Show();
-			}
-		}
-	}
-
-	onShow.Emit();
-
-	return Success();
-}
-
-S::Int S::GUI::Layer::Hide()
-{
-	if (!visible) return Success();
-
-	for (Int i = 0; i < GetNOfObjects(); i++)
-	{
-		Widget	*object = GetNthObject(i);
-
-		if (object != NIL)
-		{
-			if (object->IsVisible())
-			{
-				object->Hide();
-				visible = False;
-
-				object->Show();
-				visible = True;
-			}
-		}
-	}
-
-	Bool	 wasVisible = IsVisible();
-
-	visible = False;
-
-	if (!IsRegistered()) return Success();
-
-	if (IsBackgroundColorSet() && wasVisible)
-	{
-		Surface	*surface	= GetDrawSurface();
-		Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
-
-		surface->Box(frame, container->GetBackgroundColor(), Rect::Filled);
-	}
-
-	onHide.Emit();
-
-	return Success();
 }
 
 S::Int S::GUI::Layer::Paint(Int message)

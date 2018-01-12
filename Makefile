@@ -95,7 +95,7 @@ ifeq ($(BUILD_WIN32),True)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else ifeq ($(BUILD_OSX),True)
 	ifeq ($(BUILD_XLIB),True)
-		LIBS += -lX11 -lXmu -lXft
+		LIBS += -lX11 -lXft
 	endif
 
 	ifeq ($(BUILD_CAIRO),True)
@@ -116,7 +116,7 @@ else
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif
 
-	LIBS += $(shell pkg-config --libs xmu) $(shell pkg-config --libs xft)
+	LIBS += $(shell pkg-config --libs xft)
 	LIBS += -lpthread
 
 	ifeq ($(BUILD_SOLARIS),True)

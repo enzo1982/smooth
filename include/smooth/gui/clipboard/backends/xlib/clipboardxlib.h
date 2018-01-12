@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,6 @@ namespace X11
 
 #		include <X11/Xlib.h>
 #		include <X11/Xatom.h>
-#		include <X11/Xmu/Atoms.h>
 
 #		undef True
 #		undef False

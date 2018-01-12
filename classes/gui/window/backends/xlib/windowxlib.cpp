@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -253,6 +253,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 	static Atom	 wmPingAtom	       = XInternAtom(display, "_NET_WM_PING", False);
 
+	static Atom	 xaTargets	       = XInternAtom(display, "TARGETS", True);
+	static Atom	 xaClipboard	       = XInternAtom(display, "CLIPBOARD", True);
+	static Atom	 xaUtf8String	       = XInternAtom(display, "UTF8_STRING", True);
+
 	static Atom	 xdndEnterAtom	       = XInternAtom(display, "XdndEnter", False);
 	static Atom	 xdndTypeListAtom      = XInternAtom(display, "XdndTypeList", False);
 	static Atom	 xdndPositionAtom      = XInternAtom(display, "XdndPosition", False);
@@ -325,8 +329,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			{
 				String	 text;
 
-				if	(e->xselectionrequest.selection == XA_PRIMARY)		  text = selection;
-				else if (e->xselectionrequest.selection == XA_CLIPBOARD(display)) text = clipboard;
+				if	(e->xselectionrequest.selection == XA_PRIMARY)  text = selection;
+				else if (e->xselectionrequest.selection == xaClipboard) text = clipboard;
 
 				if (text == NIL) break;
 
@@ -340,9 +344,9 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				respond.xselection.property  = e->xselectionrequest.property;
 				respond.xselection.time	     = e->xselectionrequest.time;
 
-				if (e->xselectionrequest.target == XA_TARGETS(display))
+				if (e->xselectionrequest.target == xaTargets)
 				{
-					Atom	 targets[] = { XA_STRING, XA_UTF8_STRING(display) };
+					Atom	 targets[] = { XA_STRING, xaUtf8String };
 
 					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_ATOM, 32, PropModeReplace, (unsigned char *) targets, 2);
 				}
@@ -350,9 +354,9 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				{
 					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_STRING, 8, PropModeReplace, (unsigned char *) (char *) text, text.Length());
 				}
-				else if (e->xselectionrequest.target == XA_UTF8_STRING(display))
+				else if (e->xselectionrequest.target == xaUtf8String)
 				{
-					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, XA_UTF8_STRING(display), 8, PropModeReplace, (unsigned char *) text.ConvertTo("UTF-8"), strlen(text.ConvertTo("UTF-8")));
+					XChangeProperty(display, e->xselectionrequest.requestor, e->xselectionrequest.property, xaUtf8String, 8, PropModeReplace, (unsigned char *) text.ConvertTo("UTF-8"), strlen(text.ConvertTo("UTF-8")));
 				}
 				else
 				{
@@ -368,8 +372,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			break;
 
 		case SelectionClear:
-			if	(e->xselectionclear.selection == XA_PRIMARY)		selection = NIL;
-			else if (e->xselectionclear.selection == XA_CLIPBOARD(display)) clipboard = NIL;
+			if	(e->xselectionclear.selection == XA_PRIMARY)  selection = NIL;
+			else if (e->xselectionclear.selection == xaClipboard) clipboard = NIL;
 
 			break;
 	}

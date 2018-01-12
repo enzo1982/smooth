@@ -10,7 +10,6 @@ echo "        - libfribidi development package"
 echo "        - libgtk+3.0 development package"
 echo "        - libjpeg development package"
 echo "        - libxml2 development package"
-echo "        - libxmu development package"
 echo
 echo "        - smooth uses a bundled version of libcpuid by default. To use"
 echo "          the library installed on your system, please build with"

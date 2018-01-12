@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -83,7 +83,7 @@ S::String S::GUI::ClipboardXLib::GetText(Atom clipboard) const
 
 	if (owner != None)
 	{
-		unsigned char *data = QueryAtom(display, self, clipboard, XA_UTF8_STRING(display));
+		unsigned char *data = QueryAtom(display, self, clipboard, XInternAtom(display, "UTF8_STRING", True));
 
 		if (data != NIL)
 		{
@@ -117,8 +117,8 @@ S::Bool S::GUI::ClipboardXLib::SetText(Atom clipboard, const String &text)
 
 	if (backend != NIL)
 	{
-		if	(clipboard == XA_PRIMARY)	     backend->SetSelection(text);
-		else if (clipboard == XA_CLIPBOARD(display)) backend->SetClipboard(text);
+		if	(clipboard == XA_PRIMARY)			       backend->SetSelection(text);
+		else if (clipboard == XInternAtom(display, "CLIPBOARD", True)) backend->SetClipboard(text);
 	}
 
 	XSetSelectionOwner(display, clipboard, self, CurrentTime);
@@ -141,12 +141,12 @@ S::String S::GUI::ClipboardXLib::GetClipboardText() const
 {
 	Display	*display = Backends::BackendXLib::GetDisplay();
 
-	return GetText(XA_CLIPBOARD(display));
+	return GetText(XInternAtom(display, "CLIPBOARD", True));
 }
 
 S::Bool S::GUI::ClipboardXLib::SetClipboardText(const String &text)
 {
 	Display	*display = Backends::BackendXLib::GetDisplay();
 
-	return SetText(XA_CLIPBOARD(display), text);
+	return SetText(XInternAtom(display, "CLIPBOARD", True), text);
 }

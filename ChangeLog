@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-dd.mm.17 hh:mm - smooth alpha 0.8.73.1
+dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 
 - widget.cpp		- explicitly show/hide child widgets in Show/Hide methods
 - layer.cpp		- use standard widget implementations of Show/Hide methods

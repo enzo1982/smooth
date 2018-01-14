@@ -1105,6 +1105,8 @@ S::Void S::GUI::Cursor::Undo()
 {
 	if (historyPos <= 1) return;
 
+	lineIndices.RemoveAll();
+
 	Surface	*surface = GetDrawSurface();
 
 	surface->StartPaint(Rect(GetRealPosition(), GetRealSize()));
@@ -1122,6 +1124,8 @@ S::Void S::GUI::Cursor::Undo()
 S::Void S::GUI::Cursor::Redo()
 {
 	if (historyPos >= history.Length()) return;
+
+	lineIndices.RemoveAll();
 
 	Surface	*surface = GetDrawSurface();
 

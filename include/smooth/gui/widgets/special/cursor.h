@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -58,10 +58,6 @@ namespace smooth
 
 				Array<Int>					 lineIndices;
 
-				String						 ConvertTabs(const String &) const;
-
-				Bool						 ContainsRTLCharacters(const String &) const;
-
 				Int						 GetDisplayCursorPositionFromLogical(Int) const;
 
 				Int						 GetDisplayCursorPositionFromLogical(const String &, Int) const;
@@ -70,6 +66,9 @@ namespace smooth
 				Int						 GetDisplayCursorPositionFromVisual(const String &, Int) const;
 
 				Int						 GetVisualCursorPositionFromLogical(const String &, Int) const;
+
+				static String					 ConvertTabs(const String &, Int);
+				static Bool					 ContainsRTLCharacters(const String &);
 			protected:
 				Int						 maxSize;
 

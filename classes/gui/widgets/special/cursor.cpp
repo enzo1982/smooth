@@ -399,7 +399,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 		Int	 lineLength = lineIndices.GetNth(lineNumber + 1) - lineStart - 1;
 		String	 line	    = text.SubString(lineStart, lineLength);
 
-		if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
+		if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line, tabSize),      frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
 		else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), font);
 
 		if (markStart != markEnd && markStart >= 0 && markEnd >= 0)
@@ -495,7 +495,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 
 					surface->Box(markRect, Setup::HighlightColor, Rect::Filled);
 
-					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line),	       frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
+					if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK)) surface->SetText(ConvertTabs(line, tabSize),      frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
 					else							     surface->SetText(String().FillN('*', lineLength), frame + Point(-visibleOffset, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 + Size(visibleOffset, -2), nFont);
 
 					surface->EndPaint();
@@ -1467,7 +1467,7 @@ S::Int S::GUI::Cursor::GetVisualCursorPositionFromLogical(const String &line, In
 
 /* Convert tabs in a string.
  */
-S::String S::GUI::Cursor::ConvertTabs(const String &line) const
+S::String S::GUI::Cursor::ConvertTabs(const String &line, Int tabSize)
 {
 	String	 string	      = line;
 	Int	 stringLength = string.Length();
@@ -1478,8 +1478,8 @@ S::String S::GUI::Cursor::ConvertTabs(const String &line) const
 
 		Int	 spaces = tabSize - i % tabSize;
 
-		string	      = string.Head(i).Append(String().FillN(' ', spaces)).Append(string.Tail(string.Length() - i - 1));
-		stringLength += spaces;
+		string	      = string.Head(i).Append(String().FillN(' ', spaces)).Append(string.Tail(stringLength - i - 1));
+		stringLength += spaces - 1;
 	}
 
 	return string;
@@ -1487,7 +1487,7 @@ S::String S::GUI::Cursor::ConvertTabs(const String &line) const
 
 /* Check if the string contains right-to-left characters.
  */
-S::Bool S::GUI::Cursor::ContainsRTLCharacters(const String &line) const
+S::Bool S::GUI::Cursor::ContainsRTLCharacters(const String &line)
 {
 	FriBidiStrIndex	 length = line.Length();
 

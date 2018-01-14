@@ -611,12 +611,19 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 {
 	ShowCursor(False);
 
+	Int	 textLength   = text.Length();
+	Int	 insertLength = insertText.Length();
+
+	/* Build resulting text value.
+	 */
 	String	 newText;
 
-	for (Int i = 0;		i < promptPos;			     i++) newText[i] = text[i];
-	for (Int j = promptPos; j < promptPos + insertText.Length(); j++) newText[j] = insertText[j - promptPos];
-	for (Int k = promptPos; k <= text.Length();		     k++) newText[k + insertText.Length()] = text[k];
+	for (Int i = 0;		i <  promptPos;		       i++) newText[i] = text[i];
+	for (Int i = promptPos; i <  promptPos + insertLength; i++) newText[i] = insertText[i - promptPos];
+	for (Int i = promptPos; i <=		 textLength;   i++) newText[i + insertLength] = text[i];
 
+	/* Draw widget with new content.
+	 */
 	Bool	 prevVisible = IsVisible();
 
 	visible = False;
@@ -627,6 +634,8 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 
 	visible = prevVisible;
 
+	/* Update screen.
+	 */
 	Surface	*surface = GetDrawSurface();
 
 	surface->StartPaint(Rect(container->GetRealPosition(), container->GetRealSize()));
@@ -635,7 +644,9 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 
 	surface->EndPaint();
 
-	SetCursorPos(promptPos + insertText.Length());
+	/* Update cursor position.
+	 */
+	SetCursorPos(promptPos + insertLength);
 
 	AddHistoryEntry();
 
@@ -1345,18 +1356,18 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromVisual(const String &line, In
 
 	if (!Binary::IsFlagSet(container->GetFlags(), EDB_ASTERISK))
 	{
-		String	 vText = line;
+		String	 string = line;
 
 		if (Setup::useIconv && ContainsRTLCharacters(line))
 		{
 			FriBidiChar	*visual = new FriBidiChar [length + 1];
 			FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
-			fribidi_log2vis((FriBidiChar *) vText.ConvertTo("UCS-4LE"), length, &type, visual, NIL, NIL, NIL);
+			fribidi_log2vis((FriBidiChar *) string.ConvertTo("UCS-4LE"), length, &type, visual, NIL, NIL, NIL);
 
 			visual[length] = 0;
 
-			vText.ImportFrom("UCS-4LE", (char *) visual);
+			string.ImportFrom("UCS-4LE", (char *) visual);
 
 			delete [] visual;
 		}
@@ -1365,20 +1376,20 @@ S::Int S::GUI::Cursor::GetDisplayCursorPositionFromVisual(const String &line, In
 		 */
 		Int	 offset = 0;
 
-		for (Int i = 0; i < vText.Length(); i++)
+		for (Int i = 0; i < length; i++)
 		{
-			if (vText[i] != '\t') continue;
+			if (string[i] != '\t') continue;
 
 			Int	 spaces = tabSize - i % tabSize;
 
-			vText	 = vText.Head(i).Append(String().FillN(' ', spaces)).Append(vText.Tail(vText.Length() - i - 1));
-			length	+= spaces - 1;
+			string  = string.Head(i).Append(String().FillN(' ', spaces)).Append(string.Tail(length - i - 1));
+			length += spaces - 1;
 
 			if (i < promptPos + offset) offset += spaces - 1;
 		}
 
-		if (!IsRightToLeft()) position += font.GetScaledTextSizeX(vText.Head(	      promptPos + offset)) - visibleOffset;
-		else		      position += font.GetScaledTextSizeX(vText.Tail(length - promptPos - offset)) - visibleOffset;
+		if (!IsRightToLeft()) position += font.GetScaledTextSizeX(string.Head(	       promptPos + offset)) - visibleOffset;
+		else		      position += font.GetScaledTextSizeX(string.Tail(length - promptPos - offset)) - visibleOffset;
 	}
 	else
 	{
@@ -1397,22 +1408,32 @@ S::Int S::GUI::Cursor::GetLogicalCursorPositionFromDisplay(const String &line, I
 
 	if (length == 0) return 0;
 
-	Int	 bestPos      = 0;
-	Int	 bestPosValue = 100000;
+	/* Find best position using binary search.
+	 */
+	Int	 bestPos   = 0;
+	Int	 bestValue = 2147483647;
 
-	for (Int i = 0; i <= length; i++)
+	Int	 startPos  = 0;
+	Int	 endPos	   = length;
+
+	while (endPos >= startPos)
 	{
-		Int	 pos = GetDisplayCursorPositionFromLogical(line, i);
+		/* Select element to compare and perform comparison.
+		 */
+		Int	 m   = (startPos + endPos) / 2;
+		Int	 pos = GetDisplayCursorPositionFromVisual(line, m);
 
-		if (Math::Abs(pos - displayPos) >= bestPosValue) continue;
+		if (pos > displayPos) endPos   = m - 1;
+		else		      startPos = m + 1;
 
-		bestPos	     = i;
-		bestPosValue = Math::Abs(pos - displayPos);
-
-		if (bestPosValue == 0) break;
+		if (Math::Abs(pos - displayPos) < bestValue)
+		{
+			bestPos	  = m;
+			bestValue = Math::Abs(pos - displayPos);
+		}
 	}
 
-	return bestPos;
+	return GetLogicalCursorPositionFromVisual(line, bestPos);
 }
 
 /* Returns the cursor position in the visual string
@@ -1442,6 +1463,60 @@ S::Int S::GUI::Cursor::GetVisualCursorPositionFromLogical(const String &line, In
 		FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
 
 		fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, &type, NIL, positions, NIL, NIL);
+
+		if (n == length)
+		{
+			if	( FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1];
+			else					position = positions[n - 1] + 1;
+		}
+		else if (n == 0)
+		{
+			if	( FRIBIDI_IS_RTL(types[n    ]))	position = positions[n    ] + 1;
+			else					position = positions[n    ];
+		}
+		else
+		{
+			if	( FRIBIDI_IS_RTL(types[n    ]))	position = positions[n    ] + 1;
+			else if ( FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1];
+			else if ( FRIBIDI_IS_SPACE(types[n]) &&
+				 !FRIBIDI_IS_RTL(types[n - 1])) position = positions[n - 1] + 1;
+			else					position = positions[n    ];
+		}
+
+		delete [] types;
+		delete [] positions;
+	}
+
+	return position;
+}
+
+/* Returns the cursor position in the logical string
+ * for a given visual cursor position.
+ */
+S::Int S::GUI::Cursor::GetLogicalCursorPositionFromVisual(const String &line, Int n) const
+{
+	FriBidiStrIndex	 length = line.Length();
+
+	if (length == 0) return 0;
+
+	Int		 position = n;
+
+	/* Check if the input string contains RTL characters.
+	 */
+	if (Setup::useIconv && ContainsRTLCharacters(line))
+	{
+		/* Get BiDi types for input string.
+		 */
+		FriBidiCharType	*types = new FriBidiCharType [length + 1];
+
+		fribidi_get_bidi_types((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, types);
+
+		/* Get visual cursor position.
+		 */
+		FriBidiStrIndex	*positions = new FriBidiStrIndex [length + 1];
+		FriBidiParType	 type = (IsRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
+
+		fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), length, &type, NIL, NIL, positions, NIL);
 
 		if (n == length)
 		{

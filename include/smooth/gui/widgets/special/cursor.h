@@ -66,6 +66,7 @@ namespace smooth
 				Int						 GetDisplayCursorPositionFromVisual(const String &, Int) const;
 
 				Int						 GetVisualCursorPositionFromLogical(const String &, Int) const;
+				Int						 GetLogicalCursorPositionFromVisual(const String &, Int) const;
 
 				static String					 ConvertTabs(const String &, Int);
 				static Bool					 ContainsRTLCharacters(const String &);

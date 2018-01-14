@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -176,27 +176,60 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void) keyDown: (NSEvent *) event
 	{
-		if (![self hasMarkedText]) [self handleEvent: event];
+		/* Collect queued key down events to process them all together.
+		 */
+		NSMutableArray	*keyEvents = [NSMutableArray arrayWithCapacity: 1];
 
-		NSString	*characters    = [event charactersIgnoringModifiers];
-		S::Int		 keySym	       = [characters length] >= 1 ? [characters characterAtIndex: 0] : 0;
-		S::Int		 modifierFlags = [event modifierFlags];
+		while (event != nil)
+		{
+			if (![self hasMarkedText]) [self handleEvent: event];
 
-		if ([self hasMarkedText] || (keySym != NSTabCharacter		 &&
-					     keySym != NSBackTabCharacter	 &&
-					     keySym != NSDeleteCharacter	 &&
-					     keySym != NSEnterCharacter		 &&
-					     keySym != NSNewlineCharacter	 &&
-					     keySym != NSCarriageReturnCharacter &&
-					     keySym != NSHomeFunctionKey	 &&
-					     keySym != NSEndFunctionKey		 &&
-					     keySym != NSDeleteFunctionKey	 &&
-					     keySym != NSLeftArrowFunctionKey	 &&
-					     keySym != NSUpArrowFunctionKey	 &&
-					     keySym != NSRightArrowFunctionKey	 &&
-					     keySym != NSDownArrowFunctionKey    &&
-					     !(modifierFlags & NSControlKeyMask) &&
-					     !(modifierFlags & NSCommandKeyMask))) [self interpretKeyEvents: [NSArray arrayWithObject: event]];
+			/* Check if event is relevant for us.
+			 */
+			NSString	*characters    = [event charactersIgnoringModifiers];
+			S::Int		 keySym	       = [characters length] >= 1 ? [characters characterAtIndex: 0] : 0;
+			S::Int		 modifierFlags = [event modifierFlags];
+
+			if ([self hasMarkedText] || (keySym != NSTabCharacter		 &&
+						     keySym != NSBackTabCharacter	 &&
+						     keySym != NSDeleteCharacter	 &&
+						     keySym != NSEnterCharacter		 &&
+						     keySym != NSNewlineCharacter	 &&
+						     keySym != NSCarriageReturnCharacter &&
+						     keySym != NSHomeFunctionKey	 &&
+						     keySym != NSEndFunctionKey		 &&
+						     keySym != NSDeleteFunctionKey	 &&
+						     keySym != NSLeftArrowFunctionKey	 &&
+						     keySym != NSUpArrowFunctionKey	 &&
+						     keySym != NSRightArrowFunctionKey	 &&
+						     keySym != NSDownArrowFunctionKey    &&
+						     !(modifierFlags & NSControlKeyMask) &&
+						     !(modifierFlags & NSCommandKeyMask))) [keyEvents addObject: event];
+
+			/* Get next key down event.
+			 */
+			event = [[self window] nextEventMatchingMask: NSKeyDownMask
+							   untilDate: [NSDate distantPast]
+							      inMode: NSDefaultRunLoopMode
+							     dequeue: YES];
+		}
+
+		/* Send events to input manager.
+		 */
+		if ([keyEvents count] == 0) return;
+
+		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([self window]);
+
+		if (backend != NIL && cursor != NIL)
+		{
+			S::GUI::Surface	*surface = cursor->GetDrawSurface();
+
+			surface->StartPaint(S::GUI::Rect(cursor->GetContainer()->GetRealPosition(), cursor->GetContainer()->GetRealSize()));
+
+			[self interpretKeyEvents: keyEvents];
+
+			surface->EndPaint();
+		}
 	}
 
 	- (void) keyUp:		    (NSEvent *) event { [self handleEvent: event]; }
@@ -254,16 +287,7 @@ const int	 NSApplicationDropFiles	 = 9;
 									 data1: (NSInteger) string
 									 data2: nil];
 
-		if (backend != NIL && cursor != NIL)
-		{
-			S::GUI::Surface	*surface = cursor->GetDrawSurface();
-
-			surface->StartPaint(S::GUI::Rect(cursor->GetContainer()->GetRealPosition(), cursor->GetContainer()->GetRealSize()));
-
-			backend->ProcessSystemMessages(event);
-
-			surface->EndPaint();
-		}
+		if (backend != NIL && cursor != NIL) backend->ProcessSystemMessages(event);
 
 		[self unmarkText];
 	}
@@ -370,7 +394,7 @@ const int	 NSApplicationDropFiles	 = 9;
 	}
 
 	/* Helper methods.
-	*/
+	 */
 	- (void) setCursor: (S::GUI::Cursor *) aCursor position: (const S::GUI::Point &) aPoint
 	{
 		const S::GUI::Font	&font = aCursor->GetFont();

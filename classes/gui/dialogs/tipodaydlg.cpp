@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -144,6 +144,7 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 	dlgwnd->SetPosition(workArea.GetPosition() + Point((workArea.GetSize().cx - dlgwnd->GetWidth()) / 2, (workArea.GetSize().cy - dlgwnd->GetHeight()) / 2));
 
 	layer_inner->SetSize(size);
+	txt_tip->SetSize(size);
 
 	/* Set next tip and display dialog.
 	 */

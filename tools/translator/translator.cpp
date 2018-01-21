@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -132,6 +132,12 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	entry = menu_file->AddEntry("Save as...");
 	entry->onAction.Connect(&Translator::SaveFileAs, this);
 	entry->SetShortcut(SC_CONTROL | SC_SHIFT, 'S', wnd);
+	entry->Deactivate();
+
+	menu_file->AddEntry();
+
+	entry = menu_file->AddEntry("Export as...");
+	entry->onAction.Connect(&Translator::ExportAs, this);
 	entry->Deactivate();
 
 	menu_file->AddEntry();
@@ -318,6 +324,7 @@ Void Translator::NewFile()
 	menu_file->GetNthEntry(1)->Activate();
 	menu_file->GetNthEntry(4)->Activate();
 	menu_file->GetNthEntry(5)->Activate();
+	menu_file->GetNthEntry(7)->Activate();
 
 	menubar->GetNthEntry(1)->Activate();
 
@@ -437,6 +444,7 @@ Void Translator::CloseFile()
 	menu_file->GetNthEntry(1)->Deactivate();
 	menu_file->GetNthEntry(4)->Deactivate();
 	menu_file->GetNthEntry(5)->Deactivate();
+	menu_file->GetNthEntry(7)->Deactivate();
 
 	menubar->GetNthEntry(1)->Deactivate();
 }
@@ -621,6 +629,32 @@ Void Translator::SaveFileName(const String &file)
 
 	ReplaceLineEndings(file);
 	FormatLines(file);
+}
+
+Void Translator::ExportAs()
+{
+	if (fileName == NIL) return;
+
+	FileSelection	 dialog;
+
+	dialog.SetParentWindow(wnd);
+	dialog.SetMode(SFM_SAVE);
+	dialog.SetDefaultExtension("txt");
+
+	dialog.AddFilter("Plain Text Files", "*.txt");
+	dialog.AddFilter("All Files", "*.*");
+
+	if (dialog.ShowDialog() == Success())
+	{
+		IO::OutStream	 stream(IO::STREAM_FILE, dialog.GetFileName(), IO::OS_REPLACE);
+
+		stream.OutputLine(((InfoItem *) entries.GetNth(0))->GetValue().Append(" ").Append(((InfoItem *) entries.GetNth(1))->GetValue()));
+		stream.OutputLine(((InfoItem *) entries.GetNth(2))->GetValue());
+		stream.OutputLine(((InfoItem *) entries.GetNth(5))->GetValue());
+		stream.OutputString("\n");
+
+		dataSection->Export(stream, 0);
+	}
 }
 
 Void Translator::ReplaceLineEndings(const String &file)

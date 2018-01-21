@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -128,6 +128,35 @@ Bool Section::Save(XML::Node *xmlSection, const String &templateName)
 		node->SetAttribute("name", section->GetName());
 
 		section->Save(node, templateName);
+	}
+
+	return True;
+}
+
+Bool Section::Export(IO::OutStream &stream, Int level)
+{
+	String	 indent;
+
+	indent.FillN(' ', level * 2);
+
+	for (Int i = 0; i < items.Length(); i++)
+	{
+		StringItem	*item = items.GetNth(i);
+
+		/* Save only entries with a translation.
+		 */
+		if (item->GetTranslation() != NIL) stream.OutputLine(String(indent).Append(item->GetTranslation().Replace("\n", " \\ ")));
+	}
+
+	foreach (Section *section, sections)
+	{
+		if (section->items.Length() == 0 && section->sections.Length() == 0) continue;
+
+		stream.OutputString("\n");
+		stream.OutputLine(String(indent).Append("# ").Append(section->GetName()));
+		stream.OutputString("\n");
+
+		section->Export(stream, level + 1);
 	}
 
 	return True;

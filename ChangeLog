@@ -13,3 +13,4 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - added Float32 and Float64 type defintions
 - removed dependency on libXmu
 - upgraded libcurl to version 7.56.1
+- upgraded libjpeg to version 9c

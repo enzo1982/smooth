@@ -23,7 +23,6 @@ The following packages must be installed in order to compile _smooth_:
 - libgtk+3.0 development package
 - libjpeg development package
 - libxml2 development package
-- libxmu development package
 
 After installing these prerequisites, run `make` followed by `sudo make install` to compile and install _smooth_.
 

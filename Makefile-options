@@ -1,6 +1,6 @@
 ########## smooth options makefile ##########
 
-VERSION	 = 0.8.73
+VERSION	 = 0.8.74
 REVISION = 0
 
 # Find source folder and set vpath

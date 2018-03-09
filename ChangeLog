@@ -7,6 +7,7 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - combobox.cpp		- fixed selected entry not being updated when new entry has the same memory address
 - cursor.cpp		- fixed text not being drawn correctly after undo/redo
 			- performance optimizations for text input
+- tree.cpp		- draw horizontal branch lines to improve tree look
 - directory.cpp		- fixed permissions of newly created directories to respect umask setting
 - driver_posix.cpp	- fixed permissions of newly created files to respect umask setting
 

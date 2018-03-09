@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -151,17 +151,33 @@ S::Int S::GUI::Tree::Paint(Int message)
 						entry->SetVisibleDirect(True);
 					}
 
-					entryPosition.y	    += entry->GetHeight();
-					entryRealPosition.y  = Math::Round(entryPosition.y * surface->GetSurfaceDPI() / 96.0);
+					/* Draw horizontal branch line.
+					 */
+					Point	 startPos = GetRealPosition() + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), entryRealPosition.y + Math::Round(8 * surface->GetSurfaceDPI() / 96.0) + Math::Round(16 * surface->GetSurfaceDPI() / 96.0));
+
+					for (Int x = 0; x < Math::Round(5 * surface->GetSurfaceDPI() / 96.0); x += 2)
+					{
+						surface->SetPixel(startPos + Point(x, 0), Setup::InactiveTextColor);
+					}
+
+					/* Compute next entry position.
+					 */
+					if (i < Length() - 1)
+					{
+						entryPosition.y	    += entry->GetHeight();
+						entryRealPosition.y  = Math::Round(entryPosition.y * surface->GetSurfaceDPI() / 96.0);
+					}
 				}
 
 				list.Show();
 
-				Point	 realPos = GetRealPosition();
+				/* Draw vertical dotted line.
+				 */
+				Point	 startPos = frame.GetPosition() + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), Math::Round(16 * surface->GetSurfaceDPI() / 96.0));
 
-				for (Int i = Math::Round(16 * surface->GetSurfaceDPI() / 96.0); i < frame.GetHeight() - Math::Round(7 * surface->GetSurfaceDPI() / 96.0); i += 2)
+				for (Int i = 0; i < entryRealPosition.y + Math::Round(9 * surface->GetSurfaceDPI() / 96.0); i += 2)
 				{
-					surface->SetPixel(realPos + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), i), Setup::InactiveTextColor);
+					surface->SetPixel(startPos + Point(0, i), Setup::InactiveTextColor);
 				}
 			}
 

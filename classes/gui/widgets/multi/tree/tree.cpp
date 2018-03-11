@@ -149,15 +149,15 @@ S::Int S::GUI::Tree::Paint(Int message)
 					{
 						entry->SetMetrics(entryPosition, Size(list.GetWidth(), entry->GetHeight()));
 						entry->SetVisibleDirect(True);
-					}
 
-					/* Draw horizontal branch line.
-					 */
-					Point	 startPos = GetRealPosition() + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), entryRealPosition.y + Math::Round(8 * surface->GetSurfaceDPI() / 96.0) + Math::Round(16 * surface->GetSurfaceDPI() / 96.0));
+						/* Draw horizontal branch line.
+						 */
+						Point	 startPos = GetRealPosition() + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), entryRealPosition.y + Math::Round(8 * surface->GetSurfaceDPI() / 96.0) + Math::Round(16 * surface->GetSurfaceDPI() / 96.0));
 
-					for (Int x = 0; x < Math::Round(5 * surface->GetSurfaceDPI() / 96.0); x += 2)
-					{
-						surface->SetPixel(startPos + Point(x, 0), Setup::InactiveTextColor);
+						for (Int x = 0; x < Math::Round(5 * surface->GetSurfaceDPI() / 96.0); x += 2)
+						{
+							surface->SetPixel(startPos + Point(x, 0), Setup::InactiveTextColor);
+						}
 					}
 
 					/* Compute next entry position.
@@ -169,13 +169,14 @@ S::Int S::GUI::Tree::Paint(Int message)
 					}
 				}
 
-				list.Show();
+				list.SetVisibleDirect(True);
+				list.Paint(SP_PAINT);
 
 				/* Draw vertical dotted line.
 				 */
 				Point	 startPos = frame.GetPosition() + Point(Math::Round(6 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), Math::Round(16 * surface->GetSurfaceDPI() / 96.0));
 
-				for (Int i = 0; i < entryRealPosition.y + Math::Round(9 * surface->GetSurfaceDPI() / 96.0); i += 2)
+				for (Int i = visibleArea.top - visibleArea.top % 2; i < Math::Min(entryRealPosition.y, visibleArea.bottom) + Math::Round(9 * surface->GetSurfaceDPI() / 96.0); i += 2)
 				{
 					surface->SetPixel(startPos + Point(0, i), Setup::InactiveTextColor);
 				}
@@ -199,20 +200,20 @@ S::Int S::GUI::Tree::Paint(Int message)
 
 S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 {
-	Surface	*surface	= GetDrawSurface();
-	Rect	 frame		= Rect(GetRealPosition(), GetRealSize());
-	Font	 nFont		= font;
-	Bool	 gotTabs	= False;
+	Surface	*surface = GetDrawSurface();
+	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+	Font	 nFont	 = font;
+	Bool	 gotTabs = False;
 
-	if (!active)	nFont.SetColor(Setup::InactiveTextColor);
-	else		nFont.SetColor(color);
+	if (!active) nFont.SetColor(Setup::InactiveTextColor);
+	else	     nFont.SetColor(color);
 
 	if (text.Contains(ListEntry::tabDelimiter)) gotTabs = True;
 
 	surface->StartPaint(GetVisibleArea());
 
-	if (drawGradient)	surface->Gradient(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))), Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
-	else			surface->Box(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))), Setup::ClientColor, Rect::Filled);
+	if (drawGradient) surface->Gradient(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))), Setup::GradientStartColor, Setup::GradientEndColor, OR_HORZ);
+	else		  surface->Box(Rect(Point(frame.left, frame.top), Size(frame.GetWidth(), Math::Round(16 * surface->GetSurfaceDPI() / 96.0))), Setup::ClientColor, Rect::Filled);
 
 	Rect	 cbRect = Rect(GetRealPosition() + Point(2, 3) * surface->GetSurfaceDPI() / 96.0, Size(9, 9) * surface->GetSurfaceDPI() / 96.0);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -112,7 +112,7 @@ S::Void S::GUI::Divider::UpdateMetrics()
 			rect.bottom	= container->GetHeight() - 3;
 		}
 
-		rect.right = rect.left + 1;
+		rect.right = rect.left + 2;
 
 		for (Int i = container->GetNOfObjects() - 1; i >= 0; i--)
 		{
@@ -156,7 +156,7 @@ S::Void S::GUI::Divider::UpdateMetrics()
 			rect.right	= container->GetWidth() - 3;
 		}
 
-		rect.bottom = rect.top + 1;
+		rect.bottom = rect.top + 2;
 
 		for (Int i = container->GetNOfObjects() - 1; i >= 0; i--)
 		{
@@ -182,8 +182,8 @@ S::Void S::GUI::Divider::UpdateMetrics()
 
 	SetMetrics(rect.GetPosition(), rect.GetSize());
 
-	if (Binary::IsFlagSet(flags, OR_VERT))	dragHotspot->SetMetrics(Point(-1, 0), rect.GetSize() + Size(3, 1));
-	else					dragHotspot->SetMetrics(Point(0, -1), rect.GetSize() + Size(1, 3));
+	if (Binary::IsFlagSet(flags, OR_VERT))	dragHotspot->SetMetrics(Point(-1, 0), rect.GetSize() + Size(2, 1));
+	else					dragHotspot->SetMetrics(Point(0, -1), rect.GetSize() + Size(1, 2));
 }
 
 S::Void S::GUI::Divider::OnMouseOver()

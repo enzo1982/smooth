@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../../..
 
 # Enter object files here:
-OBJECTS	  = crc32.o crc64.o md5.o sha1.o
+OBJECTS	  = crc16.o crc32.o crc64.o md5.o sha1.o
 
 ## Do not change anything below this line. ##
 

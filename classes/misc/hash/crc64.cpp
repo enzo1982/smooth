@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,6 +15,7 @@ S::Bool			 S::Hash::CRC64::initialized = False;
 
 S::Hash::CRC64::CRC64()
 {
+	Reset();
 }
 
 S::Hash::CRC64::~CRC64()
@@ -35,18 +36,42 @@ S::Void S::Hash::CRC64::InitTable()
 	initialized = True;
 }
 
-S::UnsignedInt64 S::Hash::CRC64::Compute(const UnsignedByte *ptr, Int size)
+S::Bool S::Hash::CRC64::Reset()
 {
 	if (!initialized) InitTable();
 
-	UnsignedInt64	 crc = 0xFFFFFFFFFFFFFFFFULL;
+	crc = 0xFFFFFFFFFFFFFFFFULL;
 
-	while (size--) crc = (crc >> 8) ^ table[(crc & 0xFF) ^ *ptr++];
+	return True;
+}
 
+S::Bool S::Hash::CRC64::Feed(const UnsignedByte *data, Int size)
+{
+	while (size--) crc = (crc >> 8) ^ table[(crc & 0xFF) ^ *data++];
+
+	return True;
+}
+
+S::Bool S::Hash::CRC64::Feed(const Buffer<UnsignedByte> &data)
+{
+	return Feed(data, data.Size());
+}
+
+S::UnsignedInt64 S::Hash::CRC64::Finish()
+{
 	return crc ^ 0xFFFFFFFFFFFFFFFFULL;
 }
 
-S::UnsignedInt64 S::Hash::CRC64::Compute(const Buffer<UnsignedByte> &buffer)
+S::UnsignedInt64 S::Hash::CRC64::Compute(const UnsignedByte *data, Int size)
 {
-	return Compute(buffer, buffer.Size());
+	CRC64	 crc64;
+
+	crc64.Feed(data, size);
+
+	return crc64.Finish();
+}
+
+S::UnsignedInt64 S::Hash::CRC64::Compute(const Buffer<UnsignedByte> &data)
+{
+	return Compute(data, data.Size());
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,13 +32,22 @@ namespace smooth
 				static UnsignedInt64	 table[256];
 				static Bool		 initialized;
 
-				static Void		 InitTable();
+				UnsignedInt64		 crc;
 
-							 CRC64();
-							~CRC64();
+				static Void		 InitTable();
 			public:
 				static UnsignedInt64	 Compute(const UnsignedByte *, Int);
 				static UnsignedInt64	 Compute(const Buffer<UnsignedByte> &);
+
+							 CRC64();
+							~CRC64();
+
+				Bool			 Reset();
+
+				Bool			 Feed(const UnsignedByte *, Int);
+				Bool			 Feed(const Buffer<UnsignedByte> &);
+
+				UnsignedInt64		 Finish();
 		};
 	};
 };

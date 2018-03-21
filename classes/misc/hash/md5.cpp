@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -196,11 +196,11 @@ S::Bool S::Hash::MD5::Reset()
 	return True;
 }
 
-S::Bool S::Hash::MD5::Feed(const Buffer<UnsignedByte> &data)
+S::Bool S::Hash::MD5::Feed(const UnsignedByte *data, Int size)
 {
-	buffer.Resize(buffer.Size() + data.Size());
+	buffer.Resize(buffer.Size() + size);
 
-	memcpy(buffer + buffer.Size() - data.Size(), data, data.Size());
+	memcpy(buffer + buffer.Size() - size, data, size);
 
 	for (Int i = 0; i + 63 < buffer.Size(); i += 64) Transform(buffer + i);
 
@@ -209,6 +209,11 @@ S::Bool S::Hash::MD5::Feed(const Buffer<UnsignedByte> &data)
 	buffer.Resize(buffer.Size() % 64);
 
 	return True;
+}
+
+S::Bool S::Hash::MD5::Feed(const Buffer<UnsignedByte> &data)
+{
+	return Feed(data, data.Size());
 }
 
 S::String S::Hash::MD5::Finish()
@@ -247,11 +252,16 @@ S::String S::Hash::MD5::Finish()
 	return string;
 }
 
-S::String S::Hash::MD5::Compute(const Buffer<UnsignedByte> &data)
+S::String S::Hash::MD5::Compute(const UnsignedByte *data, Int size)
 {
 	MD5	 md5;
 
-	md5.Feed(data);
+	md5.Feed(data, size);
 
 	return md5.Finish();
+}
+
+S::String S::Hash::MD5::Compute(const Buffer<UnsignedByte> &data)
+{
+	return Compute(data, data.Size());
 }

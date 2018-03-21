@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -90,11 +90,11 @@ S::Bool S::Hash::SHA1::Reset()
 	return True;
 }
 
-S::Bool S::Hash::SHA1::Feed(const Buffer<UnsignedByte> &data)
+S::Bool S::Hash::SHA1::Feed(const UnsignedByte *data, Int size)
 {
-	buffer.Resize(buffer.Size() + data.Size());
+	buffer.Resize(buffer.Size() + size);
 
-	memcpy(buffer + buffer.Size() - data.Size(), data, data.Size());
+	memcpy(buffer + buffer.Size() - size, data, size);
 
 	for (Int i = 0; i + 63 < buffer.Size(); i += 64) Transform(buffer + i);
 
@@ -103,6 +103,11 @@ S::Bool S::Hash::SHA1::Feed(const Buffer<UnsignedByte> &data)
 	buffer.Resize(buffer.Size() % 64);
 
 	return True;
+}
+
+S::Bool S::Hash::SHA1::Feed(const Buffer<UnsignedByte> &data)
+{
+	return Feed(data, data.Size());
 }
 
 S::String S::Hash::SHA1::Finish()
@@ -134,11 +139,16 @@ S::String S::Hash::SHA1::Finish()
 	return string;
 }
 
-S::String S::Hash::SHA1::Compute(const Buffer<UnsignedByte> &data)
+S::String S::Hash::SHA1::Compute(const UnsignedByte *data, Int size)
 {
 	SHA1	 sha1;
 
-	sha1.Feed(data);
+	sha1.Feed(data, size);
 
 	return sha1.Finish();
+}
+
+S::String S::Hash::SHA1::Compute(const Buffer<UnsignedByte> &data)
+{
+	return Compute(data, data.Size());
 }

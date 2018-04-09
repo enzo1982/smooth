@@ -29,7 +29,7 @@ namespace smooth
 		class SMOOTHAPI CRC16
 		{
 			private:
-				static UnsignedInt16	 table[256];
+				static UnsignedInt16	 table[8][256];
 				static Bool		 initialized;
 
 				UnsignedInt16		 crc;

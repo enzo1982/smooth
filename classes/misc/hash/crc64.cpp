@@ -10,7 +10,7 @@
 
 #include <smooth/misc/hash/crc64.h>
 
-S::UnsignedInt64	 S::Hash::CRC64::table[256];
+S::UnsignedInt64	 S::Hash::CRC64::table[8][256];
 S::Bool			 S::Hash::CRC64::initialized = False;
 
 S::Hash::CRC64::CRC64()
@@ -28,9 +28,14 @@ S::Void S::Hash::CRC64::InitTable()
 
 	for (Int i = 0; i <= 0xFF; i++)
 	{
-		table[i] = i;
+		table[0][i] = i;
 
-		for (Int j = 0; j < 8; j++) table[i] = (table[i] >> 1) ^ (table[i] & 1 ? polynomial : 0);
+		for (Int j = 0; j < 8; j++) table[0][i] = (table[0][i] >> 1) ^ (table[0][i] & 1 ? polynomial : 0);
+	}
+
+	for (Int i = 0; i <= 0xFF; i++)
+	{
+		for (Int j = 1; j < 8; j++) table[j][i] = table[0][table[j - 1][i] & 0xFF] ^ (table[j - 1][i] >> 8);
 	}
 
 	initialized = True;
@@ -47,7 +52,18 @@ S::Bool S::Hash::CRC64::Reset()
 
 S::Bool S::Hash::CRC64::Feed(const UnsignedByte *data, Int size)
 {
-	while (size--) crc = (crc >> 8) ^ table[(crc & 0xFF) ^ *data++];
+	while (size >= 8)
+	{
+		crc   =	table[7][data[0] ^ ( crc	& 0xFF)] ^ table[6][data[1] ^ ((crc >>  8) & 0xFF)] ^
+			table[5][data[2] ^ ((crc >> 16) & 0xFF)] ^ table[4][data[3] ^ ((crc >> 24) & 0xFF)] ^
+			table[3][data[4] ^ ((crc >> 32) & 0xFF)] ^ table[2][data[5] ^ ((crc >> 40) & 0xFF)] ^
+			table[1][data[6] ^ ((crc >> 48) & 0xFF)] ^ table[0][data[7] ^ ((crc >> 56) & 0xFF)];
+
+		data += 8;
+		size -= 8;
+	}
+
+	while (size--) crc = (crc >> 8) ^ table[0][(crc & 0xFF) ^ *data++];
 
 	return True;
 }

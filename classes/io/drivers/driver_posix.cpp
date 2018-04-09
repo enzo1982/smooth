@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -121,7 +121,7 @@ S::Int S::IO::DriverPOSIX::ReadData(UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	return read(stream, data, (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos())));
+	return read(stream, data, dataSize);
 }
 
 S::Int S::IO::DriverPOSIX::WriteData(UnsignedByte *data, Int dataSize)

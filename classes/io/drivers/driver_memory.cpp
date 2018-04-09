@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/io/drivers/driver_memory.h>
+#include <smooth/misc/math.h>
 
 #include <memory.h>
 
@@ -26,7 +27,7 @@ S::Int S::IO::DriverMemory::ReadData(UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	dataSize = (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos()));
+	dataSize = Math::Min((Int64) dataSize, size - position);
 
 	memcpy((void *) data, (void *) ((unsigned char *) stream + position), dataSize);
 
@@ -39,7 +40,7 @@ S::Int S::IO::DriverMemory::WriteData(UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	dataSize = (dataSize < (GetSize() - GetPos()) ? dataSize : (GetSize() - GetPos()));
+	dataSize = Math::Min((Int64) dataSize, size - position);
 
 	memcpy((void *) ((unsigned char *) stream + position), (void *) data, dataSize);
 
@@ -47,7 +48,6 @@ S::Int S::IO::DriverMemory::WriteData(UnsignedByte *data, Int dataSize)
 
 	return dataSize;
 }
-
 
 S::Int64 S::IO::DriverMemory::Seek(Int64 newPosition)
 {

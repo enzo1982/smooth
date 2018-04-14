@@ -8,6 +8,7 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - cursor.cpp		- fixed text not being drawn correctly after undo/redo
 			- performance optimizations for text input
 - tree.cpp		- draw horizontal branch lines to improve tree look
+- windowxlib.cpp	- fixed thread-safety issues with Xlib windows
 - keyboard.cpp		- improved thread-safety
 - crc16.cpp		- added Hash::CRC16 class to calculate 16 bit CRCs
 - directory.cpp		- fixed permissions of newly created directories to respect umask setting

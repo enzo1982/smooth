@@ -117,6 +117,8 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 
 S::GUI::WindowXLib::~WindowXLib()
 {
+	Threads::Lock	 lock(mutex);
+
 	if (sysIcon != NIL)
 	{
 		delete [] sysIcon;
@@ -267,6 +269,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 	static Atom	 xdndActionPrivateAtom = XInternAtom(display, "XdndActionPrivate", False);
 
+	/* Acquire lock on the window.
+	 */
+	Threads::Lock	 lock(mutex);
+
 	/* Process system events not relevant
 	 * to portable Window implementation.
 	 */
@@ -292,6 +298,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			/* Initialize window metrics here to handle X servers
 			 * that do not send a ConfigureNotify to new windows.
 			 */
+			if (wnd == e->xany.window)
 			{
 				XWindowAttributes	 attributes;
 
@@ -312,9 +319,9 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				onEvent.Call(SM_WINDOWMETRICS, ((	     attributes.x		  + 32768) << 16) | (		 attributes.y		       + 32768),
 							       ((Math::Round(attributes.width / fontSize) + 32768) << 16) | (Math::Round(attributes.height / fontSize) + 32768));
-			}
 
-			onEvent.Call(SM_GETFOCUS, 0, 0);
+				onEvent.Call(SM_GETFOCUS, 0, 0);
+			}
 
 			break;
 
@@ -377,6 +384,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			break;
 	}
+
+	/* Check if window still matches the event.
+	 */
+	if (wnd != e->xany.window) return Error();
 
 	/* Convert Xlib events to smooth messages.
 	 */
@@ -978,6 +989,8 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 S::Int S::GUI::WindowXLib::Close()
 {
 	if (wnd == NIL) return Success();
+
+	Threads::Lock	 lock(mutex);
 
 	/* Delete surface.
 	 */

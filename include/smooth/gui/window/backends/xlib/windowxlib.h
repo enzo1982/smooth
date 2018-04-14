@@ -24,6 +24,7 @@ namespace smooth
 #include "../windowbackend.h"
 #include "../../../../graphics/forms/rect.h"
 #include "../../../../input/keyboard.h"
+#include "../../../../threads/mutex.h"
 
 namespace X11
 {
@@ -71,6 +72,8 @@ namespace smooth
 				Bool					 IsModalWindowActive();
 			protected:
 				Int					 id;
+
+				Threads::Mutex				 mutex;
 
 				X11::Window				 wnd;
 				X11::Window				 oldwnd;

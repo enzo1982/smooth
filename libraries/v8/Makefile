@@ -15,7 +15,7 @@ endif
 GLOBALDLL   = smooth-js
 IMPORTLIB   = libsmooth-js.a
 
-MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/include
+MYCCOPTS    = -fpermissive -I$(SRCDIR) -I$(SRCDIR)/include
 
 ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS += -Wno-unused-local-typedefs
@@ -26,7 +26,7 @@ ifeq ($(BUILD_FREEBSD),True)
 endif
 
 ifeq ($(BUILD_OPENBSD),True)
-	MYCCOPTS += -fpermissive -I/usr/local/include
+	MYCCOPTS += -I/usr/local/include
 endif
 
 ifeq ($(BUILD_SOLARIS),True)
@@ -34,7 +34,7 @@ ifeq ($(BUILD_SOLARIS),True)
 endif
 
 ifeq ($(BUILD_HAIKU),True)
-	MYCCOPTS += -fpermissive -Wno-format
+	MYCCOPTS += -Wno-format
 endif
 
 ifeq ($(BUILD_ARM),True)

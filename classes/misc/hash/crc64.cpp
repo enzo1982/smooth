@@ -28,9 +28,11 @@ S::Void S::Hash::CRC64::InitTable()
 
 	for (Int i = 0; i <= 0xFF; i++)
 	{
-		table[0][i] = i;
+		UnsignedInt64	 value = i;
 
-		for (Int j = 0; j < 8; j++) table[0][i] = (table[0][i] >> 1) ^ (table[0][i] & 1 ? polynomial : 0);
+		for (Int j = 0; j < 8; j++) value = (value >> 1) ^ (value & 1 ? polynomial : 0);
+
+		table[0][i] = value;
 	}
 
 	for (Int i = 0; i <= 0xFF; i++)
@@ -57,7 +59,7 @@ S::Bool S::Hash::CRC64::Feed(const UnsignedByte *data, Int size)
 		crc   =	table[7][data[0] ^ ( crc	& 0xFF)] ^ table[6][data[1] ^ ((crc >>  8) & 0xFF)] ^
 			table[5][data[2] ^ ((crc >> 16) & 0xFF)] ^ table[4][data[3] ^ ((crc >> 24) & 0xFF)] ^
 			table[3][data[4] ^ ((crc >> 32) & 0xFF)] ^ table[2][data[5] ^ ((crc >> 40) & 0xFF)] ^
-			table[1][data[6] ^ ((crc >> 48) & 0xFF)] ^ table[0][data[7] ^ ((crc >> 56) & 0xFF)];
+			table[1][data[6] ^ ((crc >> 48) & 0xFF)] ^ table[0][data[7] ^  (crc >> 56)	  ];
 
 		data += 8;
 		size -= 8;

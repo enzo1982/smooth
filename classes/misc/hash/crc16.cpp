@@ -28,11 +28,11 @@ S::Void S::Hash::CRC16::InitTable()
 
 	for (Int i = 0; i <= 0xFF; i++)
 	{
-		table[0][i] = Reflect(i, 8) << 8;
+		UnsignedInt16	 value = Reflect(i, 8) << 8;
 
-		for (Int j = 0; j < 8; j++) table[0][i] = (table[0][i] << 1) ^ (table[0][i] & (1 << 15) ? polynomial : 0);
+		for (Int j = 0; j < 8; j++) value = (value << 1) ^ (value & (1 << 15) ? polynomial : 0);
 
-		table[0][i] = Reflect(table[0][i], 16);
+		table[0][i] = Reflect(value, 16);
 	}
 
 	for (Int i = 0; i <= 0xFF; i++)
@@ -70,10 +70,12 @@ S::Bool S::Hash::CRC16::Feed(const UnsignedByte *data, Int size)
 {
 	while (size >= 8)
 	{
-		crc   =	table[7][data[0] ^ (crc & 0xFF)] ^ table[6][data[1] ^ (crc >> 8)] ^
-			table[5][data[2]	       ] ^ table[4][data[3]		] ^
-			table[3][data[4]	       ] ^ table[2][data[5]		] ^
-			table[1][data[6]	       ] ^ table[0][data[7]		];
+		crc  ^= data[1] << 8 | data[0];
+
+		crc   =	table[7][crc & 0xFF] ^ table[6][crc >> 8] ^
+			table[5][data[2]   ] ^ table[4][data[3]	] ^
+			table[3][data[4]   ] ^ table[2][data[5]	] ^
+			table[1][data[6]   ] ^ table[0][data[7]	];
 
 		data += 8;
 		size -= 8;

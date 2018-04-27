@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -258,7 +258,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 			return MessageProcessed;
 
 		case WM_ACTIVATEAPP:
-			if (wParam == True && GetForegroundWindow() == hwnd && !IsWindowEnabled(hwnd))
+			if (wParam == TRUE && GetForegroundWindow() == hwnd && !IsWindowEnabled(hwnd))
 			{
 				/* If disabled, activate the next modal window.
 				 */

@@ -34,7 +34,7 @@ namespace smooth
 
 				UnsignedInt16		 crc;
 
-				static Void		 InitTable();
+				static Bool		 InitTable();
 				static UnsignedInt16	 Reflect(UnsignedInt16, char);
 			public:
 				static UnsignedInt16	 Compute(const UnsignedByte *, Int);

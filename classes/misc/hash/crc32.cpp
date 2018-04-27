@@ -11,7 +11,7 @@
 #include <smooth/misc/hash/crc32.h>
 
 S::UnsignedInt32	 S::Hash::CRC32::table[8][256];
-S::Bool			 S::Hash::CRC32::initialized = False;
+S::Bool			 S::Hash::CRC32::initialized = InitTable();
 
 S::Hash::CRC32::CRC32()
 {
@@ -22,7 +22,7 @@ S::Hash::CRC32::~CRC32()
 {
 }
 
-S::Void S::Hash::CRC32::InitTable()
+S::Bool S::Hash::CRC32::InitTable()
 {
 	UnsignedInt32	 polynomial = 0x04C11DB7;
 
@@ -40,7 +40,7 @@ S::Void S::Hash::CRC32::InitTable()
 		for (Int j = 1; j < 8; j++) table[j][i] = table[0][table[j - 1][i] & 0xFF] ^ (table[j - 1][i] >> 8);
 	}
 
-	initialized = True;
+	return True;
 }
 
 S::UnsignedInt32 S::Hash::CRC32::Reflect(UnsignedInt32 ref, char ch)
@@ -59,8 +59,6 @@ S::UnsignedInt32 S::Hash::CRC32::Reflect(UnsignedInt32 ref, char ch)
 
 S::Bool S::Hash::CRC32::Reset()
 {
-	if (!initialized) InitTable();
-
 	crc = 0xFFFFFFFF;
 
 	return True;

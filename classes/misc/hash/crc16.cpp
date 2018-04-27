@@ -11,7 +11,7 @@
 #include <smooth/misc/hash/crc16.h>
 
 S::UnsignedInt16	 S::Hash::CRC16::table[8][256];
-S::Bool			 S::Hash::CRC16::initialized = False;
+S::Bool			 S::Hash::CRC16::initialized = InitTable();
 
 S::Hash::CRC16::CRC16()
 {
@@ -22,7 +22,7 @@ S::Hash::CRC16::~CRC16()
 {
 }
 
-S::Void S::Hash::CRC16::InitTable()
+S::Bool S::Hash::CRC16::InitTable()
 {
 	UnsignedInt16	 polynomial = 0x8005;
 
@@ -40,7 +40,7 @@ S::Void S::Hash::CRC16::InitTable()
 		for (Int j = 1; j < 8; j++) table[j][i] = table[0][table[j - 1][i] & 0xFF] ^ (table[j - 1][i] >> 8);
 	}
 
-	initialized = True;
+	return True;
 }
 
 S::UnsignedInt16 S::Hash::CRC16::Reflect(UnsignedInt16 ref, char ch)
@@ -59,8 +59,6 @@ S::UnsignedInt16 S::Hash::CRC16::Reflect(UnsignedInt16 ref, char ch)
 
 S::Bool S::Hash::CRC16::Reset()
 {
-	if (!initialized) InitTable();
-
 	crc = 0x0000;
 
 	return True;

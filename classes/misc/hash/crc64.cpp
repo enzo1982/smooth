@@ -11,7 +11,7 @@
 #include <smooth/misc/hash/crc64.h>
 
 S::UnsignedInt64	 S::Hash::CRC64::table[8][256];
-S::Bool			 S::Hash::CRC64::initialized = False;
+S::Bool			 S::Hash::CRC64::initialized = InitTable();
 
 S::Hash::CRC64::CRC64()
 {
@@ -22,7 +22,7 @@ S::Hash::CRC64::~CRC64()
 {
 }
 
-S::Void S::Hash::CRC64::InitTable()
+S::Bool S::Hash::CRC64::InitTable()
 {
 	UnsignedInt64	 polynomial = 0x95AC9329AC4BC9B5ULL;
 
@@ -40,13 +40,11 @@ S::Void S::Hash::CRC64::InitTable()
 		for (Int j = 1; j < 8; j++) table[j][i] = table[0][table[j - 1][i] & 0xFF] ^ (table[j - 1][i] >> 8);
 	}
 
-	initialized = True;
+	return True;
 }
 
 S::Bool S::Hash::CRC64::Reset()
 {
-	if (!initialized) InitTable();
-
 	crc = 0xFFFFFFFFFFFFFFFFULL;
 
 	return True;

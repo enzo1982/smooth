@@ -34,7 +34,7 @@ namespace smooth
 
 				UnsignedInt64		 crc;
 
-				static Void		 InitTable();
+				static Bool		 InitTable();
 			public:
 				static UnsignedInt64	 Compute(const UnsignedByte *, Int);
 				static UnsignedInt64	 Compute(const Buffer<UnsignedByte> &);

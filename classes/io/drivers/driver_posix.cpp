@@ -114,7 +114,7 @@ S::IO::DriverPOSIX::DriverPOSIX(Int iStream) : Driver()
 
 S::IO::DriverPOSIX::~DriverPOSIX()
 {
-	if (closeStream) close(stream);
+	Close();
 }
 
 S::Int S::IO::DriverPOSIX::ReadData(UnsignedByte *data, Int dataSize)
@@ -134,6 +134,15 @@ S::Int S::IO::DriverPOSIX::WriteData(UnsignedByte *data, Int dataSize)
 S::Int64 S::IO::DriverPOSIX::Seek(Int64 newPos)
 {
 	return lseek64(stream, newPos, SEEK_SET);
+}
+
+S::Bool S::IO::DriverPOSIX::Close()
+{
+	if (!closeStream || close(stream) != 0) return False;
+
+	closeStream = False;
+
+	return True;
 }
 
 S::Int64 S::IO::DriverPOSIX::GetSize() const

@@ -35,11 +35,13 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	if (stream == (unsigned) (~0)) { lastError = IO_ERROR_UNEXPECTED; return; }
 
+	closeStream = True;
+
 	/* Get proxy hostname.
 	 */
 	hostent		*host = gethostbyname(proxy);
 
-	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (host == NIL) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Connect to proxy.
 	 */
@@ -51,7 +53,7 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
-	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Send connect request.
 	 */
@@ -61,7 +63,7 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	connect.Append("\n");
 
-	if (send(stream, (char *) connect, connect.Length(), 0) < connect.Length()) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (send(stream, (char *) connect, connect.Length(), 0) < connect.Length()) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Receive answer.
 	 */
@@ -70,21 +72,19 @@ S::IO::DriverHTTPS::DriverHTTPS(const String &proxy, Int httpPort, const String 
 
 	while (!(answer.EndsWith("\n\n") || answer.EndsWith("\r\n\r\n")))
 	{
-		if (recv(stream, c, 1, 0) <= 0) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (recv(stream, c, 1, 0) <= 0) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		answer.Append(c);
 	}
 
 	/* Check if connect attempt was successful.
 	 */
-	if (answer.SubString(9, 3) != "200") { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
-
-	closeStream = True;
+	if (answer.SubString(9, 3) != "200") { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 }
 
 S::IO::DriverHTTPS::~DriverHTTPS()
 {
-	if (closeStream) CloseSocket();
+	Close();
 }
 
 S::Int S::IO::DriverHTTPS::ReadData(UnsignedByte *data, Int dataSize)
@@ -104,11 +104,15 @@ S::Int S::IO::DriverHTTPS::WriteData(UnsignedByte *data, Int dataSize)
 	return send(stream, (char *) data, dataSize, 0);
 }
 
-S::Void S::IO::DriverHTTPS::CloseSocket()
+S::Bool S::IO::DriverHTTPS::Close()
 {
 #if defined __WIN32__
-	closesocket(stream);
+	if (!closeStream || closesocket(stream) != 0) return False;
 #else
-	close(stream);
+	if (!closeStream || close(stream)	!= 0) return False;
 #endif
+
+	closeStream = False;
+
+	return True;
 }

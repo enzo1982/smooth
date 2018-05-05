@@ -91,7 +91,7 @@ S::IO::DriverANSI::DriverANSI(FILE *iStream) : Driver()
 
 S::IO::DriverANSI::~DriverANSI()
 {
-	if (closeStream) fclose(stream);
+	Close();
 }
 
 S::Int S::IO::DriverANSI::ReadData(UnsignedByte *data, Int dataSize)
@@ -113,6 +113,15 @@ S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 	if (fseek(stream, newPos, SEEK_SET) != 0) return -1;
 
 	return GetPos();
+}
+
+S::Bool S::IO::DriverANSI::Close()
+{
+	if (!closeStream || fclose(stream) != 0) return False;
+
+	closeStream = False;
+
+	return True;
 }
 
 S::Int64 S::IO::DriverANSI::GetSize() const

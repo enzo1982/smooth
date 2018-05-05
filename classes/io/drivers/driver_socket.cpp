@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,11 +42,13 @@ S::IO::DriverSocket::DriverSocket(const String &hostName, Int port) : Driver()
 
 	if (stream == (unsigned) (~0)) { lastError = IO_ERROR_UNEXPECTED; return; }
 
+	closeStream = True;
+
 	/* Get server hostname.
 	 */
 	hostent		*host = gethostbyname(hostName);
 
-	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (host == NIL) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Connect to server.
 	 */
@@ -58,9 +60,7 @@ S::IO::DriverSocket::DriverSocket(const String &hostName, Int port) : Driver()
 
 	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
-	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
-
-	closeStream = True;
+	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 }
 
 S::IO::DriverSocket::DriverSocket(unsigned int iStream) : Driver()
@@ -76,7 +76,7 @@ S::IO::DriverSocket::DriverSocket(unsigned int iStream) : Driver()
 
 S::IO::DriverSocket::~DriverSocket()
 {
-	if (closeStream) CloseSocket();
+	Close();
 }
 
 S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
@@ -122,13 +122,17 @@ S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)
 	return send(stream, (char *) data, dataSize, 0);
 }
 
-S::Void S::IO::DriverSocket::CloseSocket()
+S::Bool S::IO::DriverSocket::Close()
 {
 #if defined __WIN32__
-	closesocket(stream);
+	if (!closeStream || closesocket(stream) != 0) return False;
 #else
-	close(stream);
+	if (!closeStream || close(stream)	!= 0) return False;
 #endif
+
+	closeStream = False;
+
+	return True;
 }
 
 S::Bool S::IO::DriverSocket::SetMode(Int nm)

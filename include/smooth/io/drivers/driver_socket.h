@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,8 +34,6 @@ namespace smooth
 
 				UnsignedLong	 mode;
 				Int		 timeout;
-
-				Void		 CloseSocket();
 			public:
 						 DriverSocket(const String &, Int);
 						 DriverSocket(unsigned int);
@@ -43,6 +41,8 @@ namespace smooth
 
 				Int		 ReadData(UnsignedByte *, Int);
 				Int		 WriteData(UnsignedByte *, Int);
+
+				Bool		 Close();
 
 				Bool		 SetMode(Int);
 				Bool		 SetTimeout(Int);

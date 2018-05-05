@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,11 +35,13 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 
 	if (stream == (unsigned) (~0)) { lastError = IO_ERROR_UNEXPECTED; return; }
 
+	closeStream = True;
+
 	/* Get proxy hostname.
 	 */
 	hostent		*host = gethostbyname(proxy);
 
-	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (host == NIL) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Connect to proxy.
 	 */
@@ -51,7 +53,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 
 	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
-	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Send connect request.
 	 */
@@ -63,7 +65,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		socksdata[1] = 1;	// One authentication method
 		socksdata[2] = 0x00;	// Method 1: No authentication
 
-		if (send(stream, (char *) socksdata, 3, 0) < 3) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (send(stream, (char *) socksdata, 3, 0) < 3) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		/* Read and evaluate response.
 		 */
@@ -73,14 +75,14 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		{
 			int	 bytes = recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
 
-			if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+			if (bytes <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 			recbytes += bytes;
 		}
 
 		/* Check if proxy requires authentication.
 		 */
-		if (socksdata[1] == 0xFF) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (socksdata[1] == 0xFF) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		delete [] socksdata;
 	}
@@ -93,7 +95,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		socksdata[2] = 0x00;	// Method 0x00: No authentication
 		socksdata[3] = 0x02;	// Method 0x02: Username / password
 
-		if (send(stream, (char *) socksdata, 4, 0) < 4) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (send(stream, (char *) socksdata, 4, 0) < 4) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		/* Read and evaluate response.
 		 */
@@ -103,14 +105,14 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		{
 			int	 bytes = recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
 
-			if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+			if (bytes <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 			recbytes += bytes;
 		}
 
 		/* Check if proxy accepted authentication method.
 		 */
-		if (socksdata[1] == 0xFF) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (socksdata[1] == 0xFF) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		if (socksdata[1] == 0x02)
 		{
@@ -129,7 +131,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 
 			for (Int i = 0; i < (Int) strlen(passwd); i++) socksdata[3 + strlen(uname) + i] = passwd[i];
 
-			if (send(stream, (char *) socksdata, 3 + strlen(uname) + strlen(passwd), 0) < signed(3 + strlen(uname) + strlen(passwd))) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+			if (send(stream, (char *) socksdata, 3 + strlen(uname) + strlen(passwd), 0) < signed(3 + strlen(uname) + strlen(passwd))) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 			/* Read and evaluate response.
 			 */
@@ -139,14 +141,14 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 			{
 				int	 bytes = recv(stream, (char *) socksdata + recbytes, 2 - recbytes, 0);
 
-				if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+				if (bytes <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 				recbytes += bytes;
 			}
 
 			/* Check if proxy accepted username/password.
 			 */
-			if (socksdata[1] != 0x00) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+			if (socksdata[1] != 0x00) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 		}
 
 		delete [] socksdata;
@@ -167,7 +169,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	socksdata[5 + strlen(hostName)] = htons((short) port) % 256;
 	socksdata[6 + strlen(hostName)] = htons((short) port) / 256;
 
-	if (send(stream, (char *) socksdata, 7 + strlen(hostName), 0) < signed(7 + strlen(hostName))) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (send(stream, (char *) socksdata, 7 + strlen(hostName), 0) < signed(7 + strlen(hostName))) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Receive and evaluate first 4 bytes of answer.
 	 */
@@ -177,14 +179,14 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	{
 		int	 bytes = recv(stream, (char *) socksdata + recbytes, 4 - recbytes, 0);
 
-		if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (bytes <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		recbytes += bytes;
 	}
 
 	/* Check if connect attempt was successful.
 	 */
-	if (socksdata[1] != 0x00) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (socksdata[1] != 0x00) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Receive rest of answer.
 	 */
@@ -198,7 +200,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		{
 			int	 bytes = recv(stream, (char *) socksdata + 4 + recbytes, 6 - recbytes, 0);
 
-			if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+			if (bytes <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 			recbytes += bytes;
 		}
@@ -207,7 +209,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	{
 		/* Read length of hostname.
 		 */
-		if (recv(stream, (char *) socksdata + 4, 1, 0) <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (recv(stream, (char *) socksdata + 4, 1, 0) <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		/* Read hostname and port.
 		 */
@@ -218,20 +220,18 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 		{
 			int	 bytes = recv(stream, (char *) socksdata + 5 + recbytes, neededbytes - recbytes, 0);
 
-			if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+			if (bytes <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 			recbytes += bytes;
 		}
 	}
 
 	delete [] socksdata;
-
-	closeStream = True;
 }
 
 S::IO::DriverSOCKS5::~DriverSOCKS5()
 {
-	if (closeStream) CloseSocket();
+	Close();
 }
 
 S::Int S::IO::DriverSOCKS5::ReadData(UnsignedByte *data, Int dataSize)
@@ -251,11 +251,15 @@ S::Int S::IO::DriverSOCKS5::WriteData(UnsignedByte *data, Int dataSize)
 	return send(stream, (char *) data, dataSize, 0);
 }
 
-S::Void S::IO::DriverSOCKS5::CloseSocket()
+S::Bool S::IO::DriverSOCKS5::Close()
 {
 #if defined __WIN32__
-	closesocket(stream);
+	if (!closeStream || closesocket(stream) != 0) return False;
 #else
-	close(stream);
+	if (!closeStream || close(stream)	!= 0) return False;
 #endif
+
+	closeStream = False;
+
+	return True;
 }

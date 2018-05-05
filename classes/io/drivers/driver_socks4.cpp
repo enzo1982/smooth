@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,11 +35,13 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 	if (stream == (unsigned) (~0)) { lastError = IO_ERROR_UNEXPECTED; return; }
 
+	closeStream = True;
+
 	/* Get proxy and server hostname.
 	 */
 	hostent		*host = gethostbyname(proxy);
 
-	if (host == NIL) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (host == NIL) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Connect to proxy.
 	 */
@@ -51,7 +53,7 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 	memset(&saddr.sin_zero, 0, sizeof(saddr.sin_zero));
 
-	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (connect(stream, (sockaddr *) &saddr, sizeof(struct sockaddr)) == -1) { Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Send connect request.
 	 */
@@ -71,7 +73,7 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 		socksdata[7] = server_hostent->h_addr_list[0][3];
 		socksdata[8] = 0;
 
-		if (send(stream, (char *) socksdata, 9, 0) < 9) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (send(stream, (char *) socksdata, 9, 0) < 9) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		delete [] socksdata;
 	}
@@ -89,7 +91,7 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 		socksdata[7] = IOGetByte(inet_addr(hostName), 3);
 		socksdata[8] = 0;
 
-		if (send(stream, (char *) socksdata, 9, 0) < 9) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (send(stream, (char *) socksdata, 9, 0) < 9) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		delete [] socksdata;
 	}
@@ -111,7 +113,7 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 
 		socksdata[9 + strlen(hostName)] = 0;
 
-		if (send(stream, (char *) socksdata, 10 + strlen(hostName), 0) < signed(10 + strlen(hostName))) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (send(stream, (char *) socksdata, 10 + strlen(hostName), 0) < signed(10 + strlen(hostName))) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		delete [] socksdata;
 	}
@@ -125,23 +127,21 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 	{
 		int	 bytes = recv(stream, (char *) socksdata + recbytes, 8 - recbytes, 0);
 
-		if (bytes <= 0) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (bytes <= 0) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		recbytes += bytes;
 	}
 
 	/* Check if connect attempt was successful.
 	 */
-	if (socksdata[1] != 90) { delete [] socksdata; CloseSocket(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (socksdata[1] != 90) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	delete [] socksdata;
-
-	closeStream = True;
 }
 
 S::IO::DriverSOCKS4::~DriverSOCKS4()
 {
-	if (closeStream) CloseSocket();
+	Close();
 }
 
 S::Int S::IO::DriverSOCKS4::ReadData(UnsignedByte *data, Int dataSize)
@@ -161,11 +161,15 @@ S::Int S::IO::DriverSOCKS4::WriteData(UnsignedByte *data, Int dataSize)
 	return send(stream, (char *) data, dataSize, 0);
 }
 
-S::Void S::IO::DriverSOCKS4::CloseSocket()
+S::Bool S::IO::DriverSOCKS4::Close()
 {
 #if defined __WIN32__
-	closesocket(stream);
+	if (!closeStream || closesocket(stream) != 0) return False;
 #else
-	close(stream);
+	if (!closeStream || close(stream)	!= 0) return False;
 #endif
+
+	closeStream = False;
+
+	return True;
 }

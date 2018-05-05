@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,6 +57,16 @@ S::Int64 S::IO::Driver::Seek(Int64 newPos)
 	return position;
 }
 
+S::Bool S::IO::Driver::Flush()
+{
+	return True;
+}
+
+S::Bool S::IO::Driver::Close()
+{
+	return True;
+}
+
 S::Int64 S::IO::Driver::GetSize() const
 {
 	return size;
@@ -65,11 +75,6 @@ S::Int64 S::IO::Driver::GetSize() const
 S::Int64 S::IO::Driver::GetPos() const
 {
 	return position;
-}
-
-S::Bool S::IO::Driver::Flush()
-{
-	return True;
 }
 
 const S::String &S::IO::Driver::GetStreamID() const

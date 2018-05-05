@@ -79,7 +79,7 @@ S::IO::DriverWin32::DriverWin32(HANDLE iStream) : Driver()
 
 S::IO::DriverWin32::~DriverWin32()
 {
-	if (closeStream) CloseHandle(stream);
+	Close();
 }
 
 S::Int S::IO::DriverWin32::ReadData(UnsignedByte *data, Int dataSize)
@@ -112,6 +112,15 @@ S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 	if (lo32 == INVALID_SET_FILE_POINTER && ::GetLastError() != NO_ERROR) return -1;
 
 	return (Int64) hi32 << 32 | lo32;
+}
+
+S::Bool S::IO::DriverWin32::Close()
+{
+	if (!closeStream || !CloseHandle(stream)) return False;
+
+	closeStream = False;
+
+	return True;
 }
 
 S::Int64 S::IO::DriverWin32::GetSize() const

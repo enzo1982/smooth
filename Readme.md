@@ -1,5 +1,6 @@
 The smooth Class Library
 ====================================================================================================
+[![Build Status](https://travis-ci.com/enzo1982/smooth.svg?branch=master)](https://travis-ci.com/enzo1982/smooth)
 
 _smooth_ is an object oriented C++ class library for Windows, macOS, Linux and most Unix-like operating systems. It provides basic functionality and platform support for applications and libraries.
 

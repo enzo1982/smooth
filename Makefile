@@ -4,9 +4,145 @@ SMOOTH_PATH = .
 
 include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
-### Output options ###
+### Object files ###
 
-OBJECTS = classes/*/*.o classes/*/*/*.o classes/*/*/*/*.o classes/*/*/*/*/*.o misc/*.o
+OBJECTS  = classes/backends/backend.o
+OBJECTS += classes/basic/object.o classes/basic/objecttype.o classes/basic/setup.o
+OBJECTS += classes/errors/error.o classes/errors/success.o
+OBJECTS += classes/errors/fs/endoffile.o classes/errors/fs/filenotfound.o
+OBJECTS += classes/errors/misc/permissiondenied.o
+OBJECTS += classes/files/directory.o classes/files/file.o
+OBJECTS += classes/graphics/bitmap.o classes/graphics/color.o classes/graphics/font.o classes/graphics/surface.o
+OBJECTS += classes/graphics/backends/bitmapbackend.o classes/graphics/backends/fontbackend.o classes/graphics/backends/surfacebackend.o
+OBJECTS += classes/graphics/forms/rect.o
+OBJECTS += classes/graphics/imageloader/imageloader.o classes/graphics/imageloader/jpeg.o classes/graphics/imageloader/pci.o classes/graphics/imageloader/png.o
+OBJECTS += classes/graphics/modifiers/fontsize.o classes/graphics/modifiers/righttoleft.o classes/graphics/modifiers/upsidedown.o
+OBJECTS += classes/gui/application/application.o
+OBJECTS += classes/gui/clipboard/clipboard.o
+OBJECTS += classes/gui/clipboard/backends/clipboardbackend.o
+OBJECTS += classes/gui/dialogs/colordlg.o classes/gui/dialogs/dialog.o classes/gui/dialogs/fontdlg.o classes/gui/dialogs/messagebox.o classes/gui/dialogs/splashscreen.o classes/gui/dialogs/tipodaydlg.o
+OBJECTS += classes/gui/dialogs/directory/dirdlg.o
+OBJECTS += classes/gui/dialogs/file/filedlg.o
+OBJECTS += classes/gui/widgets/layer.o classes/gui/widgets/widget.o
+OBJECTS += classes/gui/widgets/basic/activearea.o classes/gui/widgets/basic/arrows.o classes/gui/widgets/basic/button.o classes/gui/widgets/basic/checkbox.o classes/gui/widgets/basic/client.o classes/gui/widgets/basic/divider.o classes/gui/widgets/basic/editbox.o classes/gui/widgets/basic/groupbox.o classes/gui/widgets/basic/hyperlink.o classes/gui/widgets/basic/image.o classes/gui/widgets/basic/multiedit.o classes/gui/widgets/basic/optionbox.o classes/gui/widgets/basic/progressbar.o classes/gui/widgets/basic/scrollbar.o classes/gui/widgets/basic/slider.o classes/gui/widgets/basic/statusbar.o classes/gui/widgets/basic/tabwidget.o classes/gui/widgets/basic/text.o classes/gui/widgets/basic/titlebar.o
+OBJECTS += classes/gui/widgets/hotspot/hotspot.o classes/gui/widgets/hotspot/simplebutton.o
+OBJECTS += classes/gui/widgets/multi/image/imagebox.o classes/gui/widgets/multi/image/imageentry.o
+OBJECTS += classes/gui/widgets/multi/list/combobox.o classes/gui/widgets/multi/list/list.o classes/gui/widgets/multi/list/listbox.o classes/gui/widgets/multi/list/listboxheader.o classes/gui/widgets/multi/list/listentry.o classes/gui/widgets/multi/list/listentryseparator.o
+OBJECTS += classes/gui/widgets/multi/menu/menu.o classes/gui/widgets/multi/menu/menubar.o classes/gui/widgets/multi/menu/menubarentry.o classes/gui/widgets/multi/menu/menuentry.o classes/gui/widgets/multi/menu/micromenu.o classes/gui/widgets/multi/menu/popupmenu.o classes/gui/widgets/multi/menu/popupmenuentry.o classes/gui/widgets/multi/menu/popupmenuentrycheck.o classes/gui/widgets/multi/menu/popupmenuentryoption.o
+OBJECTS += classes/gui/widgets/multi/tree/tree.o
+OBJECTS += classes/gui/widgets/special/cursor.o classes/gui/widgets/special/dragcontrol.o classes/gui/widgets/special/droparea.o classes/gui/widgets/special/shortcut.o classes/gui/widgets/special/tooltip.o
+OBJECTS += classes/gui/window/toolwindow.o classes/gui/window/window.o
+OBJECTS += classes/gui/window/backends/windowbackend.o
+OBJECTS += classes/i18n/language.o classes/i18n/number.o classes/i18n/section.o classes/i18n/translator.o classes/i18n/translator_internal.o
+OBJECTS += classes/input/keyboard.o classes/input/pointer.o
+OBJECTS += classes/input/backends/pointerbackend.o
+OBJECTS += classes/io/driver.o classes/io/filter.o classes/io/instream.o classes/io/outstream.o classes/io/stream.o
+OBJECTS += classes/io/drivers/driver_ansi.o classes/io/drivers/driver_https.o classes/io/drivers/driver_memory.o classes/io/drivers/driver_posix.o classes/io/drivers/driver_socket.o classes/io/drivers/driver_socks4.o classes/io/drivers/driver_socks5.o classes/io/drivers/driver_zero.o
+OBJECTS += classes/io/filters/filter_bzip2.o classes/io/filters/filter_xor.o
+OBJECTS += classes/misc/args.o classes/misc/array.o classes/misc/binary.o classes/misc/config.o classes/misc/datetime.o classes/misc/math.o classes/misc/memory.o classes/misc/number.o classes/misc/string.o classes/misc/string_case.o
+OBJECTS += classes/misc/encoding/base64.o classes/misc/encoding/urlencode.o
+OBJECTS += classes/misc/hash/crc16.o classes/misc/hash/crc32.o classes/misc/hash/crc64.o classes/misc/hash/md5.o classes/misc/hash/sha1.o
+OBJECTS += classes/net/protocols/file.o classes/net/protocols/http.o classes/net/protocols/protocol.o
+OBJECTS += classes/system/console.o classes/system/cpu.o classes/system/dynamicloader.o classes/system/event.o classes/system/screen.o classes/system/system.o classes/system/timer.o
+OBJECTS += classes/system/backends/eventbackend.o classes/system/backends/screenbackend.o classes/system/backends/timerbackend.o
+OBJECTS += classes/threads/access.o classes/threads/mutex.o classes/threads/rwlock.o classes/threads/semaphore.o classes/threads/thread.o
+OBJECTS += classes/threads/backends/mutexbackend.o classes/threads/backends/semaphorebackend.o classes/threads/backends/threadbackend.o
+OBJECTS += classes/xml/attribute.o classes/xml/document.o classes/xml/node.o
+OBJECTS += classes/xml/xul/box.o classes/xml/xul/button.o classes/xml/xul/description.o classes/xml/xul/label.o classes/xml/xul/menubar.o classes/xml/xul/popupmenu.o classes/xml/xul/renderer.o classes/xml/xul/textbox.o classes/xml/xul/widget.o classes/xml/xul/window.o
+OBJECTS += misc/codecs.o misc/init.o misc/pciio.o
+
+ifeq ($(BUILD_WIN32),True)
+	OBJECTS += classes/backends/win32/backendwin32.o
+	OBJECTS += classes/graphics/imageloader/icon.o
+	OBJECTS += classes/gui/application/xulloader.o
+	OBJECTS += classes/gui/clipboard/backends/win32/clipboardwin32.o
+	OBJECTS += classes/gui/dialogs/directory/dirdlg_win32.o
+	OBJECTS += classes/gui/dialogs/file/filedlg_win32.o
+	OBJECTS += classes/gui/window/backends/gdi/windowgdi.o
+	OBJECTS += classes/input/backends/win32/pointerwin32.o
+	OBJECTS += classes/io/drivers/driver_win32.o
+	OBJECTS += classes/system/backends/win32/eventwin32.o classes/system/backends/win32/screenwin32.o classes/system/backends/win32/timerwin32.o
+	OBJECTS += classes/threads/backends/win32/mutexwin32.o classes/threads/backends/win32/semaphorewin32.o classes/threads/backends/win32/threadwin32.o
+
+	ifeq ($(BUILD_GDIPLUS),True)
+		OBJECTS += classes/backends/gdiplus/backendgdiplus.o
+		OBJECTS += classes/graphics/backends/gdiplus/bitmapgdiplus.o
+
+		ifneq ($(BUILD_CAIRO),True)
+			OBJECTS += classes/graphics/backends/gdiplus/fontgdiplus.o classes/graphics/backends/gdiplus/surfacegdiplus.o
+		endif 
+	else
+		OBJECTS += classes/graphics/backends/gdi/bitmapgdi.o
+
+		ifneq ($(BUILD_CAIRO),True)
+			OBJECTS += classes/graphics/backends/gdi/fontgdi.o classes/graphics/backends/gdi/surfacegdi.o
+		endif
+	endif
+else ifeq ($(BUILD_OSX),True)
+	OBJECTS += classes/backends/cocoa/backendcocoa.o
+	OBJECTS += classes/gui/clipboard/backends/cocoa/clipboardcocoa.o
+	OBJECTS += classes/gui/dialogs/directory/dirdlg_cocoa.o
+	OBJECTS += classes/gui/dialogs/file/filedlg_cocoa.o
+	OBJECTS += classes/gui/widgets/multi/menu/menubar_cocoa.o
+
+	ifneq ($(BUILD_XLIB),True)
+		OBJECTS += classes/graphics/backends/cocoa/bitmapcocoa.o classes/graphics/backends/cocoa/fontcocoa.o classes/graphics/backends/cocoa/surfacecocoa.o
+		OBJECTS += classes/gui/window/backends/cocoa/windowcocoa.o
+		OBJECTS += classes/input/backends/cocoa/pointercocoa.o
+		OBJECTS += classes/system/backends/cocoa/eventcocoa.o classes/system/backends/cocoa/screencocoa.o classes/system/backends/cocoa/timercocoa.o
+	endif
+else ifeq ($(BUILD_HAIKU),True)
+	OBJECTS += classes/graphics/backends/haiku/bitmaphaiku.o classes/graphics/backends/haiku/fonthaiku.o classes/graphics/backends/haiku/surfacehaiku.o 
+	OBJECTS += classes/gui/clipboard/backends/haiku/clipboardhaiku.o
+	OBJECTS += classes/gui/dialogs/directory/dirdlg_haiku.o
+	OBJECTS += classes/gui/dialogs/file/filedlg_haiku.o
+	OBJECTS += classes/gui/window/backends/haiku/windowhaiku.o
+	OBJECTS += classes/input/backends/haiku/pointerhaiku.o
+	OBJECTS += classes/system/backends/haiku/eventhaiku.o classes/system/backends/haiku/screenhaiku.o
+else
+	OBJECTS += classes/gui/dialogs/directory/dirdlg_gtk.o
+	OBJECTS += classes/gui/dialogs/file/filedlg_gtk.o
+endif
+
+ifeq ($(BUILD_XLIB),True)
+	OBJECTS += classes/backends/xlib/backendxlib.o
+	OBJECTS += classes/graphics/backends/xlib/bitmapxlib.o
+	OBJECTS += classes/gui/window/backends/xlib/windowxlib.o
+	OBJECTS += classes/input/backends/xlib/pointerxlib.o
+	OBJECTS += classes/system/backends/xlib/eventxlib.o classes/system/backends/xlib/screenxlib.o
+
+	ifneq ($(BUILD_CAIRO),True)
+		OBJECTS += classes/graphics/backends/xlib/fontxlib.o classes/graphics/backends/xlib/surfacexlib.o
+	endif
+
+	ifneq ($(BUILD_OSX),True)
+		OBJECTS += classes/gui/clipboard/backends/xlib/clipboardxlib.o
+	endif
+endif
+
+ifeq ($(BUILD_CAIRO),True)
+	OBJECTS += classes/graphics/backends/cairo/fontcairo.o classes/graphics/backends/cairo/surfacecairo.o
+endif 
+
+ifeq ($(BUILD_POSIXTIMER),True)
+	OBJECTS += classes/system/backends/posix/timerposix.o
+else ifeq ($(BUILD_THREADSTIMER),True)
+	OBJECTS += classes/system/backends/threads/timerthreads.o
+endif 
+
+ifeq ($(BUILD_POSIXTHREADS),True)
+	OBJECTS += classes/threads/backends/posix/mutexposix.o classes/threads/backends/posix/semaphoreposix.o
+
+	ifneq ($(BUILD_OSX),True)
+		OBJECTS += classes/threads/backends/posix/threadposix.o
+	else ifeq ($(BUILD_XLIB),True)
+		OBJECTS += classes/threads/backends/posix/threadposix.o
+	else
+		OBJECTS += classes/threads/backends/cocoa/threadcocoa.o
+	endif
+endif 
+
+### Output options ###
 
 LIBS = -lstdc++
 
@@ -79,7 +215,7 @@ else
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	OBJECTS += resources/*.o
+	OBJECTS += resources/resources.o
 
 	ifeq ($(BUILD_GDIPLUS),True)
 		LIBS += -lgdiplus
@@ -290,7 +426,10 @@ doc: doc-clean
 doc-clean:
 	rm -r -f doc/reference
 
-$(DLLNAME): objects libs
+$(OBJECTS): objects
+	
+
+$(DLLNAME): $(OBJECTS) | libs
 	$(LD) $(OBJECTS) $(LINKER_OPTS) $(LDFLAGS) $(LIBS)
 ifeq ($(BUILD_WIN32),True)
 	countbuild BuildNumber

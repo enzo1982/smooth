@@ -434,6 +434,7 @@
     <ClCompile Include="..\..\classes\misc\config.cpp" />
     <ClCompile Include="..\..\classes\misc\datetime.cpp" />
     <ClCompile Include="..\..\classes\misc\encoding\urlencode.cpp" />
+    <ClCompile Include="..\..\classes\misc\hash\crc16.cpp" />
     <ClCompile Include="..\..\classes\misc\hash\crc64.cpp" />
     <ClCompile Include="..\..\classes\misc\math.cpp" />
     <ClCompile Include="..\..\classes\misc\memory.cpp" />
@@ -701,6 +702,7 @@
     <ClInclude Include="..\..\include\smooth\main.h" />
     <ClInclude Include="..\..\include\smooth\misc\array.h" />
     <ClInclude Include="..\..\include\smooth\misc\encoding\urlencode.h" />
+    <ClInclude Include="..\..\include\smooth\misc\hash\crc16.h" />
     <ClInclude Include="..\..\include\smooth\misc\hash\crc64.h" />
     <ClInclude Include="..\..\include\smooth\pciio.h" />
     <ClInclude Include="..\..\include\smooth\resources.h" />

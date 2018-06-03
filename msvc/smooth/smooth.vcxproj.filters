@@ -1,0 +1,1912 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Quelldateien\classes">
+      <UniqueIdentifier>{e3d648e5-0f0c-4e59-b337-00af2840410a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\basic">
+      <UniqueIdentifier>{44316ac8-ce0f-464a-a985-76d337035c10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\backends">
+      <UniqueIdentifier>{34299b6e-39bb-47cd-828a-68f8039fcedc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\backends\gdiplus">
+      <UniqueIdentifier>{e0797dd9-7f15-45e6-afad-69b0ff88fcda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\backends\win32">
+      <UniqueIdentifier>{719941d5-d728-41cc-8c49-2b44b8e49a9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\backends\xlib">
+      <UniqueIdentifier>{af32af43-6893-4d51-9d47-f056fa88e39f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\errors">
+      <UniqueIdentifier>{68ae3adb-3857-437a-8b8f-a0d32f6f0ec4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\errors\fs">
+      <UniqueIdentifier>{2679bf21-0450-45bf-9596-f32e70e2ea6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\errors\misc">
+      <UniqueIdentifier>{2ce4a894-09d9-4ae2-8508-def8162e677c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\files">
+      <UniqueIdentifier>{3f714a56-71b4-48e7-98a0-7275b20885fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics">
+      <UniqueIdentifier>{3b9f69c0-4050-4a4a-b67e-62721a665846}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\forms">
+      <UniqueIdentifier>{581c4769-db5f-4655-a366-c85e7a4778b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\imageloader">
+      <UniqueIdentifier>{1d7e0675-b88d-4bff-9cd2-4a5d868bf177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends">
+      <UniqueIdentifier>{d1884496-4c99-498f-8372-326027132553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends\gdi">
+      <UniqueIdentifier>{1b1c2504-242a-478a-a0a2-c06046721a9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends\xlib">
+      <UniqueIdentifier>{5c564a72-f4e6-473b-bde9-33fb97bdfd18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends\cairo">
+      <UniqueIdentifier>{65617e76-9189-472e-a210-6e9683d231fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends\gdiplus">
+      <UniqueIdentifier>{ab8e3aa5-757e-416b-bbd9-b6eaf1e05f0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\modifiers">
+      <UniqueIdentifier>{168004a4-46fe-4db8-85cf-2144265b6cc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui">
+      <UniqueIdentifier>{dc43e6b8-e074-4951-8e5b-b76d9b83c9ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets">
+      <UniqueIdentifier>{8729f175-1404-45b4-a42c-ea646bd96746}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\basic">
+      <UniqueIdentifier>{d81f9dc5-820a-426d-bd9d-f231cddd04b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\hotspot">
+      <UniqueIdentifier>{65315b57-4f15-4d15-8f4c-03a8170def4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\multi">
+      <UniqueIdentifier>{cf7b1b8f-8713-491d-9b7e-555151262a4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\multi\list">
+      <UniqueIdentifier>{5afc39dc-cf61-4600-844a-175ce38d4cac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\multi\menu">
+      <UniqueIdentifier>{5b02e2d6-0717-4ad6-8f12-fc4f315e74f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\multi\tree">
+      <UniqueIdentifier>{696d632a-f28d-4a80-9843-f0bfd486065e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\multi\image">
+      <UniqueIdentifier>{17148fd7-2b62-4dc9-8cc9-7a2423a4e081}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\widgets\special">
+      <UniqueIdentifier>{df0d908e-9ac1-4011-959a-266d7e7ab946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\window">
+      <UniqueIdentifier>{0056155d-3273-4bc3-aee0-25929c2c6b9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\window\backends">
+      <UniqueIdentifier>{40f36a45-d04c-4e94-bec3-ee85ed5abf23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\window\backends\gdi">
+      <UniqueIdentifier>{70e267ed-7ecb-41b4-9363-595f12d24525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\window\backends\xlib">
+      <UniqueIdentifier>{e4ba62f8-b56d-4f27-9dae-62c4805a215f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\dialogs">
+      <UniqueIdentifier>{55bb85f3-bbd1-4d3a-9f48-a754506e8fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\dialogs\file">
+      <UniqueIdentifier>{7a9e17ff-afee-419b-9b78-ccdc825bd95f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\dialogs\directory">
+      <UniqueIdentifier>{5d20e427-aed0-4552-99a0-8a800bbc579d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\application">
+      <UniqueIdentifier>{cc6451ce-d506-4b1c-8c9d-0b9b1de338aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\clipboard">
+      <UniqueIdentifier>{a4aebf7b-73d3-465d-a7e9-3af3a1ed2843}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\clipboard\backends">
+      <UniqueIdentifier>{423b08a7-7c80-4300-9318-975ecf34849b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\clipboard\backends\win32">
+      <UniqueIdentifier>{6c4d12aa-632d-4f15-90bd-3af304342b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\clipboard\backends\xlib">
+      <UniqueIdentifier>{09129953-22ee-4cd0-82de-6e2f49a2633d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\misc">
+      <UniqueIdentifier>{fae5992e-16e3-47bd-bfc6-31e1b6504471}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\misc\encoding">
+      <UniqueIdentifier>{652b13f2-3ac5-4012-9b7f-6a6459761277}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\misc\hash">
+      <UniqueIdentifier>{4b03e5c3-b175-4cf4-b4f8-cb5f4ec2d5a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\xml">
+      <UniqueIdentifier>{6b42ebee-8980-434d-a824-872489d588bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\xml\xul">
+      <UniqueIdentifier>{4c78af2e-f5ee-4bbe-8e7d-5db9498d1237}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system">
+      <UniqueIdentifier>{fd7c2958-7a0a-48c9-8de7-c6da7d7e82a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system\backends">
+      <UniqueIdentifier>{a994fdd4-7cda-47df-8f03-92d22822ea9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system\backends\xlib">
+      <UniqueIdentifier>{dd280a7b-05b6-4cd2-9912-07339b8a0cbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system\backends\win32">
+      <UniqueIdentifier>{160a3b82-0d51-44b1-8aaf-27bbe4056fa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system\backends\posix">
+      <UniqueIdentifier>{d5928f0b-5f96-4788-ade7-110500e792ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system\backends\threads">
+      <UniqueIdentifier>{48b40314-5860-4c70-8650-4903029bd3c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\threads">
+      <UniqueIdentifier>{8cee18ea-8c17-4d30-8e95-90c83fc4018d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\threads\backends">
+      <UniqueIdentifier>{e129a7ca-2f3b-4a4b-9678-4ce1b1c1e2da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\threads\backends\posix">
+      <UniqueIdentifier>{5c38bb59-c0bb-4471-a2e8-e4e8aaad7e96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\threads\backends\win32">
+      <UniqueIdentifier>{ca86b9bc-6b6c-44cc-8556-54979232bbbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\io">
+      <UniqueIdentifier>{ac5801ad-0855-4c2d-b6e9-09127ed839b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\io\drivers">
+      <UniqueIdentifier>{cf019052-ff34-40f4-b3ed-eb35393c8af1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\io\filters">
+      <UniqueIdentifier>{88ea8ec0-6d3a-4503-b7c0-96acbf18a66d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\i18n">
+      <UniqueIdentifier>{a94f9040-aac5-4118-8215-89aa04429afa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\i18n\locales">
+      <UniqueIdentifier>{173379fd-bdda-4316-b30c-7a2f5c13c21c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\net">
+      <UniqueIdentifier>{5f96c353-aae9-4a16-8c89-cf9d8a7a4fb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\net\protocols">
+      <UniqueIdentifier>{2c2e71d9-039c-472c-bc3e-40beb9d7a57c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\input">
+      <UniqueIdentifier>{b2445ddd-5f66-4ba4-86e8-ad0e106e3de1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\misc">
+      <UniqueIdentifier>{0ef02bf4-30f5-4c5c-a675-8586c5b511bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\smooth">
+      <UniqueIdentifier>{2d02c3b2-bffe-464a-9363-844c0c82b5ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system">
+      <UniqueIdentifier>{6556a0c1-0bda-4a2e-9b94-7fac4230b767}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system\backends">
+      <UniqueIdentifier>{c4384134-17df-46ce-8dfd-085c69ba1a04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system\backends\posix">
+      <UniqueIdentifier>{ca888883-4f17-4fdb-a4b8-b31f64fdc7e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system\backends\win32">
+      <UniqueIdentifier>{11253afe-f16a-4973-80e4-21fba48ec7e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system\backends\threads">
+      <UniqueIdentifier>{417d5200-fdaf-425b-b9f3-f730127da66a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system\backends\xlib">
+      <UniqueIdentifier>{7352bf39-e104-4e5a-91ca-d15d9c7682d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\basic">
+      <UniqueIdentifier>{15bb3488-1f4c-4113-9262-698a4191bb62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\backends">
+      <UniqueIdentifier>{6bd7f4a0-58bb-479c-903a-4dff50643e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\backends\gdiplus">
+      <UniqueIdentifier>{c9a786e0-fc6d-43fd-a8bd-2f1d227aea3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\backends\win32">
+      <UniqueIdentifier>{60f86725-78fa-4da9-a78a-b696de087a63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\backends\xlib">
+      <UniqueIdentifier>{3d0dff58-5a6a-4f5d-9898-b7a9494a1bfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\misc">
+      <UniqueIdentifier>{54f125f5-c9c7-4251-835d-8ff5461b7426}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\misc\encoding">
+      <UniqueIdentifier>{321cefab-edd7-4d3e-9282-dd6ee27fe4dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\misc\hash">
+      <UniqueIdentifier>{1b75e392-53ae-4bfd-98cd-032166d6216d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui">
+      <UniqueIdentifier>{cc17a67b-24fa-44a7-bdda-9efc8235e052}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets">
+      <UniqueIdentifier>{dea86870-3ab1-448c-8899-0edd68683f73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\multi">
+      <UniqueIdentifier>{572df2d6-6bd1-4091-8685-5225a9b59172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\multi\menu">
+      <UniqueIdentifier>{f98d859a-6b12-4a29-8660-f1983ea96f24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\multi\list">
+      <UniqueIdentifier>{b1873921-7c5a-4f1b-bfe2-7c4728f4ec5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\multi\tree">
+      <UniqueIdentifier>{d60e4a37-674c-4fc4-b042-85fa96e05b3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\multi\image">
+      <UniqueIdentifier>{31b073f1-9f2c-4f1d-9ac4-b7b659fb9715}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\basic">
+      <UniqueIdentifier>{1f717867-9450-458c-a30c-10086fc87a69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\special">
+      <UniqueIdentifier>{b30d16af-9a54-4733-98ed-41bce842be6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\widgets\hotspot">
+      <UniqueIdentifier>{ec9cf953-4632-423a-a2b4-e952052fe389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\window">
+      <UniqueIdentifier>{07435b2c-ec77-4e07-9b56-6deffdb02a19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\window\backends">
+      <UniqueIdentifier>{fd4690f1-c6a3-4fb9-b956-b40b870cafcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\window\backends\gdi">
+      <UniqueIdentifier>{422447e4-2b46-4e10-a39b-da2ec4332309}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\window\backends\xlib">
+      <UniqueIdentifier>{a2007313-7ab1-4e12-9a64-08541c68eed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\dialogs">
+      <UniqueIdentifier>{9a2c5a1f-2d4e-4f48-8ce3-a3d09646a986}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\application">
+      <UniqueIdentifier>{55917038-a479-4536-a9f9-e2462181b835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\clipboard">
+      <UniqueIdentifier>{dae7b823-371e-46d1-b575-2e6b886e2e30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\clipboard\backends">
+      <UniqueIdentifier>{277c7425-84a1-4adb-8a82-b6d204da8a80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\clipboard\backends\win32">
+      <UniqueIdentifier>{fa9ca552-8541-45c0-99f2-322608200970}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\clipboard\backends\xlib">
+      <UniqueIdentifier>{c44de026-98e7-4633-9115-3660ceb4afbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\net">
+      <UniqueIdentifier>{83e8b9fa-567c-4d64-a0e9-194fd84478eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\net\protocols">
+      <UniqueIdentifier>{319e1500-a98d-432d-88a6-6b61290c8f72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics">
+      <UniqueIdentifier>{87bdd951-64b6-45d4-bbab-0d3678fefedb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends">
+      <UniqueIdentifier>{27f3754f-8145-4878-ba41-868e0a720070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends\gdi">
+      <UniqueIdentifier>{cebaf764-2ef2-431c-98f1-64dcd55f8da8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends\xlib">
+      <UniqueIdentifier>{b05d0696-c7b2-4f3c-84a0-5b27b1db23ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends\cairo">
+      <UniqueIdentifier>{949baf55-e473-4f45-bece-34519f20f0d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends\gdiplus">
+      <UniqueIdentifier>{65d6c8b6-dd9a-4e57-a84d-c698b62bfb7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\forms">
+      <UniqueIdentifier>{dc1f8aa1-be99-4686-8d90-982be217f5bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\imageloader">
+      <UniqueIdentifier>{85d58e30-6563-4efe-bd5e-8d399b91c6f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\modifiers">
+      <UniqueIdentifier>{5db440f2-dc6f-4130-9bb0-2854140a1a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\templates">
+      <UniqueIdentifier>{b73dbdfb-b203-4fe3-a788-1638abb91e39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\templates\buffer">
+      <UniqueIdentifier>{edad5eed-f212-4780-a871-0f82d1cc4428}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\templates\array">
+      <UniqueIdentifier>{1a576ce4-444f-4d3c-896c-df1572a6754e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\templates\signals">
+      <UniqueIdentifier>{ac581f32-f4f0-4b66-a9a8-20f9f07bc504}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\templates\slots">
+      <UniqueIdentifier>{473cafef-af03-485a-a5d6-c88ffcebfb51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\threads">
+      <UniqueIdentifier>{0095d71b-24b3-40c9-8e1e-a33df115bd06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\threads\backends">
+      <UniqueIdentifier>{f31de9c6-14c3-412c-b3c7-26cbc349e5da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\threads\backends\posix">
+      <UniqueIdentifier>{e3a9ddb8-9bf3-43ef-a6ed-2142d4265297}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\threads\backends\win32">
+      <UniqueIdentifier>{a584c56f-016c-4322-afed-16966a6c9934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\i18n">
+      <UniqueIdentifier>{28d39524-b04f-4f5d-bf47-91d1c1c1ac38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\files">
+      <UniqueIdentifier>{78450392-9462-4b2e-83f9-0a97a6e11d78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\input">
+      <UniqueIdentifier>{2e15538c-1615-4ce9-b7f1-806d21eb28b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system\backends\cocoa">
+      <UniqueIdentifier>{4f914100-37d0-4fd3-ba15-bb132bf9c006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\system\backends\haiku">
+      <UniqueIdentifier>{88e00dc6-5e01-475d-ab77-1e906783852a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system\backends\cocoa">
+      <UniqueIdentifier>{a59cb894-c80f-49d3-8b7b-1a4094297a17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\system\backends\haiku">
+      <UniqueIdentifier>{ce2d9359-16c6-443f-8b61-644280731b9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\input\backends">
+      <UniqueIdentifier>{44a1883b-51b1-401a-a58f-351682a923ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\input\backends\win32">
+      <UniqueIdentifier>{f6f5ab04-6cc9-4fd9-9ae5-80713ea0b3cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\input\backends\cocoa">
+      <UniqueIdentifier>{8a0cd69f-2374-4cb0-ab0f-a1b577208acc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\input\backends\xlib">
+      <UniqueIdentifier>{e1ba5330-774e-445f-a4a9-185124880ec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\input\backends\haiku">
+      <UniqueIdentifier>{36032388-575c-43d2-afca-dcc1c2bfa138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\input\backends">
+      <UniqueIdentifier>{1a44c7a4-23cd-4a99-bf50-af1e66abfe1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\input\backends\haiku">
+      <UniqueIdentifier>{595a2451-cfee-4334-bf0b-9421ce6a3413}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\input\backends\cocoa">
+      <UniqueIdentifier>{d0ca6918-653a-44fe-941e-2aa3d0f7dc1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\input\backends\win32">
+      <UniqueIdentifier>{007283fb-8209-42c1-b814-97e4ef7d1a8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\input\backends\xlib">
+      <UniqueIdentifier>{d5e5b731-180e-4461-8db6-be5ddfac2576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\window\backends\cocoa">
+      <UniqueIdentifier>{ece127ba-df1e-4bfc-b0a8-a86fd67378cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\window\backends\haiku">
+      <UniqueIdentifier>{9c5c16b5-9a4c-49be-b04f-1fd169a830eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\clipboard\backends\haiku">
+      <UniqueIdentifier>{2f537511-9346-4748-832b-b72aec6d3837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\gui\clipboard\backends\cocoa">
+      <UniqueIdentifier>{6d35e323-ad59-450d-b2a7-d221ac9f7a8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\window\backends\cocoa">
+      <UniqueIdentifier>{fce7f3e5-2bf6-4be9-9945-561d4e4ce6dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\window\backends\haiku">
+      <UniqueIdentifier>{9ef83d17-d4f2-45ec-8e97-6bfdfb02c5a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\clipboard\backends\cocoa">
+      <UniqueIdentifier>{10119fc7-46a8-4933-86a1-30368c29e343}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\clipboard\backends\haiku">
+      <UniqueIdentifier>{4313e97e-0c8f-4103-9b3e-118765195cfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends\cocoa">
+      <UniqueIdentifier>{c06ec65a-a1c3-4abe-9597-bbc582a73ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends\haiku">
+      <UniqueIdentifier>{5434d963-2469-493a-92a2-1228a400866f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\backends\cocoa">
+      <UniqueIdentifier>{db83b329-417d-41a6-a4fb-3c5b1dd73abe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\backends\cocoa">
+      <UniqueIdentifier>{b248601e-74f0-401c-8522-a0d029554853}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends\cocoa">
+      <UniqueIdentifier>{1b082beb-ece7-425a-9f53-0537ed519339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends\haiku">
+      <UniqueIdentifier>{bcc9229a-1c1e-4096-b0eb-1cf7c951dc12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\classes\basic\object.cpp">
+      <Filter>Quelldateien\classes\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\basic\objecttype.cpp">
+      <Filter>Quelldateien\classes\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\basic\setup.cpp">
+      <Filter>Quelldateien\classes\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\backends\backend.cpp">
+      <Filter>Quelldateien\classes\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\backends\gdiplus\backendgdiplus.cpp">
+      <Filter>Quelldateien\classes\backends\gdiplus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\backends\win32\backendwin32.cpp">
+      <Filter>Quelldateien\classes\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\backends\xlib\backendxlib.cpp">
+      <Filter>Quelldateien\classes\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\errors\error.cpp">
+      <Filter>Quelldateien\classes\errors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\errors\success.cpp">
+      <Filter>Quelldateien\classes\errors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\errors\fs\endoffile.cpp">
+      <Filter>Quelldateien\classes\errors\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\errors\fs\filenotfound.cpp">
+      <Filter>Quelldateien\classes\errors\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\errors\misc\permissiondenied.cpp">
+      <Filter>Quelldateien\classes\errors\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\files\directory.cpp">
+      <Filter>Quelldateien\classes\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\files\file.cpp">
+      <Filter>Quelldateien\classes\files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\bitmap.cpp">
+      <Filter>Quelldateien\classes\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\color.cpp">
+      <Filter>Quelldateien\classes\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\font.cpp">
+      <Filter>Quelldateien\classes\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\surface.cpp">
+      <Filter>Quelldateien\classes\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\forms\rect.cpp">
+      <Filter>Quelldateien\classes\graphics\forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\imageloader\icon.cpp">
+      <Filter>Quelldateien\classes\graphics\imageloader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\imageloader\imageloader.cpp">
+      <Filter>Quelldateien\classes\graphics\imageloader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\imageloader\jpeg.cpp">
+      <Filter>Quelldateien\classes\graphics\imageloader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\imageloader\pci.cpp">
+      <Filter>Quelldateien\classes\graphics\imageloader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\imageloader\png.cpp">
+      <Filter>Quelldateien\classes\graphics\imageloader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\bitmapbackend.cpp">
+      <Filter>Quelldateien\classes\graphics\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\fontbackend.cpp">
+      <Filter>Quelldateien\classes\graphics\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\surfacebackend.cpp">
+      <Filter>Quelldateien\classes\graphics\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdi\bitmapgdi.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\gdi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdi\fontgdi.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\gdi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdi\surfacegdi.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\gdi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\xlib\bitmapxlib.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\xlib\surfacexlib.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\fontcairo.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\cairo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairo.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\cairo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\bitmapgdiplus.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\gdiplus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\fontgdiplus.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\gdiplus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\surfacegdiplus.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\gdiplus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\modifiers\fontsize.cpp">
+      <Filter>Quelldateien\classes\graphics\modifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\modifiers\righttoleft.cpp">
+      <Filter>Quelldateien\classes\graphics\modifiers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\layer.cpp">
+      <Filter>Quelldateien\classes\gui\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\widget.cpp">
+      <Filter>Quelldateien\classes\gui\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\activearea.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\arrows.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\button.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\checkbox.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\client.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\divider.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\editbox.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\groupbox.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\hyperlink.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\image.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\multiedit.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\optionbox.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\progressbar.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\scrollbar.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\slider.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\statusbar.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\tabwidget.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\text.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\basic\titlebar.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\hotspot\hotspot.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\hotspot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\hotspot\simplebutton.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\hotspot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\combobox.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\list</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\list.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\list</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listbox.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\list</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listboxheader.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\list</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listentry.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\list</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\list\listentryseparator.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\list</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menu.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menubar.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menubarentry.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\menuentry.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\micromenu.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenu.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenuentry.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenuentrycheck.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\menu\popupmenuentryoption.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\tree\tree.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\image\imagebox.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\multi\image\imageentry.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\multi\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\special\cursor.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\special\dragcontrol.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\special\droparea.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\special\shortcut.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\widgets\special\tooltip.cpp">
+      <Filter>Quelldateien\classes\gui\widgets\special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\toolwindow.cpp">
+      <Filter>Quelldateien\classes\gui\window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\window.cpp">
+      <Filter>Quelldateien\classes\gui\window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\backends\windowbackend.cpp">
+      <Filter>Quelldateien\classes\gui\window\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\backends\gdi\windowgdi.cpp">
+      <Filter>Quelldateien\classes\gui\window\backends\gdi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\backends\xlib\windowxlib.cpp">
+      <Filter>Quelldateien\classes\gui\window\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\colordlg.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\dialog.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\fontdlg.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\messagebox.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\splashscreen.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\tipodaydlg.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_gtk.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_win32.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\directory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_win32.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\directory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\application\application.cpp">
+      <Filter>Quelldateien\classes\gui\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\application\xulloader.cpp">
+      <Filter>Quelldateien\classes\gui\application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\clipboard\clipboard.cpp">
+      <Filter>Quelldateien\classes\gui\clipboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\clipboardbackend.cpp">
+      <Filter>Quelldateien\classes\gui\clipboard\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\win32\clipboardwin32.cpp">
+      <Filter>Quelldateien\classes\gui\clipboard\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\xlib\clipboardxlib.cpp">
+      <Filter>Quelldateien\classes\gui\clipboard\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\args.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\binary.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\config.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\datetime.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\math.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\memory.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\number.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\string.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\string_case.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\encoding\base64.cpp">
+      <Filter>Quelldateien\classes\misc\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\hash\crc32.cpp">
+      <Filter>Quelldateien\classes\misc\hash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\hash\md5.cpp">
+      <Filter>Quelldateien\classes\misc\hash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\hash\sha1.cpp">
+      <Filter>Quelldateien\classes\misc\hash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\attribute.cpp">
+      <Filter>Quelldateien\classes\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\document.cpp">
+      <Filter>Quelldateien\classes\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\node.cpp">
+      <Filter>Quelldateien\classes\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\box.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\button.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\description.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\label.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\menubar.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\popupmenu.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\renderer.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\textbox.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\widget.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\xml\xul\window.cpp">
+      <Filter>Quelldateien\classes\xml\xul</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\console.cpp">
+      <Filter>Quelldateien\classes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\cpu.cpp">
+      <Filter>Quelldateien\classes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\dynamicloader.cpp">
+      <Filter>Quelldateien\classes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\event.cpp">
+      <Filter>Quelldateien\classes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\system.cpp">
+      <Filter>Quelldateien\classes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\timer.cpp">
+      <Filter>Quelldateien\classes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\eventbackend.cpp">
+      <Filter>Quelldateien\classes\system\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\timerbackend.cpp">
+      <Filter>Quelldateien\classes\system\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\xlib\eventxlib.cpp">
+      <Filter>Quelldateien\classes\system\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\win32\eventwin32.cpp">
+      <Filter>Quelldateien\classes\system\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\win32\timerwin32.cpp">
+      <Filter>Quelldateien\classes\system\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\posix\timerposix.cpp">
+      <Filter>Quelldateien\classes\system\backends\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\threads\timerthreads.cpp">
+      <Filter>Quelldateien\classes\system\backends\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\mutex.cpp">
+      <Filter>Quelldateien\classes\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\rwlock.cpp">
+      <Filter>Quelldateien\classes\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\semaphore.cpp">
+      <Filter>Quelldateien\classes\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\thread.cpp">
+      <Filter>Quelldateien\classes\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\mutexbackend.cpp">
+      <Filter>Quelldateien\classes\threads\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\semaphorebackend.cpp">
+      <Filter>Quelldateien\classes\threads\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\threadbackend.cpp">
+      <Filter>Quelldateien\classes\threads\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\posix\mutexposix.cpp">
+      <Filter>Quelldateien\classes\threads\backends\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\posix\semaphoreposix.cpp">
+      <Filter>Quelldateien\classes\threads\backends\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\posix\threadposix.cpp">
+      <Filter>Quelldateien\classes\threads\backends\posix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\win32\mutexwin32.cpp">
+      <Filter>Quelldateien\classes\threads\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\win32\semaphorewin32.cpp">
+      <Filter>Quelldateien\classes\threads\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\backends\win32\threadwin32.cpp">
+      <Filter>Quelldateien\classes\threads\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\driver.cpp">
+      <Filter>Quelldateien\classes\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\filter.cpp">
+      <Filter>Quelldateien\classes\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\instream.cpp">
+      <Filter>Quelldateien\classes\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\outstream.cpp">
+      <Filter>Quelldateien\classes\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\stream.cpp">
+      <Filter>Quelldateien\classes\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_ansi.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_https.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_memory.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_posix.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_socket.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_socks4.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_socks5.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_win32.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\drivers\driver_zero.cpp">
+      <Filter>Quelldateien\classes\io\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\filters\filter_bzip2.cpp">
+      <Filter>Quelldateien\classes\io\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\io\filters\filter_xor.cpp">
+      <Filter>Quelldateien\classes\io\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\i18n\language.cpp">
+      <Filter>Quelldateien\classes\i18n</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\i18n\number.cpp">
+      <Filter>Quelldateien\classes\i18n</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\i18n\section.cpp">
+      <Filter>Quelldateien\classes\i18n</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\i18n\translator.cpp">
+      <Filter>Quelldateien\classes\i18n</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\i18n\translator_internal.cpp">
+      <Filter>Quelldateien\classes\i18n</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\net\protocols\file.cpp">
+      <Filter>Quelldateien\classes\net\protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\net\protocols\http.cpp">
+      <Filter>Quelldateien\classes\net\protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\net\protocols\protocol.cpp">
+      <Filter>Quelldateien\classes\net\protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\input\pointer.cpp">
+      <Filter>Quelldateien\classes\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\misc\codecs.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\misc\init.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\misc\pciio.cpp">
+      <Filter>Quelldateien\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\input\keyboard.cpp">
+      <Filter>Quelldateien\classes\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\threads\access.cpp">
+      <Filter>Quelldateien\classes\threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\screen.cpp">
+      <Filter>Quelldateien\classes\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\xlib\screenxlib.cpp">
+      <Filter>Quelldateien\classes\system\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\win32\screenwin32.cpp">
+      <Filter>Quelldateien\classes\system\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\haiku\eventhaiku.cpp">
+      <Filter>Quelldateien\classes\system\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\haiku\screenhaiku.cpp">
+      <Filter>Quelldateien\classes\system\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\system\backends\screenbackend.cpp">
+      <Filter>Quelldateien\classes\system\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\input\backends\pointerbackend.cpp">
+      <Filter>Quelldateien\classes\input\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\input\backends\haiku\pointerhaiku.cpp">
+      <Filter>Quelldateien\classes\input\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\input\backends\xlib\pointerxlib.cpp">
+      <Filter>Quelldateien\classes\input\backends\xlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\input\backends\win32\pointerwin32.cpp">
+      <Filter>Quelldateien\classes\input\backends\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\backends\haiku\windowhaiku.cpp">
+      <Filter>Quelldateien\classes\gui\window\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\file\filedlg_haiku.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\clipboard\backends\haiku\clipboardhaiku.cpp">
+      <Filter>Quelldateien\classes\gui\clipboard\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\haiku\bitmaphaiku.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\haiku\fonthaiku.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\haiku\surfacehaiku.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\haiku</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\encoding\urlencode.cpp">
+      <Filter>Quelldateien\classes\misc\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\array.cpp">
+      <Filter>Quelldateien\classes\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_gtk.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\directory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\directory\dirdlg_haiku.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\directory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\hash\crc64.cpp">
+      <Filter>Quelldateien\classes\misc\hash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\hash\crc16.cpp">
+      <Filter>Quelldateien\classes\misc\hash</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ar.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_bg.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ca.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_cs.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_da.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_de.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_el.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_es.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_et.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_fi.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_fr.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_gl.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_he.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_hi.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_hr.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_hu.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_id.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_it.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ja.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ko.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_lt.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ms.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_nl.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_no.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pa.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pl.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pt.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_pt_BR.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ro.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_ru.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_sk.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_sr.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_sv.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_th.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_tr.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_uk.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_vi.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_zh_CN.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_zh_TW.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\args.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\codecs.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\definitions.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\dll.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\foreach.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\init.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\main.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\pciio.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\resources.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\version.h">
+      <Filter>Headerdateien\smooth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\console.h">
+      <Filter>Headerdateien\smooth\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\cpu.h">
+      <Filter>Headerdateien\smooth\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\dynamicloader.h">
+      <Filter>Headerdateien\smooth\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\event.h">
+      <Filter>Headerdateien\smooth\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\system.h">
+      <Filter>Headerdateien\smooth\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\timer.h">
+      <Filter>Headerdateien\smooth\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\eventbackend.h">
+      <Filter>Headerdateien\smooth\system\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\timerbackend.h">
+      <Filter>Headerdateien\smooth\system\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\posix\timerposix.h">
+      <Filter>Headerdateien\smooth\system\backends\posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\win32\eventwin32.h">
+      <Filter>Headerdateien\smooth\system\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\win32\timerwin32.h">
+      <Filter>Headerdateien\smooth\system\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\threads\timerthreads.h">
+      <Filter>Headerdateien\smooth\system\backends\threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\xlib\eventxlib.h">
+      <Filter>Headerdateien\smooth\system\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\basic\object.h">
+      <Filter>Headerdateien\smooth\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\basic\objecttype.h">
+      <Filter>Headerdateien\smooth\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\basic\setup.h">
+      <Filter>Headerdateien\smooth\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\backends\backend.h">
+      <Filter>Headerdateien\smooth\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\backends\gdiplus\backendgdiplus.h">
+      <Filter>Headerdateien\smooth\backends\gdiplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\backends\win32\backendwin32.h">
+      <Filter>Headerdateien\smooth\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\backends\xlib\backendxlib.h">
+      <Filter>Headerdateien\smooth\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\args.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\binary.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\config.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\datetime.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\math.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\memory.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\number.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\string.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\encoding\base64.h">
+      <Filter>Headerdateien\smooth\misc\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\hash\crc32.h">
+      <Filter>Headerdateien\smooth\misc\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\hash\md5.h">
+      <Filter>Headerdateien\smooth\misc\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\hash\sha1.h">
+      <Filter>Headerdateien\smooth\misc\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\layer.h">
+      <Filter>Headerdateien\smooth\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\widget.h">
+      <Filter>Headerdateien\smooth\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menu.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menubar.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menubarentry.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\menuentry.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\micromenu.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenu.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentry.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentrycheck.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\menu\popupmenuentryoption.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\combobox.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\list.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listbox.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listboxheader.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listentry.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\list\listentryseparator.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\tree\tree.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\tree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\image\imagebox.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\image\imageentry.h">
+      <Filter>Headerdateien\smooth\gui\widgets\multi\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\activearea.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\arrows.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\button.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\checkbox.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\client.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\divider.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\editbox.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\groupbox.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\hyperlink.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\image.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\multiedit.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\optionbox.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\progressbar.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\scrollbar.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\slider.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\statusbar.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\tabwidget.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\text.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\basic\titlebar.h">
+      <Filter>Headerdateien\smooth\gui\widgets\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\cursor.h">
+      <Filter>Headerdateien\smooth\gui\widgets\special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\dragcontrol.h">
+      <Filter>Headerdateien\smooth\gui\widgets\special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\droparea.h">
+      <Filter>Headerdateien\smooth\gui\widgets\special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\shortcut.h">
+      <Filter>Headerdateien\smooth\gui\widgets\special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\special\tooltip.h">
+      <Filter>Headerdateien\smooth\gui\widgets\special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\hotspot\hotspot.h">
+      <Filter>Headerdateien\smooth\gui\widgets\hotspot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\widgets\hotspot\simplebutton.h">
+      <Filter>Headerdateien\smooth\gui\widgets\hotspot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\toolwindow.h">
+      <Filter>Headerdateien\smooth\gui\window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\window.h">
+      <Filter>Headerdateien\smooth\gui\window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\windowbackend.h">
+      <Filter>Headerdateien\smooth\gui\window\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\gdi\windowgdi.h">
+      <Filter>Headerdateien\smooth\gui\window\backends\gdi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\xlib\windowxlib.h">
+      <Filter>Headerdateien\smooth\gui\window\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\colordlg.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\dialog.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\fontdlg.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\messagebox.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\splashscreen.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\tipodaydlg.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\application\application.h">
+      <Filter>Headerdateien\smooth\gui\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\application\xulloader.h">
+      <Filter>Headerdateien\smooth\gui\application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\clipboard.h">
+      <Filter>Headerdateien\smooth\gui\clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\clipboardbackend.h">
+      <Filter>Headerdateien\smooth\gui\clipboard\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\win32\clipboardwin32.h">
+      <Filter>Headerdateien\smooth\gui\clipboard\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\xlib\clipboardxlib.h">
+      <Filter>Headerdateien\smooth\gui\clipboard\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\net\protocols\file.h">
+      <Filter>Headerdateien\smooth\net\protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\net\protocols\http.h">
+      <Filter>Headerdateien\smooth\net\protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\net\protocols\protocol.h">
+      <Filter>Headerdateien\smooth\net\protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\bitmap.h">
+      <Filter>Headerdateien\smooth\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\color.h">
+      <Filter>Headerdateien\smooth\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\font.h">
+      <Filter>Headerdateien\smooth\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\surface.h">
+      <Filter>Headerdateien\smooth\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\bitmapbackend.h">
+      <Filter>Headerdateien\smooth\graphics\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\fontbackend.h">
+      <Filter>Headerdateien\smooth\graphics\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\surfacebackend.h">
+      <Filter>Headerdateien\smooth\graphics\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdi\bitmapgdi.h">
+      <Filter>Headerdateien\smooth\graphics\backends\gdi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdi\fontgdi.h">
+      <Filter>Headerdateien\smooth\graphics\backends\gdi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdi\surfacegdi.h">
+      <Filter>Headerdateien\smooth\graphics\backends\gdi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\xlib\bitmapxlib.h">
+      <Filter>Headerdateien\smooth\graphics\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\xlib\surfacexlib.h">
+      <Filter>Headerdateien\smooth\graphics\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\fontcairo.h">
+      <Filter>Headerdateien\smooth\graphics\backends\cairo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairo.h">
+      <Filter>Headerdateien\smooth\graphics\backends\cairo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\bitmapgdiplus.h">
+      <Filter>Headerdateien\smooth\graphics\backends\gdiplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\fontgdiplus.h">
+      <Filter>Headerdateien\smooth\graphics\backends\gdiplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\surfacegdiplus.h">
+      <Filter>Headerdateien\smooth\graphics\backends\gdiplus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\forms\line.h">
+      <Filter>Headerdateien\smooth\graphics\forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\forms\point.h">
+      <Filter>Headerdateien\smooth\graphics\forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\forms\rect.h">
+      <Filter>Headerdateien\smooth\graphics\forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\forms\size.h">
+      <Filter>Headerdateien\smooth\graphics\forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\icon.h">
+      <Filter>Headerdateien\smooth\graphics\imageloader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\imageloader.h">
+      <Filter>Headerdateien\smooth\graphics\imageloader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\pci.h">
+      <Filter>Headerdateien\smooth\graphics\imageloader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\modifiers\fontsize.h">
+      <Filter>Headerdateien\smooth\graphics\modifiers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\modifiers\righttoleft.h">
+      <Filter>Headerdateien\smooth\graphics\modifiers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\array.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\buffer.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\callbacks.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\iterator.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\nonblocking.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\signals.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\signalsr.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slotsr.h">
+      <Filter>Headerdateien\smooth\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\buffer\buffer.h">
+      <Filter>Headerdateien\smooth\templates\buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\array\array.h">
+      <Filter>Headerdateien\smooth\templates\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\array\arraybackend.h">
+      <Filter>Headerdateien\smooth\templates\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\array\arrayentry.h">
+      <Filter>Headerdateien\smooth\templates\array</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\signals\callback.h">
+      <Filter>Headerdateien\smooth\templates\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\signals\signal.h">
+      <Filter>Headerdateien\smooth\templates\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\signals\signal_base.h">
+      <Filter>Headerdateien\smooth\templates\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\signals\signalr.h">
+      <Filter>Headerdateien\smooth\templates\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_base.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_class.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_global.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slot_signal.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_base.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_class.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_global.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_signal.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\templates\slots\slotr_value.h">
+      <Filter>Headerdateien\smooth\templates\slots</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\mutex.h">
+      <Filter>Headerdateien\smooth\threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\rwlock.h">
+      <Filter>Headerdateien\smooth\threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\semaphore.h">
+      <Filter>Headerdateien\smooth\threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\thread.h">
+      <Filter>Headerdateien\smooth\threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\mutexbackend.h">
+      <Filter>Headerdateien\smooth\threads\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\semaphorebackend.h">
+      <Filter>Headerdateien\smooth\threads\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\threadbackend.h">
+      <Filter>Headerdateien\smooth\threads\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\posix\mutexposix.h">
+      <Filter>Headerdateien\smooth\threads\backends\posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\posix\semaphoreposix.h">
+      <Filter>Headerdateien\smooth\threads\backends\posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\posix\threadposix.h">
+      <Filter>Headerdateien\smooth\threads\backends\posix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\win32\mutexwin32.h">
+      <Filter>Headerdateien\smooth\threads\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\win32\semaphorewin32.h">
+      <Filter>Headerdateien\smooth\threads\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\backends\win32\threadwin32.h">
+      <Filter>Headerdateien\smooth\threads\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\i18n\language.h">
+      <Filter>Headerdateien\smooth\i18n</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\i18n\number.h">
+      <Filter>Headerdateien\smooth\i18n</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\i18n\section.h">
+      <Filter>Headerdateien\smooth\i18n</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\i18n\translator.h">
+      <Filter>Headerdateien\smooth\i18n</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\i18n\translator_internal.h">
+      <Filter>Headerdateien\smooth\i18n</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\files\directory.h">
+      <Filter>Headerdateien\smooth\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\files\file.h">
+      <Filter>Headerdateien\smooth\files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\input\pointer.h">
+      <Filter>Headerdateien\smooth\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\input\keyboard.h">
+      <Filter>Headerdateien\smooth\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\threads\access.h">
+      <Filter>Headerdateien\smooth\threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\screen.h">
+      <Filter>Headerdateien\smooth\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\cocoa\eventcocoa.h">
+      <Filter>Headerdateien\smooth\system\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\cocoa\screencocoa.h">
+      <Filter>Headerdateien\smooth\system\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\cocoa\timercocoa.h">
+      <Filter>Headerdateien\smooth\system\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\haiku\eventhaiku.h">
+      <Filter>Headerdateien\smooth\system\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\haiku\screenhaiku.h">
+      <Filter>Headerdateien\smooth\system\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\win32\screenwin32.h">
+      <Filter>Headerdateien\smooth\system\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\system\backends\xlib\screenxlib.h">
+      <Filter>Headerdateien\smooth\system\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\input\backends\cocoa\pointercocoa.h">
+      <Filter>Headerdateien\smooth\input\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\input\backends\haiku\pointerhaiku.h">
+      <Filter>Headerdateien\smooth\input\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\input\backends\xlib\pointerxlib.h">
+      <Filter>Headerdateien\smooth\input\backends\xlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\input\backends\win32\pointerwin32.h">
+      <Filter>Headerdateien\smooth\input\backends\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\input\backends\pointerbackend.h">
+      <Filter>Headerdateien\smooth\input\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\cocoa\windowcocoa.h">
+      <Filter>Headerdateien\smooth\gui\window\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\haiku\windowhaiku.h">
+      <Filter>Headerdateien\smooth\gui\window\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\cocoa\clipboardcocoa.h">
+      <Filter>Headerdateien\smooth\gui\clipboard\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\haiku\clipboardhaiku.h">
+      <Filter>Headerdateien\smooth\gui\clipboard\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\bitmaphaiku.h">
+      <Filter>Headerdateien\smooth\graphics\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\fonthaiku.h">
+      <Filter>Headerdateien\smooth\graphics\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\surfacehaiku.h">
+      <Filter>Headerdateien\smooth\graphics\backends\haiku</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cocoa\bitmapcocoa.h">
+      <Filter>Headerdateien\smooth\graphics\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cocoa\fontcocoa.h">
+      <Filter>Headerdateien\smooth\graphics\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cocoa\surfacecocoa.h">
+      <Filter>Headerdateien\smooth\graphics\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\backends\cocoa\backendcocoa.h">
+      <Filter>Headerdateien\smooth\backends\cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\encoding\urlencode.h">
+      <Filter>Headerdateien\smooth\misc\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\array.h">
+      <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\hash\crc64.h">
+      <Filter>Headerdateien\smooth\misc\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\dirdlg.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\filedlg.h">
+      <Filter>Headerdateien\smooth\gui\dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\hash\crc16.h">
+      <Filter>Headerdateien\smooth\misc\hash</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\resources\resources.rc">
+      <Filter>Ressourcendateien</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\classes\gui\dialogs\file\filedlg_cocoa.mm">
+      <Filter>Quelldateien\classes\gui\dialogs\file</Filter>
+    </None>
+    <None Include="..\..\classes\system\backends\cocoa\eventcocoa.mm">
+      <Filter>Quelldateien\classes\system\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\system\backends\cocoa\screencocoa.mm">
+      <Filter>Quelldateien\classes\system\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\system\backends\cocoa\timercocoa.mm">
+      <Filter>Quelldateien\classes\system\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\input\backends\cocoa\pointercocoa.mm">
+      <Filter>Quelldateien\classes\input\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\gui\window\backends\cocoa\windowcocoa.mm">
+      <Filter>Quelldateien\classes\gui\window\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\gui\clipboard\backends\cocoa\clipboardcocoa.mm">
+      <Filter>Quelldateien\classes\gui\clipboard\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\backends\cocoa\backendcocoa.mm">
+      <Filter>Quelldateien\classes\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\graphics\backends\cocoa\fontcocoa.mm">
+      <Filter>Quelldateien\classes\graphics\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\graphics\backends\cocoa\surfacecocoa.mm">
+      <Filter>Quelldateien\classes\graphics\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\graphics\backends\cocoa\bitmapcocoa.mm">
+      <Filter>Quelldateien\classes\graphics\backends\cocoa</Filter>
+    </None>
+    <None Include="..\..\classes\gui\dialogs\directory\dirdlg_cocoa.mm">
+      <Filter>Quelldateien\classes\gui\dialogs\directory</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="smooth.natvis" />
+  </ItemGroup>
+</Project>

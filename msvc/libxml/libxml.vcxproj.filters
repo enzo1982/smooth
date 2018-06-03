@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien\libxml">
+      <UniqueIdentifier>{bc6184d8-56c5-489d-af83-a3218f78266a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\chvalid.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\debugXML.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\dict.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\encoding.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\entities.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\globals.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\hash.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\HTMLparser.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\HTMLtree.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\list.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\nanoftp.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\nanohttp.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\parser.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\parserInternals.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\SAX.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\SAX2.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\threads.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\tree.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\uri.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\valid.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xlink.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlautomata.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlerror.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlexports.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlIO.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlmemory.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlreader.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlregexp.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlsave.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlstring.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlversion.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml\xmlwriter.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\libxml.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\support\libxml2\win32config.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libraries\libxml2\buf.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\chvalid.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\dict.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\encoding.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\entities.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\error.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\globals.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\hash.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\list.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\parser.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\parserInternals.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\SAX2.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\threads.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\tree.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\uri.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\valid.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\xmlIO.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\xmlmemory.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\xmlreader.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\xmlsave.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\xmlstring.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\libxml2\xmlwriter.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

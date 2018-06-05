@@ -45,6 +45,8 @@ namespace smooth
 				virtual Int		 WriteData(UnsignedByte *, Int);
 
 				virtual Int64		 Seek(Int64);
+
+				virtual Bool		 Truncate(Int64);
 				virtual Bool		 Flush();
 
 				virtual Bool		 Close();

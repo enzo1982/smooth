@@ -57,6 +57,11 @@ S::Int64 S::IO::Driver::Seek(Int64 newPos)
 	return position;
 }
 
+S::Bool S::IO::Driver::Truncate(Int64 newSize)
+{
+	return False;
+}
+
 S::Bool S::IO::Driver::Flush()
 {
 	return True;

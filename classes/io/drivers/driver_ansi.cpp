@@ -18,7 +18,13 @@
 #if defined __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
 
+#	include <io.h>
+
 #	define fopen _wfopen
+
+#	define ftruncate chsize
+#else
+#	include <unistd.h>
 #endif
 
 S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
@@ -113,6 +119,13 @@ S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 	if (fseek(stream, newPos, SEEK_SET) != 0) return -1;
 
 	return GetPos();
+}
+
+S::Bool S::IO::DriverANSI::Truncate(Int64 newSize)
+{
+	if (fflush(stream) != 0 || ftruncate(fileno(stream), newSize) != 0) return False;
+
+	return True;
 }
 
 S::Bool S::IO::DriverANSI::Flush()

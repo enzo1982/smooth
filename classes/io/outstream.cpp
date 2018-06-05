@@ -552,3 +552,14 @@ S::Bool S::IO::OutStream::RelSeek(Int64 offset)
 
 	return Seek(currentFilePos + offset);
 }
+
+S::Bool S::IO::OutStream::Truncate(Int64 size)
+{
+	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
+
+	if (!driver->Truncate(size)) return False;
+
+	Seek(size);
+
+	return True;
+}

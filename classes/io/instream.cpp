@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -530,28 +530,30 @@ S::Bool S::IO::InStream::Seek(Int64 position)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
-	return RelSeek(position - currentFilePos);
+	if (bitstreamActive) CompleteBitstream();
+
+	Int64	 offset = position - currentFilePos;
+
+	if (currentBufferPos + offset >= 0 && currentBufferPos + offset <= packageSize)
+	{
+		currentFilePos	  = position;
+		currentBufferPos += offset;
+	}
+	else
+	{
+		if (!driver->Seek(position)) return False;
+
+		currentFilePos	  = position;
+		currentBufferPos  = packageSize;
+		origfilepos	  = currentFilePos;
+	}
+
+	return True;
 }
 
 S::Bool S::IO::InStream::RelSeek(Int64 offset)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
-	if (bitstreamActive) CompleteBitstream();
-
-	if (currentBufferPos + offset >= 0 && currentBufferPos + offset <= packageSize)
-	{
-		currentFilePos	 += offset;
-		currentBufferPos += offset;
-	}
-	else
-	{
-		driver->Seek(currentFilePos + offset);
-
-		currentFilePos	 += offset;
-		currentBufferPos = packageSize;
-		origfilepos	 = currentFilePos;
-	}
-
-	return True;
+	return Seek(currentFilePos + offset);
 }

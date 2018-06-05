@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -538,7 +538,7 @@ S::Bool S::IO::OutStream::Seek(Int64 position)
 
 	Flush();
 
-	driver->Seek(position);
+	if (!driver->Seek(position)) return False;
 
 	currentFilePos	 = position;
 	currentBufferPos = 0;
@@ -550,12 +550,5 @@ S::Bool S::IO::OutStream::RelSeek(Int64 offset)
 {
 	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
 
-	Flush();
-
-	driver->Seek(currentFilePos + offset);
-
-	currentFilePos	 += offset;
-	currentBufferPos = 0;
-
-	return True;
+	return Seek(currentFilePos + offset);
 }

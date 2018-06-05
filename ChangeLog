@@ -14,6 +14,7 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - directory.cpp		- fixed permissions of newly created directories to respect umask setting
 - driver_posix.cpp	- fixed permissions of newly created files to respect umask setting
 - driver.cpp		- added Close() method to public API
+			- implemented Flush() method for file drivers
 
 - added Float32 and Float64 type defintions
 - added stream API to CRC32 and CRC64 classes

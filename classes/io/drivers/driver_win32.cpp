@@ -114,6 +114,13 @@ S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 	return (Int64) hi32 << 32 | lo32;
 }
 
+S::Bool S::IO::DriverWin32::Flush()
+{
+	if (!FlushFileBuffers(stream)) return False;
+
+	return True;
+}
+
 S::Bool S::IO::DriverWin32::Close()
 {
 	if (!closeStream || !CloseHandle(stream)) return False;

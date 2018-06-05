@@ -115,6 +115,13 @@ S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 	return GetPos();
 }
 
+S::Bool S::IO::DriverANSI::Flush()
+{
+	if (fflush(stream) != 0) return False;
+
+	return True;
+}
+
 S::Bool S::IO::DriverANSI::Close()
 {
 	if (!closeStream || fclose(stream) != 0) return False;

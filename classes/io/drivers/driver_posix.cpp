@@ -28,6 +28,7 @@
 #	define write _write
 
 #	define lseek64 _lseeki64
+#	define fsync _commit
 #else
 #	include <unistd.h>
 
@@ -134,6 +135,13 @@ S::Int S::IO::DriverPOSIX::WriteData(UnsignedByte *data, Int dataSize)
 S::Int64 S::IO::DriverPOSIX::Seek(Int64 newPos)
 {
 	return lseek64(stream, newPos, SEEK_SET);
+}
+
+S::Bool S::IO::DriverPOSIX::Flush()
+{
+	if (fsync(stream) != 0) return False;
+
+	return True;
 }
 
 S::Bool S::IO::DriverPOSIX::Close()

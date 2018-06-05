@@ -42,6 +42,7 @@ namespace smooth
 				Int	 WriteData(UnsignedByte *, Int);
 
 				Int64	 Seek(Int64);
+				Bool	 Flush();
 
 				Bool	 Close();
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,6 +32,8 @@ S::Input::PointerXLib::~PointerXLib()
 
 S::Bool S::Input::PointerXLib::SetCursor(const GUI::Window *window, Pointer::CursorType mouseCursor)
 {
+	if (display == NIL) return False;
+
 	static Cursor	 hCursorTextEdit = XCreateFontCursor(display, XC_xterm);
 	static Cursor	 hCursorHand	 = XCreateFontCursor(display, XC_hand2);
 	static Cursor	 hCursorHSize	 = XCreateFontCursor(display, XC_sb_h_double_arrow);

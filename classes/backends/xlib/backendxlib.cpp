@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,27 +39,6 @@ S::Int S::Backends::BackendXLib::Init()
 {
 	XInitThreads();
 
-	/* Open display.
-	 */
-	display	= XOpenDisplay(NIL);
-
-	if (display == NIL)
-	{
-		const char	*display = getenv("DISPLAY");
-
-		fprintf(stderr, "Error: Unable to open display at %s.\n", display != NIL ? display : "<none>");
-
-		return Error();
-	}
-
-	/* Set locale and open input method.
-	 */
-	setlocale(LC_ALL, "");
-
-	XSetLocaleModifiers("");
-
-	im = XOpenIM(display, NIL, NIL, NIL);
-
 	/* Set default font size.
 	 */
 	Setup::FontSize = 1.00;
@@ -77,10 +56,37 @@ S::Int S::Backends::BackendXLib::Deinit()
 
 Display *S::Backends::BackendXLib::GetDisplay()
 {
+	if (display != NIL) return display;
+
+	/* Open display.
+	 */
+	display	= XOpenDisplay(NIL);
+
 	return display;
 }
 
 XIM S::Backends::BackendXLib::GetIM()
 {
+	if (im != NIL) return im;
+
+	/* Check if display is open.
+	 */
+	if (display == NIL && GetDisplay() == NIL)
+	{
+		const char	*display = getenv("DISPLAY");
+
+		fprintf(stderr, "Error: Unable to open display at %s.\n", (display != NIL && display[0] != 0) ? display : "<none>");
+
+		exit(-1);
+	}
+
+	/* Set locale and open input method.
+	 */
+	setlocale(LC_ALL, "");
+
+	XSetLocaleModifiers("");
+
+	im = XOpenIM(display, NIL, NIL, NIL);
+
 	return im;
 }

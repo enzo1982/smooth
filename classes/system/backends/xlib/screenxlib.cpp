@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,15 +33,21 @@ S::System::ScreenXLib::~ScreenXLib()
 
 S::GUI::Rect S::System::ScreenXLib::GetActiveScreenMetrics()
 {
+	if (display == NIL) return GUI::Rect();
+
 	return GUI::Rect(GUI::Point(0, 0), GUI::Size(XWidthOfScreen(XDefaultScreenOfDisplay(display)), XHeightOfScreen(XDefaultScreenOfDisplay(display))));
 }
 
 S::GUI::Rect S::System::ScreenXLib::GetActiveScreenWorkArea()
 {
+	if (display == NIL) return GUI::Rect();
+
 	return GUI::Rect(GUI::Point(0, 0), GUI::Size(XWidthOfScreen(XDefaultScreenOfDisplay(display)), XHeightOfScreen(XDefaultScreenOfDisplay(display))));
 }
 
 S::GUI::Rect S::System::ScreenXLib::GetVirtualScreenMetrics()
 {
+	if (display == NIL) return GUI::Rect();
+
 	return GUI::Rect(GUI::Point(0, 0), GUI::Size(XWidthOfScreen(XDefaultScreenOfDisplay(display)), XHeightOfScreen(XDefaultScreenOfDisplay(display))));
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,15 +19,13 @@
 
 const S::Short	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
-S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &bitmap, const String &link, const Point &iPos, const Size &iSize) : Text(iText, iPos, Size())
+S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &iBitmap, const String &iLink, const Point &iPos, const Size &iSize) : Text(iText, iPos, Size())
 {
-	type		= classID;
-	linkURL		= link;
-	linkBitmap	= bitmap;
+	type	= classID;
+	linkURL	= iLink;
 
 	SetSize(iSize);
-
-	linkBitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	SetBitmap(iBitmap);
 
 	font.SetStyle(Font::Underline);
 	font.SetColor(Color(0, 0, 255));
@@ -136,7 +134,7 @@ S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBitmap)
 {
 	linkBitmap = newBitmap;
 
-	linkBitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	linkBitmap.SetBackgroundColor(GetBackgroundColor());
 
 	Paint(SP_PAINT);
 

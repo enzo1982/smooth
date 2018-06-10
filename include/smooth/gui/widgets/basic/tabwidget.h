@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,6 +20,7 @@ namespace smooth
 };
 
 #include "../widget.h"
+#include "../../../graphics/bitmap.h"
 
 namespace smooth
 {
@@ -29,6 +30,8 @@ namespace smooth
 		{
 			protected:
 				const Widget			*selectedTab;
+
+				Array<Bitmap>			 bitmaps;
 			public:
 				static const Short		 classID;
 
@@ -38,7 +41,7 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 
-				virtual Int			 Add(Widget *);
+				virtual Int			 Add(Widget *, const Bitmap & = NIL);
 				virtual Int			 Remove(Widget *);
 
 				Int				 SelectTab(const Widget *);

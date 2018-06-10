@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -51,15 +51,18 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 				frame.right	= frame.left;
 				frame.bottom	= frame.top + offset;
 
-				for (Int j = 0; j < GetNOfObjects(); j++)
+				for (Int i = 0; i < GetNOfObjects(); i++)
 				{
-					Widget	*object	= GetNthObject(j);
-					Widget	*prev	= (j > 0) ? GetNthObject(j - 1) : NIL;
+					Widget		*widget = GetNthObject(i);
+					Widget		*prev	= (i > 0) ? GetNthObject(i - 1) : NIL;
+
+					const Bitmap	&bitmap = bitmaps.Get(widget->GetHandle());
+					Size		 sSize	= bitmap == NIL ? Size() : Size(bitmap.GetSize().cx / (bitmap.GetSize().cy / 15.0) , 15) * surface->GetSurfaceDPI() / 96;
 
 					frame.left  = frame.right + 1;
-					frame.right = frame.left + object->GetScaledTextWidth() + 12;
+					frame.right = frame.left + widget->GetScaledTextWidth() + sSize.cx + 6 + Int(widget->GetText() != NIL ? 6 : 0);
 
-					if (object->IsVisible())
+					if (widget->IsVisible())
 					{
 						frame.left--;
 						frame.right++;
@@ -90,11 +93,16 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 
 					if (IsRightToLeft()) { frame.left--; frame.right--; }
 
-					if (object->IsVisible()) frame.bottom--;
+					if (widget->IsVisible()) frame.bottom--;
 
-					surface->SetText(object->GetText(), Rect(Point(frame.left + 6 + (object->IsVisible() ? 1 : 0), frame.top + Math::Ceil(Float(frame.GetHeight() - object->GetFont().GetScaledTextSizeY()) / 2) - 1), Size(object->GetScaledTextWidth(), offset - 2)), object->GetFont());
+					if (bitmap != NIL)
+					{
+						surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), Rect(Point(frame.left + 3 + (widget->IsVisible() ? 1 : 0), frame.top + 2), sSize));
+					}
 
-					if (object->IsVisible())
+					surface->SetText(widget->GetText(), Rect(Point(frame.left + sSize.cx + 6 + (widget->IsVisible() ? 1 : 0), frame.top + Math::Ceil(Float(frame.GetHeight() - widget->GetFont().GetScaledTextSizeY()) / 2) - 1), Size(widget->GetScaledTextWidth() + sSize.cx, offset - 2)), widget->GetFont());
+
+					if (widget->IsVisible())
 					{
 						frame.bottom++;
 
@@ -141,10 +149,13 @@ S::Int S::GUI::TabWidget::Process(Int message, Int wParam, Int lParam)
 
 				for (Int i = 0; i < GetNOfObjects(); i++)
 				{
-					Widget	*widget = GetNthObject(i);
+					Widget		*widget = GetNthObject(i);
+
+					const Bitmap	&bitmap = bitmaps.Get(widget->GetHandle());
+					Size		 sSize	= bitmap == NIL ? Size() : Size(bitmap.GetSize().cx / (bitmap.GetSize().cy / 15.0) , 15) * surface->GetSurfaceDPI() / 96;
 
 					frame.left  = frame.right + 1;
-					frame.right = frame.left + widget->GetScaledTextWidth() + 12;
+					frame.right = frame.left + widget->GetScaledTextWidth() + sSize.cx + 6 + Int(widget->GetText() != NIL ? 6 : 0);
 
 					if (!widget->IsVisible() && window->IsMouseOn(frame)) { SelectTab(widget); break; }
 				}
@@ -196,7 +207,7 @@ S::Void S::GUI::TabWidget::OnChangeSize(const Size &nSize)
 	for (Int i = 0; i < GetNOfObjects(); i++) GetNthObject(i)->SetSize(nSize - Size(3, 22));
 }
 
-S::Int S::GUI::TabWidget::Add(Widget *widget)
+S::Int S::GUI::TabWidget::Add(Widget *widget, const Bitmap &nBitmap)
 {
 	if (widget == NIL) return Error();
 
@@ -206,6 +217,12 @@ S::Int S::GUI::TabWidget::Add(Widget *widget)
 
 		if (Widget::Add(widget) == Success())
 		{
+			Bitmap	 bitmap = nBitmap;
+
+			bitmap.SetBackgroundColor(GetBackgroundColor());
+
+			bitmaps.Add(bitmap, widget->GetHandle());
+
 			widget->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));
 
 			if (GetNOfObjects() == 1) SelectTab(widget);
@@ -225,6 +242,8 @@ S::Int S::GUI::TabWidget::Remove(Widget *widget)
 
 	if (Widget::Remove(widget) == Success())
 	{
+		bitmaps.Remove(widget->GetHandle());
+
 		if (wasVisible)
 		{
 			if (GetNOfObjects() > 0) SelectTab(GetNthObject(0));

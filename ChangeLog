@@ -8,6 +8,7 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - cursor.cpp		- fixed text not being drawn correctly after undo/redo
 			- performance optimizations for text input
 - tree.cpp		- draw horizontal branch lines to improve tree look
+- tabwidget.cpp		- added support for displaying bitmaps on tab handles
 - backendxlib.cpp	- allow console applications to run without an X display available
 - windowxlib.cpp	- fixed thread-safety issues with Xlib windows
 - keyboard.cpp		- improved thread-safety

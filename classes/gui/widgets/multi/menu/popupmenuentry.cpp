@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -72,7 +72,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-	Rect	 bmpRect = Rect(GetRealPosition() + Point(2, 2) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0);
+	Rect	 bmpRect = Rect(GetRealPosition() + Point(2, 2) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), Size(12, 12) * surface->GetSurfaceDPI() / 96.0);
 
 	surface->StartPaint(frame);
 

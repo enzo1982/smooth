@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -148,9 +148,6 @@ S::Int S::GUI::Window::SetIcon(const Bitmap &nIcon)
 		icon = newIcon;
 
 		backend->SetIcon(icon);
-
-		if (icon.GetDepth() == 32) icon.SetBackgroundColor(Setup::BackgroundColor);
-		else			   icon.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
 	}
 
 	return Success();

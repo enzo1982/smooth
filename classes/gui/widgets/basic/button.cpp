@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,9 +20,8 @@ S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &
 {
 	type	= classID;
 	text	= iText;
-	bitmap	= iBitmap;
 
-	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	SetBitmap(iBitmap);
 
 	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(22);
@@ -83,8 +82,15 @@ S::Int S::GUI::Button::Paint(Int message)
 
 				if (bitmap != NIL)
 				{
+					Size	 size	  = GetSize();
+					Size	 bmpSize  = bitmap.GetSize();
+
+					if	(Float(bmpSize.cx) / size.cx >= Float(bmpSize.cy) / size.cy && bmpSize.cx > size.cx - 12) bmpSize = bmpSize * (Float(size.cx - 12) / bmpSize.cx);
+					else if (Float(bmpSize.cy) / size.cy >= Float(bmpSize.cx) / size.cx && bmpSize.cy > size.cy - 12) bmpSize = bmpSize * (Float(size.cy - 12) / bmpSize.cy);
+
+					bmpSize = bmpSize * surface->GetSurfaceDPI() / 96.0;
+
 					Rect	 bmpRect;
-					Size	 bmpSize = bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0;
 
 					bmpRect.left	= frame.left + (frame.GetWidth() - bmpSize.cx) / 2;
 
@@ -116,7 +122,7 @@ S::Int S::GUI::Button::SetBitmap(const Bitmap &nBitmap)
 	if (IsRegistered() && prevVisible) Hide();
 
 	bitmap = nBitmap;
-	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	bitmap.SetBackgroundColor(GetBackgroundColor());
 
 	if (IsRegistered() && prevVisible) Show();
 

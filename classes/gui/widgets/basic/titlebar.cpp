@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -133,7 +133,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			if (flatStyle)
 			{
-				icon.ReplaceColor(Setup::BackgroundColor, gradientStartColor);
+				icon.SetBackgroundColor(gradientStartColor);
 
 				surface->Gradient(titleFrame - Point(1, 1) + Size(2, 1), gradientStartColor, gradientEndColor, OR_HORZ);
 			}
@@ -142,8 +142,9 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			if (!flatStyle)
 			{
-				surface->Frame(titleFrame, FRAME_UP);
+				icon.SetBackgroundColor(GetBackgroundColor());
 
+				surface->Frame(titleFrame, FRAME_UP);
 				surface->Gradient(titleFrame + Point(1, 1) - Size(2, 2), gradientStartColor, gradientEndColor, OR_HORZ);
 			}
 

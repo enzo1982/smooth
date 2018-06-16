@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -65,9 +65,9 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 
 	if (bitmap == NIL) return Success();
 
-	bitmap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	bitmap.SetBackgroundColor(GetBackgroundColor());
 
-	graymap.ReplaceColor(Color(192, 192, 192), Setup::BackgroundColor);
+	graymap.SetBackgroundColor(GetBackgroundColor());
 	graymap.GrayscaleBitmap();
 
 	return Success();

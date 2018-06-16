@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -47,6 +47,8 @@ S::GUI::MenubarEntry::MenubarEntry(const String &iText, const Bitmap &iBitmap, P
 	}
 
 	popupMenuClosed	= 0;
+
+	onChangeSize.Connect(&MenubarEntry::OnChangeSize, this);
 }
 
 S::GUI::MenubarEntry::~MenubarEntry()
@@ -63,7 +65,7 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 	Surface	*surface  = GetDrawSurface();
 	Point	 realPos  = GetRealPosition();
 	Size	 realSize = GetRealSize();
-	Rect	 bmpRect  = Rect(realPos + Point(2, 2) * surface->GetSurfaceDPI() / 96.0, bitmap.GetSize() * surface->GetSurfaceDPI() / 96.0);
+	Rect	 bmpRect  = Rect(realPos + Point(2, 2) * surface->GetSurfaceDPI() / 96.0, (GetSize() - Size(4 + (popup != NIL ? 12 : 0), 4)) * surface->GetSurfaceDPI() / 96.0);
 
 	switch (message)
 	{
@@ -197,6 +199,14 @@ S::Void S::GUI::MenubarEntry::OnMouseOver()
 
 		OpenPopupMenu();
 	}
+}
+
+S::Void S::GUI::MenubarEntry::OnChangeSize(const Size &nSize)
+{
+	if (hotspot == NIL || actionHotspot == NIL) return;
+
+	hotspot->SetSize(nSize);
+	actionHotspot->SetSize(nSize - Size((text == NIL && bitmap != NIL && popup != NIL ? 12 : 0), 0));
 }
 
 S::Void S::GUI::MenubarEntry::OpenPopupMenu()

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -77,7 +77,7 @@ S::Int S::GUI::Menubar::Paint(Int message)
 #ifdef __WIN32__
 	static Bool	 flatStyle = Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2);
 #else
-	static Bool	 flatStyle = False;
+	static Bool	 flatStyle = True;
 #endif
 
 	if (orientation == OR_TOP || orientation == OR_BOTTOM)

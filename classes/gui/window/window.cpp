@@ -646,7 +646,7 @@ S::Int S::GUI::Window::Paint(Int message)
 #ifdef __WIN32__
 	static Bool	 flatStyle = Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2);
 #else
-	static Bool	 flatStyle = False;
+	static Bool	 flatStyle = True;
 #endif
 
 	Size	 realSize = GetRealSize();

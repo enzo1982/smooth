@@ -387,7 +387,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 	/* Check if window still matches the event.
 	 */
-	if (wnd != e->xany.window) return Error();
+	if (e->xany.window != wnd &&
+	    e->xany.window != iwnd) return Error();
 
 	/* Convert Xlib events to smooth messages.
 	 */

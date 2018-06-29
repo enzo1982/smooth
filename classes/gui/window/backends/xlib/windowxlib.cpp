@@ -907,24 +907,20 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 		/* Set application name.
 		 */
-		Widget	*widget = Window::GetWindow((Void *) wnd);
-
-		while (widget->GetObjectType() != Application::classID)
+		for (Int i = 0; i < Object::GetNOfObjects(); i++)
 		{
-			if (widget->GetContainer() == NIL) break;
+			if (Object::GetNthObject(i)->GetObjectType() != Application::classID) continue;
 
-			widget = widget->GetContainer();
-		}
+			Application	*application = (Application *) Object::GetNthObject(i);
+			XClassHint	*classHint   = XAllocClassHint();
 
-		if (widget->GetObjectType() == Application::classID)
-		{
-			XClassHint	*classHint = XAllocClassHint();
-
-			classHint->res_name  = widget->GetText();
-			classHint->res_class = widget->GetText();
+			classHint->res_name  = application->GetText();
+			classHint->res_class = application->GetText();
 
 			XSetClassHint(display, wnd, classHint);
 			XFree(classHint);
+
+			break;
 		}
 
 		/* Set window title.

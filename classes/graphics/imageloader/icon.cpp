@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,21 +28,13 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderIcon::Load()
 	{
 		HICON	 icon = NIL;
 
-		if	(iconID >= 32512 && iconID <= 32517) icon = (HICON) LoadImage(NIL,	    MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		else if (iconID >= 20000 && iconID <= 20999) icon = (HICON) LoadImage(hDllInstance, MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
-		else					     icon = (HICON) LoadImage(hInstance,    MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+		if	(iconID >= 32512 && iconID <= 32517) icon = (HICON) LoadImage(NIL,	    MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		else if (iconID >= 20000 && iconID <= 20999) icon = (HICON) LoadImage(hDllInstance, MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		else					     icon = (HICON) LoadImage(hInstance,    MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 
 		Size	 size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
 
 		bitmap.CreateBitmap(size, 32);
-
-		for (Int x = 0; x < size.cx; x++)
-		{
-			for (Int y = 0; y < size.cy; y++)
-			{
-				bitmap.SetPixel(Point(x, y), Setup::BackgroundColor);
-			}
-		}
 
 		HDC	 dc = CreateCompatibleDC(NIL);
 		HBITMAP	 backup = (HBITMAP) SelectObject(dc, bitmap.GetSystemBitmap());

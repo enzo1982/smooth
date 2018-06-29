@@ -6,6 +6,7 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - layer.cpp		- use standard widget implementations of Show/Hide methods
 - combobox.cpp		- fixed selected entry not being updated when new entry has the same memory address
 - cursor.cpp		- fixed text not being drawn correctly after undo/redo
+			- fixed multi-line cursors not responding after clicking below the last line
 			- performance optimizations for text input
 - tree.cpp		- draw horizontal branch lines to improve tree look
 - tabwidget.cpp		- added support for displaying bitmaps on tab handles

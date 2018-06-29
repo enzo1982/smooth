@@ -128,7 +128,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 						{
 							wText[i - wPromptPos] = 0;
 
-							if (lineCount - scrollPos == line) break;
+							if (lineCount - scrollPos == line || text[i] == 0) break;
 
 							wPromptPos = i + 1;
 							lineCount++;
@@ -320,7 +320,7 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 							{
 								wText[i - wPromptPos] = 0;
 
-								if (lineCount - scrollPos == line) break;
+								if (lineCount - scrollPos == line || text[i] == 0) break;
 
 								wPromptPos = i + 1;
 								lineCount++;

@@ -56,6 +56,24 @@ S::GUI::MenuEntry *S::GUI::Menubar::AddEntry(const String &text, const Bitmap &b
 	return newEntry;
 }
 
+S::Int S::GUI::Menubar::Show()
+{
+	if (visible) return Success();
+
+	if (orientation == OR_FREE) return Success();
+
+	return Menu::Show();
+}
+
+S::Int S::GUI::Menubar::Hide()
+{
+	if (!visible) return Success();
+
+	if (orientation == OR_FREE) return Success();
+
+	return Menu::Hide();
+}
+
 S::Int S::GUI::Menubar::Paint(Int message)
 {
 	if (!IsRegistered()) return Error();
@@ -192,7 +210,8 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		}
 	}
 
-#ifndef __APPLE__
+	/* Draw handles of non-flat style menubars.
+	 */
 	switch (message)
 	{
 		case SP_PAINT:
@@ -221,7 +240,6 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 			break;
 	}
-#endif
 
 	return Widget::Paint(message);
 }

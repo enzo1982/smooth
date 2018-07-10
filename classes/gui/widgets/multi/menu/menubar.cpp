@@ -60,7 +60,9 @@ S::Int S::GUI::Menubar::Show()
 {
 	if (visible) return Success();
 
-	if (orientation == OR_FREE) return Success();
+#ifdef __APPLE__
+	if (menubarCocoa != NIL) { visible = True; return menubarCocoa->Show(); }
+#endif
 
 	return Menu::Show();
 }
@@ -69,7 +71,9 @@ S::Int S::GUI::Menubar::Hide()
 {
 	if (!visible) return Success();
 
-	if (orientation == OR_FREE) return Success();
+#ifdef __APPLE__
+	if (menubarCocoa != NIL) { visible = False; return menubarCocoa->Hide(); }
+#endif
 
 	return Menu::Hide();
 }

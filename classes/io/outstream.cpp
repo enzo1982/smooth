@@ -538,7 +538,7 @@ S::Bool S::IO::OutStream::Seek(Int64 position)
 
 	Flush();
 
-	if (!driver->Seek(position)) return False;
+	if (driver->Seek(position) == -1) return False;
 
 	currentFilePos	 = position;
 	currentBufferPos = 0;

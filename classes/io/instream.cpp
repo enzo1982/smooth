@@ -541,7 +541,7 @@ S::Bool S::IO::InStream::Seek(Int64 position)
 	}
 	else
 	{
-		if (!driver->Seek(position)) return False;
+		if (driver->Seek(position) == -1) return False;
 
 		currentFilePos	  = position;
 		currentBufferPos  = packageSize;

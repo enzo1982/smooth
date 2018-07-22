@@ -41,7 +41,8 @@ namespace smooth
 				virtual Int			 Paint(Int);
 				virtual Int			 Process(Int, Int, Int);
 
-				virtual Int			 Add(Widget *, const Bitmap & = NIL);
+				virtual Int			 Add(Widget *);
+				virtual Int			 Add(Widget *, const Bitmap &);
 				virtual Int			 Remove(Widget *);
 
 				Int				 SelectTab(const Widget *);

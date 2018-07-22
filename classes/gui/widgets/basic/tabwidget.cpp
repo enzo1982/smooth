@@ -207,6 +207,11 @@ S::Void S::GUI::TabWidget::OnChangeSize(const Size &nSize)
 	for (Int i = 0; i < GetNOfObjects(); i++) GetNthObject(i)->SetSize(nSize - Size(3, 22));
 }
 
+S::Int S::GUI::TabWidget::Add(Widget *widget)
+{
+	return Add(widget, NIL);
+}
+
 S::Int S::GUI::TabWidget::Add(Widget *widget, const Bitmap &nBitmap)
 {
 	if (widget == NIL) return Error();

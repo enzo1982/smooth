@@ -38,18 +38,18 @@ S::Int S::GUI::Image::Paint(Int message)
 				/* Scale image if necessary.
 				 */
 				Size	 size	  = GetSize();
-				Size	 realSize = GetRealSize();
 				Size	 bmpSize  = bitmap.GetSize();
 				Size	 newSize  = bmpSize;
 
-				if	(float(bmpSize.cx) / size.cx >= float(bmpSize.cy) / size.cy && bmpSize.cx > size.cx) newSize = newSize * (float(size.cx) / bmpSize.cx);
-				else if (float(bmpSize.cy) / size.cy >= float(bmpSize.cx) / size.cx && bmpSize.cy > size.cy) newSize = newSize * (float(size.cy) / bmpSize.cy);
+				if	(Float(bmpSize.cx) / size.cx >= Float(bmpSize.cy) / size.cy && bmpSize.cx > size.cx) newSize = newSize * (Float(size.cx) / bmpSize.cx);
+				else if (Float(bmpSize.cy) / size.cy >= Float(bmpSize.cx) / size.cx && bmpSize.cy > size.cy) newSize = newSize * (Float(size.cy) / bmpSize.cy);
 
 				newSize = newSize * surface->GetSurfaceDPI() / 96.0;
 
 				/* Draw image centered.
 				 */
-				Rect	 bmpRect = Rect(GetRealPosition() + Point(realSize.cx - newSize.cx, realSize.cy - newSize.cy) / 2, newSize);
+				Size	 realSize = GetRealSize();
+				Rect	 bmpRect  = Rect(GetRealPosition() + Point(realSize.cx - newSize.cx, realSize.cy - newSize.cy) / 2, newSize);
 
 				surface->StartPaint(GetVisibleArea());
 

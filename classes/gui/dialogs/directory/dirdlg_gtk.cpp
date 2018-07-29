@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,12 +21,10 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 	/* Create file chooser dialog.
 	 */
-	GtkWidget	*dialog = NULL;
-
-	dialog = gtk_file_chooser_dialog_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER,
-					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-					     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
-					     NULL);
+	GtkWidget	*dialog = gtk_file_chooser_dialog_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER,
+							      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+							      GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+							      NULL);
 
 	if (directory != NIL) gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), directory);
 

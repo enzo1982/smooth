@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -289,7 +289,7 @@ S::Int S::File::Create()
 	return Success();
 }
 
-S::Int S::File::Copy(const String &destination)
+S::Int S::File::Copy(const File &destination)
 {
 	if (!Exists()) return Error();
 
@@ -299,7 +299,7 @@ S::Int S::File::Copy(const String &destination)
 	Bool	 result = False;
 
 	FILE	*source	= fopen(String(*this).ConvertTo("UTF-8"), "rb");
-	FILE	*dest	= fopen(destination.ConvertTo("UTF-8"), "wb");
+	FILE	*dest	= fopen(String(destination).ConvertTo("UTF-8"), "wb");
 
 	if (source != NIL && dest != NIL)
 	{
@@ -331,7 +331,7 @@ S::Int S::File::Copy(const String &destination)
 	else		     return Success();
 }
 
-S::Int S::File::Move(const String &destination)
+S::Int S::File::Move(const File &destination)
 {
 	if (!Exists()) return Error();
 
@@ -345,7 +345,7 @@ S::Int S::File::Move(const String &destination)
 
 	SetFileAttributes(fileName, fileAttributes);
 #else
-	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
+	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), String(destination).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False) return Error();

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -311,19 +311,19 @@ S::Int S::Directory::Create()
 	else		     return Success();
 }
 
-S::Int S::Directory::Copy(const String &destination)
+S::Int S::Directory::Copy(const Directory &destination)
 {
 	return Error();
 }
 
-S::Int S::Directory::Move(const String &destination)
+S::Int S::Directory::Move(const Directory &destination)
 {
 	if (!Exists()) return Error();
 
 #ifdef __WIN32__
 	Bool	 result = MoveFile(String(GetUnicodePathPrefix(*this)).Append(*this), String(GetUnicodePathPrefix(destination)).Append(destination));
 #else
-	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), destination.ConvertTo("UTF-8")) == 0);
+	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), String(destination).ConvertTo("UTF-8")) == 0);
 #endif
 
 	if (result == False) return Error();

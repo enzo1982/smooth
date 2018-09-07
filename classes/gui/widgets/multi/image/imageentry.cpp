@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -88,6 +88,6 @@ S::Void S::GUI::ImageEntry::OnChangeSize(const Size &newSize)
 
 S::Bool S::GUI::ImageEntry::IsTypeCompatible(Short compType) const
 {
-	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID) return True;
-	else												  return False;
+	if (compType == ListEntry::classID) return True;
+	else				    return ListEntry::IsTypeCompatible(compType);
 }

@@ -267,6 +267,6 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 
 S::Bool S::GUI::MenubarEntry::IsTypeCompatible(Short compType) const
 {
-	if (compType == Object::classID || compType == Widget::classID || compType == MenuEntry::classID) return True;
-	else												  return False;
+	if (compType == MenuEntry::classID) return True;
+	else				    return MenuEntry::IsTypeCompatible(compType);
 }

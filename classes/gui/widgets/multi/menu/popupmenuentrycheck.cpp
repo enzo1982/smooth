@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -92,9 +92,6 @@ S::Void S::GUI::PopupMenuEntryCheck::OnClickEntry()
 
 S::Bool S::GUI::PopupMenuEntryCheck::IsTypeCompatible(Short compType) const
 {
-	if (compType == Object::classID	   ||
-	    compType == Widget::classID	   ||
-	    compType == MenuEntry::classID ||
-	    compType == PopupMenuEntry::classID) return True;
-	else					 return False;
+	if (compType == PopupMenuEntry::classID) return True;
+	else					 return PopupMenuEntry::IsTypeCompatible(compType);
 }

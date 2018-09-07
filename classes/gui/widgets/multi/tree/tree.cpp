@@ -318,6 +318,6 @@ S::Void S::GUI::Tree::OnMouseOut()
 
 S::Bool S::GUI::Tree::IsTypeCompatible(Short compType) const
 {
-	if (compType == Object::classID || compType == Widget::classID || compType == ListEntry::classID) return True;
-	else												  return False;
+	if (compType == ListEntry::classID) return True;
+	else				    return ListEntry::IsTypeCompatible(compType);
 }

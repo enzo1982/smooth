@@ -17,23 +17,20 @@ const S::Short	 S::GUI::MenuEntry::classID = S::Object::RequestClassID();
 
 S::GUI::MenuEntry::MenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : Widget(Point(), Size())
 {
-	type		= classID;
+	type	    = classID;
 
-	popup		= iPopup;
-	bVar		= ibVar;
-	iVar		= iiVar;
-	iCode		= iiCode;
-	orientation	= OR_LEFT;
+	popup	    = NIL;
+	bVar	    = ibVar;
+	iVar	    = iiVar;
+	iCode	    = iiCode;
+	orientation = OR_LEFT;
+
+	shortcut    = NIL;
 
 	SetText(iText);
 	SetBitmap(iBitmap);
 
-	shortcut	= NIL;
-
-	if (popup != NIL)
-	{
-		popup->onEnqueueForDeletion.Connect(&MenuEntry::InternalOnDeletePopup, this);
-	}
+	SetPopupMenu(iPopup);
 }
 
 S::GUI::MenuEntry::~MenuEntry()
@@ -54,6 +51,17 @@ S::Int S::GUI::MenuEntry::SetShortcut(Int scFlags, Int scKey, Window *window)
 	shortcut->onKeyDown.Connect(&onAction);
 
 	window->Add(shortcut);
+
+	return Success();
+}
+
+S::Int S::GUI::MenuEntry::SetPopupMenu(PopupMenu *nPopup)
+{
+	if (popup != NIL) popup->onEnqueueForDeletion.Disconnect(&MenuEntry::InternalOnDeletePopup, this);
+
+	popup = nPopup;
+
+	if (popup != NIL) popup->onEnqueueForDeletion.Connect(&MenuEntry::InternalOnDeletePopup, this);
 
 	return Success();
 }

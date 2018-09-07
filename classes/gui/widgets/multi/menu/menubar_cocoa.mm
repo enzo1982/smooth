@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -199,12 +199,12 @@ class CocoaMenuEntryDelegate
 
 		menu = iMenu;
 
-		for (S::Int i = 0; i < menu->GetNOfEntries(); i++)
+		for (S::Int i = 0; i < menu->Length(); i++)
 		{
 			const S::GUI::MenuEntry	*entry = menu->GetNthEntry(i);
 
-			if (ignoreLastEntry && ( i == menu->GetNOfEntries() - 1 ||
-						(i == menu->GetNOfEntries() - 2 && entry->GetText() == NIL))) break;
+			if (ignoreLastEntry && ( i == menu->Length() - 1 ||
+						(i == menu->Length() - 2 && entry->GetText() == NIL))) break;
 
 			/* Add menu item.
 			 */
@@ -254,11 +254,11 @@ class CocoaMenuEntryDelegate
 
 		/* Add About... entry.
 		 */
-		if (menubar->GetNOfEntries() >= 1 && menubar->GetNthEntry(menubar->GetNOfEntries() - 1)->GetOrientation() == OR_RIGHT && menubar->GetNthEntry(menubar->GetNOfEntries() - 1)->GetPopupMenu() != NIL)
+		if (menubar->Length() >= 1 && menubar->GetNthEntry(menubar->Length() - 1)->GetOrientation() == OR_RIGHT && menubar->GetNthEntry(menubar->Length() - 1)->GetPopupMenu() != NIL)
 		{
-			const S::GUI::Menu	*lastMenu = menubar->GetNthEntry(menubar->GetNOfEntries() - 1)->GetPopupMenu();
+			const S::GUI::Menu	*lastMenu = menubar->GetNthEntry(menubar->Length() - 1)->GetPopupMenu();
 
-			aboutItem = [[CocoaMenuEntry alloc] initWithMenuEntry: lastMenu->GetNthEntry(lastMenu->GetNOfEntries() - 1)
+			aboutItem = [[CocoaMenuEntry alloc] initWithMenuEntry: lastMenu->GetNthEntry(lastMenu->Length() - 1)
 							      ignoreLastEntry: NO];
 
 			[appMenu addItem: aboutItem];
@@ -281,11 +281,11 @@ class CocoaMenuEntryDelegate
 
 		/* Add Quit entry.
 		 */
-		if (menubar->GetNOfEntries() >= 1 && menubar->GetNthEntry(0)->GetPopupMenu() != NIL)
+		if (menubar->Length() >= 1 && menubar->GetNthEntry(0)->GetPopupMenu() != NIL)
 		{
 			const S::GUI::Menu	*firstMenu = menubar->GetNthEntry(0)->GetPopupMenu();
 
-			quitItem = [[CocoaMenuEntry alloc] initWithMenuEntry: firstMenu->GetNthEntry(firstMenu->GetNOfEntries() - 1)
+			quitItem = [[CocoaMenuEntry alloc] initWithMenuEntry: firstMenu->GetNthEntry(firstMenu->Length() - 1)
 							     ignoreLastEntry: NO];
 
 			[appMenu addItem: [NSMenuItem separatorItem]];
@@ -307,7 +307,7 @@ class CocoaMenuEntryDelegate
 
 		/* Add other menus.
 		 */
-		for (S::Int i = 0; i < menubar->GetNOfEntries(); i++)
+		for (S::Int i = 0; i < menubar->Length(); i++)
 		{
 			const S::GUI::MenuEntry	*entry = menubar->GetNthEntry(i);
 
@@ -316,8 +316,8 @@ class CocoaMenuEntryDelegate
 			/* Add menu item.
 			 */
 			NSMenuItem	*item = [[CocoaMenuEntry alloc] initWithMenuEntry: entry
-									  ignoreLastEntry: (i == 0			      && quitItem  != nil) ||
-											   (i == menubar->GetNOfEntries() - 1 && aboutItem != nil)];
+									  ignoreLastEntry: (i == 0		       && quitItem  != nil) ||
+											   (i == menubar->Length() - 1 && aboutItem != nil)];
 
 			menuItems.Add(item);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -52,9 +52,16 @@ S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap 
 
 	newEntry->SetOwner(this);
 
-	Add(newEntry);
+	if (Add(newEntry) == Success())
+	{
+		createdEntry.Set(newEntry->GetHandle(), True);
 
-	return newEntry;
+		return newEntry;
+	}
+
+	DeleteObject(newEntry);
+
+	return NIL;
 }
 
 S::Int S::GUI::PopupMenu::Show()
@@ -75,9 +82,9 @@ S::Int S::GUI::PopupMenu::Show()
 	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
 	toolWindow->onLoseFocus.Connect(&internalRequestClose);
 
-	for (Int k = 0; k < GetNOfObjects(); k++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(k);
+		MenuEntry	*entry = GetNthEntry(i);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
@@ -111,9 +118,9 @@ S::Int S::GUI::PopupMenu::Hide()
 	 */
 	toolWindow->Hide();
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+		MenuEntry	*entry = GetNthEntry(i);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
@@ -141,18 +148,18 @@ S::Void S::GUI::PopupMenu::CalculateSize()
 	Int	 nextYPos		= 3;
 	Int	 maxShortcutTextSize	= 0;
 
-	for (Int l = 0; l < GetNOfObjects(); l++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(l);
+		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthEntry(i);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
 		maxShortcutTextSize = Math::Max(maxShortcutTextSize, entry->GetShortcutTextSize());
 	}
 
-	for (Int i = 0; i < GetNOfObjects(); i++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(i);
+		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthEntry(i);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 
@@ -164,9 +171,9 @@ S::Void S::GUI::PopupMenu::CalculateSize()
 		nextYPos += entry->GetHeight() + 1;
 	}
 
-	for (Int j = 0; j < GetNOfObjects(); j++)
+	for (Int i = 0; i < Length(); i++)
 	{
-		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthObject(j);
+		PopupMenuEntry	*entry = (PopupMenuEntry *) GetNthEntry(i);
 
 		if (entry->GetObjectType() != PopupMenuEntry::classID) continue;
 

@@ -8,52 +8,48 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_MICROMENU
-#define H_OBJSMOOTH_MICROMENU
+#ifndef H_OBJSMOOTH_CONTAINER
+#define H_OBJSMOOTH_CONTAINER
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class MicroMenu;
-		class PopupMenu;
-
-		class Hotspot;
+		class Container;
 	};
 };
 
-#include "menu.h"
+#include "entry.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI MicroMenu : public Menu
+		class SMOOTHAPI Container : public Widget
 		{
 			protected:
-				Hotspot			*hotspot;
-
-				PopupMenu		*popup;
+				Array<Bool>		 createdEntry;
+				Array<Entry *, Void *>	 elementOrder;
 			public:
 				static const Short	 classID;
 
-							 MicroMenu(const Point &, const Size &, Int);
-				virtual			~MicroMenu();
+							 Container();
+				virtual			~Container();
 
-				virtual Int		 Paint(Int);
+				virtual Int		 EnableLocking(Bool = True);
 
-				MenuEntry		*AddEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0);
-
+				virtual Int		 Add(Widget *);
 				virtual Int		 Remove(Widget *);
+
 				virtual Int		 RemoveAllEntries();
 
-				Rect			 GetVisibleArea() const;
+				virtual Int		 MoveEntry(Int, Int);
+			accessors:
+				virtual Int		 Length() const			{ return elementOrder.Length(); }
+
+				virtual Entry		*GetNthEntry(Int n) const	{ return elementOrder.GetNth(n); }
 			signals:
-				Signal0<Void>		 onOpenPopupMenu;
-				Signal0<Void>		 onClosePopupMenu;
-			slots:
-				Void			 OpenPopupMenu();
-				Void			 ClosePopupMenu();
+				Signal0<Void>		 onChangeEntryOrder;
 		};
 	};
 };

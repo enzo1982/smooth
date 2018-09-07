@@ -52,9 +52,11 @@ S::GUI::MenuEntry *S::GUI::MicroMenu::AddEntry(const String &text, const Bitmap 
 	return popup->AddEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
 }
 
-S::Int S::GUI::MicroMenu::RemoveEntry(MenuEntry *entry)
+S::Int S::GUI::MicroMenu::Remove(Widget *widget)
 {
-	return popup->RemoveEntry(entry);
+	if (widget->GetObjectType() == Entry::classID) return popup->Remove(widget);
+
+	return Menu::Remove(widget);
 }
 
 S::Int S::GUI::MicroMenu::RemoveAllEntries()

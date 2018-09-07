@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,7 +22,7 @@ const S::Short	 S::GUI::ListEntry::classID = S::Object::RequestClassID();
 
 const S::String	 S::GUI::ListEntry::tabDelimiter = "\v";
 
-S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 16))
+S::GUI::ListEntry::ListEntry(const String &iText)
 {
 	type		= classID;
 
@@ -44,6 +44,8 @@ S::GUI::ListEntry::ListEntry(const String &iText) : Widget(Point(), Size(100, 16
 
 	Add(hotspot);
 	Add(markHotspot);
+
+	SetSize(Size(100, 16));
 
 	internalOnSelectEntry.Connect(&ListEntry::OnSelectOtherEntry, this);
 
@@ -269,4 +271,10 @@ S::Void S::GUI::ListEntry::OnSelectOtherEntry(Int containerHandle, Int handle)
 	if (!IsRegistered()) return;
 
 	if (container->GetHandle() == containerHandle && GetHandle() != handle && selected) Deselect();
+}
+
+S::Bool S::GUI::ListEntry::IsTypeCompatible(Short compType) const
+{
+	if (compType == Entry::classID) return True;
+	else				return Entry::IsTypeCompatible(compType);
 }

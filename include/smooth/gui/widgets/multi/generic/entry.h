@@ -8,37 +8,30 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef H_OBJSMOOTH_MENU
-#define H_OBJSMOOTH_MENU
+#ifndef H_OBJSMOOTH_ENTRY
+#define H_OBJSMOOTH_ENTRY
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class Menu;
-
-		class PopupMenu;
+		class Entry;
 	};
 };
 
-#include "../generic/container.h"
-#include "menuentry.h"
+#include "../../widget.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		abstract class SMOOTHAPI Menu : public Container
+		class SMOOTHAPI Entry : public Widget
 		{
 			public:
 				static const Short	 classID;
 
-							 Menu();
-				virtual			~Menu();
-
-				virtual MenuEntry	*AddEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int iCode = 0) = 0;
-			accessors:
-				MenuEntry		*GetNthEntry(Int n) const	{ return (MenuEntry *) Container::GetNthEntry(n); }
+							 Entry();
+				virtual			~Entry();
 		};
 	};
 };

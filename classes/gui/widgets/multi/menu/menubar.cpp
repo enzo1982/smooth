@@ -48,12 +48,19 @@ S::GUI::MenuEntry *S::GUI::Menubar::AddEntry(const String &text, const Bitmap &b
 {
 	MenuEntry	*newEntry = new MenubarEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
 
-	Add(newEntry);
+	if (Add(newEntry) == Success())
+	{
+		createdEntry.Set(newEntry->GetHandle(), True);
 
-	if (GetHeight() < newEntry->GetHeight() + 2) SetHeight(newEntry->GetHeight() + 2);
-	if (GetWidth() < newEntry->GetWidth() + 3) SetWidth(newEntry->GetWidth() + 3);
+		if (GetHeight() < newEntry->GetHeight() + 2) SetHeight(newEntry->GetHeight() + 2);
+		if (GetWidth() < newEntry->GetWidth() + 3) SetWidth(newEntry->GetWidth() + 3);
 
-	return newEntry;
+		return newEntry;
+	}
+
+	DeleteObject(newEntry);
+
+	return NIL;
 }
 
 S::Int S::GUI::Menubar::Show()
@@ -108,9 +115,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		Int	 leftWidth	= 0;
 		Int	 rightWidth	= 0;
 
-		for (Int i = 0; i < GetNOfObjects(); i++)
+		for (Int i = 0; i < Length(); i++)
 		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+			MenuEntry	*entry = GetNthEntry(i);
 
 			if	(entry->GetOrientation() == OR_TOP    || entry->GetOrientation() == OR_LEFT)  leftWidth	 += entry->GetWidth() + 2;
 			else if (entry->GetOrientation() == OR_BOTTOM || entry->GetOrientation() == OR_RIGHT) rightWidth += entry->GetWidth() + 2;
@@ -126,9 +133,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 #endif
 		Int	 highestEntry	= 0;
 
-		for (Int i = 0; i < GetNOfObjects(); i++)
+		for (Int i = 0; i < Length(); i++)
 		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+			MenuEntry	*entry = GetNthEntry(i);
 
 			if (entry->GetOrientation() == OR_TOP) entry->SetOrientation(OR_LEFT);
 
@@ -142,9 +149,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			}
 		}
 
-		for (Int j = GetNOfObjects() - 1; j >= 0; j--)
+		for (Int i = Length() - 1; i >= 0; i--)
 		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(j);
+			MenuEntry	*entry = GetNthEntry(i);
 
 			if (entry->GetOrientation() == OR_BOTTOM) entry->SetOrientation(OR_RIGHT);
 
@@ -160,9 +167,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		SetHeight(highestEntry + 2);
 
-		for (Int k = 0; k < GetNOfObjects(); k++)
+		for (Int i = 0; i < Length(); i++)
 		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(k);
+			MenuEntry	*entry = GetNthEntry(i);
 
 			if (entry->GetText() == NIL && entry->GetBitmap() == NIL) entry->SetHeight(GetHeight() - 3);
 		}
@@ -172,9 +179,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 		Int	 nextYPos	= 1;
 		Int	 widestEntry	= 0;
 
-		for (Int i = 0; i < GetNOfObjects(); i++)
+		for (Int i = 0; i < Length(); i++)
 		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(i);
+			MenuEntry	*entry = GetNthEntry(i);
 
 			if (entry->GetOrientation() == OR_LEFT) entry->SetOrientation(OR_TOP);
 
@@ -188,9 +195,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 			}
 		}
 
-		for (Int j = 0; j < GetNOfObjects(); j++)
+		for (Int i = 0; i < Length(); i++)
 		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(j);
+			MenuEntry	*entry = GetNthEntry(i);
 
 			if (entry->GetOrientation() == OR_RIGHT) entry->SetOrientation(OR_BOTTOM);
 
@@ -206,9 +213,9 @@ S::Int S::GUI::Menubar::Paint(Int message)
 
 		SetWidth(widestEntry + 3);
 
-		for (Int k = 0; k < GetNOfObjects(); k++)
+		for (Int i = 0; i < Length(); i++)
 		{
-			MenuEntry	*entry = (MenuEntry *) GetNthObject(k);
+			MenuEntry	*entry = GetNthEntry(i);
 
 			if (entry->GetText() == NIL && entry->GetBitmap() == NIL) entry->SetWidth(GetWidth() - 3);
 		}

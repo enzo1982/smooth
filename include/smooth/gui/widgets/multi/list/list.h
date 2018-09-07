@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,7 @@ namespace smooth
 	};
 };
 
+#include "../generic/container.h"
 #include "listentry.h"
 #include "listentryseparator.h"
 
@@ -26,36 +27,24 @@ namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI List : public Widget
+		class SMOOTHAPI List : public Container
 		{
-			private:
-				Array<Bool>			 createdEntry;
-				Array<ListEntry *, Void *>	 elementOrder;
 			public:
 				static const Short		 classID;
 
 								 List();
 				virtual				~List();
 
-				virtual Int			 EnableLocking(Bool = True);
+				ListEntry			*AddEntry(const String & = NIL, Bool = False);
+				ListEntry			*AddSeparator();
 
-				ListEntry			*AddEntry(const String &, Bool = False);
-				ListEntrySeparator		*AddSeparator();
-
-				Int				 Add(Widget *);
-				Int				 Remove(Widget *);
-
-				Int				 RemoveAllEntries();
-
-				Int				 MoveEntry(Int, Int);
+				virtual Int			 Add(Widget *);
 
 				virtual String			 ToString() const		{ return "a List"; }
 			accessors:
-				Int				 Length() const			{ return elementOrder.Length(); }
-
 				ListEntry			*GetSelectedEntry() const;
 				ListEntry			*GetEntry(const String &) const;
-				ListEntry			*GetNthEntry(Int n) const	{ return elementOrder.GetNth(n); }
+				ListEntry			*GetNthEntry(Int n) const	{ return (ListEntry *) Container::GetNthEntry(n); }
 
 				Int				 GetSelectedEntryNumber() const;
 				Int				 GetEntryNumber(const String &) const;
@@ -66,8 +55,6 @@ namespace smooth
 			signals:
 				Signal1<Void, ListEntry *>	 onSelectEntry;
 				Signal1<Void, ListEntry *>	 onMarkEntry;
-
-				Signal0<Void>			 onChangeEntryOrder;
 		};
 	};
 };

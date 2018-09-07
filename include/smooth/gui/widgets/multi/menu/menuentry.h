@@ -24,14 +24,14 @@ namespace smooth
 	};
 };
 
-#include "../../widget.h"
+#include "../generic/entry.h"
 #include "../../../../graphics/bitmap.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI MenuEntry : public Widget
+		class SMOOTHAPI MenuEntry : public Entry
 		{
 			protected:
 				PopupMenu		*popup;
@@ -49,6 +49,8 @@ namespace smooth
 
 							 MenuEntry(const String & = NIL, const Bitmap & = NIL, PopupMenu * = NIL, Bool * = NIL, Int * = NIL, Int = 0);
 				virtual			~MenuEntry();
+
+				virtual Bool		 IsTypeCompatible(Short) const;
 			accessors:
 				Int			 SetShortcut(Int, Int, Window *);
 				const Shortcut		*GetShortcut() const			{ return shortcut; }

@@ -15,7 +15,7 @@
 
 const S::Short	 S::GUI::MenuEntry::classID = S::Object::RequestClassID();
 
-S::GUI::MenuEntry::MenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode) : Widget(Point(), Size())
+S::GUI::MenuEntry::MenuEntry(const String &iText, const Bitmap &iBitmap, PopupMenu *iPopup, Bool *ibVar, Int *iiVar, Int iiCode)
 {
 	type	    = classID;
 
@@ -79,4 +79,10 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 	graymap.GrayscaleBitmap();
 
 	return Success();
+}
+
+S::Bool S::GUI::MenuEntry::IsTypeCompatible(Short compType) const
+{
+	if (compType == Entry::classID) return True;
+	else				return Entry::IsTypeCompatible(compType);
 }

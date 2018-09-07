@@ -283,6 +283,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\classes\gui\widgets\layer.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\generic\container.cpp" />
+    <ClCompile Include="..\..\classes\gui\widgets\multi\generic\entry.cpp" />
     <ClCompile Include="..\..\classes\gui\widgets\widget.cpp" />
     <ClCompile Include="..\..\classes\gui\widgets\basic\activearea.cpp" />
     <ClCompile Include="..\..\classes\gui\widgets\basic\arrows.cpp" />
@@ -690,6 +692,8 @@
     <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\haiku\clipboardhaiku.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\dirdlg.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\filedlg.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\generic\container.h" />
+    <ClInclude Include="..\..\include\smooth\gui\widgets\multi\generic\entry.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\cocoa\windowcocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\window\backends\haiku\windowhaiku.h" />
     <ClInclude Include="..\..\include\smooth\init.h" />

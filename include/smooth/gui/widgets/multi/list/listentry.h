@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,13 +20,13 @@ namespace smooth
 	};
 };
 
-#include "../../widget.h"
+#include "../generic/entry.h"
 
 namespace smooth
 {
 	namespace GUI
 	{
-		class SMOOTHAPI ListEntry : public Widget
+		class SMOOTHAPI ListEntry : public Entry
 		{
 			private:
 				Bool				 marked;
@@ -47,6 +47,8 @@ namespace smooth
 				virtual Int			 Paint(Int);
 
 				virtual String			 ToString() const		{ return "a ListEntry"; }
+
+				virtual Bool			 IsTypeCompatible(Short) const;
 			accessors:
 				Int				 SetMark(Bool);
 				Bool				 IsMarked() const		{ return marked; }

@@ -8,15 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/gui/widgets/multi/menu/menu.h>
+#include <smooth/gui/widgets/multi/generic/entry.h>
 
-const S::Short	 S::GUI::Menu::classID = S::Object::RequestClassID();
+const S::Short	 S::GUI::Entry::classID = S::Object::RequestClassID();
 
-S::GUI::Menu::Menu()
+S::GUI::Entry::Entry() : Widget(Point(), Size())
 {
 	type = classID;
 }
 
-S::GUI::Menu::~Menu()
+S::GUI::Entry::~Entry()
 {
 }

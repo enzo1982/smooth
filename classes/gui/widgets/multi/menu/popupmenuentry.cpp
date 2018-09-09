@@ -264,8 +264,8 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	if (S::System::System::Clock() - popupMenuClosed < 100) return;
 
-	Widget	*window	   = container->GetContainerWindow();
-	Surface	*surface   = GetDrawSurface();
+	Widget	*window	     = container->GetContainerWindow();
+	Surface	*surface     = GetDrawSurface();
 
 	if (window == NIL) return;
 
@@ -278,20 +278,21 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	hotspot->Deactivate();
 
-	Rect	 monitor   = System::Screen::GetActiveScreenMetrics();
+	Rect	 monitor     = System::Screen::GetActiveScreenMetrics();
+	Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
 
 	popup->CalculateSize();
 
-	Point	 realPos   = GetRealPosition();
-	Size	 realSize  = GetRealSize();
+	Point	 realPos     = GetRealPosition();
+	Size	 realSize    = GetRealSize();
 
-	Point	 popupPos  = realPos + Point(realSize.cx, Math::Round(-3 * surface->GetSurfaceDPI() / 96.0));
-	Size	 popupSize = popup->GetRealSize();
+	Point	 popupPos    = realPos + Point(realSize.cx, Math::Round(-3 * scaleFactor));
+	Size	 popupSize   = popup->GetSize();
 
-	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popupSize.cx >= monitor.GetWidth()) popupPos.x = realPos.x - popupSize.cx; }
-	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popupSize.cx <= 0)		     popupPos.x = realPos.x - popupSize.cx; }
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + Math::Round(popupSize.cx * scaleFactor) >= monitor.GetWidth()) popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - Math::Round(popupSize.cx * scaleFactor) <= 0)			popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor); }
 
-	if (window->GetY() + popupPos.y + popupSize.cy >= monitor.GetHeight()) popupPos.y = realPos.y - popupSize.cy + realSize.cy + Math::Round(3 * surface->GetSurfaceDPI() / 96.0);
+	if (window->GetY() + popupPos.y + Math::Round(popupSize.cy * scaleFactor) >= monitor.GetHeight()) popupPos.y = realPos.y - Math::Round(popupSize.cy * scaleFactor) + realSize.cy + Math::Round(3 * scaleFactor);
 
 	popup->SetPosition(popupPos);
 	popup->internalRequestClose.Connect(&PopupMenuEntry::ClosePopupMenu, this);

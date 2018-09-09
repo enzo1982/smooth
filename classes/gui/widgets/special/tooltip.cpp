@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -51,24 +51,27 @@ S::Int S::GUI::Tooltip::Show()
 
 	if (!IsRegistered()) return Success();
 
-	Window	*window	 = container->GetContainerWindow();
-	Surface	*surface = GetDrawSurface();
-	Size	 tSize	 = (layer != NIL ? layer->GetSize() : Size(font.GetUnscaledTextSizeX(text) + 6, font.GetUnscaledTextSizeY(text) + 4));
-	Size	 sSize	 = tSize * surface->GetSurfaceDPI() / 96.0;
-	Point	 tPos	 = Point(GetX(), GetY() - sSize.cy + 1);
-	Rect	 vScreen = System::Screen::GetVirtualScreenMetrics();
+	Window	*window	     = container->GetContainerWindow();
+	Surface	*surface     = GetDrawSurface();
+
+	Rect	 vScreen     = System::Screen::GetVirtualScreenMetrics();
+	Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
+
+	Size	 tSize	     = (layer != NIL ? layer->GetSize() : Size(font.GetUnscaledTextSizeX(text) + 6, font.GetUnscaledTextSizeY(text) + 4));
+	Size	 sSize	     = tSize * scaleFactor;
+	Point	 tPos	     = Point(GetX(), GetY() - sSize.cy + 1);
 
 	if (tPos.y + window->GetY() < vScreen.top + 2) tPos.y = GetY() + vScreen.top + 2;
 
 	if (!IsRightToLeft())
 	{
-		if (tPos.x + window->GetX() + tSize.cx > vScreen.right - 2) tPos.x = -window->GetX() + vScreen.right - 2 - tSize.cx;
+		if (tPos.x + window->GetX() + sSize.cx > vScreen.right - 2) tPos.x = -window->GetX() + vScreen.right - 2 - sSize.cx;
 		if (tPos.x + window->GetX()	       < vScreen.left  + 2) tPos.x = -window->GetX() + vScreen.left + 2;
 	}
 	else
 	{
 		if (window->GetWidth() - tPos.x + window->GetX()	    > vScreen.right - 2) tPos.x = -vScreen.right + 2 + window->GetWidth() + window->GetX();
-		if (window->GetWidth() - tPos.x - tSize.cx + window->GetX() < vScreen.left  + 2) tPos.x = -(vScreen.left + 2) + window->GetWidth() + window->GetX() - tSize.cx;
+		if (window->GetWidth() - tPos.x - sSize.cx + window->GetX() < vScreen.left  + 2) tPos.x = -(vScreen.left + 2) + window->GetWidth() + window->GetX() - sSize.cx;
 	}
 
 	toolWindow = new ToolWindow(tPos, tSize);

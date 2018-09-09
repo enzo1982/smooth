@@ -135,13 +135,17 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 	/* Compute and set dialog size.
 	 */
 	Rect	 workArea	= System::Screen::GetActiveScreenWorkArea();
+	Float	 scaleFactor	= Surface().GetSurfaceDPI() / 96.0;
+
 	Int	 additionalSize = Math::Max(0, check_showtips->GetUnscaledTextWidth() - 133);
 	Size	 size		= Size(328 + additionalSize, 182);
 
-	foreach (const String &tip, tips) size = Size(Math::Max(size.cx, font.GetUnscaledTextSizeX(tip) + 12), Math::Max(size.cy, font.GetUnscaledTextSizeY(tip) + 12));
+	foreach (const String &tip, tips) size = Size(Math::Max(size.cx, font.GetUnscaledTextSizeX(tip) + 12),
+						      Math::Max(size.cy, font.GetUnscaledTextSizeY(tip) + 12));
 
 	dlgwnd->SetSize(Size(24, 120) + size);
-	dlgwnd->SetPosition(workArea.GetPosition() + Point((workArea.GetSize().cx - dlgwnd->GetWidth()) / 2, (workArea.GetSize().cy - dlgwnd->GetHeight()) / 2));
+	dlgwnd->SetPosition(workArea.GetPosition() + Point((workArea.GetWidth()  - Math::Round(dlgwnd->GetWidth()  * scaleFactor)) / 2,
+							   (workArea.GetHeight() - Math::Round(dlgwnd->GetHeight() * scaleFactor)) / 2));
 
 	layer_inner->SetSize(size);
 	txt_tip->SetSize(size);

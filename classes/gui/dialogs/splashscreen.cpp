@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,9 +23,15 @@ S::GUI::Dialogs::SplashScreen::SplashScreen(const GUI::Bitmap &iBitmap, Int iTim
 
 	bitmap	= iBitmap;
 
-	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
+	Rect	 workArea    = System::Screen::GetActiveScreenWorkArea();
+	Float	 scaleFactor = Surface().GetSurfaceDPI() / 96.0;
 
-	splashscreen = new Window("Splash screen", workArea.GetPosition() + Point((workArea.GetSize().cx - (bitmap.GetSize().cx + 2)) / 2, (workArea.GetSize().cy - (bitmap.GetSize().cy + 2)) / 2), bitmap.GetSize() + Size(2, 2));
+	Size	 size = bitmap.GetSize();
+
+	splashscreen = new Window("Splash screen", Point(), size + Size(2, 2));
+
+	splashscreen->SetPosition(workArea.GetPosition() + Point((workArea.GetWidth()  - Math::Round((size.cx + 2) * scaleFactor)) / 2,
+								 (workArea.GetHeight() - Math::Round((size.cy + 2) * scaleFactor)) / 2));
 
 	splashscreen->onPaint.Connect(&SplashScreen::SplashPaintProc, this);
 	splashscreen->doClose.Connect(&SplashScreen::SplashKillProc, this);

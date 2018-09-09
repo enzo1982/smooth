@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -88,23 +88,21 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	static const char	*iconDirs[] = { "/usr/share/icons", "/usr/local/share/icons", NIL };
 
-	for (int i = 0; iconDirs[i] != NIL; i++)
+	for (Int i = 0; iconDirs[i] != NIL; i++)
 	{
-		if (Directory(iconDirs[i]).Exists())
-		{
-			String	 file = String(iconDirs[i]).Append("/gnome/").Append(String::FromInt(iconSize)).Append("x").Append(String::FromInt(iconSize)).Append("/status/").Append(iconName);
+		if (!Directory(iconDirs[i]).Exists()) continue;
 
-			if (File(file).Exists())
-			{
-				Bitmap	 bitmap = ImageLoader::Load(file);
+		String	 file = String(iconDirs[i]).Append("/gnome/").Append(String::FromInt(iconSize)).Append("x").Append(String::FromInt(iconSize)).Append("/status/").Append(iconName);
 
-				bitmap.SetBackgroundColor(Setup::BackgroundColor);
+		if (!File(file).Exists()) continue;
 
-				icon = new Image(bitmap, Point(14, 19), Size(iconSize, iconSize));
+		Bitmap	 bitmap = ImageLoader::Load(file);
 
-				break;
-			}
-		}
+		bitmap.SetBackgroundColor(Setup::BackgroundColor);
+
+		icon = new Image(bitmap, Point(14, 19), Size(iconSize, iconSize));
+
+		break;
 	}
 #endif
 
@@ -125,9 +123,9 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 		if (text[0] == 0) lines = 0;
 
-		for (int i = 0; i < 256; i++)
+		for (Int i = 0; i < 256; i++)
 		{
-			for (int j = 0; j < 256; j++)
+			for (Int j = 0; j < 256; j++)
 			{
 				if (text[actpos] != '\n')
 				{
@@ -145,11 +143,11 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			}
 		}
 
-		for (int j = 0; j < lines; j++)
+		for (Int i = 0; i < lines; i++)
 		{
 			GUI::Font	 font;
 
-			thissize = font.GetUnscaledTextSizeX(line[j]);
+			thissize = font.GetUnscaledTextSizeX(line[i]);
 
 			if (thissize > maxsize) maxsize = thissize;
 		}
@@ -237,10 +235,12 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			break;
 	}
 
-	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
+	Rect	 workArea    = System::Screen::GetActiveScreenWorkArea();
+	Float	 scaleFactor = Surface().GetSurfaceDPI() / 96.0;
 
 	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonLabels.Length() * (buttonWidth + 9) + 21));
-	msgbox->SetPosition(workArea.GetPosition() + Point((workArea.GetSize().cx - msgbox->GetWidth()) / 2, (workArea.GetSize().cy - msgbox->GetHeight()) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
+	msgbox->SetPosition(workArea.GetPosition() + Point((workArea.GetWidth()  - Math::Round(msgbox->GetWidth()  * scaleFactor)) / 2,
+							   (workArea.GetHeight() - Math::Round(msgbox->GetHeight() * scaleFactor)) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
 
 	for (Int i = 0; i < buttonLabels.Length(); i++)
 	{

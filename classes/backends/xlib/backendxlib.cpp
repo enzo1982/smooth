@@ -39,6 +39,31 @@ S::Int S::Backends::BackendXLib::Init()
 {
 	XInitThreads();
 
+	/* Open display.
+	 */
+	const char	*displayId = getenv("DISPLAY");
+
+	if (displayId != NIL)
+	{
+		display	= XOpenDisplay(NIL);
+
+		if (display == NIL)
+		{
+
+			fprintf(stderr, "Error: Unable to open display at %s.\n", displayId);
+
+			return Error();
+		}
+
+		/* Set locale and open input method.
+		 */
+		setlocale(LC_ALL, "");
+
+		XSetLocaleModifiers("");
+
+		im = XOpenIM(display, NIL, NIL, NIL);
+	}
+
 	/* Set default font size.
 	 */
 	Setup::FontSize = 1.00;
@@ -56,37 +81,10 @@ S::Int S::Backends::BackendXLib::Deinit()
 
 Display *S::Backends::BackendXLib::GetDisplay()
 {
-	if (display != NIL) return display;
-
-	/* Open display.
-	 */
-	display	= XOpenDisplay(NIL);
-
 	return display;
 }
 
 XIM S::Backends::BackendXLib::GetIM()
 {
-	if (im != NIL) return im;
-
-	/* Check if display is open.
-	 */
-	if (display == NIL && GetDisplay() == NIL)
-	{
-		const char	*display = getenv("DISPLAY");
-
-		fprintf(stderr, "Error: Unable to open display at %s.\n", (display != NIL && display[0] != 0) ? display : "<none>");
-
-		exit(-1);
-	}
-
-	/* Set locale and open input method.
-	 */
-	setlocale(LC_ALL, "");
-
-	XSetLocaleModifiers("");
-
-	im = XOpenIM(display, NIL, NIL, NIL);
-
 	return im;
 }

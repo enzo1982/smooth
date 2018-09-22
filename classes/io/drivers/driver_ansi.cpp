@@ -22,6 +22,7 @@
 
 #	define fopen _wfopen
 
+#	define fseek _fseeki64
 #	define ftruncate chsize
 #else
 #	include <unistd.h>

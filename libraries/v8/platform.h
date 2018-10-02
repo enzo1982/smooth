@@ -59,7 +59,7 @@ int signbit(double x);
 # endif
 #endif
 
-#if defined(__sun) || defined(__HAIKU__)
+#if defined(__sun)
 #include <math.h>
 
 #undef fpclassify

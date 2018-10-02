@@ -54,33 +54,6 @@
 #include "vm-state-inl.h"
 
 
-namespace std {
-
-// Test for type of x
-int fpclassify(double x) {
-  return __fpclassify(x);
-}
-
-int isfinite(double x) {
-  return __finite(x);
-}
-
-int isnan(double x) {
-  return __isnan(x);
-}
-
-int isinf(double x) {
-  return __isinf(x);
-}
-
-// Test if x is less than y and both nominal - usually defined in math.h
-int isless(double x, double y) {
-  return isnan(x) || isnan(y) ? 0 : x < y;
-}
-
-}
-
-
 namespace v8 {
 namespace internal {
 

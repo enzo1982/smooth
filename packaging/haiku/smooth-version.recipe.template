@@ -1,0 +1,92 @@
+SUMMARY="A cross-platform C++ class library"
+DESCRIPTION="smooth is an object oriented C++ class library for Windows, \
+macOS, Linux and most Unix-like operating systems. It provides basic \
+functionality and platform support for applications and libraries.
+
+Features provided by smooth include:
+
+- user interface API with various widgets
+- simple to use multithreading API
+- file and network IO interface
+- completely transparent Unicode and software internationalization support
+- a libxml2 based XML parser"
+HOMEPAGE="http://www.smooth-project.org/"
+COPYRIGHT="1998-2018 by Robert Kausch"
+LICENSE="Artistic v2.0"
+REVISION="1"
+SOURCE_URI="https://sourceforge.net/projects/smooth/files/smooth/<release>/<sourcefile>"
+CHECKSUM_SHA256="<checksum>"
+
+if [[ $portVersion == *~* ]]; then
+	SOURCE_DIR="$portName-${portVersion%%~*}-${portVersion##*~}"
+else
+	SOURCE_DIR="$portName-$portVersion"
+fi
+
+ARCHITECTURES="x86 x86_64"
+SECONDARY_ARCHITECTURES="x86"
+
+libVersion="${portVersion%~*}"
+libVersionCompat="$libVersion compat >= ${libVersion%.*}"
+
+PROVIDES="
+	smooth$secondaryArchSuffix = $portVersion
+	cmd:smooth_translator$secondaryArchSuffix = $portVersion
+	lib:libsmooth$secondaryArchSuffix = $libVersionCompat
+	lib:libsmooth_${libVersion%.*}$secondaryArchSuffix = $libVersionCompat
+	"
+
+REQUIRES="
+	haiku$secondaryArchSuffix
+	lib:libbz2$secondaryArchSuffix
+	lib:libcurl$secondaryArchSuffix
+	lib:libfribidi$secondaryArchSuffix
+	lib:libiconv$secondaryArchSuffix
+	lib:libjpeg$secondaryArchSuffix
+	lib:libpng$secondaryArchSuffix
+	lib:libxml2$secondaryArchSuffix
+	lib:libz$secondaryArchSuffix
+	"
+
+PROVIDES_devel="
+	smooth${secondaryArchSuffix}_devel = $portVersion
+	devel:libsmooth$secondaryArchSuffix = $libVersionCompat
+	devel:libsmooth_${libVersion%.*}$secondaryArchSuffix = $libVersionCompat
+	"
+
+REQUIRES_devel="
+	smooth$secondaryArchSuffix == $portVersion base
+	"
+
+BUILD_REQUIRES="
+	devel:libbz2$secondaryArchSuffix
+	devel:libcurl$secondaryArchSuffix
+	devel:libfribidi$secondaryArchSuffix
+	devel:libiconv$secondaryArchSuffix
+	devel:libjpeg$secondaryArchSuffix
+	devel:libpng$secondaryArchSuffix
+	devel:libxml2$secondaryArchSuffix
+	devel:libz$secondaryArchSuffix
+	"
+
+BUILD_PREREQUIRES="
+	haiku_devel
+	cmd:make
+	cmd:gcc$secondaryArchSuffix
+	cmd:g++$secondaryArchSuffix
+	cmd:ld$secondaryArchSuffix
+	cmd:pkg_config
+	"
+
+BUILD()
+{
+	make $jobArgs
+}
+
+INSTALL()
+{
+	make prefix=$prefix install
+
+	packageEntries devel \
+		$developDir
+}

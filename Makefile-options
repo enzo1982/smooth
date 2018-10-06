@@ -251,8 +251,6 @@ else ifeq ($(findstring systemlibfribidi,$(config)),systemlibfribidi)
 else
 	ifeq ($(BUILD_OSX),True)
 		USE_BUNDLED_LIBFRIBIDI = True
-	else ifeq ($(BUILD_HAIKU),True)
-		USE_BUNDLED_LIBFRIBIDI = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBFRIBIDI = True
 	endif

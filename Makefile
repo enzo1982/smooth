@@ -288,8 +288,6 @@ else
 		LINKER_OPTS += -Wl,-rpath,/usr/local/lib -L/usr/local/lib -Wl,-rpath,/usr/X11R6/lib -L/usr/X11R6/lib
 	else ifeq ($(BUILD_NETBSD),True)
 		LINKER_OPTS += -Wl,-rpath,/usr/pkg/lib -L/usr/pkg/lib -Wl,-rpath,/usr/X11R7/lib -L/usr/X11R7/lib
-	else ifeq ($(BUILD_HAIKU),True)
-		LINKER_OPTS += -L/boot/common/lib
 	endif
 endif
 

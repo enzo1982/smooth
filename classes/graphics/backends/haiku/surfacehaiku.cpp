@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -425,12 +425,27 @@ S::Int S::GUI::SurfaceHaiku::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	/* Copy the image.
 	 */
-	if (!painting)
+	if (destRect.GetSize() == srcRect.GetSize())
 	{
-		view->DrawBitmapAsync((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom));
-	}
+		if (!painting) view->DrawBitmap((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
 
-	bitmapView->DrawBitmapAsync((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom));
+		bitmapView->DrawBitmap((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
+	}
+	else
+	{
+		/* Quality of Haiku's biliniear filter is not good enough and there are no other options.
+		 * Use our own weighted average scaling until there are better alternatives offered by Haiku.
+		 */
+		Float	 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
+		Float	 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
+
+		Size		 srcSize      = bitmap.GetSize();
+		const Bitmap	&scaledBitmap = bitmap.Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
+
+		if (!painting) view->DrawBitmap((BBitmap *) scaledBitmap.GetSystemBitmap(), BRect(Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.right) / scaleFactorX, Float(srcRect.bottom) / scaleFactorY), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
+
+		bitmapView->DrawBitmap((BBitmap *) scaledBitmap.GetSystemBitmap(), BRect(Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.right) / scaleFactorX, Float(srcRect.bottom) / scaleFactorY), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
+	}
 
 	return Success();
 }
@@ -455,7 +470,7 @@ S::Int S::GUI::SurfaceHaiku::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 
 	bitmapView->Sync();
 
-	destView->DrawBitmap(this->bitmap, BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom));
+	destView->DrawBitmap(this->bitmap, BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
 
 	destBitmap->Unlock();
 	destBitmap->RemoveChild(destView);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -245,6 +245,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 
 		case B_WINDOW_CREATED:
 			onCreate.Emit();
+			onEvent.Call(SM_GETFOCUS, 0, 0);
 
 			return MessageProcessed;
 
@@ -296,6 +297,17 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			currentMessage.FindInt32("buttons", &buttons);
 			currentMessage.FindInt32("clicks", &clicks);
 
+			/* Notify tool windows about lost focus.
+			 */
+			foreach (WindowHaiku *backend, windowBackends)
+			{
+				if ( backend->wnd   != NIL &&
+				     backend->id    >  id  &&
+				    (backend->flags &  WF_THINBORDER)) onEvent.Call(SM_LOSEFOCUS, Window::GetWindow((Void *) wnd)->GetHandle(), 0);
+			}
+
+			/* Send mouse button event.
+			 */
 			if	(buttons == B_PRIMARY_MOUSE_BUTTON)   onEvent.Call(SM_LBUTTONDOWN, 0, 0);
 			else if (buttons == B_SECONDARY_MOUSE_BUTTON) onEvent.Call(SM_RBUTTONDOWN, 0, 0);
 			else if (buttons == B_TERTIARY_MOUSE_BUTTON)  onEvent.Call(SM_MBUTTONDOWN, 0, 0);
@@ -310,6 +322,8 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			break;
 
 		case B_MOUSE_UP:
+			/* Send mouse button event.
+			 */
 			if	(buttons == B_PRIMARY_MOUSE_BUTTON)   onEvent.Call(SM_LBUTTONUP, 0, 0);
 			else if (buttons == B_SECONDARY_MOUSE_BUTTON) onEvent.Call(SM_RBUTTONUP, 0, 0);
 			else if (buttons == B_TERTIARY_MOUSE_BUTTON)  onEvent.Call(SM_MBUTTONUP, 0, 0);
@@ -483,11 +497,12 @@ S::Int S::GUI::WindowHaiku::Open(const String &title, const Point &pos, const Si
 	Int	 windowFeel  = B_NORMAL_WINDOW_FEEL;
 	Int	 windowFlags = 0;
 
-	if (flags & WF_NORESIZE	 ) windowFlags |= B_NOT_RESIZABLE;
-	if (flags & WF_NOTITLE	 ) windowLook  ^= B_TITLED_WINDOW_LOOK;
-	if (flags & WF_THINBORDER) windowLook	= B_NO_BORDER_WINDOW_LOOK;
-	if (flags & WF_TOPMOST	 ) windowFeel	= B_FLOATING_ALL_WINDOW_FEEL;
-	if (flags & WF_MODAL	 ) windowFeel	= B_MODAL_APP_WINDOW_FEEL;
+	if (flags & WF_NORESIZE	 )   windowFlags |= B_NOT_RESIZABLE;
+	if (flags & WF_NOTITLE	 )   windowLook	 ^= B_TITLED_WINDOW_LOOK;
+	if (flags & WF_THINBORDER) { windowFlags  = B_AVOID_FOCUS;
+				     windowLook	  = B_NO_BORDER_WINDOW_LOOK; }
+	if (flags & WF_TOPMOST	 )   windowFeel	  = B_FLOATING_ALL_WINDOW_FEEL;
+	if (flags & WF_MODAL	 )   windowFeel	  = B_MODAL_APP_WINDOW_FEEL;
 
 	wnd = new HaikuWindow(BRect(pos.x, pos.y, pos.x + Math::Round(size.cx * fontSize) + sizeModifier.cx - 1, pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy - 1), title, windowLook, windowFeel, windowFlags);
 

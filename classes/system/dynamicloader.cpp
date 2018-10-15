@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -156,10 +156,18 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		if (Directory("/opt/local/lib").Exists())   directories.Add("/opt/local/lib");
 		if (Directory("/sw/lib").Exists())	    directories.Add("/sw/lib");
 #elif defined __HAIKU__
-		/* Haiku puts libraries into /system/[non-packaged/]lib.
+		/* Query smooth library path to handle architecture suffix on Haiku.
 		 */
-							    directories.Add("/system/lib");
-							    directories.Add("/system/non-packaged/lib");
+		Dl_info	 info = { 0 };
+
+		dladdr((void *) &S::System::DynamicLoader::GetLibraryDirectories, &info);
+
+		const String	 libraryPath = File(info.dli_fname).GetFilePath();
+
+		directories.Add(libraryPath);
+
+		if	(libraryPath.StartsWith("/system/non-packaged")) directories.Add(libraryPath.Replace("/system/non-packaged", "/system"));
+		else if (libraryPath.StartsWith("/system"))		 directories.Add(libraryPath.Replace("/system", "/system/non-packaged"));
 #elif defined __NetBSD__
 		/* Packages live in /usr/pkg on NetBSD.
 		 */

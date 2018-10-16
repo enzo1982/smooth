@@ -93,6 +93,7 @@ else ifeq ($(BUILD_OSX),True)
 		OBJECTS += classes/system/backends/cocoa/eventcocoa.o classes/system/backends/cocoa/screencocoa.o classes/system/backends/cocoa/timercocoa.o
 	endif
 else ifeq ($(BUILD_HAIKU),True)
+	OBJECTS += classes/backends/haiku/backendhaiku.o 
 	OBJECTS += classes/graphics/backends/haiku/bitmaphaiku.o classes/graphics/backends/haiku/fonthaiku.o classes/graphics/backends/haiku/surfacehaiku.o 
 	OBJECTS += classes/gui/clipboard/backends/haiku/clipboardhaiku.o
 	OBJECTS += classes/gui/dialogs/directory/dirdlg_haiku.o

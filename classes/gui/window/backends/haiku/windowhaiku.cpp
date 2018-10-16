@@ -12,12 +12,12 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
+#include <smooth/backends/haiku/backendhaiku.h>
 #include <smooth/system/backends/haiku/eventhaiku.h>
 #include <smooth/system/system.h>
 #include <smooth/init.h>
 #include <smooth/foreach.h>
 
-#include <Application.h>
 #include <Message.h>
 #include <Region.h>
 #include <Entry.h>
@@ -540,7 +540,12 @@ S::Int S::GUI::WindowHaiku::Close()
 	 */
 	ProcessSystemMessages(B_WINDOW_DESTROYED, 0, 0, BMessage());
 
-	if (Window::nOfActiveWindows == 0) be_app->PostMessage(B_QUIT_REQUESTED);
+	if (Window::nOfActiveWindows == 0)
+	{
+		BApplication	*app = Backends::BackendHaiku::GetApplication();
+
+		app->PostMessage(B_QUIT_REQUESTED);
+	}
 
 	/* Delete surface.
 	 */

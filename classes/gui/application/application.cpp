@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,7 +18,8 @@
 #if defined __WIN32__
 #	include <windows.h>
 #elif defined __HAIKU__
-#	include <Application.h>
+#	include <smooth/backends/haiku/backendhaiku.h>
+
 #	include <Roster.h>
 #	include <Path.h>
 
@@ -185,9 +186,10 @@ S::String S::GUI::Application::GetApplicationDirectory()
 #elif defined __HAIKU__
 	/* In Haiku, get the path from application info.
 	 */
+	BApplication	*app = Backends::BackendHaiku::GetApplication();
 	app_info	 ai;
 
-	if (be_app->GetAppInfo(&ai) == B_OK) applicationDirectory.ImportFrom("UTF-8", BPath(&ai.ref).Path());
+	if (app->GetAppInfo(&ai) == B_OK) applicationDirectory.ImportFrom("UTF-8", BPath(&ai.ref).Path());
 #endif
 
 	if (applicationDirectory == NIL)

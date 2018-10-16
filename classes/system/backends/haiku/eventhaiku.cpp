@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,7 +15,6 @@
 #include <smooth/templates/nonblocking.h>
 #include <smooth/foreach.h>
 
-#include <Application.h>
 #include <Window.h>
 
 S::System::EventBackend *CreateEventHaiku()
@@ -85,16 +84,6 @@ S::Void S::System::EventHaiku::ProcessMessage(Void *window, const BMessage &curr
 
 	while (messages.Length() > 0) System::System::Sleep(0);
 }
-
-class HaikuApplication : public BApplication
-{
-	public:
-		HaikuApplication() : BApplication("application/x-vnd.smooth-haiku")
-		{
-		}
-};
-
-static HaikuApplication	 app;
 
 S::Bool S::System::EventHaiku::ProcessNextEvent()
 {

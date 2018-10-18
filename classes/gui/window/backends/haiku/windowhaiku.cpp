@@ -233,6 +233,8 @@ S::Input::Keyboard::Key S::GUI::WindowHaiku::ConvertKey(Int keyCode, const BMess
 
 S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int lParam, const BMessage &currentMessage)
 {
+	static Int	 focusWndId = -1;
+
 	/* Process system messages not relevant
 	 * to portable Window implementation.
 	 */
@@ -245,12 +247,21 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 
 		case B_WINDOW_CREATED:
 			onCreate.Emit();
+
+			/* Set internal focus window.
+			 */
+			focusWndId = id;
+
 			onEvent.Call(SM_GETFOCUS, 0, 0);
 
 			return MessageProcessed;
 
 		case B_WINDOW_DESTROYED:
 			onDestroy.Emit();
+
+			/* Clear internal focus window.
+			 */
+			if (focusWndId == id) focusWndId = -1;
 
 			return MessageProcessed;
 	}
@@ -266,10 +277,10 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 		Input::Pointer::UpdatePosition(Window::GetWindow(wnd), point.x, point.y);
 	}
 
-	static int32	 buttons   = -1;
+	static int32	 buttons = -1;
 
-	int32		 clicks	   =  0;
-	float		 amount	   =  0;
+	int32		 clicks	 =  0;
+	float		 amount	 =  0;
 
 	/* Convert Windows messages to smooth messages.
 	 */
@@ -297,13 +308,17 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			currentMessage.FindInt32("buttons", &buttons);
 			currentMessage.FindInt32("clicks", &clicks);
 
-			/* Notify tool windows about lost focus.
+			/* Grab the keyboard focus if we don't have it already.
 			 */
-			foreach (WindowHaiku *backend, windowBackends)
+			if (focusWndId != id)
 			{
-				if ( backend->wnd   != NIL &&
-				     backend->id    >  id  &&
-				    (backend->flags &  WF_THINBORDER)) onEvent.Call(SM_LOSEFOCUS, Window::GetWindow((Void *) wnd)->GetHandle(), 0);
+				WindowHaiku	*focusWnd = windowBackends.Get(focusWndId);
+
+				if (focusWnd != NIL) focusWnd->onEvent.Call(SM_LOSEFOCUS, Window::GetWindow((Void *) wnd)->GetHandle(), 0);
+
+				focusWndId = id;
+
+				onEvent.Call(SM_GETFOCUS, 0, 0);
 			}
 
 			/* Send mouse button event.
@@ -442,6 +457,8 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 		case B_WINDOW_ACTIVATED:
 			if (wParam == True)
 			{
+				focusWndId = id;
+
 				onEvent.Call(SM_GETFOCUS, 0, 0);
 			}
 			else

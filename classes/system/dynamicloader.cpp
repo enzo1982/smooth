@@ -166,8 +166,8 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 
 		directories.Add(libraryPath);
 
-		if	(libraryPath.StartsWith("/system/non-packaged")) directories.Add(libraryPath.Replace("/system/non-packaged", "/system"));
-		else if (libraryPath.StartsWith("/system"))		 directories.Add(libraryPath.Replace("/system", "/system/non-packaged"));
+		if	(libraryPath.Contains("/system/non-packaged/")) directories.Add(libraryPath.Replace("/system/non-packaged/", "/system/"));
+		else if (libraryPath.Contains("/system/"))		directories.Add(libraryPath.Replace("/system/", "/system/non-packaged/"));
 #elif defined __NetBSD__
 		/* Packages live in /usr/pkg on NetBSD.
 		 */

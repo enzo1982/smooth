@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,8 +38,6 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLi
 
 int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLine, int iCmdShow)
 {
-	Int		 retValue = -1;
-
 	hInstance     = shInstance;
 	hPrevInstance = shPrevInstance;
 
@@ -50,6 +48,8 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLi
 
 	GUI::Application::GetStartupDirectory();
 	GUI::Application::GetApplicationDirectory();
+
+	Int	 retValue = -1;
 
 	if (Init())
 	{
@@ -73,18 +73,15 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLi
 #else
 int main(int argc, char **argv)
 {
-	Int		 retValue = -1;
-	String		 cmdLine;
-
-	for (Int i = 1; i < argc; i++) cmdLine.Append(String(i > 1 ? " " : "").Append(argv[i]));
-
-	ArgumentsParser	 args(argv[0], cmdLine);
+	ArgumentsParser	 args(argc, argv);
 
 	GUI::Application::SetCommand(args.GetCommand());
 	GUI::Application::SetArguments(args.GetArguments());
 
 	GUI::Application::GetStartupDirectory();
 	GUI::Application::GetApplicationDirectory();
+
+	Int	 retValue = -1;
 
 	if (Init())
 	{

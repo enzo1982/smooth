@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2011 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,20 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/misc/args.h>
+
+S::ArgumentsParser::ArgumentsParser(int argc, char **argv)
+{
+	command = argv[0];
+
+	for (Int i = 1; i < argc; i++)
+	{
+#ifdef __APPLE__
+		if (strncmp(argv[i], "-psn_", 5) == 0) continue;
+#endif
+
+		args.Add(argv[i]);
+	}
+}
 
 S::ArgumentsParser::ArgumentsParser(const String &iCommand, const String &iArgs)
 {
@@ -21,10 +35,6 @@ S::ArgumentsParser::ArgumentsParser(const String &iCommand, const String &iArgs)
 	{
 		if ((iArgs[i] == ' ' && !quoted && iArgs[i - 1] != '\\') || i == iArgs.Length())
 		{
-#ifdef __APPLE__
-			if (!param.StartsWith("-psn_"))
-#endif
-
 			if (param.Length() > 0) args.Add(param);
 
 			param	= NIL;

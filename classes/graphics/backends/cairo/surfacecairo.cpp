@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,6 +15,7 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/files/file.h>
 #include <smooth/misc/math.h>
+#include <smooth/misc/number.h>
 #include <smooth/foreach.h>
 
 #ifdef __WIN32__
@@ -288,37 +289,12 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 
 	ReleaseDC(0, dc);
 #else
-	Short	 dpi = 96;
-
-	/* Search the path for gsettings.
+	/* Evaluate GDK_SCALE setting.
 	 */
-	String			 path  = getenv("PATH");
-	const Array<String>	&paths = path.Explode(":");
+	Short	 dpi   = 96;
+	Int	 scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
 
-	foreach (const String &path, paths)
-	{
-		/* Check for gsettings in this path.
-		 */
-		if (File(String(path).Append("/").Append("gsettings")).Exists())
-		{
-			/* If gsettings exists, use it to get the font scaling factor.
-			 */
-			FILE	*pstdin = popen("gsettings get org.gnome.desktop.interface text-scaling-factor", "r");
-
-			if (pstdin != NIL)
-			{
-				float	 factor = 1.0;
-
-				if (fscanf(pstdin, "%f", &factor) > 0) dpi = Math::Round(96.0 * Math::Min(Math::Max(factor, 0.1), 100.0));
-
-				pclose(pstdin);
-			}
-
-			break;
-		}
-	}
-
-	String::ExplodeFinish();
+	if (scale > 0) dpi *= scale;
 #endif
 
 	surfaceDPI = dpi;

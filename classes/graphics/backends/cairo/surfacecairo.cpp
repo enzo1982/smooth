@@ -545,6 +545,59 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	}
 #endif
 
+	/* Set up Cairo font.
+	 */
+	Rect	 tRect = rightToLeft.TranslateRect(rect);
+
+#if !defined __WIN32__ && !defined __APPLE__
+	PangoLayout		*layout = NIL;
+	PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
+									    .Append(" ")
+									    .Append(font.GetStyle() & Font::Italic ? "Italic " : "")
+									    .Append(font.GetWeight() >= Font::Bold ? "Bold " : "")
+									    .Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0))));
+#endif
+
+	if (!painting)
+	{
+		CreateCairoContext();
+
+		cairo_save(context);
+		cairo_rectangle(context, tRect.left, tRect.top, tRect.GetWidth(), tRect.GetHeight() + 1);
+		cairo_clip(context);
+
+		cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+
+#if defined __WIN32__ || defined __APPLE__
+		cairo_select_font_face(context, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+								(font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+
+		cairo_set_font_size(context, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
+#else
+		layout = pango_cairo_create_layout(context);
+
+		pango_layout_set_font_description(layout, desc);
+#endif
+	}
+
+	cairo_save(paintContextCairo);
+	cairo_rectangle(paintContextCairo, tRect.left, tRect.top, tRect.GetWidth(), tRect.GetHeight() + 1);
+	cairo_clip(paintContextCairo);
+
+	cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
+
+#if defined __WIN32__ || defined __APPLE__
+	cairo_select_font_face(paintContextCairo, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
+								  (font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
+
+	cairo_set_font_size(paintContextCairo, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
+#else
+	PangoLayout	*paintLayout = pango_cairo_create_layout(paintContextCairo);
+
+	pango_layout_set_font_description(paintLayout, desc);
+	pango_font_description_free(desc);
+#endif
+
 	/* Draw text line by line.
 	 */
 	const Array<String>	&lines = string.Explode("\n");
@@ -557,11 +610,13 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	foreach (const String &line, lines)
 #endif
 	{
+		Int	 lineLength = line.Length();
+
+		if (lineLength == 0) { rect.top += lineHeight; continue; }
+
 		Rect	 tRect = rightToLeft.TranslateRect(rect);
 
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
-
-		Int	 lineLength = line.Length();
 
 #ifdef __WIN32__
 		/* Check for right to left characters in text.
@@ -587,90 +642,21 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		}
 #endif
 
-		Int	 utf8Length = (line != NIL ? strlen(line.ConvertTo("UTF-8")) : 0);
-
+#if defined __WIN32__ || defined __APPLE__
 		if (!painting)
 		{
-			CreateCairoContext();
-
-			cairo_save(context);
-			cairo_rectangle(context, tRect.left, tRect.top, tRect.GetWidth(), tRect.GetHeight() + 1);
-			cairo_clip(context);
-
-			cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
-
-#if defined __WIN32__ || defined __APPLE__
-			cairo_select_font_face(context, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-									(font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
-
-			cairo_set_font_size(context, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
-
 			cairo_move_to(context, tRect.left, tRect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 			cairo_show_text(context, line.ConvertTo("UTF-8"));
-#else
-			PangoLayout		*layout	       = pango_cairo_create_layout(context);
-			PangoFontDescription	*desc	       = pango_font_description_from_string(String(font.GetName())
-												   .Append(" ")
-												   .Append(font.GetStyle() & Font::Italic ? "Italic " : "")
-												   .Append(font.GetWeight() >= Font::Bold ? "Bold " : "")
-												   .Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0))));
-
-			PangoAttrList		*attributes    = pango_attr_list_new();
-			PangoAttribute		*underline     = pango_attr_underline_new(font.GetStyle() & Font::Underline ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
-			PangoAttribute		*strikethrough = pango_attr_strikethrough_new(font.GetStyle() & Font::StrikeOut ? True : False);
-
-			underline->end_index	 = utf8Length;
-			strikethrough->end_index = utf8Length;
-
-			pango_attr_list_insert(attributes, underline);
-			pango_attr_list_insert(attributes, strikethrough);
-
-			pango_layout_set_attributes(layout, attributes);
-
-			pango_attr_list_unref(attributes);
-
-			if (lineLength > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
-
-			pango_layout_set_font_description(layout, desc);
-
-			pango_font_description_free(desc);
-
-			cairo_move_to(context, tRect.left, tRect.top);
-			pango_cairo_show_layout(context, layout);
-
-			g_object_unref(layout);
-#endif
-
-			cairo_restore(context);
-
-			DestroyCairoContext();
 		}
-
-		cairo_save(paintContextCairo);
-		cairo_rectangle(paintContextCairo, tRect.left, tRect.top, tRect.GetWidth(), tRect.GetHeight() + 1);
-		cairo_clip(paintContextCairo);
-
-		cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
-
-#if defined __WIN32__ || defined __APPLE__
-		cairo_select_font_face(paintContextCairo, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-									  (font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
-
-		cairo_set_font_size(paintContextCairo, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
 
 		cairo_move_to(paintContextCairo, tRect.left, tRect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
 		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
 #else
-		PangoLayout		*layout	       = pango_cairo_create_layout(paintContextCairo);
-		PangoFontDescription	*desc	       = pango_font_description_from_string(String(font.GetName())
-											   .Append(" ")
-											   .Append(font.GetStyle() & Font::Italic ? "Italic " : "")
-											   .Append(font.GetWeight() >= Font::Bold ? "Bold " : "")
-											   .Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0))));
+		Int	 utf8Length = (line != NIL ? strlen(line.ConvertTo("UTF-8")) : 0);
 
-		PangoAttrList		*attributes    = pango_attr_list_new();
-		PangoAttribute		*underline     = pango_attr_underline_new(font.GetStyle() & Font::Underline ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
-		PangoAttribute		*strikethrough = pango_attr_strikethrough_new(font.GetStyle() & Font::StrikeOut ? True : False);
+		PangoAttrList	*attributes    = pango_attr_list_new();
+		PangoAttribute	*underline     = pango_attr_underline_new(font.GetStyle() & Font::Underline ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
+		PangoAttribute	*strikethrough = pango_attr_strikethrough_new(font.GetStyle() & Font::StrikeOut ? True : False);
 
 		underline->end_index	 = utf8Length;
 		strikethrough->end_index = utf8Length;
@@ -678,27 +664,47 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		pango_attr_list_insert(attributes, underline);
 		pango_attr_list_insert(attributes, strikethrough);
 
-		pango_layout_set_attributes(layout, attributes);
+		if (!painting)
+		{
+			pango_layout_set_attributes(layout, attributes);
 
-		pango_attr_list_unref(attributes);
+			pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
 
-		if (lineLength > 0) pango_layout_set_text(layout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
+			cairo_move_to(context, tRect.left, tRect.top);
+			pango_cairo_show_layout(context, layout);
+		}
 
-		pango_layout_set_font_description(layout, desc);
-		pango_font_description_free(desc);
+		pango_layout_set_attributes(paintLayout, attributes);
+
+		pango_layout_set_text(paintLayout, String(line).Append(" ").ConvertTo("UTF-8"), -1);
 
 		cairo_move_to(paintContextCairo, tRect.left, tRect.top);
-		pango_cairo_show_layout(paintContextCairo, layout);
+		pango_cairo_show_layout(paintContextCairo, paintLayout);
 
-		g_object_unref(layout);
+		pango_attr_list_unref(attributes);
 #endif
-
-		cairo_restore(paintContextCairo);
 
 		rect.top += lineHeight;
 	}
 
 	String::ExplodeFinish();
+
+	if (!painting)
+	{
+#if !defined __WIN32__ && !defined __APPLE__
+		g_object_unref(layout);
+#endif
+
+		cairo_restore(context);
+
+		DestroyCairoContext();
+	}
+
+#if !defined __WIN32__ && !defined __APPLE__
+	g_object_unref(paintLayout);
+#endif
+
+	cairo_restore(paintContextCairo);
 
 	return Success();
 }

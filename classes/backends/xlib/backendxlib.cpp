@@ -49,7 +49,6 @@ S::Int S::Backends::BackendXLib::Init()
 
 		if (display == NIL)
 		{
-
 			fprintf(stderr, "Error: Unable to open display at %s.\n", displayId);
 
 			return Error();

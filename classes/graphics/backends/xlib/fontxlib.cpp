@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -88,6 +88,10 @@ S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &iText) const
 {
 	if (iText == NIL) return Size();
 
+	Display	*display       = Backends::BackendXLib::GetDisplay();
+
+	if (display == NIL) return Size();
+
 	String	 text	       = iText;
 	Int	 textLength    = text.Length();
 
@@ -113,7 +117,8 @@ S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &iText) const
 		delete [] visual;
 	}
 
-	Display		*display = Backends::BackendXLib::GetDisplay();
+	/* Get text extents.
+	 */
 	XftFont		*font	 = XftFontOpenName(display, XDefaultScreen(display), String(fontName).Append("-").Append(String::FromInt(Math::Round(fontSize * dpi / 96.0))).Append(":").Append(fontWeight >= Font::Bold ? "bold" : "medium").Append(fontStyle & Font::Italic ? ":italic" : ""));
 	XGlyphInfo	 extents = { 0 };
 
@@ -121,9 +126,9 @@ S::GUI::Size S::GUI::FontXLib::GetTextSize(const String &iText) const
 
 	XftFontClose(display, font);
 
-	int		 lines	    = 1;
+	int		 lines	 = 1;
 
-	for (Int j = 0; j < textLength; j++) if (text[j] == '\n') lines++;
+	for (Int i = 0; i < textLength; i++) if (text[i] == '\n') lines++;
 
 	return Size(extents.width - 2, (font->ascent + 2) * lines);
 }

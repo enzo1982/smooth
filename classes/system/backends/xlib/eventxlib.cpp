@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -61,6 +61,8 @@ int FindConfigureEvent(Display *d, XEvent *e, XPointer arg)
 
 S::Bool S::System::EventXLib::ProcessNextEvent()
 {
+	if (display == NIL) return False;
+
 	/* Emulate a timeout of ~100ms by trying to find a message
 	 * 10 times while sleeping for 10ms between trying.
 	 */

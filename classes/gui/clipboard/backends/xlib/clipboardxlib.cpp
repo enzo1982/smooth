@@ -26,6 +26,7 @@ S::GUI::ClipboardXLib::ClipboardXLib(Window *iWindow)
 {
 	type	= CLIPBOARD_XLIB;
 
+	display	= Backends::BackendXLib::GetDisplay();
 	window	= iWindow;
 }
 
@@ -77,9 +78,8 @@ S::String S::GUI::ClipboardXLib::GetText(Atom clipboard) const
 
 	String		 text;
 
-	Display		*display = Backends::BackendXLib::GetDisplay();
-	X11::Window	 self	 = (X11::Window) window->GetSystemWindow();
-	X11::Window	 owner	 = XGetSelectionOwner(display, clipboard);
+	X11::Window	 self  = (X11::Window) window->GetSystemWindow();
+	X11::Window	 owner = XGetSelectionOwner(display, clipboard);
 
 	if (owner != None)
 	{
@@ -111,7 +111,6 @@ S::Bool S::GUI::ClipboardXLib::SetText(Atom clipboard, const String &text)
 {
 	if (window == NIL) return False;
 
-	Display		*display = Backends::BackendXLib::GetDisplay();
 	X11::Window	 self	 = (X11::Window) window->GetSystemWindow();
 	WindowXLib	*backend = GUI::WindowXLib::GetWindowBackend(self);
 
@@ -139,14 +138,14 @@ S::Bool S::GUI::ClipboardXLib::SetSelectionText(const String &text)
 
 S::String S::GUI::ClipboardXLib::GetClipboardText() const
 {
-	Display	*display = Backends::BackendXLib::GetDisplay();
+	if (display == NIL) return NIL;
 
 	return GetText(XInternAtom(display, "CLIPBOARD", True));
 }
 
 S::Bool S::GUI::ClipboardXLib::SetClipboardText(const String &text)
 {
-	Display	*display = Backends::BackendXLib::GetDisplay();
+	if (display == NIL) return False;
 
 	return SetText(XInternAtom(display, "CLIPBOARD", True), text);
 }

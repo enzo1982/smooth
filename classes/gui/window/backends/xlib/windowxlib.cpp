@@ -21,6 +21,9 @@
 #include <smooth/init.h>
 #include <smooth/backends/xlib/backendxlib.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 using namespace X11;
 
 S::GUI::WindowBackend *CreateWindowXLib()
@@ -92,6 +95,13 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 
 	display		= Backends::BackendXLib::GetDisplay();
 	im		= Backends::BackendXLib::GetIM();
+
+	if (display == NIL)
+	{
+		fprintf(stderr, "Error: Unable to open display.\n");
+
+		exit(EXIT_FAILURE);
+	}
 
 	wnd		= NIL;
 	oldwnd		= NIL;

@@ -51,6 +51,7 @@ namespace smooth
 		class ClipboardXLib : public ClipboardBackend
 		{
 			private:
+				X11::Display	*display;
 				Window		*window;
 
 				unsigned char	*QueryAtom(X11::Display *, X11::Window, X11::Atom, X11::Atom) const;

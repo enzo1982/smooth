@@ -211,6 +211,8 @@ S::Short S::GUI::SurfaceHaiku::GetSurfaceDPI() const
 
 	Short	 dpi = 96;
 
+	dpi *= be_plain_font->Size() / 12.0;
+
 	surfaceDPI = dpi;
 
 	return dpi;

@@ -50,15 +50,11 @@ namespace smooth
 
 				void Draw(BRect updateRect)
 				{
-					BRegion	 clippingRegion;
+					BWindow	*wnd	  = Window();
+					Float	 fontSize = Surface().GetSurfaceDPI() / 96.0;
 
-					GetClippingRegion(&clippingRegion);
-
-					BRect	 clippingRect = clippingRegion.Frame();
-					Float	 fontSize     = Surface().GetSurfaceDPI() / 96.0;
-
-					System::EventHaiku::EnqueueMessage(Window(), *(Window()->CurrentMessage()), B_PAINT, ((	      (int) clippingRect.left			  + 32768) << 16) | (	    (int) clippingRect.top			 + 32768),
-															     ((Math::Floor((clippingRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Floor((clippingRect.Height() + 1) / fontSize) + 32768));
+					System::EventHaiku::EnqueueMessage(wnd, *(wnd->CurrentMessage()), B_PAINT, (((int) updateRect.left    + 32768) << 16) | ((int) updateRect.top	   + 32768),
+														   (((int) updateRect.Width() + 32768) << 16) | ((int) updateRect.Height() + 32768));
 				}
 
 				void MouseMoved(BPoint point, uint32 transit, const BMessage *message)

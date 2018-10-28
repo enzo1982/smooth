@@ -329,6 +329,39 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 	Rect	 rect	    = iRect;
 	Int	 lineHeight = 0;
 
+	/* Set up Haiku font.
+	 */
+	BFont		 viewFont;
+	font_height	 height;
+
+	viewFont.SetFamilyAndStyle(font.GetName(), NULL);
+	viewFont.SetFace((font.GetStyle() & Font::Italic    ? B_ITALIC_FACE     : 0) |
+			 (font.GetStyle() & Font::Underline ? B_UNDERSCORE_FACE : 0) |
+			 (font.GetStyle() & Font::StrikeOut ? B_STRIKEOUT_FACE  : 0) |
+			 (font.GetWeight() >= Font::Bold    ? B_BOLD_FACE       : 0));
+	viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
+
+	Rect	 tRect = rightToLeft.TranslateRect(rect);
+	BRegion	 clippingRegion(BRect(tRect.left, tRect.top, tRect.right, tRect.bottom));
+
+	if (!painting)
+	{
+		view->PushState();
+		view->SetFont(&viewFont);
+		view->SetDrawingMode(B_OP_OVER);
+		view->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
+		view->ConstrainClippingRegion(&clippingRegion);
+	}
+
+	bitmapView->PushState();
+	bitmapView->SetFont(&viewFont);
+	bitmapView->GetFontHeight(&height);
+	bitmapView->SetDrawingMode(B_OP_OVER);
+	bitmapView->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
+	bitmapView->ConstrainClippingRegion(&clippingRegion);
+
+	/* Draw text line by line.
+	 */
 	const Array<String>	&lines = string.Explode("\n");
 
 	if (lines.Length() > 1) lineHeight = font.GetScaledTextSizeY() + 3;
@@ -339,51 +372,18 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
 
-		if (!painting)
-		{
-			BFont		 viewFont;
-			font_height	 height;
+		if (!painting) view->DrawString(line.ConvertTo("UTF-8"), BPoint(tRect.left, tRect.top + height.ascent));
 
-			viewFont.SetFamilyAndStyle(font.GetName(), NULL);
-			viewFont.SetFace((font.GetStyle() & Font::Italic    ? B_ITALIC_FACE     : 0) |
-					 (font.GetStyle() & Font::Underline ? B_UNDERSCORE_FACE : 0) |
-					 (font.GetStyle() & Font::StrikeOut ? B_STRIKEOUT_FACE  : 0) |
-					 (font.GetWeight() >= Font::Bold    ? B_BOLD_FACE       : 0));
-			viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
-
-			view->SetFont(&viewFont);
-			view->GetFontHeight(&height);
-
-			view->SetDrawingMode(B_OP_OVER);
-			view->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
-			view->MovePenTo(BPoint(tRect.left, tRect.top + height.ascent));
-			view->DrawString(line.ConvertTo("UTF-8"));
-			view->SetDrawingMode(B_OP_COPY);
-		}
-
-		BFont		 viewFont;
-		font_height	 height;
-
-		viewFont.SetFamilyAndStyle(font.GetName(), NULL);
-		viewFont.SetFace((font.GetStyle() & Font::Italic    ? B_ITALIC_FACE     : 0) |
-				 (font.GetStyle() & Font::Underline ? B_UNDERSCORE_FACE : 0) |
-				 (font.GetStyle() & Font::StrikeOut ? B_STRIKEOUT_FACE  : 0) |
-				 (font.GetWeight() >= Font::Bold    ? B_BOLD_FACE       : 0));
-		viewFont.SetSize(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
-
-		bitmapView->SetFont(&viewFont);
-		bitmapView->GetFontHeight(&height);
-
-		bitmapView->SetDrawingMode(B_OP_OVER);
-		bitmapView->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
-		bitmapView->MovePenTo(BPoint(tRect.left, tRect.top + height.ascent));
-		bitmapView->DrawString(line.ConvertTo("UTF-8"));
-		bitmapView->SetDrawingMode(B_OP_COPY);
+		bitmapView->DrawString(line.ConvertTo("UTF-8"), BPoint(tRect.left, tRect.top + height.ascent));
 
 		rect.top += lineHeight;
 	}
 
 	String::ExplodeFinish();
+
+	if (!painting) view->PopState();
+
+	bitmapView->PopState();
 
 	return Success();
 }

@@ -396,13 +396,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 
 			/* Receive all mouse events while button is pressed.
 			 */
-			if (message == WM_LBUTTONDOWN || message == WM_NCLBUTTONDOWN ||
-			    message == WM_RBUTTONDOWN || message == WM_NCRBUTTONDOWN ||
-			    message == WM_MBUTTONDOWN || message == WM_NCMBUTTONDOWN) SetCapture(hwnd);
-
-			if (message == WM_LBUTTONUP || message == WM_NCLBUTTONUP ||
-			    message == WM_RBUTTONUP || message == WM_NCRBUTTONUP ||
-			    message == WM_MBUTTONUP || message == WM_NCMBUTTONUP) ReleaseCapture();
+			if	(message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_MBUTTONDOWN) SetCapture(hwnd);
+			else if (message == WM_LBUTTONUP   || message == WM_RBUTTONUP	|| message == WM_MBUTTONUP)   ReleaseCapture();
 
 			/* Pass message to smooth window.
 			 */

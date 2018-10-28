@@ -20,16 +20,8 @@
 #include <smooth/init.h>
 #include <smooth/backends/win32/backendwin32.h>
 
-#if !defined WM_MOUSEWHEEL
-#	define WM_MOUSEWHEEL 522
-#endif
-
 #if !defined SM_CXPADDEDBORDER
 #	define SM_CXPADDEDBORDER 92
-#endif
-
-#if !defined CS_DROPSHADOW
-#	define CS_DROPSHADOW 0x00020000
 #endif
 
 S::GUI::WindowBackend *CreateWindowGDI()

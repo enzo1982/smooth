@@ -36,8 +36,7 @@ S::Int	 addWindowGDIFreeTmp = S::AddFreeFunction(&S::GUI::WindowGDI::Free);
 
 S::Array<S::GUI::WindowGDI *, S::Void *>	 S::GUI::WindowGDI::windowBackends;
 
-S::System::Timer	*S::GUI::WindowGDI::mouseNotifyTimer = NIL;
-S::GUI::Cursor		*S::GUI::WindowGDI::activeCursor     = NIL;
+S::GUI::Cursor		*S::GUI::WindowGDI::activeCursor = NIL;
 
 LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -56,13 +55,6 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 
 S::Int S::GUI::WindowGDI::Initialize()
 {
-	/* Initialize mouse notifier.
-	 */
-	mouseNotifyTimer = new System::Timer();
-
-	mouseNotifyTimer->onInterval.Connect(&WindowGDI::MouseNotifier);
-	mouseNotifyTimer->Start(25);
-
 	/* Register for cursor events.
 	 */
 	Cursor::internalSetCursor.Connect(&WindowGDI::SetCursor);
@@ -77,12 +69,6 @@ S::Int S::GUI::WindowGDI::Free()
 	 */
 	Cursor::internalSetCursor.Disconnect(&WindowGDI::SetCursor);
 	Cursor::internalRemoveCursor.Disconnect(&WindowGDI::RemoveCursor);
-
-	/* Stop and free mouse notifier.
-	 */
-	mouseNotifyTimer->Stop();
-
-	delete mouseNotifyTimer;
 
 	return Success();
 }
@@ -352,6 +338,32 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 				Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
 			}
 
+			/* Register for mouse leave events.
+			 */
+			{
+				TRACKMOUSEEVENT tme;
+
+				tme.cbSize	= sizeof(TRACKMOUSEEVENT);
+				tme.dwFlags	= TME_LEAVE;
+				tme.hwndTrack	= hwnd;
+				tme.dwHoverTime = 0;
+
+				TrackMouseEvent(&tme);
+			}
+
+			return onEvent.Call(SM_MOUSEMOVE, 0, 0);
+
+		case WM_MOUSELEAVE:
+			/* Update pointer position in Input::Pointer.
+			 */
+			{
+				POINT	 point;
+
+				GetCursorPos(&point);
+
+				Input::Pointer::UpdatePosition(Window::GetWindow(WindowFromPoint(point)), point.x, point.y);
+			}
+
 			return onEvent.Call(SM_MOUSEMOVE, 0, 0);
 
 		case WM_LBUTTONDOWN:
@@ -381,6 +393,16 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 
 				Input::Pointer::UpdatePosition(Window::GetWindow(hwnd), point.x, point.y);
 			}
+
+			/* Receive all mouse events while button is pressed.
+			 */
+			if (message == WM_LBUTTONDOWN || message == WM_NCLBUTTONDOWN ||
+			    message == WM_RBUTTONDOWN || message == WM_NCRBUTTONDOWN ||
+			    message == WM_MBUTTONDOWN || message == WM_NCMBUTTONDOWN) SetCapture(hwnd);
+
+			if (message == WM_LBUTTONUP || message == WM_NCLBUTTONUP ||
+			    message == WM_RBUTTONUP || message == WM_NCRBUTTONUP ||
+			    message == WM_MBUTTONUP || message == WM_NCMBUTTONUP) ReleaseCapture();
 
 			/* Pass message to smooth window.
 			 */
@@ -915,28 +937,6 @@ S::Int S::GUI::WindowGDI::Raise()
 	SetFocus(hwnd);
 
 	return Success();
-}
-
-S::Void S::GUI::WindowGDI::MouseNotifier()
-{
-	static Point	 savedMousePos = Point(0, 0);
-	POINT		 currentMousePos;
-
-	GetCursorPos(&currentMousePos);
-
-	Input::Pointer::UpdatePosition(Window::GetWindow(WindowFromPoint(currentMousePos)), currentMousePos.x, currentMousePos.y);
-
-	if (currentMousePos.x != savedMousePos.x || currentMousePos.y != savedMousePos.y)
-	{
-		for (Int i = 0; i < Window::GetNOfWindows(); i++)
-		{
-			Window	*window = Window::GetNthWindow(i);
-
-			if (window->IsInUse() && !window->IsMouseOn(Rect(Point(), window->GetSize()))) window->Process(SM_MOUSEMOVE, 0, 0);
-		}
-
-		savedMousePos = Point(currentMousePos.x, currentMousePos.y);
-	}
 }
 
 S::Int S::GUI::WindowGDI::SetProgressIndicator(Window::ProgressIndicatorState state, Float value)

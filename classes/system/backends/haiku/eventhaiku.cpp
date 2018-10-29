@@ -52,9 +52,9 @@ S::Void S::System::EventHaiku::EnqueueMessage(Void *window, const BMessage &curr
 {
 	messages.LockForWrite();
 
-	/* Process only the most recent B_MOUSE_MOVED and B_WINDOW_RESIZED message.
+	/* Process only the most recent B_MOUSE_MOVED message.
 	 */
-	if (messageID == B_MOUSE_MOVED || messageID == B_WINDOW_RESIZED)
+	if (messageID == B_MOUSE_MOVED)
 	{
 		foreachreverse (Message *message, messages)
 		{

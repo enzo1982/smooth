@@ -13,6 +13,7 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 #include <smooth/gui/application/application.h>
+#include <smooth/system/system.h>
 #include <smooth/files/file.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
@@ -90,8 +91,14 @@ S::Int S::GUI::SurfaceHaiku::Lock()
 	{
 		BWindow	*window = view->Window();
 
+		while (window->LockWithTimeout(0) != B_OK)
+		{
+			SurfaceBackend::Release();
+			S::System::System::Sleep(0);
+			SurfaceBackend::Lock();
+		}
+
 		bitmap->Lock();
-		window->Lock();
 	}
 
 	return Success();
@@ -103,8 +110,8 @@ S::Int S::GUI::SurfaceHaiku::Release()
 	{
 		BWindow	*window = view->Window();
 
-		window->Unlock();
 		bitmap->Unlock();
+		window->Unlock();
 	}
 
 	return SurfaceBackend::Release();
@@ -321,10 +328,10 @@ S::Int S::GUI::SurfaceHaiku::Box(const Rect &iRect, const Color &color, Int styl
 
 S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, const Font &font, Bool shadow)
 {
-	if (view == NIL)	return Success();
+	if (view == NIL)   return Success();
 
-	if (string == NIL)	return Error();
-	if (shadow)		return SurfaceBackend::SetText(string, iRect, font, shadow);
+	if (string == NIL) return Error();
+	if (shadow)	   return SurfaceBackend::SetText(string, iRect, font, shadow);
 
 	Rect	 rect	    = iRect;
 	Int	 lineHeight = 0;

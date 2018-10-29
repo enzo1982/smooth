@@ -52,11 +52,11 @@ namespace smooth
 
 				void Draw(BRect updateRect)
 				{
-					BWindow	*wnd	  = Window();
-					Float	 fontSize = Surface().GetSurfaceDPI() / 96.0;
+					BWindow		*wnd	  = Window();
+					WindowHaiku	*backend  = WindowHaiku::GetWindowBackend(wnd);
 
-					System::EventHaiku::EnqueueMessage(wnd, *(wnd->CurrentMessage()), B_PAINT, (((int) updateRect.left    + 32768) << 16) | ((int) updateRect.top	   + 32768),
-														   (((int) updateRect.Width() + 32768) << 16) | ((int) updateRect.Height() + 32768));
+					backend->ProcessSystemMessages(B_PAINT, (((int) updateRect.left    + 32768) << 16) | ((int) updateRect.top	+ 32768),
+										(((int) updateRect.Width() + 32768) << 16) | ((int) updateRect.Height() + 32768), *(wnd->CurrentMessage()));
 				}
 
 				void MouseMoved(BPoint point, uint32 transit, const BMessage *message)
@@ -108,27 +108,26 @@ namespace smooth
 
 				void FrameMoved(BPoint origin)
 				{
-					System::EventHaiku::EnqueueMessage(this, *CurrentMessage(), B_WINDOW_MOVED, origin.x, origin.y);
+					WindowHaiku	*backend = WindowHaiku::GetWindowBackend(this);
+
+					backend->ProcessSystemMessages(B_WINDOW_MOVED, origin.x, origin.y, *CurrentMessage());
 				}
 
 				void FrameResized(float width, float height)
 				{
-					System::EventHaiku::EnqueueMessage(this, *CurrentMessage(), B_WINDOW_RESIZED, width, height);
+					WindowHaiku	*backend = WindowHaiku::GetWindowBackend(this);
+
+					backend->ProcessSystemMessages(B_WINDOW_RESIZED, width, height, *CurrentMessage());
 				}
 
 				bool QuitRequested()
 				{
 					WindowHaiku	*backend = WindowHaiku::GetWindowBackend(this);
 
-					if (backend != NIL)
-					{
-						System::EventHaiku::ProcessMessage(this, *CurrentMessage(), B_QUIT_REQUESTED, 0, 0);
+					backend->RequestClose();
 
-						if (backend->GetSystemWindow() == NIL) return true;
-						else				       return false;
-					}
-
-					return true;
+					if (backend->GetSystemWindow() == NIL) return true;
+					else				       return false;
 				}
 
 				void MessageReceived(BMessage *message)
@@ -252,11 +251,6 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 	 */
 	switch (message)
 	{
-		case B_QUIT_REQUESTED:
-			if (doClose.Call()) Close();
-
-			return MessageProcessed;
-
 		case B_WINDOW_CREATED:
 			onCreate.Emit();
 

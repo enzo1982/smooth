@@ -45,6 +45,8 @@ namespace smooth
 			public:
 				HaikuView(BRect frame) : BView(frame, NULL, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 				{
+					SetEventMask(B_POINTER_EVENTS);
+
 					SetViewColor(Setup::BackgroundColor.GetRed(), Setup::BackgroundColor.GetGreen(), Setup::BackgroundColor.GetBlue());
 				}
 
@@ -59,17 +61,31 @@ namespace smooth
 
 				void MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 				{
-					System::EventHaiku::EnqueueMessage(Window(), *(Window()->CurrentMessage()), B_MOUSE_MOVED, point.x, point.y);
+					BWindow	*wnd = Window();
+					BPoint	 pos = wnd->ConvertToScreen(point);
+
+					if	(transit == B_ENTERED_VIEW ||
+						 transit == B_INSIDE_VIEW)  Input::Pointer::UpdatePosition(Window::GetWindow(wnd), pos.x, pos.y);
+					else if (transit == B_EXITED_VIEW)  Input::Pointer::UpdatePosition(NIL, pos.x, pos.y);
+					else if (transit == B_OUTSIDE_VIEW) Input::Pointer::UpdatePosition(Input::Pointer::GetPointerWindow(), pos.x, pos.y);
+
+					System::EventHaiku::EnqueueMessage(wnd, *(wnd->CurrentMessage()), B_MOUSE_MOVED, point.x, point.y);
 				}
 
 				void MouseDown(BPoint point)
 				{
-					System::EventHaiku::EnqueueMessage(Window(), *(Window()->CurrentMessage()), B_MOUSE_DOWN, point.x, point.y);
+					BWindow	*wnd = Window();
+
+					if (Input::Pointer::GetPointerWindow() != Window::GetWindow(wnd)) return;
+
+					System::EventHaiku::EnqueueMessage(wnd, *(wnd->CurrentMessage()), B_MOUSE_DOWN, point.x, point.y);
 				}
 
 				void MouseUp(BPoint point)
 				{
-					System::EventHaiku::EnqueueMessage(Window(), *(Window()->CurrentMessage()), B_MOUSE_UP, point.x, point.y);
+					BWindow	*wnd = Window();
+
+					System::EventHaiku::EnqueueMessage(wnd, *(wnd->CurrentMessage()), B_MOUSE_UP, point.x, point.y);
 				}
 		};
 
@@ -260,17 +276,6 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			if (focusWndId == id) focusWndId = -1;
 
 			return MessageProcessed;
-	}
-
-	/* Update cursor position when receiving mouse messages.
-	 */
-	if (message == B_MOUSE_MOVED	||
-	    message == B_MOUSE_DOWN	||
-	    message == B_MOUSE_UP)
-	{
-		BPoint	 point = wnd->ConvertToScreen(BPoint(wParam, lParam));
-
-		Input::Pointer::UpdatePosition(Window::GetWindow(wnd), point.x, point.y);
 	}
 
 	static int32	 buttons = -1;

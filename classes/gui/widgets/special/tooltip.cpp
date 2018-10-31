@@ -61,7 +61,7 @@ S::Int S::GUI::Tooltip::Show()
 	Size	 sSize	     = tSize * scaleFactor;
 	Point	 tPos	     = Point(GetX(), GetY() - sSize.cy + 1);
 
-	if (tPos.y + window->GetY() < vScreen.top + 2) tPos.y = GetY() + vScreen.top + 2;
+	if (tPos.y + window->GetY() < vScreen.top + 2) tPos.y = GetY() + vScreen.top + 2 + Setup::HoverHeight;
 
 	if (!IsRightToLeft())
 	{

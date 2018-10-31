@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -71,6 +71,10 @@ S::Int S::Backends::BackendCocoa::Init()
 	 */
 	[NSApp setDelegate: [[[CocoaApplicationDelegate alloc] init] autorelease]];
 
+	/* Get default colors.
+	 */
+	UpdateColors();
+
 	/* Set default language if not set.
 	 */
 	NSUserDefaults	*defaults  = [NSUserDefaults standardUserDefaults];
@@ -89,6 +93,11 @@ S::Int S::Backends::BackendCocoa::Deinit()
 	[pool release];
 
 	return Success();
+}
+
+S::Void S::Backends::BackendCocoa::UpdateColors()
+{
+	Setup::BackgroundColor		  = GUI::Color(216, 216, 216);
 }
 
 S::Bool S::Backends::BackendCocoa::IsOSXVersionAtLeast(Int majorVersion, Int minorVersion, Int microVersion)

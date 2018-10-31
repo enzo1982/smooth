@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -113,6 +113,10 @@ S::Int S::Backends::BackendWin32::Init()
 
 //	FreeLibrary(user32dll);
 
+	/* Get default colors.
+	 */
+	UpdateColors();
+
 	/* Get default font size.
 	 */
 	HDC	 dc = GetWindowDC(0);
@@ -141,6 +145,28 @@ S::Int S::Backends::BackendWin32::Deinit()
 	CoUninitialize();
 
 	return Success();
+}
+
+S::Void S::Backends::BackendWin32::UpdateColors()
+{
+	Setup::BackgroundColor		  = GetSysColor(COLOR_3DFACE);
+	Setup::ClientColor		  = GetSysColor(COLOR_WINDOW);
+	Setup::ClientTextColor		  = GetSysColor(COLOR_WINDOWTEXT);
+	Setup::LightGrayColor		  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	Setup::DividerLightColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	Setup::DividerDarkColor		  = GetSysColor(COLOR_3DSHADOW);
+	Setup::TextColor		  = GetSysColor(COLOR_BTNTEXT);
+	Setup::InactiveTextColor	  = GetSysColor(COLOR_GRAYTEXT);
+	Setup::HighlightColor		  = GetSysColor(COLOR_HIGHLIGHT);
+	Setup::HighlightTextColor	  = GetSysColor(COLOR_HIGHLIGHTTEXT);
+	Setup::GradientStartColor	  = GetSysColor(COLOR_ACTIVECAPTION);
+	Setup::GradientEndColor		  = GetSysColor(COLOR_GRADIENTACTIVECAPTION);
+	Setup::GradientTextColor	  = GetSysColor(COLOR_CAPTIONTEXT);
+	Setup::InactiveGradientStartColor = GetSysColor(COLOR_INACTIVECAPTION);
+	Setup::InactiveGradientEndColor	  = GetSysColor(COLOR_GRADIENTINACTIVECAPTION);
+	Setup::InactiveGradientTextColor  = GetSysColor(COLOR_INACTIVECAPTIONTEXT);
+	Setup::TooltipColor		  = GetSysColor(COLOR_INFOBK);
+	Setup::TooltipTextColor		  = GetSysColor(COLOR_INFOTEXT);
 }
 
 S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformId, UnsignedInt majorVersion, UnsignedInt minorVersion)

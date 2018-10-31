@@ -14,10 +14,8 @@
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
-#include <smooth/system/timer.h>
 #include <smooth/system/screen.h>
 #include <smooth/foreach.h>
-#include <smooth/init.h>
 #include <smooth/backends/win32/backendwin32.h>
 
 #if !defined SM_CXPADDEDBORDER
@@ -305,7 +303,7 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 			return MessageProcessed;
 
 		case WM_SYSCOLORCHANGE:
-			GetColors();
+			Backends::BackendWin32::UpdateColors();
 
 			break;
 

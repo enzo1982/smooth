@@ -38,6 +38,8 @@ namespace smooth
 				Int			 Init();
 				Int			 Deinit();
 
+				static Void		 UpdateColors();
+
 				static BApplication	*GetApplication();
 		};
 	};

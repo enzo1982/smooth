@@ -43,7 +43,7 @@ namespace smooth
 		class HaikuView : public BView
 		{
 			public:
-				HaikuView(BRect frame) : BView(frame, NULL, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+				HaikuView(BRect frame) : BView(frame, NULL, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 				{
 					SetEventMask(B_POINTER_EVENTS);
 
@@ -411,7 +411,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 				if (drawSurface != NIL) drawSurface->SetSize(Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
 				onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
-							       ((Math::Floor((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Floor((windowRect.Height() + 1) / fontSize) + 32768));
+							       ((Math::Round((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Round((windowRect.Height() + 1) / fontSize) + 32768));
 
 				updateRect = Rect(Point((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768),
 						   Size((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768) + Size(1, 1));
@@ -430,7 +430,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 				if (drawSurface != NIL) drawSurface->SetSize(Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
 				onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
-							       ((Math::Floor((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Floor((windowRect.Height() + 1) / fontSize) + 32768));
+							       ((Math::Round((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Round((windowRect.Height() + 1) / fontSize) + 32768));
 
 				updateRect = Rect(Point(0, 0), Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
@@ -444,7 +444,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 				BRect	 windowRect = wnd->Frame();
 
 				onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
-							       ((Math::Floor((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Floor((windowRect.Height() + 1) / fontSize) + 32768));
+							       ((Math::Round((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Round((windowRect.Height() + 1) / fontSize) + 32768));
 			}
 
 			return Success();
@@ -559,21 +559,22 @@ S::Int S::GUI::WindowHaiku::Close()
 		app->PostMessage(B_QUIT_REQUESTED);
 	}
 
+	/* Destroy window.
+	 */
+	BWindow	*oldwnd = wnd;
+
+	oldwnd->Lock();
+
+	wnd  = NIL;
+	view = NIL;
+
+	oldwnd->Quit();
+
 	/* Delete surface.
 	 */
 	if (drawSurface != NIL) delete drawSurface;
 
 	drawSurface = NIL;
-
-	/* Destroy window.
-	 */
-	BWindow	*oldwnd = wnd;
-
-	wnd  = NIL;
-	view = NIL;
-
-	oldwnd->Lock();
-	oldwnd->Quit();
 
 	return Success();
 }

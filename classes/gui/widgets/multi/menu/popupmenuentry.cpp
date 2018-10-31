@@ -89,7 +89,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 			}
 			else if (text != NIL || bitmap != NIL)
 			{
-				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
+				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 0);
 				Font	 nFont	  = font;
 
 				if (!IsActive()) nFont.SetColor(Setup::InactiveTextColor);
@@ -124,7 +124,7 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 		case SP_MOUSEIN:
 			if (text != NIL || bitmap != NIL)
 			{
-				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 2);
+				Rect	 textRect = frame + Point(18 * surface->GetSurfaceDPI() / 96.0, Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 2) - Size(4 + 18 * surface->GetSurfaceDPI() / 96.0, 0);
 				Font	 nFont	  = font;
 
 				nFont.SetColor(Setup::GradientTextColor);

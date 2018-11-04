@@ -159,14 +159,13 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 
 S::Void S::GUI::MicroMenu::ClosePopupMenu()
 {
-	if (popup->GetContainer() == this)
-	{
-		Remove(popup);
+	if (popup == NIL || popup->GetContainer() != this) return;
 
-		onClosePopupMenu.Emit();
+	Remove(popup);
 
-		popup->internalRequestClose.Disconnect(&MicroMenu::ClosePopupMenu, this);
+	onClosePopupMenu.Emit();
 
-		hotspot->Activate();
-	}
+	popup->internalRequestClose.Disconnect(&MicroMenu::ClosePopupMenu, this);
+
+	hotspot->Activate();
 }

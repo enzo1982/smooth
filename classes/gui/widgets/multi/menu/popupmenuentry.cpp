@@ -306,7 +306,7 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 {
 	if (popup == NIL || popup->GetContainer() != this) return;
 
-	owner->SetFlags(owner->GetFlags() & ~MB_POPUPOPEN);
+	if (IsRegistered()) owner->SetFlags(owner->GetFlags() & ~MB_POPUPOPEN);
 
 	popup->internalRequestClose.Disconnect(&PopupMenuEntry::ClosePopupMenu, this);
 
@@ -314,15 +314,18 @@ S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()
 
 	hotspot->Activate();
 
-	if (popup->IsClosedByClick())
+	if (IsRegistered())
 	{
-		owner->SetClosedByClick(True);
-		owner->internalRequestClose.Emit();
-	}
-	else
-	{
-		if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetRealSize()))) owner->internalRequestClose.Emit();
-		else											  container->GetContainerWindow()->Raise();
+		if (popup->IsClosedByClick())
+		{
+			owner->SetClosedByClick(True);
+			owner->internalRequestClose.Emit();
+		}
+		else
+		{
+			if (!container->GetContainerWindow()->IsMouseOn(Rect(Point(), container->GetRealSize()))) owner->internalRequestClose.Emit();
+			else											  container->GetContainerWindow()->Raise();
+		}
 	}
 
 	popupMenuClosed = S::System::System::Clock();

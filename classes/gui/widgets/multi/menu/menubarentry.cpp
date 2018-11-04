@@ -244,23 +244,26 @@ S::Void S::GUI::MenubarEntry::ClosePopupMenu()
 {
 	if (popup == NIL || popup->GetContainer() != this) return;
 
-	container->SetFlags(container->GetFlags() & ~MB_POPUPOPEN);
+	if (IsRegistered()) container->SetFlags(container->GetFlags() & ~MB_POPUPOPEN);
 
 	Remove(popup);
 
 	popup->internalRequestClose.Disconnect(&MenubarEntry::ClosePopupMenu, this);
 
-	Window	*window	 = container->GetContainerWindow();
-	Surface	*surface = GetDrawSurface();
-	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+	if (IsRegistered())
+	{
+		Window	*window	 = container->GetContainerWindow();
+		Surface	*surface = GetDrawSurface();
+		Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
-	surface->StartPaint(frame);
+		surface->StartPaint(frame);
 
-	if (!window->IsMouseOn(frame)) Paint(SP_MOUSEOUT);
+		if (!window->IsMouseOn(frame)) Paint(SP_MOUSEOUT);
 
-	hotspot->Activate();
+		hotspot->Activate();
 
-	surface->EndPaint();
+		surface->EndPaint();
+	}
 
 	popupMenuClosed = S::System::System::Clock();
 }

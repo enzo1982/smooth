@@ -97,7 +97,45 @@ S::Int S::Backends::BackendCocoa::Deinit()
 
 S::Void S::Backends::BackendCocoa::UpdateColors()
 {
-	Setup::BackgroundColor		  = GUI::Color(216, 216, 216);
+	NSWindow	*window = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 0, 0)
+							      styleMask: NSTitledWindowMask
+								backing: NSBackingStoreBuffered
+								  defer: YES];
+
+	NSColor	*windowBackground	      = [[window backgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+
+	NSColor	*text			      = [[NSColor textColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+	NSColor	*textBackground		      = [[NSColor textBackgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+
+	NSColor	*controlText		      = [[NSColor controlTextColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+	NSColor	*disabledControlText	      = [[NSColor disabledControlTextColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+	
+	NSColor	*selectedText		      = [[NSColor selectedTextColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+	NSColor	*selectedTextBackground       = [[NSColor selectedTextBackgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+
+	NSColor	*alternateSelectedControl     = [[NSColor alternateSelectedControlColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+	NSColor	*alternateSelectedControlText = [[NSColor alternateSelectedControlTextColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+	
+	[window release];
+
+	Setup::BackgroundColor	  = GUI::Color([windowBackground redComponent] * 255, [windowBackground greenComponent] * 255, [windowBackground blueComponent] * 255);
+	Setup::LightGrayColor	  = GUI::Color(([windowBackground redComponent] + (1.0 - [windowBackground redComponent]) * 0.6) * 255, ([windowBackground greenComponent] + (1.0 - [windowBackground greenComponent]) * 0.6) * 255, ([windowBackground blueComponent] + (1.0 - [windowBackground blueComponent]) * 0.6) * 255);
+
+	Setup::ClientColor	  = GUI::Color([textBackground redComponent] * 255, [textBackground greenComponent] * 255, [textBackground blueComponent] * 255);
+	Setup::ClientTextColor	  = GUI::Color([text redComponent] * 255, [text greenComponent] * 255, [text blueComponent] * 255);
+
+	Setup::DividerLightColor  = GUI::Color(([windowBackground redComponent] + (1.0 - [windowBackground redComponent]) * 0.6) * 255, ([windowBackground greenComponent] + (1.0 - [windowBackground greenComponent]) * 0.6) * 255, ([windowBackground blueComponent] + (1.0 - [windowBackground blueComponent]) * 0.6) * 255);
+	Setup::DividerDarkColor	  = GUI::Color([windowBackground redComponent] * 0.7 * 255, [windowBackground greenComponent] * 0.7 * 255, [windowBackground blueComponent] * 0.7 * 255);
+
+	Setup::TextColor	  = GUI::Color([controlText redComponent] * 255, [controlText greenComponent] * 255, [controlText blueComponent] * 255);
+	Setup::InactiveTextColor  = GUI::Color([disabledControlText redComponent] * 255, [disabledControlText greenComponent] * 255, [disabledControlText blueComponent] * 255);
+
+	Setup::HighlightColor	  = GUI::Color([selectedTextBackground redComponent] * 255, [selectedTextBackground greenComponent] * 255, [selectedTextBackground blueComponent] * 255);
+	Setup::HighlightTextColor = GUI::Color([selectedText redComponent] * 255, [selectedText greenComponent] * 255, [selectedText blueComponent] * 255);
+
+	Setup::GradientStartColor = GUI::Color([alternateSelectedControl redComponent] * 255, [alternateSelectedControl greenComponent] * 255, [alternateSelectedControl blueComponent] * 255);
+	Setup::GradientEndColor	  = GUI::Color(([alternateSelectedControl redComponent] + (1.0 - [alternateSelectedControl redComponent]) * 0.5) * 255, ([alternateSelectedControl greenComponent] + (1.0 - [alternateSelectedControl greenComponent]) * 0.5) * 255, ([alternateSelectedControl blueComponent] + (1.0 - [alternateSelectedControl blueComponent]) * 0.5) * 255);
+	Setup::GradientTextColor  = GUI::Color([alternateSelectedControlText redComponent] * 255, [alternateSelectedControlText greenComponent] * 255, [alternateSelectedControlText blueComponent] * 255);
 }
 
 S::Bool S::Backends::BackendCocoa::IsOSXVersionAtLeast(Int majorVersion, Int minorVersion, Int microVersion)

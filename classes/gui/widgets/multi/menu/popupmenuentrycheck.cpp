@@ -48,17 +48,15 @@ S::Int S::GUI::PopupMenuEntryCheck::Paint(Int message)
 			{
 				for (Int i = 0; i < 2; i++)
 				{
-					Int	 color	= (message == SP_MOUSEIN ? Setup::InactiveGradientTextColor : Setup::DividerDarkColor);
+					Color	 color	= (IsActive() ? Setup::TextColor : Setup::InactiveTextColor);
+
+					if (message == SP_MOUSEIN) color = Setup::GradientTextColor;
+					if (i == 0)		   color = Color(color.GetRed() + (255 - color.GetRed()) * 0.6, color.GetGreen() + (255 - color.GetGreen()) * 0.6, color.GetBlue() + (255 - color.GetBlue()) * 0.6);
+
 					Int	 offset = 4 * surface->GetSurfaceDPI() / 96.0;
 
 					Point	 p1	= Point(frame.left		       + offset, frame.top    + offset) - (i == 1 ? Point(i, i) : Point());
 					Point	 p2	= Point(frame.left + frame.GetHeight() - offset, frame.bottom - offset) - (i == 1 ? Point(i, i) : Point());
-
-					if (i == 1)
-					{
-						if (IsActive())	color = (message == SP_MOUSEIN ? Setup::GradientTextColor : Setup::TextColor);
-						else		color = (message == SP_MOUSEIN ? Setup::GradientTextColor : Setup::InactiveTextColor);
-					}
 
 					surface->Line(p1 + Point(0, 0), p2 + Point( 0,  0), color);
 					surface->Line(p1 + Point(1, 0), p2 + Point( 0, -1), color);

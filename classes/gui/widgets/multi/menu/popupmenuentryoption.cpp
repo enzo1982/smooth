@@ -51,15 +51,12 @@ S::Int S::GUI::PopupMenuEntryOption::Paint(Int message)
 
 				for (Int i = 0; i < 2; i++)
 				{
-					Int	 color = (message == SP_MOUSEIN ? Setup::InactiveGradientTextColor : Setup::DividerDarkColor);
+					Color	 color	= (IsActive() ? Setup::TextColor : Setup::InactiveTextColor);
 
-					if (i == 1)
-					{
-						if (IsActive())	color = (message == SP_MOUSEIN ? Setup::GradientTextColor : Setup::TextColor);
-						else		color = (message == SP_MOUSEIN ? Setup::GradientTextColor : Setup::InactiveTextColor);
+					if (message == SP_MOUSEIN) color = Setup::GradientTextColor;
+					if (i == 0)		   color = Color(color.GetRed() + (255 - color.GetRed()) * 0.6, color.GetGreen() + (255 - color.GetGreen()) * 0.6, color.GetBlue() + (255 - color.GetBlue()) * 0.6);
 
-						point -= Point(i, i);
-					}
+					if (i == 1) point -= Point(i, i);
 
 					surface->Box(Rect(point + Point(1, 0), Size(3, 3) * surface->GetSurfaceDPI() / 96.0 + Size(0, 2)), color, Rect::Filled);
 					surface->Box(Rect(point + Point(0, 1), Size(3, 3) * surface->GetSurfaceDPI() / 96.0 + Size(2, 0)), color, Rect::Filled);

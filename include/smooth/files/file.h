@@ -43,6 +43,9 @@ namespace smooth
 			DateTime	 GetWriteTime() const;
 			DateTime	 GetAccessTime() const;
 
+			Bool		 SetWriteTime(const DateTime &);
+			Bool		 SetAccessTime(const DateTime &);
+
 			Bool		 Exists() const;
 
 			Int		 Create();

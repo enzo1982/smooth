@@ -22,8 +22,9 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - driver.cpp		- added Truncate() and Close() methods to public API
 			- implemented Flush() method for file drivers
 - outstream.cpp		- added Truncate() method
-- file.cpp		- Copy() and Move() method now take a const File & argument
 - directory.cpp		- Copy() and Move() method now take a const Directory & argument
+- file.cpp		- Copy() and Move() method now take a const File & argument
+			- added methods to change modification and access time
 
 - added Float32 and Float64 type defintions
 - added stream API to CRC32 and CRC64 classes

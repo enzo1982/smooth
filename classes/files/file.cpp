@@ -23,37 +23,147 @@
 #else
 #	include <stdio.h>
 #	include <time.h>
+#	include <utime.h>
 #	include <sys/stat.h>
 #endif
 
 namespace smooth
 {
 #ifdef __WIN32__
-	Int GetFileTime(const File &file, FILETIME *cTime, FILETIME *aTime, FILETIME *wTime)
-#else
-	Int GetFileTime(const File &file, time_t *cTime, time_t *aTime, time_t *wTime)
-#endif
-	{
-		if (!file.Exists()) return Error();
+	typedef FILETIME FileTime;
 
-#ifdef __WIN32__
+	DateTime FileTimeToDateTime(const FileTime &fileTime)
+	{
+		SYSTEMTIME	 time;
+
+		FileTimeToSystemTime(&fileTime, &time);
+
+		DateTime	 dateTime;
+
+		dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
+		dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
+
+		return dateTime;
+	}
+
+	FileTime DateTimeToFileTime(const DateTime &dateTime)
+	{
+		SYSTEMTIME	 time;
+
+		memset(&time, 0, sizeof(time));
+
+		time.wYear   = dateTime.GetYear();
+		time.wMonth  = dateTime.GetMonth();
+		time.wDay    = dateTime.GetDay();
+
+		time.wHour   = dateTime.GetHour();
+		time.wMinute = dateTime.GetMinute();
+		time.wSecond = dateTime.GetSecond();
+
+		FileTime	 fileTime;
+
+		SystemTimeToFileTime(&time, &fileTime);
+
+		return fileTime;
+	}
+
+	Bool GetFileTime(const File &file, FileTime *cTime, FileTime *aTime, FileTime *wTime)
+	{
+		if (!file.Exists()) return False;
+
 		HANDLE	 handle = CreateFile(String(Directory::GetUnicodePathPrefix(file)).Append(file), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 		::GetFileTime(handle, cTime, aTime, wTime);
 
 		CloseHandle(handle);
+
+		return True;
+	}
+
+	Bool SetFileTime(const File &file, FileTime *cTime, FileTime *aTime, FileTime *wTime)
+	{
+		if (!file.Exists()) return False;
+
+		HANDLE	 handle = CreateFile(String(Directory::GetUnicodePathPrefix(file)).Append(file), GENERIC_WRITE, 0, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+
+		::SetFileTime(handle, cTime, aTime, wTime);
+
+		CloseHandle(handle);
+
+		return True;
+	}
 #else
+	typedef time_t FileTime;
+
+	DateTime FileTimeToDateTime(const FileTime &fileTime)
+	{
+		tm	 time;
+
+		localtime_r(&fileTime, &time);
+
+		DateTime	 dateTime;
+
+		dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
+		dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
+
+		return dateTime;
+	}
+
+	FileTime DateTimeToFileTime(const DateTime &dateTime)
+	{
+		tm	 time;
+
+		memset(&time, 0, sizeof(time));
+
+		time.tm_year  = dateTime.GetYear();
+		time.tm_mon   = dateTime.GetMonth();
+		time.tm_mday  = dateTime.GetDay();
+
+		time.tm_hour  = dateTime.GetHour();
+		time.tm_min   = dateTime.GetMinute();
+		time.tm_sec   = dateTime.GetSecond();
+
+		time.tm_isdst = -1;
+
+		return mktime(&time);
+	}
+
+	Bool GetFileTime(const File &file, FileTime *cTime, FileTime *aTime, FileTime *wTime)
+	{
+		if (!file.Exists()) return False;
+
 		struct stat	 info;
 
-		if (stat(String(file).ConvertTo("UTF-8"), &info) != 0) return Error();
+		if (stat(String(file).ConvertTo("UTF-8"), &info) != 0) return False;
 
-		if (cTime != NIL) *cTime = info.st_ctime;
+		if (cTime != NIL) *cTime = info.st_mtime;
 		if (aTime != NIL) *aTime = info.st_atime;
 		if (wTime != NIL) *wTime = info.st_mtime;
-#endif
 
-		return Success();
+		return True;
 	}
+
+	Bool SetFileTime(const File &file, FileTime *cTime, FileTime *aTime, FileTime *wTime)
+	{
+		if (!file.Exists()) return False;
+
+		struct stat	 info;
+		struct utimbuf	 times;
+
+		if (stat(String(file).ConvertTo("UTF-8"), &info) != 0) return False;
+
+		times.actime  = info.st_atime;
+		times.modtime = info.st_mtime;
+
+		if (cTime != NIL) times.modtime = *cTime;
+		if (aTime != NIL) times.actime  = *aTime;
+		if (wTime != NIL) times.modtime = *wTime;
+
+		if (utime(String(file).ConvertTo("UTF-8"), &times) != 0) return False;
+
+		return True;
+	}
+#endif
 };
 
 S::File::File(const String &iFileName, const String &iFilePath)
@@ -167,89 +277,43 @@ S::Int64 S::File::GetFileSize() const
 
 S::DateTime S::File::GetCreationTime() const
 {
-	DateTime	 dateTime;
+	FileTime	 fileTime;
 
-#ifdef __WIN32__
-	FILETIME	 fileTime;
-	SYSTEMTIME	 time;
-#else
-	time_t		 fileTime;
-	tm		 time;
-#endif
+	if (!GetFileTime(*this, &fileTime, NIL, NIL)) return DateTime();
 
-	if (GetFileTime(*this, &fileTime, NIL, NIL) == Error()) return dateTime;
-
-#ifdef __WIN32__
-	FileTimeToSystemTime(&fileTime, &time);
-
-	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
-	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
-#else
-	localtime_r(&fileTime, &time);
-
-	dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
-	dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
-#endif
-
-	return dateTime;
+	return FileTimeToDateTime(fileTime);
 }
 
 S::DateTime S::File::GetAccessTime() const
 {
-	DateTime	 dateTime;
+	FileTime	 fileTime;
 
-#ifdef __WIN32__
-	FILETIME	 fileTime;
-	SYSTEMTIME	 time;
-#else
-	time_t		 fileTime;
-	tm		 time;
-#endif
+	if (!GetFileTime(*this, NIL, &fileTime, NIL)) return DateTime();
 
-	if (GetFileTime(*this, NIL, &fileTime, NIL) == Error()) return dateTime;
-
-#ifdef __WIN32__
-	FileTimeToSystemTime(&fileTime, &time);
-
-	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
-	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
-#else
-	localtime_r(&fileTime, &time);
-
-	dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
-	dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
-#endif
-
-	return dateTime;
+	return FileTimeToDateTime(fileTime);
 }
 
 S::DateTime S::File::GetWriteTime() const
 {
-	DateTime	 dateTime;
+	FileTime	 fileTime;
 
-#ifdef __WIN32__
-	FILETIME	 fileTime;
-	SYSTEMTIME	 time;
-#else
-	time_t		 fileTime;
-	tm		 time;
-#endif
+	if (!GetFileTime(*this, NIL, NIL, &fileTime)) return DateTime();
 
-	if (GetFileTime(*this, NIL, NIL, &fileTime) == Error()) return dateTime;
+	return FileTimeToDateTime(fileTime);
+}
 
-#ifdef __WIN32__
-	FileTimeToSystemTime(&fileTime, &time);
+S::Bool S::File::SetAccessTime(const DateTime &dateTime)
+{
+	FileTime	 fileTime = DateTimeToFileTime(dateTime);
 
-	dateTime.SetYMD(time.wYear, time.wMonth, time.wDay);
-	dateTime.SetHMS(time.wHour, time.wMinute, time.wSecond);
-#else
-	localtime_r(&fileTime, &time);
+	return SetFileTime(*this, NIL, &fileTime, NIL);
+}
 
-	dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
-	dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
-#endif
+S::Bool S::File::SetWriteTime(const DateTime &dateTime)
+{
+	FileTime	 fileTime = DateTimeToFileTime(dateTime);
 
-	return dateTime;
+	return SetFileTime(*this, NIL, NIL, &fileTime);
 }
 
 S::Bool S::File::Exists() const

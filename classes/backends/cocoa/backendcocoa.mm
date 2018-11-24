@@ -133,8 +133,8 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 	Setup::HighlightColor	  = GUI::Color([selectedTextBackground redComponent] * 255, [selectedTextBackground greenComponent] * 255, [selectedTextBackground blueComponent] * 255);
 	Setup::HighlightTextColor = GUI::Color([selectedText redComponent] * 255, [selectedText greenComponent] * 255, [selectedText blueComponent] * 255);
 
-	Setup::GradientStartColor = GUI::Color([alternateSelectedControl redComponent] * 255, [alternateSelectedControl greenComponent] * 255, [alternateSelectedControl blueComponent] * 255);
-	Setup::GradientEndColor	  = GUI::Color(([alternateSelectedControl redComponent] + (1.0 - [alternateSelectedControl redComponent]) * 0.5) * 255, ([alternateSelectedControl greenComponent] + (1.0 - [alternateSelectedControl greenComponent]) * 0.5) * 255, ([alternateSelectedControl blueComponent] + (1.0 - [alternateSelectedControl blueComponent]) * 0.5) * 255);
+	Setup::GradientStartColor = GUI::Color(([alternateSelectedControl redComponent] - [alternateSelectedControl redComponent] * 0.25) * 255, ([alternateSelectedControl greenComponent] - [alternateSelectedControl greenComponent] * 0.25) * 255, ([alternateSelectedControl blueComponent] - [alternateSelectedControl blueComponent] * 0.25) * 255);
+	Setup::GradientEndColor	  = GUI::Color(([alternateSelectedControl redComponent] + (1.0 - [alternateSelectedControl redComponent]) * 0.25) * 255, ([alternateSelectedControl greenComponent] + (1.0 - [alternateSelectedControl greenComponent]) * 0.25) * 255, ([alternateSelectedControl blueComponent] + (1.0 - [alternateSelectedControl blueComponent]) * 0.25) * 255);
 	Setup::GradientTextColor  = GUI::Color([alternateSelectedControlText redComponent] * 255, [alternateSelectedControlText greenComponent] * 255, [alternateSelectedControlText blueComponent] * 255);
 }
 

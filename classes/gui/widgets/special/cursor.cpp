@@ -547,8 +547,6 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 {
 	if (text == newText) return Success();
 
-	lineIndices.RemoveAll();
-
 	Surface	*surface = GetDrawSurface();
 	Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
 
@@ -559,6 +557,8 @@ S::Int S::GUI::Cursor::SetText(const String &newText)
 	ShowCursor(False);
 
 	MarkText(-1, -1);
+
+	lineIndices.RemoveAll();
 
 	if (timer != NIL)
 	{

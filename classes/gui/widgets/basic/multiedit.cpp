@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -28,13 +28,13 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 
 	font.SetColor(Setup::ClientTextColor);
 
-	if (GetWidth() == 0) SetWidth(80);
+	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(19);
 
-	cursor = new Cursor(Point(3, Math::Ceil(Float(19 - font.GetUnscaledTextSizeY()) / 2) - 2), GetSize() - Size(6, 4));
+	cursor = new Cursor(Point(3, Math::Ceil(Float(GetHeight() - font.GetUnscaledTextSizeY()) / 2) - 2), GetSize() - Size(6, 2));
 	cursor->onScroll.Connect(&MultiEdit::OnCursorScroll, this);
 	cursor->SetMaxSize(maxSize);
-	cursor->SetBackgroundColor(Color(255, 255, 255));
+	cursor->SetBackgroundColor(Setup::ClientColor);
 	cursor->SetFlags(CF_MULTILINE);
 	cursor->SetFont(font);
 	cursor->SetText(iText);
@@ -169,5 +169,5 @@ S::Void S::GUI::MultiEdit::OnChangeSize(const Size &nSize)
 {
 	if (scrollbar != NIL) scrollbar->SetHeight(nSize.cy - 2);
 
-	cursor->SetSize(nSize - Size(6 + (scrollbar != NIL ? 17 : 0), 4));
+	cursor->SetSize(nSize - Size(6 + (scrollbar != NIL ? 17 : 0), 2));
 }

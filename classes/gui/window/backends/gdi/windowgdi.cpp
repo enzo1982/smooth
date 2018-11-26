@@ -354,12 +354,19 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 		case WM_MOUSELEAVE:
 			/* Update pointer position in Input::Pointer.
 			 */
+			if (IsWindowEnabled(hwnd))
 			{
 				POINT	 point;
 
 				GetCursorPos(&point);
 
 				Input::Pointer::UpdatePosition(Window::GetWindow(WindowFromPoint(point)), point.x, point.y);
+			}
+			else
+			{
+				/* Clear mouse over status when being disabled.
+				 */
+				Input::Pointer::UpdatePosition(NIL, -1, -1);
 			}
 
 			return onEvent.Call(SM_MOUSEMOVE, 0, 0);

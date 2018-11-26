@@ -303,6 +303,10 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			currentMessage.FindInt32("buttons", &buttons);
 			currentMessage.FindInt32("clicks", &clicks);
 
+			/* Reject if a modal window is active.
+			 */
+			if (IsModalWindowActive()) break;
+
 			/* Grab the keyboard focus if we don't have it already.
 			 */
 			if (focusWndId != id)
@@ -584,6 +588,19 @@ S::Int S::GUI::WindowHaiku::RequestClose()
 	if (doClose.Call()) return Close();
 
 	return Success();
+}
+
+S::Bool S::GUI::WindowHaiku::IsModalWindowActive()
+{
+	/* Look for modal windows opened after ourselves.
+	 */
+	foreachreverse (WindowHaiku *backend, windowBackends)
+	{
+		if	(backend == this)				   return False;
+		else if (backend->wnd != NIL && backend->flags & WF_MODAL) return True;
+	}
+
+	return False;
 }
 
 S::Int S::GUI::WindowHaiku::SetTitle(const String &nTitle)

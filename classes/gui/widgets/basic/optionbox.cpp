@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -78,69 +78,32 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 					surface->SetText(text, frame + Point(frame.GetHeight(), Math::Ceil(Float(frame.GetHeight() - scaledTextSize.cy) / 2) - 1), nFont);
 				}
 
-				Int	 lightColor;
+				Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
 
-				if (IsActive())	lightColor = Setup::ClientColor;
-				else		lightColor = Setup::BackgroundColor;
+				Int	 lightColor = (IsActive() ? Setup::ClientColor : Setup::BackgroundColor);
+				Int	 inset	    = 2 * scaleFactor;
 
-				Point	 lineStart	= GetRealPosition() + Point(3, 3) * surface->GetSurfaceDPI() / 96.0 + Point(3 + (IsRightToLeft() ? 1 : 0), 0);
-				Point	 lineEnd	= lineStart + Point(5 * surface->GetSurfaceDPI() / 96.0, 0);
+				Point	 lineStart  = Point(frame.left, frame.top) + Point(3, 3) * scaleFactor + Point(inset - (IsRightToLeft() ? 0 : 1), 0);
+				Point	 lineEnd    = lineStart + Point(9 * scaleFactor - 2 * inset, 0);
 
 				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
 
-				lineStart.x--;
-				lineStart.y++;
-				lineEnd.x++;
-				lineEnd.y++;
-
-				surface->Line(lineStart, lineEnd, lightColor);
-
-				surface->SetPixel(lineStart, (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor));
-				surface->SetPixel(lineEnd - Point(1, 0), (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor));
-
-				lineStart.x--;
-				lineStart.y++;
-				lineEnd.x++;
-				lineEnd.y++;
-
-				surface->Line(lineStart, lineEnd, lightColor);
-
-				surface->SetPixel(lineStart, (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor));
-				surface->SetPixel(lineEnd - Point(1, 0), (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor));
-
-				lineStart.x--;
-				lineEnd.x++;
-
-				for (Int i = 0; i < 5 * surface->GetSurfaceDPI() / 96.0; i++)
+				for (Int i = 0; i < 9 * scaleFactor; i++)
 				{
+					if	(i <=			  inset) { lineStart.x--; lineEnd.x++; }
+					else if (i >= (9 * scaleFactor) - inset) { lineStart.x++; lineEnd.x--; }
+
 					lineStart.y++;
 					lineEnd.y++;
 
 					surface->Line(lineStart, lineEnd, lightColor);
 
-					surface->SetPixel(lineStart, (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor));
-					surface->SetPixel(lineEnd - Point(1, 0), (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor));
+					Int	 leftColor  = (i >= (9 * scaleFactor) - inset) ? Setup::DividerLightColor : (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor);
+					Int	 rightColor = (i >= (9 * scaleFactor) - inset) ? Setup::DividerLightColor : (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor);	
+
+					surface->SetPixel(lineStart, leftColor);
+					surface->SetPixel(lineEnd - Point(1, 0), rightColor);
 				}
-
-				lineStart.x++;
-				lineStart.y++;
-				lineEnd.x--;
-				lineEnd.y++;
-
-				surface->Line(lineStart, lineEnd, lightColor);
-
-				surface->SetPixel(lineStart, Setup::DividerLightColor);
-				surface->SetPixel(lineEnd - Point(1, 0), Setup::DividerLightColor);
-
-				lineStart.x++;
-				lineStart.y++;
-				lineEnd.x--;
-				lineEnd.y++;
-
-				surface->Line(lineStart, lineEnd, lightColor);
-
-				surface->SetPixel(lineStart, Setup::DividerLightColor);
-				surface->SetPixel(lineEnd - Point(1, 0), Setup::DividerLightColor);
 
 				lineStart.x++;
 				lineStart.y++;
@@ -151,21 +114,32 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 
 				if (*variable == code)
 				{
-					Point	 point = Point(frame.left - (IsRightToLeft() ? 2 : 0), frame.top) + Point(3, 3) * surface->GetSurfaceDPI() / 96.0 + Point(4, 4);
-
 					for (Int j = 0; j < 2; j++)
 					{
-						Int	 color = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+						Int	 color	= IsActive() ? Setup::ClientTextColor : Setup::InactiveTextColor;
+						Point	 offset	= Point(IsRightToLeft() ? 1 : 0, 0);
 
-						if (j == 1)
+						if (j == 0)
 						{
-							color = IsActive() ? Setup::ClientTextColor : Setup::InactiveTextColor;
-
-							point -= Point((IsRightToLeft() ? -j : j), j);
+							color  = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+							offset += Point(IsRightToLeft() ? -1 : 1, 1);
 						}
 
-						surface->Box(Rect(point + Point(1, 0), Size(3, 3) * surface->GetSurfaceDPI() / 96.0 + Size(0, 2)), color, Rect::Filled);
-						surface->Box(Rect(point + Point(0, 1), Size(3, 3) * surface->GetSurfaceDPI() / 96.0 + Size(2, 0)), color, Rect::Filled);
+						Int	 inset	    = 1 * scaleFactor;
+
+						Point	 lineStart  = Point(frame.left, frame.top) + Point(3, 3) * scaleFactor + Point(2, 2) * scaleFactor + offset + Point(inset, 0);
+						Point	 lineEnd    = lineStart + Point(5 * scaleFactor - 2 * inset - 2, 0);
+
+						for (Int i = 0; i < 5 * scaleFactor; i++)
+						{
+							if	(i <=			  inset) { lineStart.x--; lineEnd.x++; }
+							else if (i >= (5 * scaleFactor) - inset) { lineStart.x++; lineEnd.x--; }
+
+							lineStart.y++;
+							lineEnd.y++;
+
+							surface->Line(lineStart, lineEnd, color);
+						}
 					}
 				}
 

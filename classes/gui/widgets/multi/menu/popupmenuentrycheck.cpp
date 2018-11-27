@@ -46,6 +46,8 @@ S::Int S::GUI::PopupMenuEntryCheck::Paint(Int message)
 		case SP_MOUSEOUT:
 			if (*bVar == True)
 			{
+				Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
+
 				for (Int i = 0; i < 2; i++)
 				{
 					Color	 color	= (IsActive() ? Setup::TextColor : Setup::InactiveTextColor);
@@ -53,17 +55,20 @@ S::Int S::GUI::PopupMenuEntryCheck::Paint(Int message)
 					if (message == SP_MOUSEIN) color = Setup::GradientTextColor;
 					if (i == 0)		   color = Color(color.GetRed() + (255 - color.GetRed()) * 0.6, color.GetGreen() + (255 - color.GetGreen()) * 0.6, color.GetBlue() + (255 - color.GetBlue()) * 0.6);
 
-					Int	 offset = 4 * surface->GetSurfaceDPI() / 96.0;
+					Int	 width  = 4 * scaleFactor;
+					Point	 offset = Point(IsRightToLeft() ? 1 : 0, 0);
 
-					Point	 p1	= Point(frame.left		       + offset, frame.top    + offset) - (i == 1 ? Point(i, i) : Point());
-					Point	 p2	= Point(frame.left + frame.GetHeight() - offset, frame.bottom - offset) - (i == 1 ? Point(i, i) : Point());
+					if (i == 0) offset += Point(IsRightToLeft() ? -1 : 1, 1);
+
+					Point	 p1	= Point(frame.left		       + width, frame.top    + width) + offset;
+					Point	 p2	= Point(frame.left + frame.GetHeight() - width, frame.bottom - width) + offset;
 
 					surface->Line(p1 + Point(0, 0), p2 + Point( 0,  0), color);
 					surface->Line(p1 + Point(1, 0), p2 + Point( 0, -1), color);
 					surface->Line(p1 + Point(0, 1), p2 + Point(-1,  0), color);
 
-					p1 = Point(frame.left + frame.GetHeight() - offset - 1, frame.top    + offset) - (i == 1 ? Point(i, i) : Point());
-					p2 = Point(frame.left			  + offset - 1, frame.bottom - offset) - (i == 1 ? Point(i, i) : Point());
+					p1 = Point(frame.left + frame.GetHeight() - width - 1, frame.top    + width) + offset;
+					p2 = Point(frame.left			  + width - 1, frame.bottom - width) + offset;
 
 					surface->Line(p1 + Point( 0, 0), p2 + Point(0,  0), color);
 					surface->Line(p1 + Point( 0, 1), p2 + Point(1,  0), color);

@@ -47,19 +47,36 @@ S::Int S::GUI::PopupMenuEntryOption::Paint(Int message)
 		case SP_MOUSEOUT:
 			if (*iVar == iCode)
 			{
-				Point	 point = Point(frame.left, frame.top) + Point(5, 5) * surface->GetSurfaceDPI() / 96.0;
+				Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
 
-				for (Int i = 0; i < 2; i++)
+				for (Int j = 0; j < 2; j++)
 				{
 					Color	 color	= (IsActive() ? Setup::TextColor : Setup::InactiveTextColor);
+					Point	 offset	= Point(IsRightToLeft() ? 1 : 0, 0);
 
 					if (message == SP_MOUSEIN) color = Setup::GradientTextColor;
-					if (i == 0)		   color = Color(color.GetRed() + (255 - color.GetRed()) * 0.6, color.GetGreen() + (255 - color.GetGreen()) * 0.6, color.GetBlue() + (255 - color.GetBlue()) * 0.6);
 
-					if (i == 1) point -= Point(i, i);
+					if (j == 0)
+					{
+						color  = Color(color.GetRed() + (255 - color.GetRed()) * 0.6, color.GetGreen() + (255 - color.GetGreen()) * 0.6, color.GetBlue() + (255 - color.GetBlue()) * 0.6);
+						offset = Point(IsRightToLeft() ? -1 : 1, 1);
+					}
 
-					surface->Box(Rect(point + Point(1, 0), Size(3, 3) * surface->GetSurfaceDPI() / 96.0 + Size(0, 2)), color, Rect::Filled);
-					surface->Box(Rect(point + Point(0, 1), Size(3, 3) * surface->GetSurfaceDPI() / 96.0 + Size(2, 0)), color, Rect::Filled);
+					Int	 inset	    = 1 * scaleFactor;
+
+					Point	 lineStart  = Point(frame.left, frame.top) + Point(4, 4) * scaleFactor + offset + Point(inset + 2, 0);
+					Point	 lineEnd    = lineStart + Point(5 * scaleFactor - 2 * inset - 2, 0);
+
+					for (Int i = 0; i < 5 * scaleFactor; i++)
+					{
+						if	(i <=			  inset) { lineStart.x--; lineEnd.x++; }
+						else if (i >= (5 * scaleFactor) - inset) { lineStart.x++; lineEnd.x--; }
+
+						lineStart.y++;
+						lineEnd.y++;
+
+						surface->Line(lineStart, lineEnd, color);
+					}
 				}
 			}
 

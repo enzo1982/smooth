@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,11 +56,6 @@ S::Int S::GUI::Dialogs::FileSelection::SetDefaultExtension(const String &newDefE
 	return Success();
 }
 
-S::Int S::GUI::Dialogs::FileSelection::GetNumberOfFiles() const
-{
-	return files.Length();
-}
-
 S::Int S::GUI::Dialogs::FileSelection::SetFileName(const String &newDefFile)
 {
 	defFile = newDefFile;
@@ -76,10 +71,7 @@ const S::String &S::GUI::Dialogs::FileSelection::GetFileName() const
 	else			return nil;
 }
 
-const S::String &S::GUI::Dialogs::FileSelection::GetNthFileName(Int n) const
+const S::Array<S::String> &S::GUI::Dialogs::FileSelection::GetFileNames() const
 {
-	static const String	 nil;
-
-	if (files.Length() > n)	return files.GetNth(n);
-	else			return nil;
+	return files;
 }

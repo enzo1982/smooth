@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -44,35 +44,34 @@ namespace smooth
 			class SMOOTHAPI FileSelection : public Dialog
 			{
 				protected:
-					Array<String>	 filterNames;
-					Array<String>	 filters;
-					Array<String>	 files;
+					Array<String>		 filterNames;
+					Array<String>		 filters;
+					Array<String>		files;
 
-					Short		 flags;
-					Short		 mode;
+					Short			 flags;
+					Short			 mode;
 
-					String		 defExt;
-					String		 defPath;
-					String		 defFile;
+					String			 defExt;
+					String			 defPath;
+					String			 defFile;
 				public:
-							 FileSelection();
-					virtual		~FileSelection();
+								 FileSelection();
+					virtual			~FileSelection();
 
-					const Error	&ShowDialog();
+					const Error		&ShowDialog();
 				accessors:
-					Int		 SetMode(Short);
-					Int		 SetFlags(Short);
+					Int			 SetMode(Short);
+					Int			 SetFlags(Short);
 
-					Int		 SetInitialPath(const String &);
-					Int		 SetDefaultExtension(const String &);
+					Int			 SetInitialPath(const String &);
+					Int			 SetDefaultExtension(const String &);
 
-					Int		 AddFilter(const String &, const String &);
+					Int			 AddFilter(const String &, const String &);
 
-					Int		 SetFileName(const String &);
-					const String	&GetFileName() const;
+					Int			 SetFileName(const String &);
+					const String		&GetFileName() const;
 
-					Int		 GetNumberOfFiles() const;
-					const String	&GetNthFileName(Int) const;
+					const Array<String>	&GetFileNames() const;
 			};
 		};
 	};

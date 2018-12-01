@@ -113,6 +113,10 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 	    [windowBackground greenComponent] == 0 &&
 	    [windowBackground blueComponent]  == 0) windowBackground = [NSColor colorWithDeviceRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0];
 
+	[window release];
+
+	/* Query the other UI colors.
+	 */
 	NSColor	*text			      = [[NSColor textColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
 	NSColor	*textBackground		      = [[NSColor textBackgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
 
@@ -124,8 +128,10 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 
 	NSColor	*alternateSelectedControl     = [[NSColor alternateSelectedControlColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
 	NSColor	*alternateSelectedControlText = [[NSColor alternateSelectedControlTextColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
-	
-	[window release];
+
+	if ([disabledControlText redComponent]   == 0 &&
+	    [disabledControlText greenComponent] == 0 &&
+	    [disabledControlText blueComponent]  == 0) disabledControlText = [NSColor colorWithDeviceRed: 0.5 green: 0.5 blue: 0.5 alpha: 1.0];
 
 	/* Convert to smooth colors.
 	 */

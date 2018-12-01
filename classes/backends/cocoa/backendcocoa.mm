@@ -97,12 +97,21 @@ S::Int S::Backends::BackendCocoa::Deinit()
 
 S::Void S::Backends::BackendCocoa::UpdateColors()
 {
+	/* Create a dummy window to retrieve its background color.
+	 *
+	 * This does not work in macOS 10.10 to 10.13, so we check if it returned
+	 * a meaningful color and assign a light gray default value otherwise.
+	 */
 	NSWindow	*window = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 0, 0)
 							      styleMask: NSTitledWindowMask
 								backing: NSBackingStoreBuffered
 								  defer: YES];
 
 	NSColor	*windowBackground	      = [[window backgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+
+	if ([windowBackground redComponent]   == 0 &&
+	    [windowBackground greenComponent] == 0 &&
+	    [windowBackground blueComponent]  == 0) windowBackground = [NSColor colorWithDeviceRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0];
 
 	NSColor	*text			      = [[NSColor textColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
 	NSColor	*textBackground		      = [[NSColor textBackgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace];
@@ -118,6 +127,8 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 	
 	[window release];
 
+	/* Convert to smooth colors.
+	 */
 	Setup::BackgroundColor	  = GUI::Color([windowBackground redComponent] * 255, [windowBackground greenComponent] * 255, [windowBackground blueComponent] * 255);
 	Setup::LightGrayColor	  = GUI::Color(([windowBackground redComponent] + (1.0 - [windowBackground redComponent]) * 0.6) * 255, ([windowBackground greenComponent] + (1.0 - [windowBackground greenComponent]) * 0.6) * 255, ([windowBackground blueComponent] + (1.0 - [windowBackground blueComponent]) * 0.6) * 255);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,6 +40,9 @@ namespace smooth
 			static Void		 AddTemporaryBuffer(char *);
 			static Void		 DeleteTemporaryBuffers(Bool = False);
 		public:
+			class InputFormat;
+			class OutputFormat;
+
 			static Int		 Initialize();
 			static Int		 Free();
 
@@ -142,6 +145,26 @@ namespace smooth
 			Bool operator		 !=(const char *) const;
 			Bool operator		 !=(const wchar_t *) const;
 			Bool operator		 !=(const String &) const;
+	};
+
+	/* Scoped input and output format.
+	 */
+	class SMOOTHAPI String::InputFormat
+	{
+		private:
+			String	 previousFormat;
+		public:
+				 InputFormat(const char *inputFormat)	{ previousFormat.ImportFrom(GetDefaultEncoding(), SetInputFormat(inputFormat)); }
+				~InputFormat()				{ SetInputFormat(previousFormat.ConvertTo(GetDefaultEncoding())); }
+	};
+
+	class SMOOTHAPI String::OutputFormat
+	{
+		private:
+			String	 previousFormat;
+		public:
+				 OutputFormat(const char *outputFormat)	{ previousFormat.ImportFrom(GetDefaultEncoding(), SetOutputFormat(outputFormat)); }
+				~OutputFormat()				{ SetOutputFormat(previousFormat.ConvertTo(GetDefaultEncoding())); }
 	};
 };
 

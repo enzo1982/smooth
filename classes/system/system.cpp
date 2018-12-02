@@ -444,8 +444,8 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 #else
 	if (File(String(personalDir).Append("/.config/user-dirs.dirs")).Exists())
 	{
-		String		 format = String::SetInputFormat("UTF-8");
-		IO::InStream	 in(IO::STREAM_FILE, String(personalDir).Append("/.config/user-dirs.dirs"), IO::IS_READ);
+		String::InputFormat	 inputFormat("UTF-8");
+		IO::InStream		 in(IO::STREAM_FILE, String(personalDir).Append("/.config/user-dirs.dirs"), IO::IS_READ);
 
 		while (in.GetPos() < in.Size())
 		{
@@ -462,8 +462,6 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 				break;
 			}
 		}
-
-		String::SetInputFormat(format);
 	}
 #endif
 #endif

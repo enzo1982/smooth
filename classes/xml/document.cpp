@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -64,14 +64,12 @@ S::Int S::XML::Document::LoadFile(const String &fileName)
 	{
 		if (xmlTextReaderNodeType(reader) == XML_ELEMENT_NODE)
 		{
-			String	 inputFormat = String::SetInputFormat("UTF-8");
+			String::InputFormat	 inputFormat("UTF-8");
 
 			rootNode = new Node(NIL);
 			ownRoot	 = True;
 
 			LoadNode(reader, rootNode);
-
-			String::SetInputFormat(inputFormat);
 
 			break;
 		}
@@ -99,14 +97,12 @@ S::Int S::XML::Document::ParseMemory(const Void *memory, Int size)
 	{
 		if (xmlTextReaderNodeType(reader) == XML_ELEMENT_NODE)
 		{
-			String	 inputFormat = String::SetInputFormat("UTF-8");
+			String::InputFormat	 inputFormat("UTF-8");
 
 			rootNode = new Node(NIL);
 			ownRoot	 = True;
 
 			LoadNode(reader, rootNode);
-
-			String::SetInputFormat(inputFormat);
 
 			break;
 		}

@@ -173,14 +173,12 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 
 	if (glob(path.Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, &fileData) == 0)
 	{
-		String	 previousInputFormat = String::SetInputFormat("UTF-8");
+		String::InputFormat	 inputFormat("UTF-8");
 
 		for (size_t i = 0; i < fileData.gl_pathc; i++)
 		{
 			if (!String(fileData.gl_pathv[i]).EndsWith("/")) files.Add(File(fileData.gl_pathv[i]));
 		}
-
-		String::SetInputFormat(previousInputFormat);
 
 		globfree(&fileData);
 	}
@@ -214,14 +212,12 @@ const S::Array<S::Directory> &S::Directory::GetDirectoriesByPattern(const String
 
 	if (glob(path.Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
 	{
-		String	 previousInputFormat = String::SetInputFormat("UTF-8");
+		String::InputFormat	 inputFormat("UTF-8");
 
 		for (size_t i = 0; i < fileData.gl_pathc; i++)
 		{
 			if (String(fileData.gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData.gl_pathv[i]));
 		}
-
-		String::SetInputFormat(previousInputFormat);
 
 		globfree(&fileData);
 	}

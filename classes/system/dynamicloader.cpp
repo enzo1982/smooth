@@ -14,6 +14,10 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/foreach.h>
 
+#ifdef __linux__
+#	include <smooth/backends/xlib/backendxlib.h>
+#endif
+
 #ifdef __WIN32__
 #	include <windows.h>
 #else
@@ -155,6 +159,16 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		 */
 		if (Directory("/opt/local/lib").Exists())   directories.Add("/opt/local/lib");
 		if (Directory("/sw/lib").Exists())	    directories.Add("/sw/lib");
+#elif defined __linux__
+		/* Query X11 library path to handle architecture-specific library paths on Linux.
+		 */
+		Dl_info	 info = { 0 };
+
+		dladdr((void *) &X11::XOpenDisplay, &info);
+
+		const String	 libraryPath = File(info.dli_fname).GetFilePath();
+
+		directories.Add(libraryPath);
 #elif defined __HAIKU__
 		/* Query smooth library path to handle architecture suffix on Haiku.
 		 */
@@ -172,7 +186,8 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		/* Packages live in /usr/pkg on NetBSD.
 		 */
 		if (Directory("/usr/pkg/lib").Exists())	    directories.Add("/usr/pkg/lib");
-#else
+#endif
+
 		/* Take care of lib32 and lib64 directories on multilib systems.
 		 */
 #if defined __x86_64__
@@ -181,7 +196,7 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 #elif defined __i386__
 		if (Directory("/usr/lib32").Exists())	    directories.Add("/usr/lib32");
 		if (Directory("/usr/local/lib32").Exists()) directories.Add("/usr/local/lib32");
-#endif
+
 		/* Parse /etc/ld.so.conf if it exists.
 		 */
 		if (File("/etc/ld.so.conf").Exists())	    ParseDirectoryList("/etc/ld.so.conf", directories);

@@ -311,7 +311,8 @@ S::String S::System::System::GetProgramFilesDirectory()
 
 S::String S::System::System::GetApplicationDataDirectory()
 {
-	String	 configDir;
+	String::InputFormat	 inputFormat("UTF-8");
+	String			 configDir;
 
 #if defined __WIN32__
 	ITEMIDLIST	*idlist;
@@ -323,6 +324,13 @@ S::String S::System::System::GetApplicationDataDirectory()
 	configDir = buffer;
 
 	CoTaskMemFree(idlist);
+#elif defined __APPLE__
+	passwd	*pw = getpwuid(getuid());
+
+	if (pw != NIL)	configDir = pw->pw_dir;
+	else		configDir = "~";
+
+	configDir = configDir.Append("/Library/Preferences");
 #elif defined __HAIKU__
 	FILE		*pstdin = popen("finddir B_USER_SETTINGS_DIRECTORY", "r");
 	Buffer<char>	 buffer(PATH_MAX + 1);
@@ -335,10 +343,17 @@ S::String S::System::System::GetApplicationDataDirectory()
 
 	configDir = buffer;
 #else
-	passwd	*pw = getpwuid(getuid());
+	configDir = getenv("XDG_CONFIG_HOME");
 
-	if (pw != NIL)	configDir = pw->pw_dir;
-	else		configDir = "~";
+	if (configDir == NIL)
+	{
+		passwd	*pw = getpwuid(getuid());
+
+		if (pw != NIL)	configDir = pw->pw_dir;
+		else		configDir = "~";
+
+		configDir = configDir.Append("/.config");
+	}
 #endif
 
 	if (!configDir.EndsWith(Directory::GetDirectoryDelimiter())) configDir.Append(Directory::GetDirectoryDelimiter());
@@ -347,9 +362,63 @@ S::String S::System::System::GetApplicationDataDirectory()
 	return configDir;
 }
 
+S::String S::System::System::GetApplicationCacheDirectory()
+{
+	String::InputFormat	 inputFormat("UTF-8");
+	String			 cacheDir;
+
+#if defined __WIN32__
+	ITEMIDLIST	*idlist;
+	Buffer<wchar_t>	 buffer(32768 + 1);
+
+	SHGetSpecialFolderLocation(NIL, CSIDL_APPDATA, &idlist);
+	SHGetPathFromIDList(idlist, buffer);
+
+	cacheDir = buffer;
+
+	CoTaskMemFree(idlist);
+#elif defined __APPLE__
+	passwd	*pw = getpwuid(getuid());
+
+	if (pw != NIL)	cacheDir = pw->pw_dir;
+	else		cacheDir = "~";
+
+	cacheDir = cacheDir.Append("/Library/Caches");
+#elif defined __HAIKU__
+	FILE		*pstdin = popen("finddir B_USER_CACHE_DIRECTORY", "r");
+	Buffer<char>	 buffer(PATH_MAX + 1);
+
+	buffer.Zero();
+
+	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+
+	pclose(pstdin);
+
+	cacheDir = buffer;
+#else
+	cacheDir = getenv("XDG_CACHE_HOME");
+
+	if (cacheDir == NIL)
+	{
+		passwd	*pw = getpwuid(getuid());
+
+		if (pw != NIL)	cacheDir = pw->pw_dir;
+		else		cacheDir = "~";
+
+		cacheDir = cacheDir.Append("/.cache");
+	}
+#endif
+
+	if (!cacheDir.EndsWith(Directory::GetDirectoryDelimiter())) cacheDir.Append(Directory::GetDirectoryDelimiter());
+	if ( cacheDir == Directory::GetDirectoryDelimiter())	    cacheDir = NIL;
+
+	return cacheDir;
+}
+
 S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 {
-	String	 personalDir;
+	String::InputFormat	 inputFormat("UTF-8");
+	String			 personalDir;
 
 #ifdef __WIN32__
 	ITEMIDLIST	*idlist;
@@ -433,7 +502,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 
 				CFStringGetCString(path, buffer, buffer.Size(), kCFStringEncodingUTF8);
 
-				personalDir.ImportFrom("UTF-8", buffer);
+				personalDir = buffer;
 
 				CFRelease(path);
 			}
@@ -442,10 +511,13 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 		}
 	}
 #else
-	if (File(String(personalDir).Append("/.config/user-dirs.dirs")).Exists())
+	String	 configHome = getenv("XDG_CONFIG_HOME");
+
+	if (configHome == NIL) configHome = String(personalDir).Append("/.config");
+
+	if (File(String(configHome).Append("/user-dirs.dirs")).Exists())
 	{
-		String::InputFormat	 inputFormat("UTF-8");
-		IO::InStream		 in(IO::STREAM_FILE, String(personalDir).Append("/.config/user-dirs.dirs"), IO::IS_READ);
+		IO::InStream	 in(IO::STREAM_FILE, String(configHome).Append("/user-dirs.dirs"), IO::IS_READ);
 
 		while (in.GetPos() < in.Size())
 		{
@@ -495,7 +567,8 @@ S::String S::System::System::GetResourcesDirectory()
 
 S::String S::System::System::GetTempDirectory()
 {
-	String	 tempDir;
+	String::InputFormat	 inputFormat("UTF-8");
+	String			 tempDir;
 
 #if defined __WIN32__
 	Buffer<wchar_t>	 buffer(32768 + 1);

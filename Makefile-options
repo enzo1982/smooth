@@ -284,9 +284,7 @@ else ifeq ($(findstring systemlibpng,$(config)),systemlibpng)
 	USE_BUNDLED_LIBPNG = False
 else
 	ifeq ($(BUILD_OSX),True)
-		ifneq ($(BUILD_XLIB),True)
-			USE_BUNDLED_LIBPNG = True
-		endif
+		USE_BUNDLED_LIBPNG = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBPNG = True
 	endif
@@ -308,9 +306,7 @@ else ifeq ($(findstring systemzlib,$(config)),systemzlib)
 	USE_BUNDLED_ZLIB = False
 else
 	ifeq ($(BUILD_OSX),True)
-		ifneq ($(BUILD_XLIB),True)
-			USE_BUNDLED_ZLIB = True
-		endif
+		USE_BUNDLED_ZLIB = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_ZLIB = True
 	endif

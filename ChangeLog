@@ -32,6 +32,7 @@ dd.mm.18 hh:mm - smooth alpha 0.8.74.0
 - added stream API to CRC32 and CRC64 classes
 - performance improvements for CRC calculations
 - added plain text export to Translator utility
+- removed support for building with Xlib backend on macOS
 - removed dependency on libXmu
 - upgraded libcurl to version 7.56.1
 - upgraded libpng to version 1.6.36

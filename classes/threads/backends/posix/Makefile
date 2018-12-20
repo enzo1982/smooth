@@ -13,8 +13,6 @@ ifeq ($(BUILD_POSIXTHREADS),True)
 
 ifneq ($(BUILD_OSX),True)
 	OBJECTS += threadposix.o
-else ifeq ($(BUILD_XLIB),True)
-	OBJECTS += threadposix.o
 endif
 endif
 

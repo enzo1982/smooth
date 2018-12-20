@@ -7,10 +7,8 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
+ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_HAIKU),True)
-ifeq ($(BUILD_OSX),True)
-	MYCCOPTS += -I/usr/X11/include
-else
 	MYCCOPTS += $(shell pkg-config --cflags x11)
 endif
 endif
@@ -20,9 +18,7 @@ endif
 OBJECTS	  = 
 
 ifeq ($(BUILD_XLIB),True)
-ifneq ($(BUILD_OSX),True)
 	OBJECTS += clipboardxlib.o
-endif
 endif
 
 ## Do not change anything below this line. ##

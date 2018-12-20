@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,10 +27,7 @@
 #	include <stdlib.h>
 
 #	include <cairo/cairo-xlib.h>
-
-#	ifndef __APPLE__
-#		include <pango/pangocairo.h>
-#	endif
+#	include <pango/pangocairo.h>
 
 #	include <smooth/backends/xlib/backendxlib.h>
 #endif
@@ -152,7 +149,7 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 	cairo_surface_t	*surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
 	cairo_t		*context = cairo_create(surface);
 
-#if defined __WIN32__ || defined __APPLE__
+#if defined __WIN32__
 	cairo_select_font_face(context, fontName, (fontStyle & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 						  (fontWeight >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
@@ -187,7 +184,7 @@ S::GUI::Size S::GUI::FontCairo::GetTextSize(const String &iText) const
 	cairo_destroy(context);
 	cairo_surface_destroy(surface);
 
-#if defined __WIN32__ || defined __APPLE__
+#if defined __WIN32__
 	return Size(textExtents.x_advance, fontExtents.height);
 #else
 	return Size(x, y - 2);

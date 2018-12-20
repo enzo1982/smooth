@@ -9,9 +9,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 OBJECTS	  = 
 
 ifeq ($(BUILD_OSX),True)
-ifneq ($(BUILD_XLIB),True)
 	OBJECTS += eventcocoa.o screencocoa.o timercocoa.o
-endif
 endif
 
 ## Do not change anything below this line. ##

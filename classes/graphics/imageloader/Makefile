@@ -16,8 +16,6 @@ endif
 
 ifeq ($(USE_BUNDLED_LIBPNG),True)
 	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng
-else ifeq ($(BUILD_OSX),True)
-	MYCCOPTS += -I/usr/X11/include
 else
 	MYCCOPTS += $(shell pkg-config --cflags libpng)
 endif

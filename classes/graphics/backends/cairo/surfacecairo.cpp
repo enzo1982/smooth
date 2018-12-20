@@ -27,10 +27,7 @@
 	using namespace X11;
 
 #	include <cairo/cairo-xlib.h>
-
-#	ifndef __APPLE__
-#		include <pango/pangocairo.h>
-#	endif
+#	include <pango/pangocairo.h>
 
 #	include <smooth/backends/xlib/backendxlib.h>
 
@@ -549,7 +546,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	 */
 	Rect	 tRect = rightToLeft.TranslateRect(rect);
 
-#if !defined __WIN32__ && !defined __APPLE__
+#if !defined __WIN32__
 	PangoLayout		*layout = NIL;
 	PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
 									    .Append(" ")
@@ -568,7 +565,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
-#if defined __WIN32__ || defined __APPLE__
+#if defined __WIN32__
 		cairo_select_font_face(context, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 								(font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
@@ -586,7 +583,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 	cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
-#if defined __WIN32__ || defined __APPLE__
+#if defined __WIN32__
 	cairo_select_font_face(paintContextCairo, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
 								  (font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
 
@@ -642,7 +639,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		}
 #endif
 
-#if defined __WIN32__ || defined __APPLE__
+#if defined __WIN32__
 		if (!painting)
 		{
 			cairo_move_to(context, tRect.left, tRect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
@@ -691,7 +688,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 	if (!painting)
 	{
-#if !defined __WIN32__ && !defined __APPLE__
+#if !defined __WIN32__
 		g_object_unref(layout);
 #endif
 
@@ -700,7 +697,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		DestroyCairoContext();
 	}
 
-#if !defined __WIN32__ && !defined __APPLE__
+#if !defined __WIN32__
 	g_object_unref(paintLayout);
 #endif
 

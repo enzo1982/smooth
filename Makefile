@@ -81,17 +81,14 @@ ifeq ($(BUILD_WIN32),True)
 	endif
 else ifeq ($(BUILD_OSX),True)
 	OBJECTS += classes/backends/cocoa/backendcocoa.o
+	OBJECTS += classes/graphics/backends/cocoa/bitmapcocoa.o classes/graphics/backends/cocoa/fontcocoa.o classes/graphics/backends/cocoa/surfacecocoa.o
 	OBJECTS += classes/gui/clipboard/backends/cocoa/clipboardcocoa.o
 	OBJECTS += classes/gui/dialogs/directory/dirdlg_cocoa.o
 	OBJECTS += classes/gui/dialogs/file/filedlg_cocoa.o
 	OBJECTS += classes/gui/widgets/multi/menu/menubar_cocoa.o
-
-	ifneq ($(BUILD_XLIB),True)
-		OBJECTS += classes/graphics/backends/cocoa/bitmapcocoa.o classes/graphics/backends/cocoa/fontcocoa.o classes/graphics/backends/cocoa/surfacecocoa.o
-		OBJECTS += classes/gui/window/backends/cocoa/windowcocoa.o
-		OBJECTS += classes/input/backends/cocoa/pointercocoa.o
-		OBJECTS += classes/system/backends/cocoa/eventcocoa.o classes/system/backends/cocoa/screencocoa.o classes/system/backends/cocoa/timercocoa.o
-	endif
+	OBJECTS += classes/gui/window/backends/cocoa/windowcocoa.o
+	OBJECTS += classes/input/backends/cocoa/pointercocoa.o
+	OBJECTS += classes/system/backends/cocoa/eventcocoa.o classes/system/backends/cocoa/screencocoa.o classes/system/backends/cocoa/timercocoa.o
 else ifeq ($(BUILD_HAIKU),True)
 	OBJECTS += classes/backends/haiku/backendhaiku.o 
 	OBJECTS += classes/graphics/backends/haiku/bitmaphaiku.o classes/graphics/backends/haiku/fonthaiku.o classes/graphics/backends/haiku/surfacehaiku.o 
@@ -109,16 +106,13 @@ endif
 ifeq ($(BUILD_XLIB),True)
 	OBJECTS += classes/backends/xlib/backendxlib.o
 	OBJECTS += classes/graphics/backends/xlib/bitmapxlib.o
+	OBJECTS += classes/gui/clipboard/backends/xlib/clipboardxlib.o
 	OBJECTS += classes/gui/window/backends/xlib/windowxlib.o
 	OBJECTS += classes/input/backends/xlib/pointerxlib.o
 	OBJECTS += classes/system/backends/xlib/eventxlib.o classes/system/backends/xlib/screenxlib.o
 
 	ifneq ($(BUILD_CAIRO),True)
 		OBJECTS += classes/graphics/backends/xlib/fontxlib.o classes/graphics/backends/xlib/surfacexlib.o
-	endif
-
-	ifneq ($(BUILD_OSX),True)
-		OBJECTS += classes/gui/clipboard/backends/xlib/clipboardxlib.o
 	endif
 endif
 
@@ -135,12 +129,10 @@ endif
 ifeq ($(BUILD_POSIXTHREADS),True)
 	OBJECTS += classes/threads/backends/posix/mutexposix.o classes/threads/backends/posix/semaphoreposix.o
 
-	ifneq ($(BUILD_OSX),True)
-		OBJECTS += classes/threads/backends/posix/threadposix.o
-	else ifeq ($(BUILD_XLIB),True)
-		OBJECTS += classes/threads/backends/posix/threadposix.o
-	else
+	ifeq ($(BUILD_OSX),True)
 		OBJECTS += classes/threads/backends/cocoa/threadcocoa.o
+	else
+		OBJECTS += classes/threads/backends/posix/threadposix.o
 	endif
 endif 
 
@@ -232,10 +224,6 @@ ifeq ($(BUILD_WIN32),True)
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else ifeq ($(BUILD_OSX),True)
-	ifeq ($(BUILD_XLIB),True)
-		LIBS += -lX11 -lXft
-	endif
-
 	ifeq ($(BUILD_CAIRO),True)
 		LIBS += -lcairo
 	endif
@@ -276,10 +264,6 @@ ifeq ($(BUILD_WIN32),True)
 	LINKER_OPTS += --shared -mwindows -Wl,--dynamicbase,--nxcompat,--kill-at,--out-implib,$(LIBNAME)
 else ifeq ($(BUILD_OSX),True)
 	LINKER_OPTS += -dynamiclib -framework Carbon -framework Cocoa -Wl,-dylib_install_name,libsmooth-$(VERSION).$(REVISION)$(SHARED)
-
-	ifeq ($(BUILD_XLIB),True)
-		LINKER_OPTS += -L/usr/X11/lib
-	endif
 else
 	LINKER_OPTS += --shared -Wl,-soname,libsmooth-$(VERSION)$(SHARED).$(REVISION)
 

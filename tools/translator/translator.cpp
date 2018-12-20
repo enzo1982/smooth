@@ -94,7 +94,8 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	text_translated	= new Text("Translation:", Point(94, 65));
 	text_translated->SetOrientation(OR_LOWERLEFT);
 
-	edit_id		= new EditBox(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 163), Size(37, 0), 5);
+	edit_id		= new EditBox(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 163), Size(37, 0), 6);
+	edit_id->SetWidth(edit_id->GetFont().GetUnscaledTextSizeX("000000") + 6); 
 	edit_id->SetFlags(EDB_NUMERIC);
 	edit_id->SetOrientation(OR_LOWERLEFT);
 

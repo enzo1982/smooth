@@ -10,7 +10,7 @@
 
 #	include <libiconv/iconv.h>
 #else
-#	define _LIBICONV_VERSION 0x010E
+#	define _LIBICONV_VERSION 0x010F
 
 #	undef iconv_t
 

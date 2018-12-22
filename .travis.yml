@@ -32,5 +32,8 @@ matrix:
     - os: osx
       compiler: clang
 
+    - os: windows
+      compiler: gcc
+
 script:
-  - make
+  - if [ $TRAVIS_OS_NAME = windows ]; then mingw32-make; else make; fi

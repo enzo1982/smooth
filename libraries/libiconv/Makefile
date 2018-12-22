@@ -3,6 +3,8 @@
 # Change these variables to fit this location:
 SMOOTH_PATH = ../..
 
+include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
+ 
 # Change these variables to fit your project:
 ifeq ($(BUILD_WIN32),True)
 	GLOBALDLL   = iconv

@@ -415,6 +415,6 @@ $(OBJECTS): objects
 
 $(DLLNAME): $(OBJECTS) | libs
 	$(LD) $(OBJECTS) $(LINKER_OPTS) $(LDFLAGS) $(LIBS)
-ifeq ($(BUILD_WIN32),True)
-	countbuild BuildNumber
+ifeq ($(findstring release,$(config)),release)
+	-countbuild BuildNumber
 endif

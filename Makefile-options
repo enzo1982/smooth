@@ -74,6 +74,11 @@ BUILD_THREADSTIMER = False
 # Do not build V8 JavaScript library by default
 BUILD_V8 = False
 
+# Treat MSYS and MinGW the same
+ifneq ($(findstring MSYS,$(UNAME)),)
+	UNAME = MINGW
+endif
+
 ifneq ($(findstring MINGW,$(UNAME)),)
 #	Set executable and shared object extensions
 	EXECUTABLE = .exe

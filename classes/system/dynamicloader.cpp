@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,6 +21,7 @@
 #ifdef __WIN32__
 #	include <windows.h>
 #else
+#	include <stdlib.h>
 #	include <dlfcn.h>
 #endif
 
@@ -188,19 +189,17 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		if (Directory("/usr/pkg/lib").Exists())	    directories.Add("/usr/pkg/lib");
 #endif
 
-		/* Take care of lib32 and lib64 directories on multilib systems.
-		 */
-#if defined __x86_64__
-		if (Directory("/usr/lib64").Exists())	    directories.Add("/usr/lib64");
-		if (Directory("/usr/local/lib64").Exists()) directories.Add("/usr/local/lib64");
-#elif defined __i386__
-		if (Directory("/usr/lib32").Exists())	    directories.Add("/usr/lib32");
-		if (Directory("/usr/local/lib32").Exists()) directories.Add("/usr/local/lib32");
-
 		/* Parse /etc/ld.so.conf if it exists.
 		 */
 		if (File("/etc/ld.so.conf").Exists())	    ParseDirectoryList("/etc/ld.so.conf", directories);
-#endif
+
+		/* Parse LD_LIBRARY_PATH environment variable.
+		 */
+		const Array<String>	&paths = String(getenv("LD_LIBRARY_PATH")).Explode(":");
+
+		foreach (const String &path, paths) if (Directory(path).Exists()) directories.Add(path);
+
+		String::ExplodeFinish();
 	}
 #endif
 

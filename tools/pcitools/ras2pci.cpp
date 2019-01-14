@@ -17,7 +17,7 @@ Int smooth::Main(const Array<String> &args)
 	if (args.Length() < 6)
 	{
 		cout << "RAS2PCI converter v0.2\n";
-		cout << "Copyright (C) 1998-2018 Robert Kausch\n\n";
+		cout << "Copyright (C) 1998-2019 Robert Kausch\n\n";
 		cout << "Usage: ras2pci <ras file> <pci file> <image id> <compression> <color> <depth>\n\n";
 		cout << "<compression> is one of these compression formats:\n";
 		cout << "\t0 = uncompressed\n";

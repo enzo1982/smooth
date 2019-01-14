@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,7 +24,6 @@ namespace smooth
 #include "../windowbackend.h"
 #include "../../../../graphics/forms/rect.h"
 #include "../../../../input/keyboard.h"
-#include "../../../../threads/mutex.h"
 
 namespace X11
 {
@@ -72,8 +71,6 @@ namespace smooth
 				Bool					 IsModalWindowActive();
 			protected:
 				Int					 id;
-
-				Threads::Mutex				 mutex;
 
 				X11::Window				 wnd;
 				X11::Window				 oldwnd;

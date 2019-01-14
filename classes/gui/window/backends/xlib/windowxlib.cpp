@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -127,8 +127,6 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 
 S::GUI::WindowXLib::~WindowXLib()
 {
-	Threads::Lock	 lock(mutex);
-
 	if (sysIcon != NIL)
 	{
 		delete [] sysIcon;
@@ -278,10 +276,6 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 	static Atom	 xdndFinishedAtom      = XInternAtom(display, "XdndFinished", False);
 
 	static Atom	 xdndActionPrivateAtom = XInternAtom(display, "XdndActionPrivate", False);
-
-	/* Acquire lock on the window.
-	 */
-	Threads::Lock	 lock(mutex);
 
 	/* Process system events not relevant
 	 * to portable Window implementation.
@@ -996,8 +990,6 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 S::Int S::GUI::WindowXLib::Close()
 {
 	if (wnd == NIL) return Success();
-
-	Threads::Lock	 lock(mutex);
 
 	/* Delete surface.
 	 */

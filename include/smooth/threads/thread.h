@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,6 +37,8 @@ namespace smooth
 		const Short	 THREAD_KILLFLAG_KILL	= 0;
 		const Short	 THREAD_KILLFLAG_WAIT	= 1;
 
+		const UnsignedInt32	 MainThreadID = 0;
+
 		class SMOOTHAPI Thread : public Object
 		{
 			private:
@@ -61,8 +63,9 @@ namespace smooth
 				Thread &operator	 =(const Thread &);
 
 				Short			 GetStatus() const;
-				Int			 GetThreadID() const;
+				UnsignedInt32		 GetThreadID() const;
 
+				static UnsignedInt32	 GetCurrentThreadID();
 				Bool			 IsCurrentThread() const;
 
 				Int			 Start();

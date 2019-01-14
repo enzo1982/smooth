@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,7 +10,13 @@
 
 #include <smooth/threads/thread.h>
 #include <smooth/threads/backends/threadbackend.h>
+#include <smooth/templates/threadlocal.h>
 #include <smooth/init.h>
+
+namespace smooth
+{
+	static multithread (UnsignedInt32)	 threadID = Threads::MainThreadID;
+}
 
 const S::Short	 S::Threads::Thread::classID = S::Object::RequestClassID();
 
@@ -67,14 +73,21 @@ S::Short S::Threads::Thread::GetStatus() const
 	return status;
 }
 
-S::Int S::Threads::Thread::GetThreadID() const
+S::UnsignedInt32 S::Threads::Thread::GetThreadID() const
 {
-	return backend->GetThreadID();
+	return GetHandle();
+}
+
+S::UnsignedInt32 S::Threads::Thread::GetCurrentThreadID()
+{
+	return threadID;
 }
 
 S::Bool S::Threads::Thread::IsCurrentThread() const
 {
-	return backend->IsCurrentThread();
+	if (GetCurrentThreadID() == GetThreadID()) return True;
+
+	return False;
 }
 
 S::Int S::Threads::Thread::Start()
@@ -143,8 +156,14 @@ S::Int S::Threads::Thread::Wait()
 
 S::Void S::Threads::Thread::MainCaller(Thread *thread)
 {
+	/* Set thread ID and call thread callback.
+	 */
+	threadID = thread->GetHandle();
+
 	thread->threadMain.Call(thread);
 
+	/* Clean up and exit thread.
+	 */
 	String::DeleteTemporaryBuffers(True);
 
 	thread->status = THREAD_STOPPED;

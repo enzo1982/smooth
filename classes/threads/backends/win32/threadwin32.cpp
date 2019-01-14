@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,21 +34,6 @@ S::Threads::ThreadWin32::ThreadWin32(Void *iThread)
 S::Threads::ThreadWin32::~ThreadWin32()
 {
 	if (myThread) Stop();
-}
-
-S::Void *S::Threads::ThreadWin32::GetSystemThread() const
-{
-	return (Void *) threadID;
-}
-
-S::Int S::Threads::ThreadWin32::GetThreadID() const
-{
-	return threadID;
-}
-
-S::Bool S::Threads::ThreadWin32::IsCurrentThread() const
-{
-	return (threadID == (Int) GetCurrentThreadId());
 }
 
 S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadParam)
@@ -109,7 +94,7 @@ S::Bool S::Threads::ThreadWin32::IsRunning() const
 
 S::Void S::Threads::ThreadWin32::Exit()
 {
-	if (!IsCurrentThread()) return;
+	if (threadID != (Int) GetCurrentThreadId()) return;
 
 	HANDLE	 thread	  = this->thread;
 	Bool	 myThread = this->myThread;

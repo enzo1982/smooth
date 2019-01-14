@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,23 +33,6 @@ S::Threads::ThreadPOSIX::ThreadPOSIX(Void *iThread)
 S::Threads::ThreadPOSIX::~ThreadPOSIX()
 {
 	if (myThread) Stop();
-}
-
-S::Void *S::Threads::ThreadPOSIX::GetSystemThread() const
-{
-	return (Void *) thread;
-}
-
-S::Int S::Threads::ThreadPOSIX::GetThreadID() const
-{
-	return thread - (pthread_t *) NIL;
-}
-
-S::Bool S::Threads::ThreadPOSIX::IsCurrentThread() const
-{
-	if (thread == NIL) return False;
-
-	return pthread_equal(pthread_self(), *thread);
 }
 
 S::Int S::Threads::ThreadPOSIX::Start(Void (*threadProc)(Void *), Void *threadParam)
@@ -102,7 +85,7 @@ S::Int S::Threads::ThreadPOSIX::Wait()
 
 S::Void S::Threads::ThreadPOSIX::Exit()
 {
-	if (!IsCurrentThread()) return;
+	if (!this->thread || !pthread_equal(pthread_self(), *this->thread)) return;
 
 	pthread_t	*thread	  = this->thread;
 	Bool		 myThread = this->myThread;

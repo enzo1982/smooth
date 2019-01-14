@@ -27,6 +27,7 @@ dd.mm.19 hh:mm - smooth alpha 0.8.74.0
 			- added methods to change modification and access time
 - string.cpp		- added scoped string format setters String::InputFormat and String::OutputFormat
 - system.cpp		- added GetApplicationCacheDirectory() method
+- thread.cpp		- added GetCurrentThreadID() method
 
 - added Float32 and Float64 type defintions
 - added stream API to CRC32 and CRC64 classes

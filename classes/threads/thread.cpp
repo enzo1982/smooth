@@ -13,9 +13,11 @@
 #include <smooth/templates/threadlocal.h>
 #include <smooth/init.h>
 
+#include <stdint.h>
+
 namespace smooth
 {
-	static multithread (UnsignedInt32)	 threadID = Threads::MainThreadID;
+	static multithread (intptr_t)	 threadID = Threads::MainThreadID;
 }
 
 const S::Short	 S::Threads::Thread::classID = S::Object::RequestClassID();

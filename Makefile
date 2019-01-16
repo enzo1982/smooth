@@ -242,7 +242,10 @@ else
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif
 
-	LIBS += $(shell pkg-config --libs xft)
+	ifneq ($(BUILD_CAIRO),True)
+		LIBS += $(shell pkg-config --libs xft)
+	endif
+
 	LIBS += -lpthread
 
 	ifeq ($(BUILD_SOLARIS),True)

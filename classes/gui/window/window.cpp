@@ -25,7 +25,6 @@
 #include <smooth/system/event.h>
 #include <smooth/system/screen.h>
 #include <smooth/system/system.h>
-#include <smooth/threads/thread.h>
 #include <smooth/resources.h>
 
 #ifdef __WIN32__
@@ -457,8 +456,7 @@ S::Int S::GUI::Window::WaitUntilClosed()
 	 */
 	System::EventProcessor	 event;
 
-	if (Threads::Thread::GetCurrentThreadID() == Threads::MainThreadID) while (!destroyed) event.ProcessNextEvent();
-	else								    while (!destroyed) S::System::System::Sleep(1);
+	while (!destroyed) event.ProcessNextEvent();
 
 	/* Sleep while Window is still in use.
 	 */

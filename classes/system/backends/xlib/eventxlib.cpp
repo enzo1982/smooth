@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,7 @@
 
 #include <smooth/system/event.h>
 #include <smooth/system/system.h>
+#include <smooth/threads/thread.h>
 #include <smooth/system/backends/xlib/eventxlib.h>
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
 #include <smooth/backends/xlib/backendxlib.h>
@@ -62,6 +63,15 @@ int FindConfigureEvent(Display *d, XEvent *e, XPointer arg)
 S::Bool S::System::EventXLib::ProcessNextEvent()
 {
 	if (display == NIL) return False;
+
+	/* Process events on main thread only.
+	 */
+	if (Threads::Thread::GetCurrentThreadID() != Threads::MainThreadID)
+	{
+		S::System::System::Sleep(1);
+
+		return True;
+	}
 
 	/* Emulate a timeout of ~100ms by trying to find a message
 	 * 10 times while sleeping for 10ms between trying.

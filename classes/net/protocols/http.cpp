@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,9 +23,6 @@
 #include <smooth/version.h>
 
 #include <curl/curl.h>
-
-#include <time.h>
-#include <stdlib.h>
 
 namespace smooth
 {
@@ -227,12 +224,10 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 		/* Write contents to temporary output file.
 		 */
-		static time_t	 timer = 0;
+		Math::RandomSeed();
 
-		if (timer == 0) srand((unsigned) time(&timer));
-
-		S::File			 tempFile = S::System::System::GetTempDirectory().Append("httprequest-").Append(Number((Int64) rand()).ToHexString()).Append(".temp");
-		IO::OutStream		 out(IO::STREAM_FILE, tempFile, IO::OS_REPLACE);
+		S::File		 tempFile = S::System::System::GetTempDirectory().Append("httprequest-").Append(Number((Int64) Math::Random() & 0x7FFFFFFF).ToHexString()).Append(".temp");
+		IO::OutStream	 out(IO::STREAM_FILE, tempFile, IO::OS_REPLACE);
 
 		out.OutputString(String("--").Append(separator).Append("\r\n"));
 		out.OutputString("Content-Disposition: form-data; name=\"MAX_FILE_SIZE\"\r\n\r\n");
@@ -265,7 +260,7 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 		/* Read contents into buffer.
 		 */
-		IO::InStream		 in(IO::STREAM_FILE, tempFile, IO::IS_READ);
+		IO::InStream	 in(IO::STREAM_FILE, tempFile, IO::IS_READ);
 
 		postBuffer.Resize(in.Size());
 

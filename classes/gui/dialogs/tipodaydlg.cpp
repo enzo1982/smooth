@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,9 +40,6 @@
 #ifdef __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
 #endif
-
-#include <time.h>
-#include <stdlib.h>
 
 S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 {
@@ -207,7 +204,6 @@ S::Void S::GUI::Dialogs::TipOfTheDay::OnNext()
 	if (tips.Length() <= 1) return;
 
 	String	 tip;
-	time_t	 timer;
 
 	switch (mode)
 	{
@@ -218,11 +214,11 @@ S::Void S::GUI::Dialogs::TipOfTheDay::OnNext()
 
 			break;
 		case TIP_RANDOM:
-			srand((unsigned) time(&timer));
+			Math::RandomSeed();
 
 			do
 			{
-				tip = tips.GetNth(rand() % tips.Length());
+				tip = tips.GetNth(Math::Random() % tips.Length());
 			}
 			while (tip == txt_tip->GetText());
 

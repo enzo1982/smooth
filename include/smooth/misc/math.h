@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -71,6 +71,9 @@ namespace smooth
 			static Int64		 Max(Int64 i1, Int64 i2)	{ return (i1 > i2 ? i1 : i2); }
 			static Int64		 Mod(Int64, Int64);
 			static Float		 Pow(Int64, Int64);
+
+			static Void		 RandomSeed();
+			static Int32		 Random();
 	};
 };
 

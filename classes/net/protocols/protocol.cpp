@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,9 +16,6 @@
 #include <smooth/misc/math.h>
 #include <smooth/misc/number.h>
 #include <smooth/init.h>
-
-#include <time.h>
-#include <stdlib.h>
 
 using namespace smooth::IO;
 
@@ -74,11 +71,9 @@ S::Net::Protocols::Protocol::~Protocol()
 
 S::Int S::Net::Protocols::Protocol::DownloadToBuffer(Buffer<UnsignedByte> &destination)
 {
-	static time_t	 timer = 0;
+	Math::RandomSeed();
 
-	if (timer == 0) srand((unsigned) time(&timer));
-
-	S::File	 downloadFile = S::System::System::GetTempDirectory().Append("download-").Append(Number((Int64) rand()).ToHexString()).Append(".temp");
+	S::File	 downloadFile = S::System::System::GetTempDirectory().Append("download-").Append(Number((Int64) Math::Random() & 0x7FFFFFFF).ToHexString()).Append(".temp");
 	Bool	 error = DownloadToFile(downloadFile);
 
 	if (error) return Error();

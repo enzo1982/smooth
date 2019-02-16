@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,6 +37,14 @@ S::DateTime::DateTime(Void *iTime)
 	value = new time_t;
 
 	if (iTime != NIL) memcpy(value, iTime, sizeof(time_t));
+	else		  memset(value, 0, sizeof(time_t));
+}
+
+S::DateTime::DateTime(const DateTime &iDateTime)
+{
+	value = new time_t;
+
+	*this = iDateTime;
 }
 
 S::DateTime::~DateTime()
@@ -49,6 +57,15 @@ S::DateTime S::DateTime::Current()
 	time_t	 t = time(NIL);
 
 	return DateTime(&t);
+}
+
+S::DateTime &S::DateTime::operator =(const DateTime &newDateTime)
+{
+	if (&newDateTime == this) return *this;
+
+	memcpy(value, newDateTime.value, sizeof(time_t));
+
+	return *this;
 }
 
 S::Bool S::DateTime::SetYMD(Int year, Int month, Int day)

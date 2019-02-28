@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -102,14 +102,14 @@ S::Int S::IO::DriverSocket::ReadData(UnsignedByte *data, Int dataSize)
 	else		return bytes;
 }
 
-S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)
+S::Int S::IO::DriverSocket::WriteData(const UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
 	if (mode == MODE_SOCKET_BLOCKING && timeout != 0)
 	{
 #if defined __WIN32__
-		TIMEVAL	 tv = {timeout, 0};
+		TIMEVAL	 tv = { timeout, 0 };
 		FD_SET	 sock;
 
 		FD_ZERO(&sock);
@@ -119,7 +119,7 @@ S::Int S::IO::DriverSocket::WriteData(UnsignedByte *data, Int dataSize)
 #endif
 	}
 
-	return send(stream, (char *) data, dataSize, 0);
+	return send(stream, (const char *) data, dataSize, 0);
 }
 
 S::Bool S::IO::DriverSocket::Close()

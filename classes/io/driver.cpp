@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,7 +41,7 @@ S::Int S::IO::Driver::ReadData(UnsignedByte *data, Int dataSize)
 	return dataSize;
 }
 
-S::Int S::IO::Driver::WriteData(UnsignedByte *data, Int dataSize)
+S::Int S::IO::Driver::WriteData(const UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 

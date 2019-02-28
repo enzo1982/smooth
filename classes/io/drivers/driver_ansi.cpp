@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -36,7 +36,7 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 #if !defined __WIN32__
 	/* Set output format to UTF-8 on non-Windows systems.
 	 */
-	String::OutputFormat	 outputFormat("UTF-8");
+	const char	*previousOutputFormat = String::SetOutputFormat("UTF-8");
 #endif
 
 	switch (mode)
@@ -70,6 +70,12 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 			break;
 	}
 
+#if !defined __WIN32__
+	/* Restore original output format.
+	 */
+	String::SetOutputFormat(previousOutputFormat);
+#endif
+
 	/* Check if stream was opened successfully.
 	 */
 	if (stream == NIL)
@@ -99,14 +105,14 @@ S::Int S::IO::DriverANSI::ReadData(UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	return fread((Void *) data, 1, dataSize, stream);
+	return fread(data, 1, dataSize, stream);
 }
 
-S::Int S::IO::DriverANSI::WriteData(UnsignedByte *data, Int dataSize)
+S::Int S::IO::DriverANSI::WriteData(const UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	return fwrite((Void *) data, 1, dataSize, stream);
+	return fwrite(data, 1, dataSize, stream);
 }
 
 S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)

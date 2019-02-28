@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -154,11 +154,11 @@ S::Int S::IO::DriverSOCKS4::ReadData(UnsignedByte *data, Int dataSize)
 	else		return bytes;
 }
 
-S::Int S::IO::DriverSOCKS4::WriteData(UnsignedByte *data, Int dataSize)
+S::Int S::IO::DriverSOCKS4::WriteData(const UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	return send(stream, (char *) data, dataSize, 0);
+	return send(stream, (const char *) data, dataSize, 0);
 }
 
 S::Bool S::IO::DriverSOCKS4::Close()

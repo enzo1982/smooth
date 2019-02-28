@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,13 +55,6 @@ namespace smooth
 
 			t		&GetNthReference(Int n)					{ return (t &)	     ArrayBackend<s>::GetNthReference(n); }
 			const t		&GetNthReference(Int n) const				{ return (const t &) ArrayBackend<s>::GetNthReference(n); }
-
-			/* Locking and unlocking for synchronization.
-			 */
-			Void		 LockForRead() const					{ ArrayBackend<s>::LockForRead(); }
-			Void		 LockForWrite() const					{ ArrayBackend<s>::LockForWrite(); }
-
-			Void		 Unlock() const						{ ArrayBackend<s>::Unlock(); }
 	};
 };
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,11 +35,11 @@ S::IndexArray::~IndexArray()
 
 S::Bool S::IndexArray::InsertAtPos(Int position, Int index)
 {
+	WriteLock	 lock(*this);
+
 	if (position > nOfEntries || position < 0) return False;
 
 	if (!IndexAvailable(index)) return False;
-
-	LockForWrite();
 
 	if (greatestIndex < index) greatestIndex = index;
 
@@ -54,8 +54,6 @@ S::Bool S::IndexArray::InsertAtPos(Int position, Int index)
 	if ((position >=	      1 && indices[position - 1] > index) ||
 	    (position <  nOfEntries - 1 && indices[position + 1] < index)) sorted = False;
 
-	Unlock();
-
 	return True;
 }
 
@@ -69,10 +67,10 @@ S::Bool S::IndexArray::Move(Int index1, Int index2)
 
 S::Bool S::IndexArray::MoveNth(Int n, Int m)
 {
+	WriteLock	 lock(*this);
+
 	if (nOfEntries <= n || n < 0 ||
 	    nOfEntries <= m || m < 0) return False;
-
-	LockForWrite();
 
 	Int	 backupIndex = indices[n];
 
@@ -82,8 +80,6 @@ S::Bool S::IndexArray::MoveNth(Int n, Int m)
 	indices[m] = backupIndex;
 
 	sorted = False;
-
-	Unlock();
 
 	return True;
 }
@@ -97,17 +93,15 @@ S::Bool S::IndexArray::Remove(Int index)
 
 S::Bool S::IndexArray::RemoveNth(Int n)
 {
+	WriteLock	 lock(*this);
+
 	if (nOfEntries <= n || n < 0) return False;
 
 	if (nOfEntries == 1) return RemoveAll();
 
-	LockForWrite();
-
 	memmove(indices + n, indices + n + 1, (nOfEntries - n - 1) * sizeof(Int));
 
 	nOfEntries--;
-
-	Unlock();
 
 	return True;
 }
@@ -116,7 +110,7 @@ S::Bool S::IndexArray::RemoveAll()
 {
 	if (nOfEntries == 0) return True;
 
-	LockForWrite();
+	WriteLock	 lock(*this);
 
 	indices.Free();
 
@@ -127,25 +121,14 @@ S::Bool S::IndexArray::RemoveAll()
 
 	lastAccessedEntry = 0;
 
-	Unlock();
-
 	return True;
 }
 
 S::Int S::IndexArray::GetNthIndex(Int n) const
 {
-	LockForRead();
+	ReadLock	 lock(*this);
 
-	if (nOfEntries > n && n >= 0)
-	{
-		Int	 index = indices[n];
-
-		Unlock();
-
-		return index;
-	}
-
-	Unlock();
+	if (nOfEntries > n && n >= 0) return indices[n];
 
 	return -1;
 }
@@ -178,7 +161,7 @@ S::Int S::IndexArray::GetEntryNumberByIndex(Int index) const
 {
 	if (nOfEntries == 0) return -1;
 
-	LockForRead();
+	ReadLock	 lock(*this);
 
 	Int	 entryNumber  = -1;
 	Int	 lastAccessed = lastAccessedEntry;
@@ -220,8 +203,6 @@ S::Int S::IndexArray::GetEntryNumberByIndex(Int index) const
 	}
 
 	if (entryNumber >= 0) lastAccessedEntry = entryNumber;
-
-	Unlock();
 
 	return entryNumber;
 }

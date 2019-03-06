@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -481,22 +481,95 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (void) windowDidResignKey: (NSNotification *) note { [self handleNotification: note as: NSApplicationUnfocus]; }
 @end
 
-@interface CocoaWindow : NSWindow { }
-	- (BOOL)	    worksWhenModal;
+@interface CocoaWindow : NSWindow
+{
+	@private
+		NSUInteger	 styleMask;
 
-	- (void)	    processEvent:	  (int) type;
-	- (void)	    processEvent:	  (int) type withData: (NSInteger) data;
+		NSRect		 frameRect;
+		NSRect		 contentRect;
+
+		NSSize		 minSize;
+		NSSize		 maxSize;
+}
+
+	/* NSWindow methods.
+	 */
+	- (BOOL)	    worksWhenModal;
 
 	- (void)	    orderFront:		  (id) sender;
 	- (void)	    orderOut:		  (id) sender;
 	- (void)	    makeKeyAndOrderFront: (id) sender;
 
+	/* Helper Methods.
+	 */
+	- (id)		    initWithContentRect:  (NSRect) rect styleMask: (NSUInteger) style;
+
+	- (void)	    setFrame:		  (NSRect) rect;
+	- (void)	    setMinSize:		  (NSSize) size;
+	- (void)	    setMaxSize:		  (NSSize) size;
+
+	- (void)	    processEvent:	  (int) type;
+	- (void)	    processEvent:	  (int) type withData: (NSInteger) data;
+
 	- (NSDragOperation) draggingEntered:	  (id) sender;
 	- (BOOL)	    performDragOperation: (id) sender;
+
+	/* Internal use only.
+	 */
+	- (id)		    internalInitWithAttributes;
+
+	- (void)	    internalSetFrameWithAttributes;
+	- (void)	    internalSetMinSizeWithAttributes;
+	- (void)	    internalSetMaxSizeWithAttributes;
+
 @end
 
 @implementation CocoaWindow
+	/* NSWindow methods.
+	 */
 	- (BOOL) worksWhenModal { return YES; }
+
+	- (void) orderFront:	       (id) sender { [super orderFront: sender];	   [self processEvent: NSApplicationMap];   }
+	- (void) orderOut:	       (id) sender { [super orderOut: sender];		   [self processEvent: NSApplicationUnmap]; }
+	- (void) makeKeyAndOrderFront: (id) sender { [super makeKeyAndOrderFront: sender]; [self processEvent: NSApplicationMap];   }
+
+	/* Helper Methods.
+	 */
+	- (id) initWithContentRect: (NSRect) rect styleMask: (NSUInteger) style
+	{
+		contentRect = rect;
+		styleMask   = style;
+
+		if ([NSThread isMainThread]) [self internalInitWithAttributes];
+		else			     [self performSelectorOnMainThread: @selector(internalInitWithAttributes) withObject: NIL waitUntilDone: YES];
+
+		return self;
+	}
+
+	- (void) setFrame: (NSRect) rect
+	{
+		frameRect = rect;
+
+		if ([NSThread isMainThread]) [self internalSetFrameWithAttributes];
+		else			     [self performSelectorOnMainThread: @selector(internalSetFrameWithAttributes) withObject: NIL waitUntilDone: YES];
+	}
+
+	- (void) setMinSize: (NSSize) size
+	{
+		minSize = size;
+
+		if ([NSThread isMainThread]) [self internalSetMinSizeWithAttributes];
+		else			     [self performSelectorOnMainThread: @selector(internalSetMinSizeWithAttributes) withObject: NIL waitUntilDone: YES];
+	}
+
+	- (void) setMaxSize: (NSSize) size
+	{
+		maxSize = size;
+
+		if ([NSThread isMainThread]) [self internalSetMaxSizeWithAttributes];
+		else			     [self performSelectorOnMainThread: @selector(internalSetMaxSizeWithAttributes) withObject: NIL waitUntilDone: YES];
+	}
 
 	- (void) processEvent: (int) type
 	{
@@ -520,10 +593,6 @@ const int	 NSApplicationDropFiles	 = 9;
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
 
-	- (void) orderFront:	       (id) sender { [super orderFront: sender];	   [self processEvent: NSApplicationMap];   }
-	- (void) orderOut:	       (id) sender { [super orderOut: sender];		   [self processEvent: NSApplicationUnmap]; }
-	- (void) makeKeyAndOrderFront: (id) sender { [super makeKeyAndOrderFront: sender]; [self processEvent: NSApplicationMap];   }
-
 	- (NSDragOperation) draggingEntered: (id) sender
 	{
 		NSPasteboard	*pasteBoard	= [sender draggingPasteboard];
@@ -544,6 +613,24 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		return YES;
 	}
+
+	/* Internal use only.
+	 */
+	- (id) internalInitWithAttributes
+	{
+		[super initWithContentRect: contentRect
+				 styleMask: styleMask
+				   backing: NSBackingStoreBuffered
+				     defer: YES];
+
+		return self;
+	}
+
+	- (void) internalSetFrameWithAttributes	  { [self setFrame: frameRect display: YES]; }
+
+	- (void) internalSetMinSizeWithAttributes { [self setContentMinSize: minSize]; }
+	- (void) internalSetMaxSizeWithAttributes { [self setContentMaxSize: maxSize]; }
+
 @end
 
 @interface CocoaCircularProgress : NSView
@@ -1092,16 +1179,14 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 {
 	flags = iFlags;
 
-	NSRect		 frame	   = NSMakeRect(pos.x, [[NSScreen mainScreen] frame].size.height - (pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy);
-	NSUInteger	 styleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
+	NSRect		 contentRect = NSMakeRect(pos.x, [[NSScreen mainScreen] frame].size.height - (pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy);
+	NSUInteger	 styleMask   = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
 
 	if (flags & WF_NORESIZE  ) styleMask ^= NSResizableWindowMask;
 	if (flags & WF_THINBORDER) styleMask  = NSBorderlessWindowMask;
 
-	wnd = [[CocoaWindow alloc] initWithContentRect: frame
-					     styleMask: styleMask
-					       backing: NSBackingStoreBuffered
-						 defer: YES];
+	wnd = [[CocoaWindow alloc] initWithContentRect: contentRect
+					     styleMask: styleMask];
 
 	if (wnd != nil)
 	{
@@ -1115,7 +1200,11 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 
 		/* Init content view and delegate.
 		 */
-		[wnd setContentView: [[[CocoaView alloc] initWithFrame: frame] autorelease]];
+		NSView	*contentView = [[[CocoaView alloc] initWithFrame: contentRect] autorelease];
+
+		if ([NSThread isMainThread]) [wnd setContentView: contentView];
+		else			     [wnd performSelectorOnMainThread: @selector(setContentView:) withObject: contentView waitUntilDone: YES];
+
 		[wnd setDelegate: [[[CocoaWindowDelegate alloc] init] autorelease]];
 
 		/* Create drawing surface.
@@ -1129,7 +1218,7 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 
 		/* Set window title.
 		 */
-		[wnd setTitle: [NSString stringWithUTF8String: title.ConvertTo("UTF-8")]];
+		SetTitle(title);
 
 		/* Set metrics to actually allocated window.
 		 */
@@ -1198,7 +1287,10 @@ S::Int S::GUI::WindowCocoa::SetTitle(const String &nTitle)
 {
 	if (wnd == nil) return Error();
 
-	[wnd setTitle: [NSString stringWithUTF8String: nTitle.ConvertTo("UTF-8")]];
+	NSString	*title = [NSString stringWithUTF8String: nTitle.ConvertTo("UTF-8")];
+
+	if ([NSThread isMainThread]) [wnd setTitle: title];
+	else			     [wnd performSelectorOnMainThread: @selector(setTitle:) withObject: title waitUntilDone: YES];
 
 	return Success();
 }
@@ -1246,14 +1338,13 @@ S::Int S::GUI::WindowCocoa::SetMinimumSize(const Size &nMinSize)
 
 	if (wnd == nil) return Success();
 
-	[wnd setContentMinSize: NSMakeSize(Math::Round(minSize.cx * fontSize) + sizeModifier.cx, Math::Round(minSize.cy * fontSize) + sizeModifier.cy)];
+	[(CocoaWindow *) wnd setMinSize: NSMakeSize(Math::Round(minSize.cx * fontSize) + sizeModifier.cx, Math::Round(minSize.cy * fontSize) + sizeModifier.cy)];
 
 	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
 
 	if (contentRect.size.width  < Math::Round(minSize.cx * fontSize) + sizeModifier.cx || contentRect.size.height < Math::Round(minSize.cy * fontSize) + sizeModifier.cy)
 	{
-		[wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy), Math::Max((Int) contentRect.size.width, (Int) Math::Round(minSize.cx * fontSize) + sizeModifier.cx), Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy))]
-		      display: YES];
+		[(CocoaWindow *) wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy), Math::Max((Int) contentRect.size.width, (Int) Math::Round(minSize.cx * fontSize) + sizeModifier.cx), Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy))]];
 	}
 
 	return Success();
@@ -1265,14 +1356,13 @@ S::Int S::GUI::WindowCocoa::SetMaximumSize(const Size &nMaxSize)
 
 	if (wnd == nil) return Success();
 
-	[wnd setContentMaxSize: NSMakeSize(Math::Round(maxSize.cx * fontSize) + sizeModifier.cx, Math::Round(maxSize.cy * fontSize) + sizeModifier.cy)];
+	[(CocoaWindow *) wnd setMaxSize: NSMakeSize(Math::Round(maxSize.cx * fontSize) + sizeModifier.cx, Math::Round(maxSize.cy * fontSize) + sizeModifier.cy)];
 
 	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
 
 	if (contentRect.size.width  > Math::Round(maxSize.cx * fontSize) + sizeModifier.cx || contentRect.size.height > Math::Round(maxSize.cy * fontSize) + sizeModifier.cy)
 	{
-		[wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Min((Int) contentRect.size.height, (Int) Math::Round(maxSize.cy * fontSize) + sizeModifier.cy), Math::Min((Int) contentRect.size.width, (Int) Math::Round(maxSize.cx * fontSize) + sizeModifier.cx), Math::Min((Int) contentRect.size.height, (Int) Math::Round(maxSize.cy * fontSize) + sizeModifier.cy))]
-		      display: YES];
+		[(CocoaWindow *) wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(contentRect.origin.x, contentRect.origin.y + contentRect.size.height - Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy), Math::Max((Int) contentRect.size.width, (Int) Math::Round(minSize.cx * fontSize) + sizeModifier.cx), Math::Max((Int) contentRect.size.height, (Int) Math::Round(minSize.cy * fontSize) + sizeModifier.cy))]];
 	}
 
 	return Success();
@@ -1327,8 +1417,7 @@ S::Int S::GUI::WindowCocoa::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (wnd == nil) return Success();
 
-	[wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(nPos.x, [[wnd screen] frame].size.height - (nPos.y + Math::Round(nSize.cy * fontSize) + sizeModifier.cy), Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy)]
-	      display: YES];
+	[(CocoaWindow *) wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(nPos.x, [[wnd screen] frame].size.height - (nPos.y + Math::Round(nSize.cy * fontSize) + sizeModifier.cy), Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy)]];
 
 	return Success();
 }
@@ -1337,7 +1426,8 @@ S::Int S::GUI::WindowCocoa::Raise()
 {
 	if (wnd == nil) return Success();
 
-	[wnd makeKeyAndOrderFront: nil];
+	if ([NSThread isMainThread]) [wnd makeKeyAndOrderFront: nil];
+	else			     [wnd performSelectorOnMainThread: @selector(makeKeyAndOrderFront:) withObject: nil waitUntilDone: YES];
 
 	return Success();
 }

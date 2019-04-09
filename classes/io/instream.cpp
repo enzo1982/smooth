@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -150,10 +150,13 @@ S::Bool S::IO::InStream::ReadData()
 
 	if (streamType != STREAM_DRIVER) return True;
 
+	/* Loop until we have some data.
+	 */
 	Int	 decsize = 0;
 
 	do
 	{
+		packageSize    = stdpacksize;
 		size	       = origsize;
 		currentFilePos = origfilepos;
 
@@ -161,8 +164,6 @@ S::Bool S::IO::InStream::ReadData()
 		{
 			/* Read unfiltered data.
 			 */
-			packageSize = stdpacksize;
-
 			driver->Seek(currentFilePos);
 
 			if (size != -1)	dataBuffer.Resize(packageSize < size - currentFilePos ? packageSize : size - currentFilePos);
@@ -175,7 +176,6 @@ S::Bool S::IO::InStream::ReadData()
 			/* Read filtered data.
 			 */
 			if (filter->GetPackageSize() > 0) packageSize = filter->GetPackageSize();
-			else				  packageSize = stdpacksize;
 
 			dataBuffer.Resize(packageSize);
 
@@ -189,13 +189,14 @@ S::Bool S::IO::InStream::ReadData()
 			if (decsize == -1) { packageSize = 0; return False; }
 
 			packageSize = decsize;
-			origsize    = size;
 			origfilepos = currentFilePos + packageSize;
 
 			if (packageSize + currentFilePos > size && size != -1) size = packageSize + currentFilePos;
 		}
 		else
 		{
+			packageSize = decsize;
+
 			if (decsize <= 0) { packageSize = 0; return False; }
 		}
 

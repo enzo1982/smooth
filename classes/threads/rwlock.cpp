@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,7 +8,6 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include <smooth/misc/string.h>
 #include <smooth/threads/mutex.h>
 #include <smooth/system/system.h>
 
@@ -74,7 +73,14 @@ S::Bool S::Threads::RWLock::LockForWrite()
 
 	/* Wait for read operations to finish.
 	 */
-	while (readLocked) S::System::System::Sleep(0);
+	while (readLocked)
+	{
+		exclusiveAccessMutex->Release();
+
+		S::System::System::Sleep(0);
+
+		exclusiveAccessMutex->Lock();
+	}
 
 	/* Increase write lock counter.
 	 */

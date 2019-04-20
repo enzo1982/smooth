@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -90,11 +90,10 @@ S::Int S::GUI::Container::Remove(Widget *widget)
 
 S::Int S::GUI::Container::RemoveAllEntries()
 {
-	Surface	*surface = NIL;
+	Surface	*surface = GetDrawSurface();
+	Bool	 visible = IsVisible();
 
-	if (IsVisible()) surface = GetDrawSurface();
-
-	if (surface != NIL)
+	if (visible)
 	{
 		Rect	 frame = Rect(GetRealPosition(), GetRealSize());
 
@@ -105,7 +104,7 @@ S::Int S::GUI::Container::RemoveAllEntries()
 
 	while (Length() > 0) Remove(GetNthEntry(Length() - 1));
 
-	if (surface != NIL)
+	if (visible)
 	{
 		Show();
 

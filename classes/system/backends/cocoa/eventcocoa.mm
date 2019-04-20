@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,60 +33,58 @@ S::Bool S::System::EventCocoa::ProcessNextEvent()
 {
 	/* Run loop in main thread only.
 	 */
-	if ([NSThread isMainThread])
+	if (![NSThread isMainThread])
 	{
-		/* Try to find active modal windows.
-		 */
-		GUI::Window	*smoothWindow = NIL;
-		NSWindow	*modalWindow  = nil;
+		S::System::System::Sleep(1);
 
-		for (Int n = GUI::Window::GetNOfWindows() - 1; n >= 0; n--)
+		return True;
+	}
+
+	/* Try to find active modal windows.
+	 */
+	GUI::Window	*smoothWindow = NIL;
+	NSWindow	*modalWindow  = nil;
+
+	for (Int n = GUI::Window::GetNOfWindows() - 1; n >= 0; n--)
+	{
+		GUI::Window	*window = GUI::Window::GetNthWindow(n);
+
+		if (window->IsVisible() && window->GetFlags() & GUI::WF_MODAL)
 		{
-			GUI::Window	*window = GUI::Window::GetNthWindow(n);
+			smoothWindow = window;
+			modalWindow  = (NSWindow *) window->GetSystemWindow();
 
-			if (window->IsVisible() && window->GetFlags() & GUI::WF_MODAL)
-			{
-				smoothWindow = window;
-				modalWindow  = (NSWindow *) window->GetSystemWindow();
-
-				break;
-			}
+			break;
 		}
+	}
 
-		/* The first loop invocation must not be modal
-		 * to prevent problems on macOS 10.9 Mavericks.
-		 */
-		static Bool	 ranNonModal = False;
+	/* The first loop invocation must not be modal
+	 * to prevent problems on macOS 10.9 Mavericks.
+	 */
+	static Bool	 ranNonModal = False;
 
-		if (!ranNonModal)
-		{
-			ranNonModal = True;
+	if (!ranNonModal)
+	{
+		ranNonModal = True;
 
-			[NSApp run];
+		[NSApp run];
 
-			return True;
-		}
+		return True;
+	}
 
-		/* Run modal or regular loop.
-		 */
-		if (modalWindow != nil && [modalWindow isVisible])
-		{
-			smoothWindow->EnterProtectedRegion();
+	/* Run modal or regular loop.
+	 */
+	if (modalWindow != nil && [modalWindow isVisible])
+	{
+		smoothWindow->EnterProtectedRegion();
 
-			[NSApp runModalForWindow: modalWindow];
+		[NSApp runModalForWindow: modalWindow];
 
-			smoothWindow->LeaveProtectedRegion();
-		}
-		else
-		{
-			[NSApp run];
-		}
+		smoothWindow->LeaveProtectedRegion();
 	}
 	else
 	{
-		/* Just sleep when called from non-main thread.
-		 */
-		S::System::System::Sleep(10);
+		[NSApp run];
 	}
 
 	return True;

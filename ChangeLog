@@ -38,6 +38,6 @@ dd.mm.19 hh:mm - smooth alpha 0.8.74.0
 - removed support for building with Xlib backend on macOS
 - removed dependency on libXmu
 - upgraded libcurl to version 7.56.1
-- upgraded libpng to version 1.6.36
+- upgraded libpng to version 1.6.37
 - upgraded libjpeg to version 9c
 - upgraded libiconv to version 1.15

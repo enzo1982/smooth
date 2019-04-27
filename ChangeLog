@@ -41,3 +41,4 @@ dd.mm.19 hh:mm - smooth alpha 0.8.74.0
 - upgraded libpng to version 1.6.37
 - upgraded libjpeg to version 9c
 - upgraded libiconv to version 1.15
+- upgraded libxml2 to version 2.9.9

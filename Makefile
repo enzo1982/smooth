@@ -238,6 +238,8 @@ else ifeq ($(BUILD_HAIKU),True)
 else
 	ifeq ($(BUILD_FREEBSD),True)
 		LIBS += -lrt
+	else ifeq ($(BUILD_LINUX),True)
+		LIBS += -lrt
 	else ifeq ($(BUILD_OPENBSD),True)
 		LIBS += -lXau -lXdmcp -lXxf86vm -lSM -lICE -lffi -ldrm -lpcre
 	endif

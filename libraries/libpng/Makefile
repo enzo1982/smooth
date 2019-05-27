@@ -13,6 +13,12 @@ ifeq ($(USE_BUNDLED_ZLIB),True)
 MYCCOPTS   += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/zlib
 endif
 
+ifeq ($(BUILD_ARM),True)
+    MYCCOPTS += -DPNG_ARM_NEON_OPT=0
+else ifeq ($(BUILD_ARM64),True)
+    MYCCOPTS += -DPNG_ARM_NEON_OPT=0
+endif
+
 # Enter object files here:
 OBJECTS	    = png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
 

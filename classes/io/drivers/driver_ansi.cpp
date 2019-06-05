@@ -33,7 +33,15 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 	stream	    = NIL;
 	closeStream = false;
 
-#if !defined __WIN32__
+#if defined __WIN32__
+	/* Add N mode option on Windows to prevent handle inheritance.
+	 */
+	String	 options = "N";
+#else
+	/* No special options on other systems.
+	 */
+	String	 options;
+
 	/* Set output format to UTF-8 on non-Windows systems.
 	 */
 	const char	*previousOutputFormat = String::SetOutputFormat("UTF-8");
@@ -46,7 +54,7 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 
 			return;
 		case OS_APPEND:		   // open a file for appending data
-			stream = fopen(fileName, String("r+b"));
+			stream = fopen(fileName, String("r+b").Append(options));
 
 			if (stream != NIL)
 			{
@@ -57,15 +65,15 @@ S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
-			stream = fopen(fileName, String("w+b"));
+			stream = fopen(fileName, String("w+b").Append(options));
 
 			break;
 		case IS_READ | IS_WRITE:   // open a file for reading data
-			stream = fopen(fileName, String("r+b"));
+			stream = fopen(fileName, String("r+b").Append(options));
 
 			break;
 		case IS_READ:		   // open a file in read only mode
-			stream = fopen(fileName, String("rb"));
+			stream = fopen(fileName, String("rb").Append(options));
 
 			break;
 	}

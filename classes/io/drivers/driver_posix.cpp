@@ -39,11 +39,15 @@
 #	endif
 
 #	ifndef O_BINARY
-#		define O_BINARY	0
+#		define O_BINARY    0
 #	endif
 
 #	ifndef O_RANDOM
-#		define O_RANDOM	0
+#		define O_RANDOM    0
+#	endif
+
+#	ifndef O_NOINHERIT
+#		define O_NOINHERIT 0
 #	endif
 #endif
 
@@ -65,7 +69,7 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 			return;
 		case OS_APPEND:		   // open a file for appending data
-			stream = open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT, 0666);
+			stream = open(fileName, O_RDWR | O_BINARY | O_NOINHERIT | O_RANDOM | O_CREAT, 0666);
 
 			if (stream != -1)
 			{
@@ -76,15 +80,15 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
-			stream = open(fileName, O_RDWR | O_BINARY | O_RANDOM | O_CREAT | O_TRUNC, 0666);
+			stream = open(fileName, O_RDWR | O_BINARY | O_NOINHERIT | O_RANDOM | O_CREAT | O_TRUNC, 0666);
 
 			break;
 		case IS_READ | IS_WRITE:   // open a file for reading data
-			stream = open(fileName, O_RDWR | O_BINARY);
+			stream = open(fileName, O_RDWR | O_BINARY | O_NOINHERIT);
 
 			break;
 		case IS_READ:		   // open a file in read only mode
-			stream = open(fileName, O_RDONLY | O_BINARY);
+			stream = open(fileName, O_RDONLY | O_BINARY | O_NOINHERIT);
 
 			break;
 	}

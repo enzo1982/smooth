@@ -13,12 +13,7 @@
 #include <smooth/io/filter.h>
 
 #include <smooth/io/drivers/driver_ansi.h>
-#include <smooth/io/drivers/driver_posix.h>
 #include <smooth/io/drivers/driver_memory.h>
-
-#ifdef __WIN32__
-#	include <smooth/io/drivers/driver_win32.h>
-#endif
 
 #include <smooth/files/file.h>
 
@@ -50,11 +45,7 @@ S::IO::InStream::InStream(Int type, const String &fileName, Int mode)
 
 	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
 
-#ifdef __WIN32__
-	driver		 = new DriverWin32(File(fileName), mode);
-#else
-	driver		 = new DriverPOSIX(File(fileName), mode);
-#endif
+	driver		 = new DriverANSI(File(fileName), mode);
 
 	if (driver->GetLastError() != IO_ERROR_OK) { lastError = driver->GetLastError(); delete driver; return; }
 

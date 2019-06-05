@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -245,11 +245,13 @@ S::Void S::GUI::ListBoxHeader::OnLeftButtonClick(const Point &mousePos)
 {
 	if (draggingTab) return;
 
+	Surface	*surface = GetDrawSurface();
 	Point	 realPos = GetRealPosition();
 
 	for (Int n = 0; n < GetNOfTabs(); n++)
 	{
-		if (mousePos.x - realPos.x >= GetNthTabOffset(n) && mousePos.x - realPos.x < GetNthTabOffset(n) + GetNthTabWidth(n))
+		if (mousePos.x - realPos.x >= GetNthTabOffset(n)		      * surface->GetSurfaceDPI() / 96.0 &&
+		    mousePos.x - realPos.x < (GetNthTabOffset(n) + GetNthTabWidth(n)) * surface->GetSurfaceDPI() / 96.0)
 		{
 			onClickTab.Emit(n);
 

@@ -83,6 +83,7 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (void)	keyUp:		   (NSEvent *) event;
 	- (void)	flagsChanged:	   (NSEvent *) event;
 
+	- (BOOL)	isFlipped;
 	- (void)	drawRect:	   (NSRect) rect;
 
 	- (BOOL)	acceptsFirstResponder;
@@ -234,6 +235,11 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void) keyUp:		    (NSEvent *) event { [self handleEvent: event]; }
 	- (void) flagsChanged:	    (NSEvent *) event { [self handleEvent: event]; }
+
+	- (BOOL) isFlipped
+	{
+		return YES;
+	}
 
 	- (void) drawRect: (NSRect) rect
 	{

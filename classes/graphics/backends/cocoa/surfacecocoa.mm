@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -47,7 +47,6 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 		}
 
 		rightToLeft.SetSurfaceSize(size);
-		upsideDown.SetSurfaceSize(size);
 
 		paintRects.Add(new Rect(Point(0, 0), size));
 
@@ -89,7 +88,6 @@ S::Int S::GUI::SurfaceCocoa::SetSize(const Size &nSize)
 	size = nSize;
 
 	rightToLeft.SetSurfaceSize(size);
-	upsideDown.SetSurfaceSize(size);
 
 	if (window != NIL && !painting)
 	{
@@ -121,7 +119,7 @@ S::Int S::GUI::SurfaceCocoa::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL || ![window isVisible]) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(upsideDown.TranslateRect(rightToLeft.TranslateRect(iPRect)), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
 
 	[window disableFlushWindow];
 
@@ -179,7 +177,7 @@ S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL || ![window isVisible]) return Success();
 
-	Point	 point = upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPoint));
+	Point	 point = rightToLeft.TranslatePoint(iPoint);
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -209,8 +207,8 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 	/* Convert coordinates.
 	 */
-	Point	 pos1	= upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos1));
-	Point	 pos2	= upsideDown.TranslatePoint(rightToLeft.TranslatePoint(iPos2));
+	Point	 pos1	= rightToLeft.TranslatePoint(iPos1);
+	Point	 pos2	= rightToLeft.TranslatePoint(iPos2);
 
 	NSPoint	 point1 = NSMakePoint(pos1.x + 0.5, pos1.y + 0.5);
 	NSPoint	 point2 = NSMakePoint(pos2.x + 0.5, pos2.y + 0.5);
@@ -219,10 +217,10 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 	 */
 	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y) && scaleFactor == 1.0)
 	{
-		if (pos1.x < pos2.x && pos1.y < pos2.y) { point2.x--; point2.y--; }
-		if (pos1.x > pos2.x && pos1.y < pos2.y) { point2.x++; point2.y--; }
-		if (pos1.x < pos2.x && pos1.y > pos2.y) { point1.x++; point1.y--; }
-		if (pos1.x > pos2.x && pos1.y > pos2.y) { point1.x--; point1.y--; }
+		if (pos1.x < pos2.x && pos1.y < pos2.y) { point1.x++; point1.y++; }
+		if (pos1.x > pos2.x && pos1.y < pos2.y) { point1.x--; point1.y++; }
+		if (pos1.x < pos2.x && pos1.y > pos2.y) { point2.x--; point2.y++; }
+		if (pos1.x > pos2.x && pos1.y > pos2.y) { point2.x++; point2.y++; }
 	}
 
 	/* Adjust to Windows GDI behaviour for horizontal and vertical lines.
@@ -258,7 +256,7 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 {
 	if (window == NIL || ![window isVisible]) return Success();
 
-	Rect	 rect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iRect));
+	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
 	if (style & Rect::Filled)
 	{
@@ -353,7 +351,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	/* Draw to window.
 	 */
-	Rect	 tRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
+	Rect	 tRect = rightToLeft.TranslateRect(rect);
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: YES];
 
@@ -363,9 +361,8 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	foreach (const String &line, lines)
 	{
-		tRect	   = upsideDown.TranslateRect(rightToLeft.TranslateRect(rect));
+		tRect	   = rightToLeft.TranslateRect(rect);
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
-		tRect.top  = tRect.bottom - lineHeight + 1;
 
 		NSAttributedString	*string	= [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String: (line == NIL ? "" : line.ConvertTo("UTF-8"))]
 										  attributes: attributes];
@@ -392,7 +389,7 @@ S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, co
 {
 	if (window == NIL || ![window isVisible]) return Success();
 
-	Rect	 rect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iRect));
+	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
 	[[NSGraphicsContext currentContext] setShouldAntialias: NO];
 
@@ -420,7 +417,7 @@ S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	if (window == NIL || ![window isVisible]) return Success();
 	if (bitmap == NIL)			  return Error();
 
-	Rect	 destRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iDestRect));
+	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
@@ -444,7 +441,7 @@ S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	if (window == NIL || ![window isVisible]) return Success();
 	if (bitmap == NIL)			  return Error();
 
-	Rect	 srcRect = upsideDown.TranslateRect(rightToLeft.TranslateRect(iSrcRect));
+	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();

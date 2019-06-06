@@ -82,6 +82,16 @@ S::Int64 S::IO::Driver::GetPos() const
 	return position;
 }
 
+S::Bool S::IO::Driver::IsBuffered() const
+{
+	return False;
+}
+
+S::Bool S::IO::Driver::SetBufferSize(Int size)
+{
+	return False;
+}
+
 const S::String &S::IO::Driver::GetStreamID() const
 {
 	return streamID;

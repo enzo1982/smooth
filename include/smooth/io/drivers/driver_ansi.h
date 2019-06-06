@@ -50,6 +50,9 @@ namespace smooth
 
 				Int64	 GetSize() const;
 				Int64	 GetPos() const;
+
+				Bool	 IsBuffered() const;
+				Bool	 SetBufferSize(Int);
 		};
 	};
 };

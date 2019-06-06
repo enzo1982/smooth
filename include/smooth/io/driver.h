@@ -54,6 +54,9 @@ namespace smooth
 				virtual Int64		 GetSize() const;
 				virtual Int64		 GetPos() const;
 
+				virtual Bool		 IsBuffered() const;
+				virtual Bool		 SetBufferSize(Int);
+
 				virtual const String	&GetStreamID() const;
 		};
 	};

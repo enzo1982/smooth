@@ -20,6 +20,7 @@ dd.mm.19 hh:mm - smooth alpha 0.8.74.0
 - directory.cpp		- fixed permissions of newly created directories to respect umask setting
 - driver_posix.cpp	- fixed permissions of newly created files to respect umask setting
 - driver.cpp		- added Truncate() and Close() methods to public API
+			- added IsBuffered() and SetBufferSize() methods to control buffering
 			- implemented Flush() method for file drivers
 - outstream.cpp		- added Truncate() method
 - directory.cpp		- Copy() and Move() method now take a const Directory & argument

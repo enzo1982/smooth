@@ -170,3 +170,17 @@ S::Int64 S::IO::DriverANSI::GetPos() const
 {
 	return ftell(stream);
 }
+
+S::Bool S::IO::DriverANSI::IsBuffered() const
+{
+	return True;
+}
+
+S::Bool S::IO::DriverANSI::SetBufferSize(Int size)
+{
+	Int	 mode = size > 0 ? _IOFBF : _IONBF;
+
+	if (setvbuf(stream, NULL, mode, size) != 0) return False;
+
+	return True;
+}

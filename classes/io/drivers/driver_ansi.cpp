@@ -28,19 +28,21 @@
 #	include <unistd.h>
 #endif
 
-S::IO::DriverANSI::DriverANSI(const String &fileName, Int mode) : Driver()
+S::IO::DriverANSI::DriverANSI(const String &file, Int mode) : Driver()
 {
 	stream	    = NIL;
 	closeStream = false;
 
 #if defined __WIN32__
-	/* Add N mode option on Windows to prevent handle inheritance.
+	/* Add N mode option and Unicode prefix on Windows.
 	 */
-	String	 options = "N";
+	String	 options  = "N";
+	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
 #else
 	/* No special options on other systems.
 	 */
 	String	 options;
+	String	 fileName = file;
 
 	/* Set output format to UTF-8 on non-Windows systems.
 	 */

@@ -15,18 +15,14 @@
 
 #include <smooth/backends/win32/backendwin32.h>
 
-S::IO::DriverWin32::DriverWin32(const String &iFileName, Int mode) : Driver()
+S::IO::DriverWin32::DriverWin32(const String &file, Int mode) : Driver()
 {
 	stream	    = INVALID_HANDLE_VALUE;
 	closeStream = False;
 
-	/* Find prefix for Unicode paths.
-	 */
-	static const char	*unicodePathPrefix = "\\\\?\\";
-
 	/* Build real filename to pass to CreateFile.
 	 */
-	String	 fileName = String(iFileName.StartsWith("\\\\") ? "" : unicodePathPrefix).Append(iFileName);
+	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
 
 	switch (mode)
 	{

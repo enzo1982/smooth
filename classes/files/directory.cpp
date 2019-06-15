@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -340,40 +340,32 @@ S::Int S::Directory::Delete()
 
 S::Int S::Directory::Empty()
 {
-	Directory	 backupDir = GetActiveDirectory();
-
-	SetActiveDirectory(*this);
-
 #ifdef __WIN32__
 	WIN32_FIND_DATA	 findData;
-	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix("*")).Append("*"), &findData);
+	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\*"), &findData);
 
-	if (handle != INVALID_HANDLE_VALUE)
+	if (handle == INVALID_HANDLE_VALUE) return Error();
+
+	do
 	{
-		do
+		if (String(findData.cFileName) == "." || String(findData.cFileName) == "..") continue;
+
+		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
-			if (String(findData.cFileName) != "." && String(findData.cFileName) != "..")
-			{
-				if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-				{
-					Directory	 dir(NIL, findData.cFileName);
+			Directory	 dir(findData.cFileName, *this);
 
-					dir.Empty();
-					dir.Delete();
-				}
-				else
-				{
-					DeleteFile(findData.cFileName);
-				}
-			}
+			dir.Empty();
+			dir.Delete();
 		}
-		while (FindNextFile(handle, &findData));
-
-		FindClose(handle);
+		else
+		{
+			File(findData.cFileName, *this).Delete();
+		}
 	}
-#endif
+	while (FindNextFile(handle, &findData));
 
-	SetActiveDirectory(backupDir);
+	FindClose(handle);
+#endif
 
 	return Success();
 }

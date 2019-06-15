@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -59,7 +59,7 @@ namespace smooth
 				Void		 SetColor(Int r, Int g, Int b, ColorSpace c = RGB)	{ color = b << 16 | g << 8 | r; colorSpace = c; }
 
 				Color		 ConvertTo(ColorSpace) const;
-				Color		 Grayscale() const					{ return Color(ConvertTo(GRAY), ConvertTo(GRAY), ConvertTo(GRAY)); }
+				Color		 Grayscale() const					{ Int gray = ConvertTo(GRAY); return Color(gray, gray, gray); }
 
 				Color		 Average(const Color &color2) const			{ return Color( (GetRed()   + color2.GetRed())	 / 2	    |
 														       ((GetGreen() + color2.GetGreen()) / 2) <<  8 |

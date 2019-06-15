@@ -74,14 +74,15 @@ namespace smooth
 			Bool Add(const s &value, Int index)
 			{
 				WriteLock	 lock(*this);
+				Int		 nOfEntries = this->nOfEntries;
 
-				if (!IndexAvailable(index)) return False;
+				if (!IndexArray::InsertAtPos(nOfEntries, index)) return False;
 
 				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
 				entries[nOfEntries] = new ArrayEntry<s>(value);
 
-				return IndexArray::InsertAtPos(nOfEntries, index);
+				return True;
 			}
 
 			Int InsertAfter(Int prevIndex, const s &value)
@@ -112,10 +113,11 @@ namespace smooth
 			Bool InsertAtPos(Int position, const s &value, Int index)
 			{
 				WriteLock	 lock(*this);
+				Int		 nOfEntries = this->nOfEntries;
 
 				if (position > nOfEntries || position < 0) return False;
 
-				if (!IndexAvailable(index)) return False;
+				if (!IndexArray::InsertAtPos(position, index)) return False;
 
 				if (entries.Size() == nOfEntries) entries.Resize(8 > nOfEntries * 1.25 ? 8 : nOfEntries * 1.25);
 
@@ -123,7 +125,7 @@ namespace smooth
 
 				entries[position] = new ArrayEntry<s>(value);
 
-				return IndexArray::InsertAtPos(position, index);
+				return True;
 			}
 
 			Bool MoveNth(Int n, Int m)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -25,25 +25,23 @@ namespace smooth
 	class ExtentsCacheEntry
 	{
 		private:
-			String		 fontName;
-			Int		 fontSize;
-			Int		 fontWeight;
-			Int		 fontStyle;
+			UnsignedInt32	 crc32;
 
 			GUI::Size	 extents;
 		public:
-					 ExtentsCacheEntry(const String &fnm, Int fsz, Int fwt, Int fst) : fontName(fnm),
-													   fontSize(fsz),
-													   fontWeight(fwt),
-													   fontStyle(fst) { }
+					 ExtentsCacheEntry(const String &text,
+							   const String &fontName,
+							   Int fontSize,
+							   Int fontWeight,
+							   Int fontStyle)	{ crc32 = String(text).Append(fontName)
+												      .Append(String::FromInt(fontSize	 << 16 |
+															      fontWeight <<  4 |
+															      fontStyle)).ComputeCRC32(); }
+
+			UnsignedInt32	 GetCRC32() const			{ return crc32; }
 
 			const GUI::Size	&GetExtents() const			{ return extents; }
 			Void		 SetExtents(const GUI::Size &nExtents)	{ extents = nExtents; }
-
-			UnsignedInt32	 ComputeCRC32(const String &text) const { return String(text).Append(fontName)
-												     .Append(String::FromInt(fontSize	<< 16 |
-															     fontWeight <<  4 |
-															     fontStyle)).ComputeCRC32(); }
 	};
 
 	static Array<ExtentsCacheEntry *, Void *>	 extentsCache;
@@ -119,40 +117,16 @@ S::Int S::GUI::FontBackend::GetTextSizeX(const String &text, Bool scaled) const
 {
 	if (text == NIL) return 0;
 
-	Int	 nOfChars = text.Length();
-	Int	 sizex	= 0;
-	Int	 lines	= 1;
+	Int	 length	= text.Length();
 	Int	 offset	= 0;
+	Int	 sizex	= 0;
 
-	for (Int k = 0; k < nOfChars; k++) if (text[k] == 10) lines++;
-
-	for (Int i = 0; i < lines; i++)
+	for (Int i = 0; i <= length; i++)
 	{
-		Int	 origOffset = offset;
-		String	 line;
+		if (i < length && text[i] != '\n') continue;
 
-		for (Int j = 0; j <= nOfChars; j++)
-		{
-			if (j + origOffset == nOfChars)
-			{
-				line[j] = 0;
-				break;
-			}
-
-			if (text[j + origOffset] == 10 || text[j + origOffset] == 0)
-			{
-				offset++;
-				line[j] = 0;
-				break;
-			}
-			else
-			{
-				offset++;
-				line[j] = text[j + origOffset];
-			}
-		}
-
-		sizex = (Int) Math::Max(sizex, GetTextSize(line, scaled).cx);
+		sizex  = (Int) Math::Max(sizex, GetTextSize(text.SubString(offset, i - offset), scaled).cx);
+		offset = i + 1;
 	}
 
 	return sizex;
@@ -162,12 +136,12 @@ S::Int S::GUI::FontBackend::GetTextSizeY(const String &text, Bool scaled) const
 {
 	if (text == NIL) return 0;
 
-	Int	 lines		= 1;
-	Int	 txtSize	= text.Length();
+	Int	 length	= text.Length();
+	Int	 lines	= 1;
 
-	for (Int i = 0; i < txtSize; i++)
+	for (Int i = 0; i < length; i++)
 	{
-		if (text[i] == 10) lines++;
+		if (text[i] == '\n') lines++;
 	}
 
 	/* Line height is always the same regardless of the actual text,
@@ -184,15 +158,15 @@ S::GUI::Size S::GUI::FontBackend::GetTextSize(const String &text, Bool scaled) c
 
 	/* Check for existing cache entry.
 	 */
-	ExtentsCacheEntry	 entry(fontName, fontSize, fontWeight, fontStyle);
+	ExtentsCacheEntry	 entry(text, fontName, fontSize, fontWeight, fontStyle);
 
 	Float			 dpi = Surface().GetSurfaceDPI();
-	Int			 crc = entry.ComputeCRC32(text);
+	Int			 crc = entry.GetCRC32();
 
-	if (extentsCache.Get(crc) != NIL)
+	if (ExtentsCacheEntry *cacheEntry = extentsCache.Get(crc))
 	{
-		if (scaled || Math::Abs(dpi - 96.0) < 0.1) return extentsCache.Get(crc)->GetExtents();
-		else					   return extentsCache.Get(crc)->GetExtents() * 96.0 / dpi;
+		if (scaled || Math::Abs(dpi - 96.0) < 0.1) return cacheEntry->GetExtents();
+		else					   return cacheEntry->GetExtents() * 96.0 / dpi;
 	}
 
 	/* Compute scaled text size.

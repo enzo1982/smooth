@@ -773,8 +773,10 @@ S::Void S::GUI::Widget::ActivateTooltip()
 		}
 		else if (tooltipLayer != NIL)
 		{
+			tooltipLayer->Show();
+
 			tooltip->SetLayer(tooltipLayer);
-			tooltip->SetPosition(window->GetMousePosition() - Point(tooltip->GetUnscaledTextWidth() > 0 ? Math::Round(0.2 * tooltip->GetUnscaledTextWidth()) : 20, Setup::HoverHeight / 2 + 1));
+			tooltip->SetPosition(window->GetMousePosition() - Point(Math::Round(0.2 * tooltipLayer->GetWidth()), Setup::HoverHeight / 2 + 1));
 			tooltip->SetTimeout(3000);
 		}
 

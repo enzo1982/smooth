@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,41 +41,43 @@ namespace smooth
 			friend class InStream;
 
 			private:
-				InStream		*inStream;
+				static Int	 defaultPackageSize;
 
-				Bool			 InitBitstream		();
-				Bool			 CompleteBitstream	();
+				InStream	*inStream;
 
-				Bool			 WriteData		();
+				Bool		 InitBitstream		();
+				Bool		 CompleteBitstream	();
+
+				Bool		 WriteData		();
 			public:
-							 OutStream		(Int, Driver *);
-							 OutStream		(Int, const String &, Int = OS_APPEND);
-							 OutStream		(Int, FILE *);
-							 OutStream		(Int, Void *, Long);
-							 OutStream		(Int, InStream *);
-				virtual			~OutStream		();
+						 OutStream		(Int, Driver *);
+						 OutStream		(Int, const String &, Int = OS_APPEND);
+						 OutStream		(Int, FILE *);
+						 OutStream		(Int, Void *, Long);
+						 OutStream		(Int, InStream *);
+				virtual		~OutStream		();
 
-				Bool			 OutputNumber		(Int64, Int);
-				Bool			 OutputNumberRaw	(Int64, Int);
+				Bool		 OutputNumber		(Int64, Int);
+				Bool		 OutputNumberRaw	(Int64, Int);
 
-				Bool			 OutputBits		(Int64, Int);
+				Bool		 OutputBits		(Int64, Int);
 
-				Bool			 OutputString		(const String &);
-				Bool			 OutputLine		(const String &);
-				Bool			 OutputData		(const Void *, Int);
+				Bool		 OutputString		(const String &);
+				Bool		 OutputLine		(const String &);
+				Bool		 OutputData		(const Void *, Int);
 
-				Bool			 SetPackageSize		(Int);
+				Bool		 SetPackageSize		(Int);
 
-				Bool			 SetFilter		(Filter *);
-				Bool			 RemoveFilter		();
+				Bool		 SetFilter		(Filter *);
+				Bool		 RemoveFilter		();
 
-				Bool			 Close			();
+				Bool		 Close			();
 
-				Bool			 Seek			(Int64);
-				Bool			 RelSeek		(Int64);
+				Bool		 Seek			(Int64);
+				Bool		 RelSeek		(Int64);
 
-				Bool			 Truncate		(Int64);
-				Bool			 Flush			();
+				Bool		 Truncate		(Int64);
+				Bool		 Flush			();
 
 		};
 	};

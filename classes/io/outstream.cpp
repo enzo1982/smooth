@@ -21,6 +21,8 @@
 #include <stdarg.h>
 #include <memory.h>
 
+S::Int	 S::IO::OutStream::defaultPackageSize = 131072;
+
 S::IO::OutStream::OutStream(Int type, Driver *iDriver)
 {
 	inStream	= NIL;
@@ -35,6 +37,10 @@ S::IO::OutStream::OutStream(Int type, Driver *iDriver)
 	size		= driver->GetSize();
 	currentFilePos	= driver->GetPos();
 	closefile	= False;
+
+	packageSize	= defaultPackageSize;
+	stdpacksize	= packageSize;
+	origpacksize	= packageSize;
 
 	dataBuffer.Resize(packageSize);
 }
@@ -53,6 +59,10 @@ S::IO::OutStream::OutStream(Int type, const String &fileName, Int mode)
 	size		= driver->GetSize();
 	currentFilePos	= size;
 
+	packageSize	= defaultPackageSize;
+	stdpacksize	= packageSize;
+	origpacksize	= packageSize;
+
 	dataBuffer.Resize(packageSize);
 }
 
@@ -70,10 +80,6 @@ S::IO::OutStream::OutStream(Int type, FILE *openFile)
 	size		= driver->GetSize();
 	currentFilePos	= driver->GetPos();
 
-	packageSize	= 1; // low package size, 'cause openFile could point to the console
-	stdpacksize	= packageSize;
-	origpacksize	= packageSize;
-
 	dataBuffer.Resize(packageSize);
 }
 
@@ -89,10 +95,6 @@ S::IO::OutStream::OutStream(Int type, Void *outBuffer, Long bufferSize)
 
 	streamType	= STREAM_DRIVER;
 	size		= driver->GetSize();
-
-	packageSize	= 1;
-	stdpacksize	= packageSize;
-	origpacksize	= packageSize;
 
 	dataBuffer.Resize(packageSize);
 }
@@ -110,6 +112,10 @@ S::IO::OutStream::OutStream(Int type, InStream *in)
 	inStream		= in;
 	inStream->outStream	= this;
 	inStream->crosslinked	= True;
+
+	packageSize		= defaultPackageSize;
+	stdpacksize		= packageSize;
+	origpacksize		= packageSize;
 
 	if (inStream->streamType == STREAM_DRIVER)
 	{

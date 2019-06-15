@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,8 +9,6 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/io/stream.h>
-
-S::Int	 S::IO::Stream::defaultPackageSize = 1048576;
 
 S::IO::Stream::Stream()
 {
@@ -31,7 +29,7 @@ S::IO::Stream::Stream()
 	filter		 = NIL;
 
 	allowpackset	 = True;
-	packageSize	 = defaultPackageSize;
+	packageSize	 = 1;
 	stdpacksize	 = packageSize;
 	origpacksize	 = packageSize;
 	origsize	 = 0;
@@ -44,16 +42,4 @@ S::IO::Stream::Stream()
 
 S::IO::Stream::~Stream()
 {
-}
-
-S::Bool S::IO::Stream::SetDefaultPackageSize(Int nDefaultPackageSize)
-{
-	if (nDefaultPackageSize > 0)
-	{
-		defaultPackageSize = nDefaultPackageSize;
-
-		return True;
-	}
-
-	return False;
 }

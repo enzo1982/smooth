@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,8 +32,6 @@ namespace smooth
 		abstract class SMOOTHAPI Stream
 		{
 			protected:
-				static Int		 defaultPackageSize;
-
 				Short			 streamType;
 				Bool			 crosslinked;
 				Bool			 closefile;
@@ -62,8 +60,6 @@ namespace smooth
 
 				mutable Short		 lastError;
 			public:
-				static Bool		 SetDefaultPackageSize	(Int);
-
 							 Stream();
 				virtual			~Stream();
 
@@ -80,7 +76,6 @@ namespace smooth
 
 				Int64			 Size() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return size; }
 				Int64			 GetPos() const		{ if (streamType == STREAM_NONE) { lastError = IO_ERROR_NOTOPEN; return -1; } return currentFilePos; }
-
 		};
 	};
 };

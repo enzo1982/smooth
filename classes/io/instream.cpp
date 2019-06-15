@@ -21,6 +21,8 @@
 #include <stdarg.h>
 #include <memory.h>
 
+S::Int	 S::IO::InStream::defaultPackageSize = 4096;
+
 S::IO::InStream::InStream(Int type, Driver *iDriver)
 {
 	outStream	 = NIL;
@@ -35,6 +37,9 @@ S::IO::InStream::InStream(Int type, Driver *iDriver)
 	size		 = driver->GetSize();
 	closefile	 = False;
 
+	packageSize	 = defaultPackageSize;
+	stdpacksize	 = packageSize;
+	origpacksize	 = packageSize;
 	currentBufferPos = defaultPackageSize;
 	origsize	 = size;
 }
@@ -52,6 +57,9 @@ S::IO::InStream::InStream(Int type, const String &fileName, Int mode)
 	streamType	 = STREAM_DRIVER;
 	size		 = driver->GetSize();
 
+	packageSize	 = defaultPackageSize;
+	stdpacksize	 = packageSize;
+	origpacksize	 = packageSize;
 	currentBufferPos = defaultPackageSize;
 	origsize	 = size;
 }
@@ -70,9 +78,6 @@ S::IO::InStream::InStream(Int type, FILE *openFile)
 	size		 = driver->GetSize();
 	currentFilePos	 = driver->GetPos();
 
-	packageSize	 = 1;
-	stdpacksize	 = packageSize;
-	origpacksize	 = packageSize;
 	currentBufferPos = defaultPackageSize;
 	origsize	 = size;
 }
@@ -90,9 +95,6 @@ S::IO::InStream::InStream(Int type, Void *inBuffer, Long bufferSize)
 	streamType	 = STREAM_DRIVER;
 	size		 = driver->GetSize();
 
-	packageSize	 = 1;
-	stdpacksize	 = packageSize;
-	origpacksize	 = packageSize;
 	currentBufferPos = packageSize;
 	origsize	 = size;
 }
@@ -110,6 +112,10 @@ S::IO::InStream::InStream(Int type, OutStream *out)
 	outStream		= out;
 	outStream->inStream	= this;
 	outStream->crosslinked	= True;
+
+	packageSize		= defaultPackageSize;
+	stdpacksize		= packageSize;
+	origpacksize		= packageSize;
 
 	if (outStream->streamType == STREAM_DRIVER)
 	{
@@ -447,8 +453,9 @@ S::Bool S::IO::InStream::SetPackageSize(Int newPackageSize)
 
 	if (bitstreamActive) CompleteBitstream();
 
-	packageSize = newPackageSize;
-	stdpacksize = packageSize;
+	packageSize	 = newPackageSize;
+	stdpacksize	 = packageSize;
+	currentBufferPos = packageSize;
 
 	Seek(currentFilePos);
 

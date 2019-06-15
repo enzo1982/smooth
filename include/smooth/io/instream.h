@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -41,38 +41,40 @@ namespace smooth
 			friend class OutStream;
 
 			private:
-				OutStream		*outStream;
+				static Int	 defaultPackageSize;
 
-				Bool			 InitBitstream		();
-				Bool			 CompleteBitstream	();
+				OutStream	*outStream;
 
-				Bool			 ReadData		();
+				Bool		 InitBitstream		();
+				Bool		 CompleteBitstream	();
+
+				Bool		 ReadData		();
 			public:
-							 InStream		(Int, Driver *);
-							 InStream		(Int, const String &, Int = IS_READ);
-							 InStream		(Int, FILE *);
-							 InStream		(Int, Void *, Long);
-							 InStream		(Int, OutStream *);
-				virtual			~InStream		();
+						 InStream		(Int, Driver *);
+						 InStream		(Int, const String &, Int = IS_READ);
+						 InStream		(Int, FILE *);
+						 InStream		(Int, Void *, Long);
+						 InStream		(Int, OutStream *);
+				virtual		~InStream		();
 
-				Int64			 InputNumber		(Int);
-				Int64			 InputNumberRaw		(Int);
+				Int64		 InputNumber		(Int);
+				Int64		 InputNumberRaw		(Int);
 
-				Int64			 InputBits		(Int);
+				Int64		 InputBits		(Int);
 
-				String			 InputString		(Int);
-				String			 InputLine		();
-				Int			 InputData		(Void *, Int);
+				String		 InputString		(Int);
+				String		 InputLine		();
+				Int		 InputData		(Void *, Int);
 
-				Bool			 SetPackageSize		(Int);
+				Bool		 SetPackageSize		(Int);
 
-				Bool			 SetFilter		(Filter *);
-				Bool			 RemoveFilter		();
+				Bool		 SetFilter		(Filter *);
+				Bool		 RemoveFilter		();
 
-				Bool			 Close			();
+				Bool		 Close			();
 
-				Bool			 Seek			(Int64);
-				Bool			 RelSeek		(Int64);
+				Bool		 Seek			(Int64);
+				Bool		 RelSeek		(Int64);
 		};
 	};
 };

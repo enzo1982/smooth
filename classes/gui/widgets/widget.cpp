@@ -274,11 +274,13 @@ S::GUI::Widget *S::GUI::Widget::GetNextTabstopWidget(Int widgetHandle) const
 
 S::Void S::GUI::Widget::ComputeTextSize()
 {
-	unscaledTextSize.cx = font.GetUnscaledTextSizeX(text);
-	unscaledTextSize.cy = font.GetUnscaledTextSizeY(text);
+	scaledTextSize.cx = font.GetScaledTextSizeX(text);
+	scaledTextSize.cy = font.GetScaledTextSizeY(text);
 
-	scaledTextSize.cx   = font.GetScaledTextSizeX(text);
-	scaledTextSize.cy   = font.GetScaledTextSizeY(text);
+	Float	 dpi = Surface().GetSurfaceDPI();
+
+	if (Math::Abs(dpi - 96.0) < 0.1) unscaledTextSize = scaledTextSize;
+	else				 unscaledTextSize = scaledTextSize * 96.0 / dpi;
 }
 
 S::Void S::GUI::Widget::InvalidateMetrics()

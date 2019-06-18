@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -71,6 +71,9 @@ S::Void S::Backends::BackendHaiku::UpdateColors()
 	rgb_color	 tooltipBackground  = ui_color(B_TOOL_TIP_BACKGROUND_COLOR);
 	rgb_color	 tooltipText	    = ui_color(B_TOOL_TIP_TEXT_COLOR);
 
+	rgb_color	 link		    = ui_color(B_LINK_TEXT_COLOR);
+	rgb_color	 linkHover	    = ui_color(B_LINK_HOVER_COLOR);
+
 	Setup::BackgroundColor		  = GUI::Color(panelBackground.red, panelBackground.green, panelBackground.blue);
 	Setup::LightGrayColor		  = GUI::Color(panelBackground.red + (255 - panelBackground.red) * 0.6, panelBackground.green + (255 - panelBackground.green) * 0.6, panelBackground.blue + (255 - panelBackground.blue) * 0.6);
 
@@ -95,6 +98,9 @@ S::Void S::Backends::BackendHaiku::UpdateColors()
 
 	Setup::TooltipColor		  = GUI::Color(tooltipBackground.red, tooltipBackground.green, tooltipBackground.blue);
 	Setup::TooltipTextColor		  = GUI::Color(tooltipText.red, tooltipText.green, tooltipText.blue);
+
+	Setup::LinkColor		  = GUI::Color(link.red, link.green, link.blue);
+	Setup::LinkHighlightColor	  = GUI::Color(linkHover.red, linkHover.green, linkHover.blue);
 }
 
 BApplication *S::Backends::BackendHaiku::GetApplication()

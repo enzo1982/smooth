@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -173,6 +173,9 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 
 	Setup::TooltipColor		  = GetSysColor(COLOR_INFOBK);
 	Setup::TooltipTextColor		  = GetSysColor(COLOR_INFOTEXT);
+
+	Setup::LinkColor		  = GetSysColor(COLOR_HOTLIGHT);
+	Setup::LinkHighlightColor	  = GetSysColor(COLOR_HOTLIGHT);
 }
 
 S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformId, UnsignedInt majorVersion, UnsignedInt minorVersion)

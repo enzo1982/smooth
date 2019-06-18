@@ -37,26 +37,24 @@
 #	if !defined __linux__ && !defined __sun && !defined __GNU__
 #		define lseek64 lseek
 #	endif
-
-#	ifndef O_BINARY
-#		define O_BINARY    0
-#	endif
-
-#	ifndef O_RANDOM
-#		define O_RANDOM    0
-#	endif
-
-#	ifndef O_NOINHERIT
-#		define O_NOINHERIT 0
-#	endif
 #endif
 
-S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
+S::IO::DriverPOSIX::DriverPOSIX(const String &file, Int mode) : Driver()
 {
 	stream	    = -1;
 	closeStream = false;
 
-#if !defined __WIN32__
+#if defined __WIN32__
+	/* Add O_NOINHERIT and O_BINARY options and Unicode prefix on Windows.
+	 */
+	Int	 options  = O_NOINHERIT | O_BINARY;
+	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
+#else
+	/* No special options on other systems.
+	 */
+	Int	 options  = 0;
+	String	 fileName = file;
+
 	/* Set output format to UTF-8 on non-Windows systems.
 	 */
 	String::OutputFormat	 outputFormat("UTF-8");
@@ -69,7 +67,7 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 			return;
 		case OS_APPEND:		   // open a file for appending data
-			stream = open(fileName, O_RDWR | O_BINARY | O_NOINHERIT | O_RANDOM | O_CREAT, 0666);
+			stream = open(fileName, options | O_RDWR | O_CREAT, 0666);
 
 			if (stream != -1)
 			{
@@ -80,15 +78,15 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &fileName, Int mode) : Driver()
 
 			break;
 		case OS_REPLACE:	   // create or overwrite a file
-			stream = open(fileName, O_RDWR | O_BINARY | O_NOINHERIT | O_RANDOM | O_CREAT | O_TRUNC, 0666);
+			stream = open(fileName, options | O_RDWR | O_CREAT | O_TRUNC, 0666);
 
 			break;
 		case IS_READ | IS_WRITE:   // open a file for reading data
-			stream = open(fileName, O_RDWR | O_BINARY | O_NOINHERIT);
+			stream = open(fileName, options | O_RDWR);
 
 			break;
 		case IS_READ:		   // open a file in read only mode
-			stream = open(fileName, O_RDONLY | O_BINARY | O_NOINHERIT);
+			stream = open(fileName, options | O_RDONLY);
 
 			break;
 	}

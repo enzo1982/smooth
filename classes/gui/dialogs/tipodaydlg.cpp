@@ -76,9 +76,10 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	img_light	= new Image(bmp, Point(5, 3), Size(32, 32));
 
 	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(8 + bmp.GetSize().cx, 7));
-	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold));
+	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold, 0, txt_didyouknow->GetFont().GetColor()));
 
 	txt_tip		= new Cursor(Point(6, 4), Size(328, 182));
+	txt_tip->SetFont(Font(Font::Default, Font::DefaultSize, Font::Normal, 0, Setup::TooltipTextColor));
 	txt_tip->SetFlags(CF_MULTILINE);
 	txt_tip->Deactivate();
 

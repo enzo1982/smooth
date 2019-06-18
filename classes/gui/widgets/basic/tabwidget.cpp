@@ -41,15 +41,19 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 	{
 		case SP_PAINT:
 			{
-				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
-				Int	 offset	 = 19 * surface->GetSurfaceDPI() / 96;
+				Surface	*surface    = GetDrawSurface();
+
+				Rect	 frame	    = Rect(GetRealPosition(), GetRealSize());
+				Int	 offset	    = 19 * surface->GetSurfaceDPI() / 96;
+
+				Long	 lightColor = Color(Math::Min(Setup::BackgroundColor.GetRed() + 64, 255), Math::Min(Setup::BackgroundColor.GetGreen() + 64, 255), Math::Min(Setup::BackgroundColor.GetBlue() + 64, 255));
+				Long	 darkColor  = Color(Math::Max(Setup::BackgroundColor.GetRed() - 64, 0), Math::Max(Setup::BackgroundColor.GetGreen() - 64, 0), Math::Max(Setup::BackgroundColor.GetBlue() - 64, 0));
 
 				surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 				surface->Frame(frame + Point(0, offset) - Size(0, offset), FRAME_UP);
 
-				frame.right	= frame.left;
-				frame.bottom	= frame.top + offset;
+				frame.right  = frame.left;
+				frame.bottom = frame.top + offset;
 
 				for (Int i = 0; i < GetNOfObjects(); i++)
 				{
@@ -82,7 +86,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 					{
 						surface->Line(Point(frame.left, frame.top + 1), Point(frame.left, frame.bottom), Setup::BackgroundColor); frame.left--;
 
-						if (IsRightToLeft()) surface->SetPixel(Point(frame.left + 1, frame.top), Setup::ClientColor);
+						if (IsRightToLeft()) surface->SetPixel(Point(frame.left + 1, frame.top), lightColor);
 					}
 					else
 					{
@@ -107,9 +111,9 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 						frame.bottom++;
 
 						surface->Line(Point(frame.left + 1, frame.bottom), Point(frame.right + (IsRightToLeft() ? 1 : 0), frame.bottom), Setup::BackgroundColor);
-						surface->SetPixel(Point(frame.left + (IsRightToLeft() ? 1 : 0), frame.bottom), (IsRightToLeft() ? Setup::DividerDarkColor : Setup::ClientColor));
+						surface->SetPixel(Point(frame.left + (IsRightToLeft() ? 1 : 0), frame.bottom), (IsRightToLeft() ? darkColor : lightColor));
 
-						if (IsRightToLeft()) surface->SetPixel(Point(frame.right + 1, frame.bottom), Setup::ClientColor);
+						if (IsRightToLeft()) surface->SetPixel(Point(frame.right + 1, frame.bottom), lightColor);
 
 						frame.right--;
 					}
@@ -117,7 +121,7 @@ S::Int S::GUI::TabWidget::Paint(Int message)
 					{
 						if (prev != NIL && prev->IsVisible()) frame.left++;
 
-						surface->Line(Point(frame.left, frame.bottom), Point(frame.right + (IsRightToLeft() ? 2 : 1), frame.bottom), Setup::ClientColor);
+						surface->Line(Point(frame.left, frame.bottom), Point(frame.right + (IsRightToLeft() ? 2 : 1), frame.bottom), lightColor);
 
 						if (prev != NIL && prev->IsVisible()) frame.left--;
 

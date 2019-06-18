@@ -137,28 +137,23 @@ S::Bool S::GUI::BitmapCocoa::DeleteBitmap()
 
 S::GUI::Bitmap S::GUI::BitmapCocoa::Scale(const Size &newSize) const
 {
-	Bitmap			 bitmap(newSize, depth);
+	Bitmap			 result(newSize, depth);
+	NSImage			*image	 = (NSImage *) result.GetSystemBitmap();
 
 	NSAutoreleasePool	*pool	 = [[NSAutoreleasePool alloc] init];
-	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: [[(NSImage *) bitmap.GetSystemBitmap() representations] objectAtIndex: 0]];
+	NSGraphicsContext	*context = [NSGraphicsContext graphicsContextWithBitmapImageRep: (NSBitmapImageRep *) [[image representations] objectAtIndex: 0]];
 
 	[NSGraphicsContext saveGraphicsState];
 	[NSGraphicsContext setCurrentContext: context];
 
-	if (image == nil) GetSystemBitmap();
-
-	[image drawInRect: NSMakeRect(0, 0, newSize.cx, newSize.cy)
-		 fromRect: NSMakeRect(0, 0, size.cx, size.cy)
-		operation: NSCompositeCopy
-		 fraction: 1.0];
-
-	[(NSImage *) bitmap.GetSystemBitmap() recache];
+	[bitmap drawInRect: NSMakeRect(0, 0, newSize.cx, newSize.cy)];
+	[image recache];
 
 	[NSGraphicsContext restoreGraphicsState];
 
 	[pool release];
 
-	return bitmap;
+	return result;
 }
 
 S::Bool S::GUI::BitmapCocoa::SetSystemBitmap(Void *nBitmap)

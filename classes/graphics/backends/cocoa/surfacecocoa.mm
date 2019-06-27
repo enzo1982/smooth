@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/cocoa/surfacecocoa.h>
+#include <smooth/graphics/backends/cocoa/fontcocoa.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
@@ -199,11 +200,11 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 	/* Get screen information.
 	 */
-	static SEL	 selScaleFactor	     = @selector(backingScaleFactor);
-	static Bool	 canQueryScaleFactor = [[NSScreen mainScreen] respondsToSelector: selScaleFactor];
+	static SEL	 scaleFactorSelector = @selector(backingScaleFactor);
+	static Bool	 canQueryScaleFactor = [[NSScreen mainScreen] respondsToSelector: scaleFactorSelector];
 
 	NSScreen	*screen	     = [window screen];
-	Float		 scaleFactor = canQueryScaleFactor ? ((CGFloat (*)(id, SEL)) [screen methodForSelector: selScaleFactor])(screen, selScaleFactor) : 1.0;
+	Float		 scaleFactor = canQueryScaleFactor ? ((CGFloat (*)(id, SEL)) [screen methodForSelector: scaleFactorSelector])(screen, scaleFactorSelector) : 1.0;
 
 	/* Convert coordinates.
 	 */
@@ -331,11 +332,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	if (string == NIL)			  return Error();
 	if (shadow)				  return SurfaceBackend::SetText(string, iRect, font, shadow);
 
-	NSFont			*nsFont	    = [[NSFontManager sharedFontManager] fontWithFamily: [NSString stringWithUTF8String: font.GetName().ConvertTo("UTF-8")]
-											 traits: (font.GetStyle() & Font::Italic ? NSItalicFontMask : 0) | (font.GetWeight() >= Font::Bold ? NSBoldFontMask : 0)
-											 weight: 5
-											   size: font.GetSize() * fontSize.TranslateY(96) / 72.0];
-
+	NSFont			*nsFont	    = FontCocoa::GetNativeFont(font);
 	NSColor			*nsColor    = [NSColor colorWithCalibratedRed: font.GetColor().GetRed()   / 255.0
 									green: font.GetColor().GetGreen() / 255.0
 									 blue: font.GetColor().GetBlue()  / 255.0

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/window/backends/cocoa/windowcocoa.h>
+#include <smooth/graphics/backends/cocoa/fontcocoa.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/cursor.h>
 #include <smooth/input/pointer.h>
@@ -405,12 +406,7 @@ const int	 NSApplicationDropFiles	 = 9;
 	{
 		const S::GUI::Font	&font = aCursor->GetFont();
 
-		NSFont			*nsFont = [[NSFontManager sharedFontManager] fontWithFamily: [NSString stringWithUTF8String: font.GetName().ConvertTo("UTF-8")]
-											     traits: (font.GetStyle() & S::GUI::Font::Italic ? NSItalicFontMask : 0) | (font.GetWeight() >= S::GUI::Font::Bold ? NSBoldFontMask : 0)
-											     weight: 5
-											       size: font.GetSize() * S::GUI::Surface().GetSurfaceDPI() / 72.0];
-
-		[markedAttributes setObject: nsFont
+		[markedAttributes setObject: S::GUI::FontCocoa::GetNativeFont(font)
 				     forKey: NSFontAttributeName];
 
 		[self unmarkText];

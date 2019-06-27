@@ -341,6 +341,9 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 	NSMutableDictionary	*attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys: nsFont,  NSFontAttributeName,
 												   nsColor, NSForegroundColorAttributeName, nil];
 
+	if (font.GetStyle() & Font::Underline) [attributes setObject: [NSNumber numberWithInt: NSUnderlineStyleSingle] forKey: NSUnderlineStyleAttributeName];
+	if (font.GetStyle() & Font::StrikeOut) [attributes setObject: [NSNumber numberWithInt: NSUnderlineStyleSingle] forKey: NSStrikethroughStyleAttributeName];
+
 	Rect			 rect	    = iRect;
 	Int			 lineHeight = font.GetScaledTextSizeY() + 3;
 

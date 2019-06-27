@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -133,6 +133,15 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 	    [disabledControlText greenComponent] == 0 &&
 	    [disabledControlText blueComponent]  == 0) disabledControlText = [NSColor colorWithDeviceRed: 0.5 green: 0.5 blue: 0.5 alpha: 1.0];
 
+	/* Query link color if selector exists.
+	 */
+	static SEL	 linkColorSelector = @selector(linkColor);
+	static Bool	 canQueryLinkColor = [[NSColor class] respondsToSelector: linkColorSelector];
+
+	NSColor	*linkColor		      = nil;
+
+	if (canQueryLinkColor) linkColor = [((NSColor *(*)(id, SEL)) [[NSColor class] methodForSelector: linkColorSelector])([NSColor class], linkColorSelector) colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+
 	/* Convert to smooth colors.
 	 */
 	Setup::BackgroundColor	  = GUI::Color([windowBackground redComponent] * 255, [windowBackground greenComponent] * 255, [windowBackground blueComponent] * 255);
@@ -153,6 +162,12 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 	Setup::GradientStartColor = GUI::Color(([alternateSelectedControl redComponent] - [alternateSelectedControl redComponent] * 0.25) * 255, ([alternateSelectedControl greenComponent] - [alternateSelectedControl greenComponent] * 0.25) * 255, ([alternateSelectedControl blueComponent] - [alternateSelectedControl blueComponent] * 0.25) * 255);
 	Setup::GradientEndColor	  = GUI::Color(([alternateSelectedControl redComponent] + (1.0 - [alternateSelectedControl redComponent]) * 0.25) * 255, ([alternateSelectedControl greenComponent] + (1.0 - [alternateSelectedControl greenComponent]) * 0.25) * 255, ([alternateSelectedControl blueComponent] + (1.0 - [alternateSelectedControl blueComponent]) * 0.25) * 255);
 	Setup::GradientTextColor  = GUI::Color([alternateSelectedControlText redComponent] * 255, [alternateSelectedControlText greenComponent] * 255, [alternateSelectedControlText blueComponent] * 255);
+
+	if (linkColor != nil)
+	{
+		Setup::LinkColor	  = GUI::Color([linkColor redComponent] * 255, [linkColor greenComponent] * 255, [linkColor blueComponent] * 255);
+		Setup::LinkHighlightColor = GUI::Color([linkColor redComponent] * 255, [linkColor greenComponent] * 255, [linkColor blueComponent] * 255);
+	}
 }
 
 S::Bool S::Backends::BackendCocoa::IsOSXVersionAtLeast(Int majorVersion, Int minorVersion, Int microVersion)

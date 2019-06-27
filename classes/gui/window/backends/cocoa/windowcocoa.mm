@@ -1059,14 +1059,14 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 					updateRect.left	  = rect->origin.x;
 					updateRect.top	  = rect->origin.y;
 					updateRect.right  = rect->origin.x + rect->size.width;
-					updateRect.bottom = rect->origin.x + rect->size.height;
+					updateRect.bottom = rect->origin.y + rect->size.height;
 				}
 				else
 				{
 					updateRect.left	  = Math::Min(updateRect.left, Int(rect->origin.x));
 					updateRect.top	  = Math::Min(updateRect.top, Int(rect->origin.y));
 					updateRect.right  = Math::Max(updateRect.right, Int(rect->origin.x + rect->size.width));
-					updateRect.bottom = Math::Max(updateRect.bottom, Int(rect->origin.x + rect->size.height));
+					updateRect.bottom = Math::Max(updateRect.bottom, Int(rect->origin.y + rect->size.height));
 				}
 
 				onEvent.Call(SM_PAINT, 0, 0);

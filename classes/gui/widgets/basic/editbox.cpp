@@ -30,7 +30,8 @@ S::GUI::EditBox::EditBox(const String &iText, const Point &iPos, const Size &iSi
 	if (GetWidth()	== 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(19);
 
-	cursor = new Cursor(Point(3, Math::Ceil(Float(GetHeight() - font.GetUnscaledTextSizeY()) / 2) - 2), GetSize() - Size(6, 2));
+	cursor = new Cursor(Point(3, Math::Ceil(Float(GetHeight() - font.GetUnscaledTextSizeY()) / 2) - 2),
+			    GetSize() - Size(6, Math::Ceil(Float(GetHeight() - font.GetUnscaledTextSizeY()) / 2) - 1));
 	cursor->SetMaxSize(maxSize);
 	cursor->SetBackgroundColor(Setup::ClientColor);
 	cursor->SetFont(font);
@@ -62,33 +63,24 @@ S::Int S::GUI::EditBox::Paint(Int message)
 	switch (message)
 	{
 		case SP_PAINT:
-			{
-				Surface	*surface = GetDrawSurface();
-				Rect	 frame	 = Rect(GetRealPosition(), GetRealSize());
+		{
+			Surface	*surface	 = GetDrawSurface();
+			Rect	 frame		 = Rect(GetRealPosition(), GetRealSize());
+			Color	 backgroundColor = IsActive() ? Setup::ClientColor : Setup::BackgroundColor;
 
-				surface->StartPaint(GetVisibleArea());
+			surface->StartPaint(GetVisibleArea());
 
-				if (IsActive())
-				{
-					cursor->SetBackgroundColor(Setup::ClientColor);
+			cursor->SetBackgroundColor(backgroundColor);
 
-					surface->Box(frame, Setup::ClientColor, Rect::Filled);
-				}
-				else
-				{
-					cursor->SetBackgroundColor(Setup::BackgroundColor);
+			surface->Box(frame, backgroundColor, Rect::Filled);
+			surface->Frame(frame, FRAME_DOWN);
 
-					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
-				}
+			Widget::Paint(message);
 
-				Widget::Paint(message);
-
-				surface->Frame(frame, FRAME_DOWN);
-
-				surface->EndPaint();
-			}
+			surface->EndPaint();
 
 			return Success();
+		}
 	}
 
 	return Widget::Paint(message);
@@ -139,7 +131,8 @@ S::Void S::GUI::EditBox::OnSelectEntry(ListEntry *entry)
 
 S::Void S::GUI::EditBox::OnChangeSize(const Size &nSize)
 {
-	cursor->SetMetrics(Point(3, Math::Ceil(Float(nSize.cy - font.GetUnscaledTextSizeY()) / 2) - 2), nSize - Size(6 + (comboBox != NIL ? 17 : 0), 2));
+	cursor->SetMetrics(Point(3, Math::Ceil(Float(nSize.cy - font.GetUnscaledTextSizeY()) / 2) - 2),
+			   nSize - Size(6 + (comboBox != NIL ? 17 : 0), Math::Ceil(Float(nSize.cy - font.GetUnscaledTextSizeY()) / 2) - 1));
 
 	if (comboBox != NIL) comboBox->SetSize(nSize);
 }

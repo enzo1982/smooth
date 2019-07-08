@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,29 +24,32 @@ S::ArgumentsParser::ArgumentsParser(int argc, char **argv)
 	}
 }
 
-S::ArgumentsParser::ArgumentsParser(const String &iCommand, const String &iArgs)
+S::ArgumentsParser::ArgumentsParser(const String &commandLine)
 {
-	command = iCommand;
-
 	String	 param;
-	Bool	 quoted = False;
+	Bool	 quoted	= False;
+	Bool	 first	= True;
 
-	for (Int i = 0, j = 0; i <= iArgs.Length(); i++)
+	for (Int i = 0, j = 0; i <= commandLine.Length(); i++)
 	{
-		if ((iArgs[i] == ' ' && !quoted && iArgs[i - 1] != '\\') || i == iArgs.Length())
+		if ((commandLine[i] == ' ' && !quoted && commandLine[i - 1] != '\\') || i == commandLine.Length())
 		{
-			if (param.Length() > 0) args.Add(param);
+			if (!param.Length()) continue;
 
-			param	= NIL;
-			j	= 0;
+			if (first) command = param;
+			else	   args.Add(param);
+
+			first = False;
+			param = NIL;
+			j     = 0;
 		}
-		else if (iArgs[i] == '\"')
+		else if (commandLine[i] == '\"')
 		{
 			quoted = !quoted;
 		}
-		else if (!(iArgs[i] == '\\' && iArgs[i + 1] == ' '))
+		else if (!(commandLine[i] == '\\' && commandLine[i + 1] == ' '))
 		{
-			param[j++] = iArgs[i];
+			param[j++] = commandLine[i];
 		}
 	}
 }

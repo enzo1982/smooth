@@ -1,1 +1,1 @@
-@rundll32 smooth.dll,LoadXUL layout.xul
+@rundll32 smooth.dll,LoadXUL %* layout.xul

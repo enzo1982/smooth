@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,29 +21,40 @@
 #ifdef __WIN32__
 #	include <smooth/init.win32.h>
 
-	int WINAPI S::GUI::LoadXUL(HWND hWnd, HINSTANCE shInstance, LPSTR szCmdLine, int iCmdShow)
+	void WINAPI S::GUI::LoadXUL(HWND hWnd, HINSTANCE shInstance, LPSTR szCmdLine, int iCmdShow)
 	{
 		hInstance = shInstance;
 
-		ArgumentsParser	 args(NIL, szCmdLine);
+		/* Parse command line arguments.
+		 */
+		ArgumentsParser	 args(GetCommandLineW());
 
-		GUI::Application::SetCommand(args.GetCommand());
-		GUI::Application::SetArguments(args.GetArguments());
+		String		 command   = args.GetCommand();
+		Array<String>	 arguments = args.GetArguments();
 
-		GUI::Application::GetStartupDirectory();
-		GUI::Application::GetApplicationDirectory();
+		if (arguments.GetFirst().EndsWith(".dll,LoadXUL"))
+		{
+			command = command.Append(" ").Append(arguments.GetFirst());
+			arguments.RemoveNth(0);
+		}
+
+		/* Init application and start XUL loader.
+		 */
+		Application::SetCommand(command);
+		Application::SetArguments(arguments);
+
+		Application::GetStartupDirectory();
+		Application::GetApplicationDirectory();
 
 		Init();
 
-		XULLoader	*loader = new XULLoader(szCmdLine);
+		XULLoader	*loader = new XULLoader(arguments.GetLast());
 
 		loader->Loop();
 
 		Object::DeleteObject(loader);
 
 		Free();
-
-		return 0;
 	}
 #endif
 

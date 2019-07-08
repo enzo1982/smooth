@@ -12,18 +12,18 @@ dd.mm.19 hh:mm - smooth alpha 0.8.74.0
 - tree.cpp		- draw horizontal branch lines to improve tree look
 - tabwidget.cpp		- added support for displaying bitmaps on tab handles
 - image.cpp		- set background color for bitmaps
-- haperlink.cpp		- set background color for bitmaps
+- hyperlink.cpp		- set background color for bitmaps
 - backendxlib.cpp	- allow console applications to run without an X display available
 - windowxlib.cpp	- fixed thread-safety issues with Xlib windows
 - keyboard.cpp		- improved thread-safety
 - crc16.cpp		- added Hash::CRC16 class to calculate 16 bit CRCs
-- directory.cpp		- fixed permissions of newly created directories to respect umask setting
 - driver_posix.cpp	- fixed permissions of newly created files to respect umask setting
 - driver.cpp		- added Truncate() and Close() methods to public API
 			- added IsBuffered() and SetBufferSize() methods to control buffering
 			- implemented Flush() method for file drivers
 - outstream.cpp		- added Truncate() method
 - directory.cpp		- Copy() and Move() method now take a const Directory & argument
+			- fixed permissions of newly created directories to respect umask setting
 - file.cpp		- Copy() and Move() method now take a const File & argument
 			- added methods to change modification and access time
 - string.cpp		- added scoped string format setters String::InputFormat and String::OutputFormat
@@ -33,6 +33,7 @@ dd.mm.19 hh:mm - smooth alpha 0.8.74.0
 - datetime.cpp		- fixed possible crashes
 
 - added Float32 and Float64 type defintions
+- added support for Unicode console I/O on Windows
 - added stream API to CRC32 and CRC64 classes
 - performance improvements for CRC calculations
 - added plain text export to Translator utility

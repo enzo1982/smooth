@@ -39,6 +39,10 @@
 char	*S::Directory::directoryDelimiter = NIL;
 char	*S::Directory::unicodePathPrefix  = NIL;
 
+S::Directory::Directory()
+{
+}
+
 S::Directory::Directory(const String &iDirName, const String &iDirPath)
 {
 	dirName = iDirName;
@@ -103,10 +107,6 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 S::Directory::Directory(const Directory &iDirectory)
 {
 	*this = iDirectory;
-}
-
-S::Directory::Directory(const int nil)
-{
 }
 
 S::Directory::~Directory()

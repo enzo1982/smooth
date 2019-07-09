@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -166,6 +166,10 @@ namespace smooth
 #endif
 };
 
+S::File::File()
+{
+}
+
 S::File::File(const String &iFileName, const String &iFilePath)
 {
 	fileName = iFileName;
@@ -226,10 +230,6 @@ S::File::File(const File &iFile)
 {
 	fileName = iFile.fileName;
 	filePath = iFile.filePath;
-}
-
-S::File::File(const int nil)
-{
 }
 
 S::File::~File()

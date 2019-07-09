@@ -325,6 +325,6 @@ namespace smooth
 	};
 };
 
-template <class s> s S::ArrayBackend<s>::nullValue = (s) 0;
+template <class s> s S::ArrayBackend<s>::nullValue;
 
 #endif

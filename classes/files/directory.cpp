@@ -45,25 +45,27 @@ S::Directory::Directory()
 
 S::Directory::Directory(const String &iDirName, const String &iDirPath)
 {
+	const String	&delimiter = Directory::GetDirectoryDelimiter();
+
 	dirName = iDirName;
 	dirPath = iDirPath;
 
-	dirName.Replace("/",  Directory::GetDirectoryDelimiter());
-	dirName.Replace("\\", Directory::GetDirectoryDelimiter());
+	dirName.Replace("/",  delimiter);
+	dirName.Replace("\\", delimiter);
 
-	dirPath.Replace("/",  Directory::GetDirectoryDelimiter());
-	dirPath.Replace("\\", Directory::GetDirectoryDelimiter());
+	dirPath.Replace("/",  delimiter);
+	dirPath.Replace("\\", delimiter);
 
 	if (dirName != NIL && dirPath == NIL)
 	{
 #ifdef __WIN32__
-		if (dirName.StartsWith(Directory::GetDirectoryDelimiter()) && !dirName.StartsWith("\\\\")) dirName = String(Directory::GetActiveDirectory()).Head(2).Append(dirName);
+		if (dirName.StartsWith(delimiter) && !dirName.StartsWith("\\\\")) dirName = String(Directory::GetActiveDirectory()).Head(2).Append(dirName);
 #endif
 
 #ifdef __WIN32__
 		if (dirName[1] == ':' || dirName.StartsWith("\\\\"))
 #else
-		if (dirName.StartsWith(GetDirectoryDelimiter()) || dirName.StartsWith("~"))
+		if (dirName.StartsWith(delimiter) || dirName.StartsWith("~"))
 #endif
 		{
 			dirPath = dirName;
@@ -71,16 +73,16 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 		}
 		else
 		{
-			dirPath = String(Directory::GetActiveDirectory()).Append(Directory::GetDirectoryDelimiter()).Append(dirName);
+			dirPath = String(Directory::GetActiveDirectory()).Append(delimiter).Append(dirName);
 			dirName = NIL;
 		}
 	}
 
 	if (dirName == NIL)
 	{
-		if (dirPath.EndsWith(GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;
+		if (dirPath.EndsWith(delimiter)) dirPath[dirPath.Length() - 1] = 0;
 
-		Int	 lastBS = dirPath.FindLast(GetDirectoryDelimiter());
+		Int	 lastBS = dirPath.FindLast(delimiter);
 
 		if (lastBS >= 0)
 		{
@@ -89,19 +91,25 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 		}
 	}
 
+	/* Replace ./ elements.
+	 */
+	if (!dirPath.EndsWith(delimiter)) dirPath.Append(delimiter);
+
+	dirPath.Replace(String(delimiter).Append(".").Append(delimiter), delimiter);
+
+	if (dirPath.StartsWith(String(".").Append(delimiter))) dirPath = String(Directory::GetActiveDirectory()).Append(dirPath.Tail(dirPath.Length() - 2));
+
 	/* Replace ../ elements.
 	 */
-	if (!dirPath.EndsWith(GetDirectoryDelimiter())) dirPath.Append(GetDirectoryDelimiter());
-
-	while (dirPath.Contains(String(GetDirectoryDelimiter()).Append("..").Append(GetDirectoryDelimiter())))
+	while (dirPath.Contains(String(delimiter).Append("..").Append(delimiter)))
 	{
-		Int	 upPos	= dirPath.Find(String(GetDirectoryDelimiter()).Append("..").Append(GetDirectoryDelimiter()));
-		Int	 prePos	= dirPath.Head(upPos).FindLast(GetDirectoryDelimiter());
+		Int	 upPos	= dirPath.Find(String(delimiter).Append("..").Append(delimiter));
+		Int	 prePos	= dirPath.Head(upPos).FindLast(delimiter);
 
 		dirPath.Replace(dirPath.SubString(prePos, upPos - prePos + 3), String());
 	}
 
-	if (dirPath.EndsWith(Directory::GetDirectoryDelimiter())) dirPath[dirPath.Length() - 1] = 0;
+	if (dirPath.EndsWith(delimiter)) dirPath[dirPath.Length() - 1] = 0;
 }
 
 S::Directory::Directory(const Directory &iDirectory)

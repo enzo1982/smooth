@@ -172,25 +172,27 @@ S::File::File()
 
 S::File::File(const String &iFileName, const String &iFilePath)
 {
+	const String	&delimiter = Directory::GetDirectoryDelimiter();
+
 	fileName = iFileName;
 	filePath = iFilePath;
 
-	fileName.Replace("/",  Directory::GetDirectoryDelimiter());
-	fileName.Replace("\\", Directory::GetDirectoryDelimiter());
+	fileName.Replace("/",  delimiter);
+	fileName.Replace("\\", delimiter);
 
-	filePath.Replace("/",  Directory::GetDirectoryDelimiter());
-	filePath.Replace("\\", Directory::GetDirectoryDelimiter());
+	filePath.Replace("/",  delimiter);
+	filePath.Replace("\\", delimiter);
 
 	if (fileName != NIL && filePath == NIL)
 	{
 #ifdef __WIN32__
-		if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) && !fileName.StartsWith("\\\\")) fileName = String(Directory::GetActiveDirectory()).Head(2).Append(fileName);
+		if (fileName.StartsWith(delimiter) && !fileName.StartsWith("\\\\")) fileName = String(Directory::GetActiveDirectory()).Head(2).Append(fileName);
 #endif
 
 #ifdef __WIN32__
 		if (fileName[1] == ':' || fileName.StartsWith("\\\\"))
 #else
-		if (fileName.StartsWith(Directory::GetDirectoryDelimiter()) || fileName.StartsWith("~"))
+		if (fileName.StartsWith(delimiter) || fileName.StartsWith("~"))
 #endif
 		{
 			filePath = fileName;
@@ -198,32 +200,38 @@ S::File::File(const String &iFileName, const String &iFilePath)
 		}
 		else
 		{
-			filePath = String(Directory::GetActiveDirectory()).Append(Directory::GetDirectoryDelimiter()).Append(fileName);
+			filePath = String(Directory::GetActiveDirectory()).Append(delimiter).Append(fileName);
 			fileName = NIL;
 		}
 	}
 
 	if (fileName == NIL)
 	{
-		Int	 lastBS = filePath.FindLast(Directory::GetDirectoryDelimiter());
+		Int	 lastBS = filePath.FindLast(delimiter);
 
 		fileName = filePath.Tail(filePath.Length() - lastBS - 1);
 		filePath[lastBS >= 0 ? lastBS : 0] = 0;
 	}
 
+	/* Replace ./ elements.
+	 */
+	if (!filePath.EndsWith(delimiter)) filePath.Append(delimiter);
+
+	filePath.Replace(String(delimiter).Append(".").Append(delimiter), delimiter);
+
+	if (filePath.StartsWith(String(".").Append(delimiter))) filePath = String(Directory::GetActiveDirectory()).Append(filePath.Tail(filePath.Length() - 2));
+
 	/* Replace ../ elements.
 	 */
-	if (!filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath.Append(Directory::GetDirectoryDelimiter());
-
-	while (filePath.Contains(String(Directory::GetDirectoryDelimiter()).Append("..").Append(Directory::GetDirectoryDelimiter())))
+	while (filePath.Contains(String(delimiter).Append("..").Append(delimiter)))
 	{
-		Int	 upPos	= filePath.Find(String(Directory::GetDirectoryDelimiter()).Append("..").Append(Directory::GetDirectoryDelimiter()));
-		Int	 prePos	= filePath.Head(upPos).FindLast(Directory::GetDirectoryDelimiter());
+		Int	 upPos	= filePath.Find(String(delimiter).Append("..").Append(delimiter));
+		Int	 prePos	= filePath.Head(upPos).FindLast(delimiter);
 
 		filePath.Replace(filePath.SubString(prePos, upPos - prePos + 3), String());
 	}
 
-	if (filePath.EndsWith(Directory::GetDirectoryDelimiter())) filePath[filePath.Length() - 1] = 0;
+	if (filePath.EndsWith(delimiter)) filePath[filePath.Length() - 1] = 0;
 }
 
 S::File::File(const File &iFile)

@@ -60,6 +60,8 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), NIL, Point(175, 29), Size());
 	btn_next->onAction.Connect(&TipOfTheDay::OnNext, this);
 	btn_next->SetOrientation(OR_LOWERRIGHT);
+	btn_next->SetWidth(Math::Max(80, btn_next->GetUnscaledTextWidth() + 13));
+	btn_next->SetX(btn_next->GetWidth() + 95);
 
 	check_showtips	= new CheckBox(I18n::Translator::defaultTranslator->TranslateString("Show tips on startup"), Point(7, 27), Size(150, 0), showTips);
 	check_showtips->SetOrientation(OR_LOWERLEFT);
@@ -135,7 +137,7 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 	Rect	 workArea	= System::Screen::GetActiveScreenWorkArea();
 	Float	 scaleFactor	= Surface().GetSurfaceDPI() / 96.0;
 
-	Int	 additionalSize = Math::Max(0, check_showtips->GetUnscaledTextWidth() - 133);
+	Int	 additionalSize = Math::Max(0, check_showtips->GetWidth() + btn_next->GetWidth() - 234);
 	Size	 size		= Size(328 + additionalSize, 182);
 
 	foreach (const String &tip, tips) size = Size(Math::Max(size.cx, font.GetUnscaledTextSizeX(tip) + 12),

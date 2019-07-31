@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,7 +56,7 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
 		paintBitmap = (HBITMAP) SelectObject(paintContext, bitmap);
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		ReleaseDC(window, gdi_dc);
 
@@ -74,8 +74,6 @@ S::GUI::SurfaceGDI::~SurfaceGDI()
 
 		DeleteDC(paintContext);
 		::DeleteObject(bitmap);
-
-		delete paintRects.GetFirst();
 	}
 }
 
@@ -93,8 +91,6 @@ S::Int S::GUI::SurfaceGDI::SetSize(const Size &nSize)
 
 		::DeleteObject(bitmap);
 
-		delete paintRects.GetFirst();
-
 		paintRects.RemoveAll();
 
 		HDC	 gdi_dc = GetWindowDC(window);
@@ -102,7 +98,7 @@ S::Int S::GUI::SurfaceGDI::SetSize(const Size &nSize)
 		bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
 
 		paintBitmap = (HBITMAP) SelectObject(paintContext, bitmap);
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		ReleaseDC(window, gdi_dc);
 	}
@@ -137,7 +133,7 @@ S::Int S::GUI::SurfaceGDI::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), paintRects.GetLast());
 	HRGN	 region = CreateRectRgn(pRect.left, pRect.top, pRect.right, pRect.bottom);
 
 	SaveDC(paintContext);
@@ -145,7 +141,7 @@ S::Int S::GUI::SurfaceGDI::StartPaint(const Rect &iPRect)
 
 	::DeleteObject(region);
 
-	paintRects.Add(new Rect(pRect));
+	paintRects.Add(pRect);
 
 	painting++;
 
@@ -158,9 +154,7 @@ S::Int S::GUI::SurfaceGDI::EndPaint()
 
 	painting--;
 
-	if (painting == 0) PaintRect(*(paintRects.GetLast()));
-
-	delete paintRects.GetLast();
+	if (painting == 0) PaintRect(paintRects.GetLast());
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -62,7 +62,7 @@ S::GUI::SurfaceHaiku::SurfaceHaiku(Void *iView, const Size &maxSize)
 
 		bitmap->AddChild(bitmapView);
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		allocSize = size;
 	}
@@ -78,8 +78,6 @@ S::GUI::SurfaceHaiku::~SurfaceHaiku()
 
 		delete bitmapView;
 		delete bitmap;
-
-		delete paintRects.GetFirst();
 	}
 }
 
@@ -133,8 +131,6 @@ S::Int S::GUI::SurfaceHaiku::SetSize(const Size &nSize)
 		delete bitmapView;
 		delete bitmap;
 
-		delete paintRects.GetFirst();
-
 		paintRects.RemoveAll();
 
 		bitmap	   = new BBitmap(BRect(0, 0, size.cx, size.cy), B_RGB32, true);
@@ -143,7 +139,7 @@ S::Int S::GUI::SurfaceHaiku::SetSize(const Size &nSize)
 		bitmap->AddChild(bitmapView);
 		bitmap->Lock();
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 	}
 
 	allocSize = nSize;
@@ -174,14 +170,14 @@ S::Int S::GUI::SurfaceHaiku::StartPaint(const Rect &iPRect)
 {
 	if (view == NIL) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), paintRects.GetLast());
 
 	BRegion	 clippingRegion(BRect(pRect.left, pRect.top, pRect.right, pRect.bottom));
 
 	bitmapView->PushState();
 	bitmapView->ConstrainClippingRegion(&clippingRegion);
 
-	paintRects.Add(new Rect(pRect));
+	paintRects.Add(pRect);
 
 	painting++;
 
@@ -194,9 +190,7 @@ S::Int S::GUI::SurfaceHaiku::EndPaint()
 
 	painting--;
 
-	if (painting == 0) PaintRect(*(paintRects.GetLast()));
-
-	delete paintRects.GetLast();
+	if (painting == 0) PaintRect(paintRects.GetLast());
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 

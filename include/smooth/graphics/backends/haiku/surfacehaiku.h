@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2013 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -32,46 +32,46 @@ namespace smooth
 		class SurfaceHaiku : public SurfaceBackend
 		{
 			private:
-				static Short		 surfaceDPI;
+				static Short	 surfaceDPI;
 			protected:
-				Size			 allocSize;
+				Size		 allocSize;
 
-				BView			*view;
+				BView		*view;
 
-				BBitmap			*bitmap;
-				BView			*bitmapView;
+				BBitmap		*bitmap;
+				BView		*bitmapView;
 
-				Array<Rect *, Void *>	 paintRects;
+				Array<Rect>	 paintRects;
 			public:
-							 SurfaceHaiku(Void * = NIL, const Size & = Size());
-							~SurfaceHaiku();
+						 SurfaceHaiku(Void * = NIL, const Size & = Size());
+						~SurfaceHaiku();
 
-				Int			 Lock();
-				Int			 Release();
+				Int		 Lock();
+				Int		 Release();
 
-				Int			 SetSize(const Size &);
-				const Size		&GetSize() const;
+				Int		 SetSize(const Size &);
+				const Size	&GetSize() const;
 
-				Int			 PaintRect(const Rect &);
+				Int		 PaintRect(const Rect &);
 
-				Int			 StartPaint(const Rect &);
-				Int			 EndPaint();
+				Int		 StartPaint(const Rect &);
+				Int		 EndPaint();
 
-				Void			*GetSystemSurface() const;
+				Void		*GetSystemSurface() const;
 
-				Short			 GetSurfaceDPI() const;
+				Short		 GetSurfaceDPI() const;
 
-				Int			 SetPixel(const Point &, const Color &);
+				Int		 SetPixel(const Point &, const Color &);
 
-				Int			 Line(const Point &, const Point &, const Color &);
-				Int			 Box(const Rect &, const Color &, Int, const Size &);
+				Int		 Line(const Point &, const Point &, const Color &);
+				Int		 Box(const Rect &, const Color &, Int, const Size &);
 
-				Int			 SetText(const String &, const Rect &, const Font &, Bool);
+				Int		 SetText(const String &, const Rect &, const Font &, Bool);
 
-				Int			 Gradient(const Rect &, const Color &, const Color &, Int);
+				Int		 Gradient(const Rect &, const Color &, const Color &, Int);
 
-				Int			 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				Int			 BlitToBitmap(const Rect &, Bitmap &, const Rect &);
+				Int		 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
+				Int		 BlitToBitmap(const Rect &, Bitmap &, const Rect &);
 		};
 	};
 };

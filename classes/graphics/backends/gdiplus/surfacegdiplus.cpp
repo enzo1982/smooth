@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -54,7 +54,7 @@ S::GUI::SurfaceGDIPlus::SurfaceGDIPlus(Void *iWindow, const Size &maxSize)
 		paintBitmap	= new Gdiplus::Bitmap(size.cx, size.cy, graphics);
 		paintContext	= new Gdiplus::Graphics(paintBitmap);
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		delete graphics;
 
@@ -72,7 +72,6 @@ S::GUI::SurfaceGDIPlus::~SurfaceGDIPlus()
 	{
 		delete paintContext;
 		delete paintBitmap;
-		delete paintRects.GetFirst();
 	}
 }
 
@@ -88,7 +87,6 @@ S::Int S::GUI::SurfaceGDIPlus::SetSize(const Size &nSize)
 	{
 		delete paintContext;
 		delete paintBitmap;
-		delete paintRects.GetFirst();
 
 		paintRects.RemoveAll();
 
@@ -99,7 +97,7 @@ S::Int S::GUI::SurfaceGDIPlus::SetSize(const Size &nSize)
 		paintBitmap	= new Gdiplus::Bitmap(size.cx, size.cy, graphics);
 		paintContext	= new Gdiplus::Graphics(paintBitmap);
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		delete graphics;
 
@@ -142,10 +140,10 @@ S::Int S::GUI::SurfaceGDIPlus::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), paintRects.GetLast());
 
 	paintStates.Add(paintContext->Save());
-	paintRects.Add(new Rect(pRect));
+	paintRects.Add(pRect);
 
 	paintContext->SetClip(Gdiplus::Rect(pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight()));
 
@@ -160,11 +158,9 @@ S::Int S::GUI::SurfaceGDIPlus::EndPaint()
 
 	painting--;
 
-	if (painting == 0) PaintRect(*(paintRects.GetLast()));
+	if (painting == 0) PaintRect(paintRects.GetLast());
 
 	paintContext->Restore(paintStates.GetLast());
-
-	delete paintRects.GetLast();
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 	paintStates.RemoveNth(paintStates.Length() - 1);

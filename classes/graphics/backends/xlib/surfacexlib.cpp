@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -65,7 +65,7 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 		bitmap = XCreatePixmap(display, window, size.cx, size.cy, windowAttributes.depth);
 		gc     = XCreateGC(display, bitmap, 0, NIL);
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		allocSize = size;
 	}
@@ -79,8 +79,6 @@ S::GUI::SurfaceXLib::~SurfaceXLib()
 	{
 		XFreeGC(display, gc);
 		XFreePixmap(display, bitmap);
-
-		delete paintRects.GetFirst();
 	}
 }
 
@@ -97,8 +95,6 @@ S::Int S::GUI::SurfaceXLib::SetSize(const Size &nSize)
 		XFreeGC(display, gc);
 		XFreePixmap(display, bitmap);
 
-		delete paintRects.GetFirst();
-
 		paintRects.RemoveAll();
 
 		XWindowAttributes	 windowAttributes;
@@ -108,7 +104,7 @@ S::Int S::GUI::SurfaceXLib::SetSize(const Size &nSize)
 		bitmap = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
 		gc     = XCreateGC(display, bitmap, 0, NIL);
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 	}
 
 	allocSize = nSize;
@@ -137,7 +133,7 @@ S::Int S::GUI::SurfaceXLib::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect		 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
+	Rect		 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), paintRects.GetLast());
 	XRectangle	 clipRect;
 
 	clipRect.x	= pRect.left;
@@ -147,7 +143,7 @@ S::Int S::GUI::SurfaceXLib::StartPaint(const Rect &iPRect)
 
 	XSetClipRectangles(display, gc, 0, 0, &clipRect, 1, Unsorted);
 
-	paintRects.Add(new Rect(pRect));
+	paintRects.Add(pRect);
 
 	painting++;
 
@@ -162,13 +158,13 @@ S::Int S::GUI::SurfaceXLib::EndPaint()
 
 	if (painting == 0)
 	{
-		PaintRect(*(paintRects.GetLast()));
+		PaintRect(paintRects.GetLast());
 
 		XSetClipMask(display, gc, None);
 	}
 	else
 	{
-		Rect		*paintRect = paintRects.GetNth(paintRects.Length() - 2);
+		const Rect	&paintRect = paintRects.GetNth(paintRects.Length() - 2);
 		XRectangle	 clipRect;
 
 		clipRect.x	= paintRect->left;
@@ -178,8 +174,6 @@ S::Int S::GUI::SurfaceXLib::EndPaint()
 
 		XSetClipRectangles(display, gc, 0, 0, &clipRect, 1, Unsorted);
 	}
-
-	delete paintRects.GetLast();
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 
@@ -355,7 +349,7 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 
 	/* Set clipping area.
 	 */
-	Rect		 pRect = *(paintRects.GetLast());
+	const Rect	&pRect = paintRects.GetLast();
 	XRectangle	 clipRect;
 
 	clipRect.x	= pRect.left;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -119,7 +119,7 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
 #endif
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		paintContextCairo = cairo_create(paintSurfaceCairo);
 
@@ -146,8 +146,6 @@ S::GUI::SurfaceCairo::~SurfaceCairo()
 #else
 		XFreePixmap(display, paintBitmap);
 #endif
-
-		delete paintRects.GetFirst();
 	}
 }
 
@@ -172,8 +170,6 @@ S::Int S::GUI::SurfaceCairo::SetSize(const Size &nSize)
 		XFreePixmap(display, paintBitmap);
 #endif
 
-		delete paintRects.GetFirst();
-
 		paintRects.RemoveAll();
 
 #ifdef __WIN32__
@@ -194,7 +190,7 @@ S::Int S::GUI::SurfaceCairo::SetSize(const Size &nSize)
 		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
 #endif
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		paintContextCairo = cairo_create(paintSurfaceCairo);
 
@@ -239,13 +235,13 @@ S::Int S::GUI::SurfaceCairo::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), paintRects.GetLast());
 
 	cairo_save(paintContextCairo);
 	cairo_rectangle(paintContextCairo, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight());
 	cairo_clip(paintContextCairo);
 
-	paintRects.Add(new Rect(pRect));
+	paintRects.Add(pRect);
 
 	painting++;
 
@@ -258,9 +254,7 @@ S::Int S::GUI::SurfaceCairo::EndPaint()
 
 	painting--;
 
-	if (painting == 0) PaintRect(*(paintRects.GetLast()));
-
-	delete paintRects.GetLast();
+	if (painting == 0) PaintRect(paintRects.GetLast());
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 

@@ -49,7 +49,7 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 
 		rightToLeft.SetSurfaceSize(size);
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 
 		[NSBezierPath setDefaultLineWidth: 0.0];
 	}
@@ -59,7 +59,6 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 
 S::GUI::SurfaceCocoa::~SurfaceCocoa()
 {
-	if (window != NIL) delete paintRects.GetFirst();
 }
 
 S::Int S::GUI::SurfaceCocoa::Lock()
@@ -92,11 +91,9 @@ S::Int S::GUI::SurfaceCocoa::SetSize(const Size &nSize)
 
 	if (window != NIL && !painting)
 	{
-		delete paintRects.GetFirst();
-
 		paintRects.RemoveAll();
 
-		paintRects.Add(new Rect(Point(0, 0), size));
+		paintRects.Add(Rect(Point(0, 0), size));
 	}
 
 	return Success();
@@ -120,7 +117,7 @@ S::Int S::GUI::SurfaceCocoa::StartPaint(const Rect &iPRect)
 {
 	if (window == NIL || ![window isVisible]) return Success();
 
-	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), *(paintRects.GetLast()));
+	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), paintRects.GetLast());
 
 	[window disableFlushWindow];
 
@@ -128,7 +125,7 @@ S::Int S::GUI::SurfaceCocoa::StartPaint(const Rect &iPRect)
 
 	[[NSBezierPath bezierPathWithRect: NSMakeRect(pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight())] addClip];
 
-	paintRects.Add(new Rect(pRect));
+	paintRects.Add(pRect);
 
 	painting++;
 
@@ -141,9 +138,7 @@ S::Int S::GUI::SurfaceCocoa::EndPaint()
 
 	painting--;
 
-	Rect	 paintRect = *(paintRects.GetLast());
-
-	delete paintRects.GetLast();
+	Rect	 paintRect = paintRects.GetLast();
 
 	paintRects.RemoveNth(paintRects.Length() - 1);
 

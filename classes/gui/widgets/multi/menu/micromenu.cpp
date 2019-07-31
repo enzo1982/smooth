@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -93,10 +93,11 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 
 				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(frame.left + (frame.GetWidth() - size) / 2 + i, frame.top + frame.GetHeight() / 2 - size + 1 + i);
-					Point	 lineEnd	= lineStart + Point(0, 2 * (size - i) - 1);
+					Point	 lineStart = Point(frame.left + (frame.GetWidth() - size) / 2 + i, frame.top + frame.GetHeight() / 2 - size + 1 + i);
+					Point	 lineEnd   = lineStart + Point(0, 2 * (size - i) - 1);
 
-					surface->Line(lineStart, lineEnd, Color(0, 0, 0));
+					if (IsActive())	surface->Line(lineStart, lineEnd, Setup::TextColor);
+					else		surface->Line(lineStart, lineEnd, Setup::InactiveTextColor);
 				}
 			}
 			else if (subtype == OR_VERT)
@@ -105,10 +106,11 @@ S::Int S::GUI::MicroMenu::Paint(Int message)
 
 				for (Int i = 0; i < size; i++)
 				{
-					Point	 lineStart	= Point(frame.left + frame.GetWidth() / 2 - size + 1 + (IsRightToLeft() ? 1 : 0) + i, frame.top + (frame.GetHeight() - size) / 2 + i);
-					Point	 lineEnd	= lineStart + Point(2 * (size - i) - 1, 0);
+					Point	 lineStart = Point(frame.left + frame.GetWidth() / 2 - size + 1 + (IsRightToLeft() ? 1 : 0) + i, frame.top + (frame.GetHeight() - size) / 2 + i);
+					Point	 lineEnd   = lineStart + Point(2 * (size - i) - 1, 0);
 
-					surface->Line(lineStart, lineEnd, Color(0, 0, 0));
+					if (IsActive())	surface->Line(lineStart, lineEnd, Setup::TextColor);
+					else		surface->Line(lineStart, lineEnd, Setup::InactiveTextColor);
 				}
 			}
 

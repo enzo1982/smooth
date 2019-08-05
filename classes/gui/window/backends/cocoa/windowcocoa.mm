@@ -263,12 +263,14 @@ const int	 NSApplicationDropFiles	 = 9;
 
 			[NSGraphicsContext saveGraphicsState];
 
-			[[NSBezierPath bezierPathWithRect: NSMakeRect(cursor->GetRealPosition().x, [self frame].size.height - cursor->GetRealPosition().y - cursor->GetRealSize().cy, cursor->GetRealSize().cx, cursor->GetRealSize().cy)] addClip];
+			S::GUI::Point	 realPos  = cursor->GetRealPosition();
+			S::GUI::Size	 realSize = cursor->GetRealSize();
+
+			NSRectClip(NSMakeRect(realPos.x, realPos.y, realSize.cx, realSize.cy));
 
 			NSAttributedString	*range = [editString attributedSubstringFromRange: markedRange];
 
-			[range drawAtPoint: NSMakePoint(cursorPosition.x - 1,
-							[self frame].size.height - cursorPosition.y - 1 - cursor->GetFont().GetScaledTextSizeY())];
+			[range drawAtPoint: NSMakePoint(cursorPosition.x - 1, cursorPosition.y - 2)];
 
 			[NSGraphicsContext restoreGraphicsState];
 		}
@@ -380,7 +382,7 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		NSRect	 rect = NSMakeRect(0, 0, 0, 0);
 
-		if (cursor != NIL) rect = NSMakeRect(cursorPosition.x, [self frame].size.height - cursorPosition.y - cursor->GetFont().GetScaledTextSizeY(), 0, 0);
+		if (cursor != NIL) rect = NSMakeRect(cursorPosition.x, cursorPosition.y + cursor->GetFont().GetScaledTextSizeY(), 0, 0);
 
 		rect	    = [self convertRectToBase: rect];
 		rect.origin = [[self window] convertBaseToScreen: rect.origin];

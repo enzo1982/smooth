@@ -64,13 +64,13 @@ S::IO::DriverWin32::DriverWin32(const String &file, Int mode) : Driver()
 		return;
 	}
 
-	closeStream = true;
+	closeStream = True;
 }
 
 S::IO::DriverWin32::DriverWin32(HANDLE iStream) : Driver()
 {
-	stream		= iStream;
-	closeStream	= false;
+	stream	    = iStream;
+	closeStream = False;
 }
 
 S::IO::DriverWin32::~DriverWin32()
@@ -80,7 +80,7 @@ S::IO::DriverWin32::~DriverWin32()
 
 S::Int S::IO::DriverWin32::ReadData(UnsignedByte *data, Int dataSize)
 {
-	if (dataSize <= 0) return 0;
+	if (stream == INVALID_HANDLE_VALUE || dataSize <= 0) return 0;
 
 	DWORD	 bytes;
 
@@ -91,7 +91,7 @@ S::Int S::IO::DriverWin32::ReadData(UnsignedByte *data, Int dataSize)
 
 S::Int S::IO::DriverWin32::WriteData(const UnsignedByte *data, Int dataSize)
 {
-	if (dataSize <= 0) return 0;
+	if (stream == INVALID_HANDLE_VALUE || dataSize <= 0) return 0;
 
 	DWORD	 bytes;
 
@@ -102,6 +102,8 @@ S::Int S::IO::DriverWin32::WriteData(const UnsignedByte *data, Int dataSize)
 
 S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 {
+	if (stream == INVALID_HANDLE_VALUE) return -1;
+
 	LONG	 hi32 = newPos >> 32;
 	DWORD	 lo32 = SetFilePointer(stream, newPos, &hi32, FILE_BEGIN);
 
@@ -112,22 +114,23 @@ S::Int64 S::IO::DriverWin32::Seek(Int64 newPos)
 
 S::Bool S::IO::DriverWin32::Truncate(Int64 newSize)
 {
-	if (Seek(newSize) == -1 || !SetEndOfFile(stream)) return False;
+	if (stream == INVALID_HANDLE_VALUE || Seek(newSize) == -1 || !SetEndOfFile(stream)) return False;
 
 	return True;
 }
 
 S::Bool S::IO::DriverWin32::Flush()
 {
-	if (!FlushFileBuffers(stream)) return False;
+	if (stream == INVALID_HANDLE_VALUE || !FlushFileBuffers(stream)) return False;
 
 	return True;
 }
 
 S::Bool S::IO::DriverWin32::Close()
 {
-	if (!closeStream || !CloseHandle(stream)) return False;
+	if (stream == INVALID_HANDLE_VALUE || !closeStream || !CloseHandle(stream)) return False;
 
+	stream	    = INVALID_HANDLE_VALUE;
 	closeStream = False;
 
 	return True;
@@ -135,6 +138,8 @@ S::Bool S::IO::DriverWin32::Close()
 
 S::Int64 S::IO::DriverWin32::GetSize() const
 {
+	if (stream == INVALID_HANDLE_VALUE) return -1;
+
 	DWORD	 hi32 = 0;
 	DWORD	 lo32 = GetFileSize(stream, &hi32);
 
@@ -145,6 +150,8 @@ S::Int64 S::IO::DriverWin32::GetSize() const
 
 S::Int64 S::IO::DriverWin32::GetPos() const
 {
+	if (stream == INVALID_HANDLE_VALUE) return -1;
+
 	LONG	 hi32 = 0;
 	DWORD	 lo32 = SetFilePointer(stream, 0, &hi32, FILE_CURRENT);
 

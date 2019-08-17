@@ -31,7 +31,7 @@
 S::IO::DriverANSI::DriverANSI(const String &file, Int mode) : Driver()
 {
 	stream	    = NIL;
-	closeStream = false;
+	closeStream = False;
 
 #if defined __WIN32__
 	/* Add N mode option and Unicode prefix on Windows.
@@ -91,13 +91,13 @@ S::IO::DriverANSI::DriverANSI(const String &file, Int mode) : Driver()
 
 	streamID = fileName;
 
-	closeStream = true;
+	closeStream = True;
 }
 
 S::IO::DriverANSI::DriverANSI(FILE *iStream) : Driver()
 {
-	stream		= iStream;
-	closeStream	= false;
+	stream	    = iStream;
+	closeStream = False;
 }
 
 S::IO::DriverANSI::~DriverANSI()
@@ -107,43 +107,44 @@ S::IO::DriverANSI::~DriverANSI()
 
 S::Int S::IO::DriverANSI::ReadData(UnsignedByte *data, Int dataSize)
 {
-	if (dataSize <= 0) return 0;
+	if (!stream || dataSize <= 0) return 0;
 
 	return fread(data, 1, dataSize, stream);
 }
 
 S::Int S::IO::DriverANSI::WriteData(const UnsignedByte *data, Int dataSize)
 {
-	if (dataSize <= 0) return 0;
+	if (!stream || dataSize <= 0) return 0;
 
 	return fwrite(data, 1, dataSize, stream);
 }
 
 S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 {
-	if (fseek(stream, newPos, SEEK_SET) != 0) return -1;
+	if (!stream || fseek(stream, newPos, SEEK_SET) != 0) return -1;
 
 	return GetPos();
 }
 
 S::Bool S::IO::DriverANSI::Truncate(Int64 newSize)
 {
-	if (fflush(stream) != 0 || ftruncate(fileno(stream), newSize) != 0) return False;
+	if (!stream || fflush(stream) != 0 || ftruncate(fileno(stream), newSize) != 0) return False;
 
 	return True;
 }
 
 S::Bool S::IO::DriverANSI::Flush()
 {
-	if (fflush(stream) != 0) return False;
+	if (!stream || fflush(stream) != 0) return False;
 
 	return True;
 }
 
 S::Bool S::IO::DriverANSI::Close()
 {
-	if (!closeStream || fclose(stream) != 0) return False;
+	if (!stream || !closeStream || fclose(stream) != 0) return False;
 
+	stream	    = NIL;
 	closeStream = False;
 
 	return True;
@@ -151,6 +152,8 @@ S::Bool S::IO::DriverANSI::Close()
 
 S::Int64 S::IO::DriverANSI::GetSize() const
 {
+	if (!stream) return -1;
+
 	Int64	 oldPos = GetPos();
 
 	if (fseek(stream,      0, SEEK_END) != 0) return -1;
@@ -164,6 +167,8 @@ S::Int64 S::IO::DriverANSI::GetSize() const
 
 S::Int64 S::IO::DriverANSI::GetPos() const
 {
+	if (!stream) return -1;
+
 	return ftell(stream);
 }
 
@@ -174,6 +179,8 @@ S::Bool S::IO::DriverANSI::IsBuffered() const
 
 S::Bool S::IO::DriverANSI::SetBufferSize(Int size)
 {
+	if (!stream) return False;
+
 	Int	 mode = size > 0 ? _IOFBF : _IONBF;
 
 	if (setvbuf(stream, NULL, mode, size) != 0) return False;

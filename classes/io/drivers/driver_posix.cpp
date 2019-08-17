@@ -42,7 +42,7 @@
 S::IO::DriverPOSIX::DriverPOSIX(const String &file, Int mode) : Driver()
 {
 	stream	    = -1;
-	closeStream = false;
+	closeStream = False;
 
 #if defined __WIN32__
 	/* Add O_NOINHERIT and O_BINARY options and Unicode prefix on Windows.
@@ -102,13 +102,13 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &file, Int mode) : Driver()
 
 	streamID = fileName;
 
-	closeStream = true;
+	closeStream = True;
 }
 
 S::IO::DriverPOSIX::DriverPOSIX(Int iStream) : Driver()
 {
-	stream		= iStream;
-	closeStream	= false;
+	stream	    = iStream;
+	closeStream = False;
 }
 
 S::IO::DriverPOSIX::~DriverPOSIX()
@@ -118,41 +118,44 @@ S::IO::DriverPOSIX::~DriverPOSIX()
 
 S::Int S::IO::DriverPOSIX::ReadData(UnsignedByte *data, Int dataSize)
 {
-	if (dataSize <= 0) return 0;
+	if (stream == -1 || dataSize <= 0) return 0;
 
 	return read(stream, data, dataSize);
 }
 
 S::Int S::IO::DriverPOSIX::WriteData(const UnsignedByte *data, Int dataSize)
 {
-	if (dataSize <= 0) return 0;
+	if (stream == -1 || dataSize <= 0) return 0;
 
 	return write(stream, data, dataSize);
 }
 
 S::Int64 S::IO::DriverPOSIX::Seek(Int64 newPos)
 {
+	if (stream == -1) return -1;
+
 	return lseek64(stream, newPos, SEEK_SET);
 }
 
 S::Bool S::IO::DriverPOSIX::Truncate(Int64 newSize)
 {
-	if (ftruncate(stream, newSize) != 0) return False;
+	if (stream == -1 || ftruncate(stream, newSize) != 0) return False;
 
 	return True;
 }
 
 S::Bool S::IO::DriverPOSIX::Flush()
 {
-	if (fsync(stream) != 0) return False;
+	if (stream == -1 || fsync(stream) != 0) return False;
 
 	return True;
 }
 
 S::Bool S::IO::DriverPOSIX::Close()
 {
-	if (!closeStream || close(stream) != 0) return False;
+	if (stream == -1 || !closeStream || close(stream) != 0) return False;
 
+	stream	    = -1;
 	closeStream = False;
 
 	return True;
@@ -160,6 +163,8 @@ S::Bool S::IO::DriverPOSIX::Close()
 
 S::Int64 S::IO::DriverPOSIX::GetSize() const
 {
+	if (stream == -1) return -1;
+
 	Int64	 oldPos = GetPos();
 	Int64	 size = lseek64(stream, 0, SEEK_END);
 
@@ -170,5 +175,7 @@ S::Int64 S::IO::DriverPOSIX::GetSize() const
 
 S::Int64 S::IO::DriverPOSIX::GetPos() const
 {
+	if (stream == -1) return -1;
+
 	return lseek64(stream, 0, SEEK_CUR);
 }

@@ -406,10 +406,16 @@ const int	 NSApplicationDropFiles	 = 9;
 	 */
 	- (void) setCursor: (S::GUI::Cursor *) aCursor position: (const S::GUI::Point &) aPoint
 	{
-		const S::GUI::Font	&font = aCursor->GetFont();
+		const S::GUI::Font	&font	 = aCursor->GetFont();
+		const S::GUI::Color	 color	 = font.GetColor();
 
-		[markedAttributes setObject: S::GUI::FontCocoa::GetNativeFont(font)
-				     forKey: NSFontAttributeName];
+		const NSColor		*nsColor = [NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
+									     green: color.GetGreen() / 255.0
+									      blue: color.GetBlue()  / 255.0
+									     alpha: 1.0];
+
+		[markedAttributes setObject: S::GUI::FontCocoa::GetNativeFont(font) forKey: NSFontAttributeName];
+		[markedAttributes setObject: nsColor				    forKey: NSForegroundColorAttributeName];
 
 		[self unmarkText];
 		[self setNeedsDisplay: YES];

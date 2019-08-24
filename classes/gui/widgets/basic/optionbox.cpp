@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -79,14 +79,17 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 				}
 
 				Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
+				Int	 inset	     = 2 * scaleFactor;
 
-				Int	 lightColor = (IsActive() ? Setup::ClientColor : Setup::BackgroundColor);
-				Int	 inset	    = 2 * scaleFactor;
+				Point	 lineStart   = Point(frame.left, frame.top) + Point(3, 3) * scaleFactor + Point(inset - (IsRightToLeft() ? 0 : 1), 0);
+				Point	 lineEnd     = lineStart + Point(9 * scaleFactor - 2 * inset, 0);
 
-				Point	 lineStart  = Point(frame.left, frame.top) + Point(3, 3) * scaleFactor + Point(inset - (IsRightToLeft() ? 0 : 1), 0);
-				Point	 lineEnd    = lineStart + Point(9 * scaleFactor - 2 * inset, 0);
+				Int	 lightColor  = Color(Math::Min(Setup::BackgroundColor.GetRed() + 64, 255), Math::Min(Setup::BackgroundColor.GetGreen() + 64, 255), Math::Min(Setup::BackgroundColor.GetBlue() + 64, 255));
+				Int	 darkColor   = Color(Math::Max(Setup::BackgroundColor.GetRed() - 64, 0), Math::Max(Setup::BackgroundColor.GetGreen() - 64, 0), Math::Max(Setup::BackgroundColor.GetBlue() - 64, 0));
 
-				surface->Line(lineStart, lineEnd, Setup::DividerDarkColor);
+				Int	 innerColor  = (IsActive() ? Setup::ClientColor : Setup::BackgroundColor);
+
+				surface->Line(lineStart, lineEnd, darkColor);
 
 				for (Int i = 0; i < 9 * scaleFactor; i++)
 				{
@@ -96,10 +99,10 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 					lineStart.y++;
 					lineEnd.y++;
 
-					surface->Line(lineStart, lineEnd, lightColor);
+					surface->Line(lineStart, lineEnd, innerColor);
 
-					Int	 leftColor  = (i >= (9 * scaleFactor) - inset) ? Setup::DividerLightColor : (IsRightToLeft() ? Setup::DividerLightColor : Setup::DividerDarkColor);
-					Int	 rightColor = (i >= (9 * scaleFactor) - inset) ? Setup::DividerLightColor : (IsRightToLeft() ? Setup::DividerDarkColor : Setup::DividerLightColor);	
+					Int	 leftColor  = (i >= (9 * scaleFactor) - inset) ? lightColor : (IsRightToLeft() ? lightColor : darkColor);
+					Int	 rightColor = (i >= (9 * scaleFactor) - inset) ? lightColor : (IsRightToLeft() ? darkColor : lightColor);
 
 					surface->SetPixel(lineStart, leftColor);
 					surface->SetPixel(lineEnd - Point(1, 0), rightColor);
@@ -110,19 +113,19 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 				lineEnd.x--;
 				lineEnd.y++;
 
-				surface->Line(lineStart, lineEnd, Setup::DividerLightColor);
+				surface->Line(lineStart, lineEnd, lightColor);
 
 				if (*variable == code)
 				{
-					for (Int j = 0; j < 2; j++)
+					for (Int i = 0; i < 2; i++)
 					{
-						Int	 color	= IsActive() ? Setup::ClientTextColor : Setup::InactiveTextColor;
-						Point	 offset	= Point(IsRightToLeft() ? 1 : 0, 0);
+						Int	 color	= IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
+						Point	 offset	= Point(IsRightToLeft() ? 0 : 1, 1);
 
-						if (j == 0)
+						if (i == 1)
 						{
-							color  = IsActive() ? Setup::DividerDarkColor : Setup::DividerDarkColor.Average(Setup::BackgroundColor);
-							offset += Point(IsRightToLeft() ? -1 : 1, 1);
+							color	= IsActive() ? Setup::ClientTextColor : Setup::InactiveTextColor;
+							offset -= Point(IsRightToLeft() ? -i : i, i);
 						}
 
 						Int	 inset	    = 1 * scaleFactor;
@@ -130,10 +133,10 @@ S::Int S::GUI::OptionBox::Paint(Int message)
 						Point	 lineStart  = Point(frame.left, frame.top) + Point(3, 3) * scaleFactor + Point(2, 2) * scaleFactor + offset + Point(inset, 0);
 						Point	 lineEnd    = lineStart + Point(5 * scaleFactor - 2 * inset - 2, 0);
 
-						for (Int i = 0; i < 5 * scaleFactor; i++)
+						for (Int j = 0; j < 5 * scaleFactor; j++)
 						{
-							if	(i <=			  inset) { lineStart.x--; lineEnd.x++; }
-							else if (i >= (5 * scaleFactor) - inset) { lineStart.x++; lineEnd.x--; }
+							if	(j <=			  inset) { lineStart.x--; lineEnd.x++; }
+							else if (j >= (5 * scaleFactor) - inset) { lineStart.x++; lineEnd.x--; }
 
 							lineStart.y++;
 							lineEnd.y++;

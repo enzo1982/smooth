@@ -1,7 +1,7 @@
 ########## smooth options makefile ##########
 
-VERSION	 = 0.8.74
-REVISION = 1
+VERSION	 = 0.9
+REVISION = 0
 
 # Find source folder and set vpath
 SRCDIR = $(abspath $(dir $(firstword $(MAKEFILE_LIST))))

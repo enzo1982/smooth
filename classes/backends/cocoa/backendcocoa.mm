@@ -168,6 +168,11 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 		Setup::LinkColor	  = GUI::Color([linkColor redComponent] * 255, [linkColor greenComponent] * 255, [linkColor blueComponent] * 255);
 		Setup::LinkHighlightColor = GUI::Color([linkColor redComponent] * 255, [linkColor greenComponent] * 255, [linkColor blueComponent] * 255);
 	}
+
+	if (Setup::InactiveTextColor == Setup::TextColor)
+	{
+		Setup::InactiveTextColor = Setup::InactiveTextColor.Average(Setup::BackgroundColor);
+	}
 }
 
 S::Bool S::Backends::BackendCocoa::IsOSXVersionAtLeast(Int majorVersion, Int minorVersion, Int microVersion)

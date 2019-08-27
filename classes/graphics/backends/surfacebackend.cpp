@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,13 +13,10 @@
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 #include <smooth/misc/math.h>
-#include <smooth/init.h>
 
 #if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/graphics/backends/gdi/surfacegdi.h>
 #endif
-
-S::Threads::Mutex	*S::GUI::SurfaceBackend::mutex = NIL;
 
 S::GUI::SurfaceBackend *CreateSurfaceBackend(S::Void *iSurface, const S::GUI::Size &maxSize)
 {
@@ -41,9 +38,6 @@ S::GUI::SurfaceBackend *S::GUI::SurfaceBackend::CreateBackendInstance(Void *iSur
 {
 	return backend_creator(iSurface, maxSize);
 }
-
-S::Int	 addSurfaceBackendInitTmp = S::AddInitFunction(&S::GUI::SurfaceBackend::Initialize);
-S::Int	 addSurfaceBackendFreeTmp = S::AddFreeFunction(&S::GUI::SurfaceBackend::Free);
 
 S::GUI::SurfaceBackend::SurfaceBackend(Void *iSurface, const Size &maxSize)
 {
@@ -70,30 +64,14 @@ S::GUI::SurfaceBackend::~SurfaceBackend()
 {
 }
 
-S::Int S::GUI::SurfaceBackend::Initialize()
-{
-	mutex = new Threads::Mutex();
-
-	return Success();
-}
-
-S::Int S::GUI::SurfaceBackend::Free()
-{
-	delete mutex;
-
-	mutex = NIL;
-
-	return Success();
-}
-
 S::Int S::GUI::SurfaceBackend::Lock()
 {
-	return mutex->Lock();
+	return mutex.Lock();
 }
 
 S::Int S::GUI::SurfaceBackend::Release()
 {
-	return mutex->Release();
+	return mutex.Release();
 }
 
 S::Short S::GUI::SurfaceBackend::GetSurfaceType() const

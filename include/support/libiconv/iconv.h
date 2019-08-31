@@ -1,16 +1,10 @@
 #ifndef _ICONV_WRAP_
 #define _ICONV_WRAP_
 
-#if !defined __WIN32__ || defined _ICONVDLL_
-#	if defined __WIN32__
-#		define LIBICONV_DLL_EXPORTED __declspec (dllexport)
-#	else
-#		define LIBICONV_DLL_EXPORTED
-#	endif
-
+#if !defined __WIN32__ || defined BUILDING_LIBICONV
 #	include <libiconv/iconv.h>
 #else
-#	define _LIBICONV_VERSION 0x010F
+#	define _LIBICONV_VERSION 0x0110
 
 #	undef iconv_t
 

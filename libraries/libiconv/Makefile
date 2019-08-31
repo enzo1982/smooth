@@ -13,13 +13,7 @@ else
 	GLOBALLIB   = libiconv.a
 endif
 
-MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libiconv
-
-ifeq ($(BUILD_WIN32),True)
-	MYCCOPTS += -D_ICONVDLL_
-else
-	MYCCOPTS += -DLIBDIR=\"/usr/lib\"
-endif
+MYCCOPTS    = -DBUILDING_LIBICONV -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libiconv
 
 # Enter object files here:
 OBJECTS	    = iconv.o localcharset.o

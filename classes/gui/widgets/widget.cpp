@@ -226,8 +226,8 @@ S::GUI::Window *S::GUI::Widget::GetContainerWindow() const
 
 S::GUI::Surface *S::GUI::Widget::GetDrawSurface() const
 {
-	if (IsRegistered()) return container->GetDrawSurface();
-	else		    return Surface::GetNullSurface();
+	if (IsVisible()) return container->GetDrawSurface();
+	else		 return Surface::GetNullSurface();
 }
 
 S::GUI::Widget *S::GUI::Widget::GetPreviousTabstopWidget(Int widgetHandle) const
@@ -417,18 +417,17 @@ S::Int S::GUI::Widget::Hide()
 
 	/* Hide ourself.
 	 */
-	Bool	 wasVisible = IsVisible();
+	Surface	*surface = (IsVisible() ? GetDrawSurface() : NIL);
 
 	visible = False;
 
 	if (!registered) return Success();
 
-	if (wasVisible)
+	if (surface)
 	{
 		if (focussed) { focussed = False; onLoseFocus.Emit(); }
 
-		Rect	 rect	 = GetVisibleArea();
-		Surface	*surface = GetDrawSurface();
+		Rect	 rect = GetVisibleArea();
 
 		surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
 
@@ -446,15 +445,13 @@ S::Int S::GUI::Widget::Activate()
 {
 	if (active) return Success();
 
-	Surface	*surface      = GetDrawSurface();
+	Surface	*surface = (IsVisible() ? GetDrawSurface() : NIL);
 
-	Bool	 prevVisible  = IsVisible();
-
-	if (registered && prevVisible) { surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
+	if (surface) { surface->StartPaint(GetVisibleArea()); Hide(); }
 
 	active = True;
 
-	if (registered && prevVisible) { Show(); Process(SM_MOUSEMOVE, 0, 0); surface->EndPaint(); }
+	if (surface) { Show(); Process(SM_MOUSEMOVE, 0, 0); surface->EndPaint(); }
 
 	onActivate.Emit();
 
@@ -465,11 +462,9 @@ S::Int S::GUI::Widget::Deactivate()
 {
 	if (!active) return Success();
 
-	Surface	*surface      = GetDrawSurface();
+	Surface	*surface = (IsVisible() ? GetDrawSurface() : NIL);
 
-	Bool	 prevVisible  = IsVisible();
-
-	if (registered && prevVisible) { surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
+	if (surface) { surface->StartPaint(GetVisibleArea()); Hide(); }
 
 	active = False;
 
@@ -483,7 +478,7 @@ S::Int S::GUI::Widget::Deactivate()
 		widget->mouseDragging	= False;
 	}
 
-	if (registered && prevVisible) { Show(); surface->EndPaint(); }
+	if (surface) { Show(); surface->EndPaint(); }
 
 	onDeactivate.Emit();
 
@@ -905,7 +900,7 @@ S::Int S::GUI::Widget::SetText(const String &nText)
 	Bool	 prevFocussed = focussed;
 
 	if (registered && prevFocussed) { focussed = False; }
-	if (registered && prevVisible)	{ surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
+	if (registered && prevVisible)	{ surface->StartPaint(GetVisibleArea()); Hide(); }
 
 	text = nText;
 
@@ -943,7 +938,7 @@ S::Int S::GUI::Widget::SetFont(const Font &nFont)
 	Bool	 prevFocussed = focussed;
 
 	if (registered && prevFocussed) { focussed = False; }
-	if (registered && prevVisible)	{ surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
+	if (registered && prevVisible)	{ surface->StartPaint(GetVisibleArea()); Hide(); }
 
 	font = nFont;
 
@@ -984,16 +979,18 @@ S::Int S::GUI::Widget::SetMetrics(const Point &nPos, const Size &nSize)
 
 	DeactivateTooltip();
 
-	Bool	 prevVisible = IsVisible();
+	Surface	*surface = (IsVisible() ? GetDrawSurface() : NIL);
 
-	if (registered && prevVisible) Hide();
+	if (surface && orientation != OR_FREE) surface->StartPaint(container->GetVisibleArea());
+	if (surface			     ) Hide();
 
 	InvalidateMetrics();
 
 	if (nPos.x   != pos.x   || nPos.y   != pos.y  )	{ pos  = nPos;  onChangePosition.Emit(pos); }
 	if (nSize.cx != size.cx || nSize.cy != size.cy)	{ size = nSize; onChangeSize.Emit(size);    }
 
-	if (registered && prevVisible) Show();
+	if (surface			     ) { Show(); Process(SM_MOUSEMOVE, 0, 0); }
+	if (surface && orientation != OR_FREE) surface->EndPaint();
 
 	return Success();
 }

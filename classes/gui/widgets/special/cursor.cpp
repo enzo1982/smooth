@@ -1120,7 +1120,7 @@ S::Void S::GUI::Cursor::Undo()
 
 	Surface	*surface = GetDrawSurface();
 
-	surface->StartPaint(Rect(GetRealPosition(), GetRealSize()));
+	surface->StartPaint(GetVisibleArea());
 
 	Int	 index	 = --historyPos - 1;
 
@@ -1140,7 +1140,7 @@ S::Void S::GUI::Cursor::Redo()
 
 	Surface	*surface = GetDrawSurface();
 
-	surface->StartPaint(Rect(GetRealPosition(), GetRealSize()));
+	surface->StartPaint(GetVisibleArea());
 
 	Int	 index	 = historyPos++;
 

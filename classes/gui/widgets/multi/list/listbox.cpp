@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -266,6 +266,8 @@ S::Int S::GUI::ListBox::GetEntriesHeight() const
 
 S::Void S::GUI::ListBox::OnScrollbarValueChange()
 {
+	if (!IsVisible()) return;
+
 	/* Redraw only the list entries.
 	 */
 	Surface	*surface = GetDrawSurface();

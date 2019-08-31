@@ -29,7 +29,7 @@ if [ "$targetArchitecture" = x86_gcc2 ]; then
 fi
 
 libVersion="${portVersion%~*}"
-libVersionCompat="${libVersion##*.} compat >= 1"
+libVersionCompat="${libVersion##*.} compat >= 0"
 
 PROVIDES="
 	smooth$secondaryArchSuffix = $portVersion

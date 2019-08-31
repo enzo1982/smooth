@@ -1,12 +1,6 @@
 /* FriBidi
  * fribidi-joining-types.c - character joining types
  *
- * $Id$
- * $Author$
- * $Date$
- * $Revision$
- * $Source$
- *
  * Authors:
  *   Behdad Esfahbod, 2001, 2002, 2004
  *
@@ -28,7 +22,7 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA
  *
- * For licensing issues, contact <license@farsiweb.info>.
+ * For licensing issues, contact <fribidi.license@gmail.com>.
  */
 
 #include "common.h"
@@ -89,7 +83,7 @@ fribidi_get_joining_type_name (
     }
 }
 
-#if DEBUG+0
+#ifdef DEBUG
 
 char
 fribidi_char_from_joining_type (

@@ -7,20 +7,17 @@
 #define FRIBIDI_NAME "fribidi"
 #define FRIBIDI_BUGREPORT "fribidi"
 
-#define FRIBIDI_VERSION "0.19.7"
-#define FRIBIDI_MAJOR_VERSION 0
-#define FRIBIDI_MINOR_VERSION 19
-#define FRIBIDI_MICRO_VERSION 7
-#define FRIBIDI_INTERFACE_VERSION 3
-#define FRIBIDI_INTERFACE_VERSION_STRING "3"
-
-/* Define to 1 if you want charset conversion codes in the library */
-#define FRIBIDI_CHARSETS 0
-
-/* Define to 1 if you want to use glib */
-#define FRIBIDI_USE_GLIB 0
+#define FRIBIDI_VERSION "1.0.5"
+#define FRIBIDI_MAJOR_VERSION 1
+#define FRIBIDI_MINOR_VERSION 0
+#define FRIBIDI_MICRO_VERSION 5
+#define FRIBIDI_INTERFACE_VERSION 4
+#define FRIBIDI_INTERFACE_VERSION_STRING "4"
 
 /* The size of a `int', as computed by sizeof. */
 #define FRIBIDI_SIZEOF_INT 4
+
+/* Define if fribidi was built with MSVC */
+#undef FRIBIDI_BUILT_WITH_MSVC
 
 #endif /* FRIBIDI_CONFIG_H */

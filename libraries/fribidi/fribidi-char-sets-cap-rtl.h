@@ -1,10 +1,13 @@
 /* FriBidi
- * fribidi-flags.h - option flags
+ * fribidi-char-sets-cap-rtl.h - CapRTL character set conversion routines
  *
- * Author:
- *   Behdad Esfahbod, 2005
+ * Authors:
+ *   Behdad Esfahbod, 2001, 2002, 2004
+ *   Dov Grobgeld, 1999, 2000
  *
- * Copyright (C) 2005 Behdad Esfahbod
+ * Copyright (C) 2004 Sharif FarsiWeb, Inc
+ * Copyright (C) 2001,2002 Behdad Esfahbod
+ * Copyright (C) 1999,2000 Dov Grobgeld
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,11 +23,12 @@
  * along with this library, in a file named COPYING; if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA
- *
+ * 
  * For licensing issues, contact <fribidi.license@gmail.com>.
  */
-#ifndef _FRIBIDI_FLAGS_H
-#define _FRIBIDI_FLAGS_H
+
+#ifndef _FRIBIDI_CHAR_SETS_CAP_RTL_H
+#define _FRIBIDI_CHAR_SETS_CAP_RTL_H
 
 #include "fribidi-common.h"
 
@@ -32,41 +36,28 @@
 
 #include "fribidi-begindecls.h"
 
-typedef uint32_t FriBidiFlags;
+#define fribidi_char_set_name_cap_rtl "CapRTL"
+#define fribidi_char_set_title_cap_rtl "CapRTL (Test)"
 
-/* 
- * Define option flags that various functions use. Each mask has
- * only one bit set.
- */
+const char *fribidi_char_set_desc_cap_rtl (
+  void
+);
 
-#define FRIBIDI_FLAG_SHAPE_MIRRORING	0x00000001
-#define FRIBIDI_FLAG_REORDER_NSM	0x00000002
+FriBidiStrIndex fribidi_cap_rtl_to_unicode (
+  const char *s,
+  FriBidiStrIndex length,
+  FriBidiChar *us
+);
 
-#define FRIBIDI_FLAG_SHAPE_ARAB_PRES	0x00000100
-#define FRIBIDI_FLAG_SHAPE_ARAB_LIGA	0x00000200
-#define FRIBIDI_FLAG_SHAPE_ARAB_CONSOLE	0x00000400
-
-#define FRIBIDI_FLAG_REMOVE_BIDI	0x00010000
-#define FRIBIDI_FLAG_REMOVE_JOINING	0x00020000
-#define FRIBIDI_FLAG_REMOVE_SPECIALS	0x00040000
-
-
-/*
- * And their combinations.
- */
-
-#define FRIBIDI_FLAGS_DEFAULT		( \
-	FRIBIDI_FLAG_SHAPE_MIRRORING	| \
-	FRIBIDI_FLAG_REORDER_NSM	| \
-	FRIBIDI_FLAG_REMOVE_SPECIALS	)
-
-#define FRIBIDI_FLAGS_ARABIC		( \
-	FRIBIDI_FLAG_SHAPE_ARAB_PRES	| \
-	FRIBIDI_FLAG_SHAPE_ARAB_LIGA	)
+FriBidiStrIndex fribidi_unicode_to_cap_rtl (
+  const FriBidiChar *us,
+  FriBidiStrIndex length,
+  char *s
+);
 
 #include "fribidi-enddecls.h"
 
-#endif /* !_FRIBIDI_FLAGS_H */
+#endif /* !_FRIBIDI_CHAR_SETS_CAP_RTL_H */
 /* Editor directions:
  * vim:textwidth=78:tabstop=8:shiftwidth=2:autoindent:cindent
  */

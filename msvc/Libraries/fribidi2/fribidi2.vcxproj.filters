@@ -36,9 +36,6 @@
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-joining-types.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-mem.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-mirroring.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -46,6 +43,30 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-shape.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-brackets.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-cap-rtl.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-cp1255.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-cp1256.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-iso8859-6.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-iso8859-8.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-utf8.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

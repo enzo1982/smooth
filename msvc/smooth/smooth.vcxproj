@@ -72,7 +72,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;LIBXML_STATIC;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -99,7 +99,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__WIN32__;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -119,7 +119,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;__WIN32__;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__WIN32__;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>
       </PrecompiledHeader>
     </ClCompile>
@@ -142,7 +142,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;__WIN32__;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__WIN32__;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>
       </PrecompiledHeader>
     </ClCompile>

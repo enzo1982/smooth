@@ -69,7 +69,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -86,7 +86,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -98,7 +98,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -111,7 +111,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -122,10 +122,17 @@
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-arabic.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-bidi-types.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-bidi.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-brackets.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-cap-rtl.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-cp1255.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-cp1256.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-iso8859-6.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-iso8859-8.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets-utf8.c" />
+    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-char-sets.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-deprecated.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-joining-types.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-joining.c" />
-    <ClCompile Include="..\..\..\libraries\fribidi\fribidi-mem.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-mirroring.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-run.c" />
     <ClCompile Include="..\..\..\libraries\fribidi\fribidi-shape.c" />

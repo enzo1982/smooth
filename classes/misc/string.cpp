@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -204,11 +204,13 @@ S::Bool S::String::IsANSI(const String &string)
 
 S::Bool S::String::IsUnicode(const String &string)
 {
-	Int	 len = string.Length();
+	const wchar_t	*chars	= string;
+	Int		 length = string.Length();
 
-	for (Int i = 0; i < len; i++)
+	for (Int i = 0; i < length; i++)
 	{
-		if (string[i] > 255) return True;
+		if ( chars[i] <	 0x20 || chars[i] > 0xFF ||
+		    (chars[i] >= 0x80 && chars[i] < 0xA0)) return True;
 	}
 
 	return False;
@@ -334,13 +336,13 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 	else if	(strncmp(format, "UNICODE-1-1", 11)	== 0) width = 2;
 	else if	(strncmp(format, "CSUNICODE11", 11)	== 0) width = 2;
 
-	Int	 len = -1;
+	Int	 length = -1;
 
-	if	(width == 1) while (true) { if (((char  *) str)[++len] == 0) { len *= 1; break; } }
-	else if (width == 2) while (true) { if (((short *) str)[++len] == 0) { len *= 2; break; } }
-	else if (width == 4) while (true) { if (((int   *) str)[++len] == 0) { len *= 4; break; } }
+	if	(width == 1) while (true) { if (((char  *) str)[++length] == 0) { length *= 1; break; } }
+	else if (width == 2) while (true) { if (((short *) str)[++length] == 0) { length *= 2; break; } }
+	else if (width == 4) while (true) { if (((int   *) str)[++length] == 0) { length *= 4; break; } }
 
-	Int	 size = ConvertString(str, len, format, NIL, 0, GetInternalFormat());
+	Int	 size = ConvertString(str, length, format, NIL, 0, GetInternalFormat());
 
 	if	(size < 0 && strcmp(format, "ISO-8859-1") != 0) return ImportFrom("ISO-8859-1", str);
 	else if (size < 0)					return Error();
@@ -349,7 +351,7 @@ S::Int S::String::ImportFrom(const char *format, const char *str)
 
 	wString.Resize(size);
 
-	ConvertString(str, len, format, (char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat());
+	ConvertString(str, length, format, (char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat());
 
 	wString[size - 1] = 0;
 
@@ -370,13 +372,15 @@ char *S::String::ConvertTo(const char *encoding) const
 
 	if (bufferSize <= 0)
 	{
-		buffer = new char [Length() + 1];
+		Int	 length = Length();
 
-		ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), buffer, Length() + 1, encoding);
+		buffer = new char [length + 1];
 
-		for (Int i = -bufferSize; i < Length(); i++) buffer[i] = '?';
+		ConvertString((char *) (wchar_t *) wString, size * sizeof(wchar_t), GetInternalFormat(), buffer, length + 1, encoding);
 
-		buffer[Length()] = 0;
+		for (Int i = -bufferSize; i < length; i++) buffer[i] = '?';
+
+		buffer[length] = 0;
 	}
 	else
 	{
@@ -748,11 +752,11 @@ S::String S::String::Tail(Int n) const
 
 S::String S::String::Trim() const
 {
-	Int	 len = Length();
-	Int	 triml = 0;
-	Int	 trimr = 0;
+	Int	 length	= Length();
+	Int	 triml	= 0;
+	Int	 trimr	= 0;
 
-	for (Int i = 0; i < len; i++)
+	for (Int i = 0; i < length; i++)
 	{
 		if ((*this)[i] == ' '  ||
 		    (*this)[i] == '\t' ||
@@ -763,7 +767,7 @@ S::String S::String::Trim() const
 		else			  break;
 	}
 
-	for (Int i = len - 1; i >= 0; i--)
+	for (Int i = length - 1; i >= 0; i--)
 	{
 		if ((*this)[i] == ' '  ||
 		    (*this)[i] == '\t' ||
@@ -774,7 +778,7 @@ S::String S::String::Trim() const
 		else			  break;
 	}
 
-	return SubString(triml, len - triml - trimr);
+	return SubString(triml, length - triml - trimr);
 }
 
 S::String &S::String::Fill(const Int value)
@@ -832,12 +836,14 @@ const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 
 	/* Split string and add entries to array.
 	 */
-	for (Int i = 0; i < Length(); )
+	Int	 length	= Length();
+
+	for (Int i = 0; i < length; )
 	{
-		Int	 index = SubString(i, Length() - i).Find(delimiter);
+		Int	 index = SubString(i, length - i).Find(delimiter);
 		String	 part;
 
-		if (index == -1) part = SubString(i, Length() - i);
+		if (index == -1) part = SubString(i, length - i);
 		else		 part = SubString(i, index);
 
 		array->Add(part);

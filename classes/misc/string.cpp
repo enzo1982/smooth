@@ -31,10 +31,8 @@
 namespace smooth
 {
 	typedef Array<char *, Void *>		 BufferArray;
-	typedef Array<Array<String> *, Void *>	 ExplodeArray;
 
 	static multithread (BufferArray *)	 allocatedBuffers = NIL;
-	static multithread (ExplodeArray *)	 explodeBuffers	  = NIL;
 
 	static multithread (char *)		 inputFormat	  = NIL;
 	static multithread (char *)		 outputFormat	  = NIL;
@@ -824,19 +822,12 @@ S::String S::String::FromFloat(Float value)
 	return Number(value).ToFloatString();
 }
 
-const S::Array<S::String> &S::String::Explode(const String &delimiter) const
+S::Array<S::String> S::String::Explode(const String &delimiter) const
 {
-	if (explodeBuffers == NIL) explodeBuffers = new ExplodeArray();
-
-	/* Create array and add to buffer list.
-	 */
-	Array<String>	*array = new Array<String>();
-
-	explodeBuffers->Add(array);
-
 	/* Split string and add entries to array.
 	 */
-	Int	 length	= Length();
+	Array<String>	 array;
+	Int		 length	= Length();
 
 	for (Int i = 0; i < length; )
 	{
@@ -846,34 +837,12 @@ const S::Array<S::String> &S::String::Explode(const String &delimiter) const
 		if (index == -1) part = SubString(i, length - i);
 		else		 part = SubString(i, index);
 
-		array->Add(part);
+		array.Add(part);
 
 		i += part.Length() + delimiter.Length();
 	}
 
-	return *array;
-}
-
-S::Int S::String::ExplodeFinish()
-{
-	if (explodeBuffers == NIL) return Error();
-
-	/* Remove most recently added buffer.
-	 */
-	delete explodeBuffers->GetLast();
-
-	explodeBuffers->RemoveNth(explodeBuffers->Length() - 1);
-
-	/* Clear buffers for this thread.
-	 */
-	if (explodeBuffers->Length() == 0)
-	{
-		delete explodeBuffers;
-
-		explodeBuffers = NIL;
-	}
-
-	return Success();
+	return array;
 }
 
 S::String S::String::Implode(const Array<String> &array, const String &delimiter)

@@ -198,8 +198,6 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		const Array<String>	&paths = String(getenv("LD_LIBRARY_PATH")).Explode(":");
 
 		foreach (const String &path, paths) if (Directory(path).Exists()) directories.Add(path);
-
-		String::ExplodeFinish();
 	}
 #endif
 

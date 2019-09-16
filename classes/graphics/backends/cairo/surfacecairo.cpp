@@ -678,8 +678,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		rect.top += lineHeight;
 	}
 
-	String::ExplodeFinish();
-
 	if (!painting)
 	{
 #if !defined __WIN32__

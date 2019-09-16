@@ -120,9 +120,7 @@ namespace smooth
 			String			 ToUpper() const;
 			String			 ToTitle() const;
 
-			const Array<String>	&Explode(const String &) const;
-			static Int		 ExplodeFinish();
-
+			Array<String>		 Explode(const String &) const;
 			static String		 Implode(const Array<String> &, const String & = String());
 
 			wchar_t &operator	 [](const int);

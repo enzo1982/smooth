@@ -414,8 +414,6 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 		rect.top += lineHeight;
 	}
 
-	String::ExplodeFinish();
-
 	if (!painting)
 	{
 		delete pGraphics;

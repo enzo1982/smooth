@@ -401,8 +401,6 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 		rect.top += lineHeight;
 	}
 
-	String::ExplodeFinish();
-
 	/* Clean up everything.
 	 */
 	XftColorFree(display, DefaultVisual(display, DefaultScreen(display)), DefaultColormap(display, DefaultScreen(display)), &xftcolor);

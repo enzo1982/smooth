@@ -450,8 +450,6 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 		rect.top += lineHeight;
 	}
 
-	String::ExplodeFinish();
-
 	if (!painting)
 	{
 		SelectObject(gdi_dc, holdfont);

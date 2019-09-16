@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -40,11 +40,7 @@ Int Time::TimeStringToSeconds(String time)
 {
 	const Array<String>	&parts = time.Explode(":");
 
-	Int	 rval = parts.GetNth(0).ToInt() * 3600 + parts.GetNth(1).ToInt() * 60;
-
-	String::ExplodeFinish();
-
-	return rval;
+	return parts.GetNth(0).ToInt() * 3600 + parts.GetNth(1).ToInt() * 60;
 }
 
 Int Time::GetDayOfWeek(Int day, Int month, Int year)

@@ -373,8 +373,6 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 	[window flushWindow];
 
-	String::ExplodeFinish();
-
 	[attributes release];
 
 	return Success();

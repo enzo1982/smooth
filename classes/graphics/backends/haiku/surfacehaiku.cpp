@@ -380,8 +380,6 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 		rect.top += lineHeight;
 	}
 
-	String::ExplodeFinish();
-
 	if (!painting) view->PopState();
 
 	bitmapView->PopState();

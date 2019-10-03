@@ -14,6 +14,7 @@
 #include <smooth/gui/widgets/special/tooltip.h>
 #include <smooth/gui/widgets/multi/menu/popupmenu.h>
 #include <smooth/gui/window/toolwindow.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/timer.h>
 #include <smooth/system/screen.h>
@@ -553,7 +554,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 					if ((tooltipText != NIL || tooltipLayer != NIL) && window->IsFocussed())
 					{
-						Threads::Lock	 lock(tooltipMutex);
+						Application::Lock	 lock;
 
 						tipPos	 = mousePos;
 						tipTimer = new System::Timer();
@@ -583,7 +584,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 				}
 				else if (mouseOver && window->IsMouseOn(visibleArea) && hitTest.Call(mousePos - realPosition))
 				{
-					Threads::Lock	 lock(tooltipMutex);
+					Application::Lock	 lock;
 
 					if (tipTimer != NIL && wParam == 0 && (Math::Abs(tipPos.x - mousePos.x) > Setup::HoverWidth / 2 || Math::Abs(tipPos.y - mousePos.y) > Setup::HoverHeight / 2))
 					{
@@ -746,9 +747,9 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 S::Void S::GUI::Widget::ActivateTooltip()
 {
-	Threads::Lock	 lock(tooltipMutex);
+	Application::Lock	 lock;
 
-	if (tooltip != NIL) return;
+	if (tipTimer == NIL || tooltip != NIL) return;
 
 	tipTimer->Stop();
 
@@ -785,7 +786,7 @@ S::Void S::GUI::Widget::ActivateTooltip()
 
 S::Void S::GUI::Widget::DeactivateTooltip()
 {
-	Threads::Lock	 lock(tooltipMutex);
+	Application::Lock	 lock;
 
 	if (tipTimer != NIL)
 	{

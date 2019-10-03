@@ -25,7 +25,6 @@ namespace smooth
 #include "../modifiers/fontsize.h"
 #include "../modifiers/righttoleft.h"
 #include "../../misc/string.h"
-#include "../../threads/mutex.h"
 
 namespace smooth
 {
@@ -37,8 +36,6 @@ namespace smooth
 		{
 			private:
 				static SurfaceBackend	*(*backend_creator)(Void *, const Size &);
-
-				Threads::Mutex		 mutex;
 			protected:
 				Short			 type;
 				Short			 painting;

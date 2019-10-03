@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,10 +11,12 @@
 #include <smooth/gui/window/backends/gdi/windowgdi.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/cursor.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
 #include <smooth/system/screen.h>
+#include <smooth/threads/thread.h>
 #include <smooth/foreach.h>
 #include <smooth/backends/win32/backendwin32.h>
 
@@ -195,6 +197,10 @@ S::Input::Keyboard::Key S::GUI::WindowGDI::ConvertKey(Int keySym)
 
 S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPARAM lParam)
 {
+	/* Lock application while processing messages.
+	 */
+	Application::Lock	 lock;
+
 	/* Process system messages not relevant
 	 * to portable Window implementation.
 	 */
@@ -654,8 +660,22 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 
 			if (leader != NIL)
 			{
+				/* If the leader window belongs to another thread,
+				 * we need to suspend our application lock in order
+				 * for EnableWindow to finish.
+				 */
+				Int	 suspendCount = (GetWindowThreadProcessId(leader->hwnd, NIL) != GetCurrentThreadId() ? Application::Lock::SuspendLock() : 0);
+
+				/* Now disable the leader window.
+				 */
 				EnableWindow(leader->hwnd, False);
 
+				/* Resume the application lock.
+				 */
+				Application::Lock::ResumeLock(suspendCount);
+
+				/* Raise our new window.
+				 */
 				Raise();
 			}
 		}
@@ -682,8 +702,22 @@ S::Int S::GUI::WindowGDI::Close()
 
 		if (leader != NIL)
 		{
+			 /* If the leader window belongs to another thread,
+			  * we need to suspend our application lock in order
+			  * for EnableWindow to finish.
+			  */
+			Int	 suspendCount = (GetWindowThreadProcessId(leader->hwnd, NIL) != GetCurrentThreadId() ? Application::Lock::SuspendLock() : 0);
+
+			/* Now enable the leader window.
+			 */
 			EnableWindow(leader->hwnd, True);
 
+			/* Resume the application lock.
+			 */
+			Application::Lock::ResumeLock(suspendCount);
+
+			/* Raise the leader window.
+			 */
 			leader->Raise();
 		}
 	}
@@ -789,7 +823,19 @@ S::Int S::GUI::WindowGDI::EnableDropFiles(Bool nEnableDropFiles)
 {
 	enableDropFiles = nEnableDropFiles;
 
-	if (hwnd != NIL) DragAcceptFiles(hwnd, enableDropFiles);
+	if (hwnd == NIL) return Success();
+
+	/* If the window belongs to another thread, we
+	 * need to suspend our application lock in order
+	 * for DragAcceptFiles to finish.
+	 */
+	Int	 suspendCount = (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId() ? Application::Lock::SuspendLock() : 0);
+
+	DragAcceptFiles(hwnd, enableDropFiles);
+
+	/* Resume the application lock.
+	 */
+	Application::Lock::ResumeLock(suspendCount);
 
 	return Success();
 }

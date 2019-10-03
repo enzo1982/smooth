@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,7 @@
 
 #include <smooth/gui/window/backends/haiku/windowhaiku.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/backends/haiku/backendhaiku.h>
@@ -245,6 +246,10 @@ S::Input::Keyboard::Key S::GUI::WindowHaiku::ConvertKey(Int keyCode, const BMess
 S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int lParam, const BMessage &currentMessage)
 {
 	static Int	 focusWndId = -1;
+
+	/* Lock application while processing messages.
+	 */
+	Application::Lock	 lock;
 
 	/* Process system messages not relevant
 	 * to portable Window implementation.
@@ -563,16 +568,24 @@ S::Int S::GUI::WindowHaiku::Close()
 		app->PostMessage(B_QUIT_REQUESTED);
 	}
 
+	/* Suspend the application lock to
+	 * allow the quit operation to finish.
+	 */
+	Int	 suspendCount = (wnd->Thread() != find_thread(NIL) ? Application::Lock::SuspendLock() : 0);
+
 	/* Destroy window.
 	 */
 	BWindow	*oldwnd = wnd;
 
-	oldwnd->Lock();
-
 	wnd  = NIL;
 	view = NIL;
 
+	oldwnd->Lock();
 	oldwnd->Quit();
+
+	/* Resume the application lock.
+	 */
+	Application::Lock::ResumeLock(suspendCount);
 
 	/* Delete surface.
 	 */
@@ -683,7 +696,13 @@ S::Int S::GUI::WindowHaiku::Show()
 {
 	if (wnd == NIL) return Success();
 
-	if (wnd->IsHidden()) wnd->Show();
+	if (wnd->IsHidden())
+	{
+		while (wnd->LockWithTimeout(0) != B_OK) Application::Lock::ResumeLock(Application::Lock::SuspendLock());
+
+		wnd->Show();
+		wnd->Unlock();
+	}
 
 	return Success();
 }
@@ -692,15 +711,33 @@ S::Int S::GUI::WindowHaiku::Hide()
 {
 	if (wnd == NIL) return Success();
 
-	if (!wnd->IsHidden()) wnd->Hide();
+	if (!wnd->IsHidden())
+	{
+		while (wnd->LockWithTimeout(0) != B_OK) Application::Lock::ResumeLock(Application::Lock::SuspendLock());
+
+		wnd->Hide();
+		wnd->Unlock();
+	}
 
 	return Success();
 }
 
 S::Int S::GUI::WindowHaiku::SetMetrics(const Point &nPos, const Size &nSize)
 {
+	/* If the window belongs to another thread, we
+	 * need to suspend our application lock in order
+	 * for the move and resize operations to finish.
+	 */
+	Int	 suspendCount = (wnd->Thread() != find_thread(NIL) ? Application::Lock::SuspendLock() : 0);
+
+	/* Set window metrics.
+	 */
 	wnd->MoveTo(nPos.x, nPos.y);
 	wnd->ResizeTo(Math::Round(nSize.cx * fontSize) + sizeModifier.cx - 1, Math::Round(nSize.cy * fontSize) + sizeModifier.cy - 1);
+
+	/* Resume the application lock.
+	 */
+	Application::Lock::ResumeLock(suspendCount);
 
 	return Success();
 }

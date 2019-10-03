@@ -12,6 +12,7 @@
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 
 #if defined __WIN32__ && defined SMOOTH_STATIC
@@ -66,12 +67,12 @@ S::GUI::SurfaceBackend::~SurfaceBackend()
 
 S::Int S::GUI::SurfaceBackend::Lock()
 {
-	return mutex.Lock();
+	return Application::Lock::Acquire();
 }
 
 S::Int S::GUI::SurfaceBackend::Release()
 {
-	return mutex.Release();
+	return Application::Lock::Release();
 }
 
 S::Short S::GUI::SurfaceBackend::GetSurfaceType() const

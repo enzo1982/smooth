@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -38,6 +38,8 @@ namespace smooth
 			public:
 				static const Short		 classID;
 
+				class Lock;
+
 								 Application(const String & = NIL);
 				virtual				~Application();
 
@@ -53,6 +55,26 @@ namespace smooth
 				static String			 GetApplicationDirectory();
 
 				static Float			 GetScaleFactor()			{ return scaleFactor; }
+		};
+
+		/* A simple scoped locker for the application.
+		 */
+		class SMOOTHAPI Application::Lock
+		{
+			public:
+				static Int		 Initialize();
+				static Int		 Free();
+
+							 Lock()	{ Acquire(); }
+							~Lock()	{ Release(); }
+
+				static Bool		 Acquire();
+				static Bool		 Release();
+
+				static Int		 SuspendLock();
+				static Bool		 ResumeLock(Int);
+
+				static UnsignedInt32	 GetOwnerThreadID();
 		};
 	};
 };

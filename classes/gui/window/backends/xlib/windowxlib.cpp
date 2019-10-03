@@ -277,6 +277,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 	static Atom	 xdndActionPrivateAtom = XInternAtom(display, "XdndActionPrivate", False);
 
+	/* Lock application while processing messages.
+	 */
+	Application::Lock	 lock;
+
 	/* Process system events not relevant
 	 * to portable Window implementation.
 	 */

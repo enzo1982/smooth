@@ -12,6 +12,7 @@
 #include <smooth/graphics/backends/cocoa/fontcocoa.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/cursor.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
 #include <smooth/system/system.h>
@@ -503,27 +504,31 @@ const int	 NSApplicationDropFiles	 = 9;
 		NSSize		 maxSize;
 }
 
+	/* NSObject methods.
+	 */
+	- (void)	    performSelectorOnMainThread: (SEL) selector withObject:(id) arg waitUntilDone: (BOOL) wait;
+
 	/* NSWindow methods.
 	 */
 	- (BOOL)	    worksWhenModal;
 
-	- (void)	    orderFront:		  (id) sender;
-	- (void)	    orderOut:		  (id) sender;
-	- (void)	    makeKeyAndOrderFront: (id) sender;
+	- (void)	    orderFront:			 (id) sender;
+	- (void)	    orderOut:			 (id) sender;
+	- (void)	    makeKeyAndOrderFront:	 (id) sender;
 
 	/* Helper Methods.
 	 */
-	- (id)		    initWithContentRect:  (NSRect) rect styleMask: (NSUInteger) style;
+	- (id)		    initWithContentRect:	 (NSRect) rect styleMask: (NSUInteger) style;
 
-	- (void)	    setFrame:		  (NSRect) rect;
-	- (void)	    setMinSize:		  (NSSize) size;
-	- (void)	    setMaxSize:		  (NSSize) size;
+	- (void)	    setFrame:			 (NSRect) rect;
+	- (void)	    setMinSize:			 (NSSize) size;
+	- (void)	    setMaxSize:			 (NSSize) size;
 
-	- (void)	    processEvent:	  (int) type;
-	- (void)	    processEvent:	  (int) type withData: (NSInteger) data;
+	- (void)	    processEvent:		 (int) type;
+	- (void)	    processEvent:		 (int) type withData: (NSInteger) data;
 
-	- (NSDragOperation) draggingEntered:	  (id) sender;
-	- (BOOL)	    performDragOperation: (id) sender;
+	- (NSDragOperation) draggingEntered:		 (id) sender;
+	- (BOOL)	    performDragOperation:	 (id) sender;
 
 	/* Internal use only.
 	 */
@@ -536,6 +541,24 @@ const int	 NSApplicationDropFiles	 = 9;
 @end
 
 @implementation CocoaWindow
+	/* NSObject methods.
+	 */
+	- (void) performSelectorOnMainThread: (SEL) selector withObject:(id) arg waitUntilDone: (BOOL) wait
+	{
+		/* If we shall wait for the call to complete,
+		 * we need to suspend our application lock.
+		 */
+		int	 suspendCount = (wait ? S::GUI::Application::Lock::SuspendLock() : 0);
+
+		[super performSelectorOnMainThread: selector
+					withObject: arg
+				     waitUntilDone: wait];
+
+		/* Resume the application lock.
+		 */
+		S::GUI::Application::Lock::ResumeLock(suspendCount);
+	}
+
 	/* NSWindow methods.
 	 */
 	- (BOOL) worksWhenModal { return YES; }
@@ -902,6 +925,10 @@ S::Input::Keyboard::Key S::GUI::WindowCocoa::ConvertKey(Int keySym)
 S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 {
 	static Int	 focusWndID = -1;
+
+	/* Lock application while processing messages.
+	 */
+	Application::Lock	 lock;
 
 	/* Convert Cocoa events to smooth messages.
 	 */

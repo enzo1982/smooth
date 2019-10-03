@@ -92,7 +92,9 @@ S::Int S::GUI::SurfaceHaiku::Lock()
 		while (window->LockWithTimeout(0) != B_OK)
 		{
 			SurfaceBackend::Release();
-			S::System::System::Sleep(0);
+
+			Application::Lock::ResumeLock(Application::Lock::SuspendLock());
+
 			SurfaceBackend::Lock();
 		}
 

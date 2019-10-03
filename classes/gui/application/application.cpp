@@ -12,8 +12,12 @@
 #include <smooth/gui/window/window.h>
 #include <smooth/system/event.h>
 #include <smooth/system/screen.h>
+#include <smooth/threads/thread.h>
+#include <smooth/threads/mutex.h>
+#include <smooth/templates/threadlocal.h>
 #include <smooth/files/directory.h>
 #include <smooth/foreach.h>
+#include <smooth/init.h>
 
 #if defined __WIN32__
 #	include <windows.h>
@@ -231,4 +235,74 @@ S::String S::GUI::Application::GetApplicationDirectory()
 #endif
 
 	return applicationDirectory;
+}
+
+namespace smooth
+{
+	static Threads::Mutex		*mutex	   = NIL;
+
+	static UnsignedInt32		 owner	   = UnsignedInt32(-1);
+	static multithread (intptr_t)	 lockCount = 0;
+};
+
+S::Int	 addApplicationInitTmp = S::AddInitFunction(&S::GUI::Application::Lock::Initialize);
+S::Int	 addApplicationFreeTmp = S::AddFreeFunction(&S::GUI::Application::Lock::Free);
+
+S::Int S::GUI::Application::Lock::Initialize()
+{
+	mutex = new Threads::Mutex();
+
+	return Success();
+}
+
+S::Int S::GUI::Application::Lock::Free()
+{
+	delete mutex;
+
+	mutex = NIL;
+
+	return Success();
+}
+
+S::Bool S::GUI::Application::Lock::Acquire()
+{
+	if (!mutex->Lock()) return False;
+
+	if (!lockCount++) owner = Threads::Thread::GetCurrentThreadID();
+
+	return True;
+}
+
+S::Bool S::GUI::Application::Lock::Release()
+{
+	if (!lockCount) return False;
+
+	if (!--lockCount) owner = UnsignedInt32(-1);
+
+	return mutex->Release();
+}
+
+S::Int S::GUI::Application::Lock::SuspendLock()
+{
+	/* Release currently held lock.
+	 */
+	Int	 suspendCount = lockCount;
+
+	for (Int i = 0; i < suspendCount; i++) Release();
+
+	return suspendCount;
+}
+
+S::Bool S::GUI::Application::Lock::ResumeLock(Int resumeCount)
+{
+	/* Acquire lock.
+	 */
+	for (Int i = 0; i < resumeCount; i++) Acquire();
+
+	return True;
+}
+
+S::UnsignedInt32 S::GUI::Application::Lock::GetOwnerThreadID()
+{
+	return owner;
 }

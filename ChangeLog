@@ -17,6 +17,7 @@ dd.mm.19 hh:mm - smooth alpha 0.9.0
 - hyperlink.cpp		- set background color for bitmaps
 - backendxlib.cpp	- allow console applications to run without an X display available
 - windowxlib.cpp	- fixed thread-safety issues with Xlib windows
+- surfacecocoa.mm	- added support for dark mode on macOS
 - keyboard.cpp		- improved thread-safety
 - crc16.cpp		- added Hash::CRC16 class to calculate 16 bit CRCs
 - driver_posix.cpp	- fixed permissions of newly created files to respect umask setting

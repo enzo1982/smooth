@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,7 +11,12 @@
 #import <Cocoa/Cocoa.h>
 
 #include <smooth/gui/dialogs/dirdlg.h>
+#include <smooth/gui/window/window.h>
+#include <smooth/backends/cocoa/backendcocoa.h>
 #include <smooth/files/directory.h>
+
+using namespace smooth;
+using namespace smooth::GUI;
 
 @interface CocoaFolderPanel : NSObject
 {
@@ -19,6 +24,8 @@
 		NSInteger	 response;
 
 		NSURL		*url;
+
+		Window		*parentWindow;
 }
 
 	/* CocoaFolderPanel methods.
@@ -28,8 +35,11 @@
 	- (id)			init;
 	- (void)		dealloc;
 
+	- (void)		setParentWindow: (Window *) window;
+
 	- (void)		runModal;
-	
+	- (void)		didEndModalSheet: (NSSavePanel *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
+
 	- (NSInteger)		response;
 
 	- (NSURL *)		URL;
@@ -47,9 +57,11 @@
 	{
 		[super init];
 
-		response    = 0;
+		response     = 0;
 
-		url	    = nil;
+		url	     = nil;
+
+		parentWindow = NIL;
 
 		return self;
 	}
@@ -60,6 +72,8 @@
 
 		[super dealloc];
 	}
+
+	- (void) setParentWindow: (Window *) window { parentWindow = window; }
 
 	- (void) runModal
 	{
@@ -74,11 +88,30 @@
 
 		/* Run the panel.
 		 */
-		response = [panel runModal];
+		if (Backends::BackendCocoa::IsOSXVersionAtLeast(10, 15, 0))
+		{
+			[panel beginSheetForDirectory: nil
+						 file: nil
+				       modalForWindow: parentWindow != NIL ? (NSWindow *) parentWindow->GetSystemWindow() : [NSApp mainWindow]
+					modalDelegate: self
+				       didEndSelector: @selector(didEndModalSheet:returnCode:contextInfo:)
+					  contextInfo: nil];
+
+			[panel runModal];
+		}
+		else
+		{
+			response = [panel runModal];
+		}
 
 		/* Get selected URL.
 		 */
 		url  = [[panel URL] retain];
+	}
+
+	- (void) didEndModalSheet: (NSSavePanel *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
+	{
+		response = returnCode;
 	}
 
 	- (NSInteger)	response	{ return response; }
@@ -93,6 +126,8 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 	/* Create file chooser dialog
 	 */
 	CocoaFolderPanel	*panel = [CocoaFolderPanel panel];
+
+	[panel setParentWindow: parentWindow];
 
 	if ([NSThread isMainThread]) [panel runModal];
 	else			     [panel performSelectorOnMainThread: @selector(runModal) withObject: nil waitUntilDone: YES];

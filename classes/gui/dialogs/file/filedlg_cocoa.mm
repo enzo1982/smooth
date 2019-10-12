@@ -11,9 +11,12 @@
 #import <Cocoa/Cocoa.h>
 
 #include <smooth/gui/dialogs/filedlg.h>
+#include <smooth/gui/window/window.h>
+#include <smooth/backends/cocoa/backendcocoa.h>
 #include <smooth/foreach.h>
 
 using namespace smooth;
+using namespace smooth::GUI;
 using namespace smooth::GUI::Dialogs;
 
 @interface CocoaFilePanel : NSObject
@@ -25,6 +28,8 @@ using namespace smooth::GUI::Dialogs;
 
 		NSURL			*url;
 		NSArray			*urls;
+
+		Window			*parentWindow;
 
 		BOOL			 multiSelect;
 
@@ -41,6 +46,8 @@ using namespace smooth::GUI::Dialogs;
 	- (id)			init;
 	- (void)		dealloc;
 
+	- (void)		setParentWindow: (Window *) window;
+
 	- (void)		setMultiSelect: (BOOL) val;
 
 	- (void)		setFilters: (const Array<String> *) arr;
@@ -49,7 +56,8 @@ using namespace smooth::GUI::Dialogs;
 	- (void)		setDefaultFile: (String) file;
 
 	- (void)		runModal;
-	
+	- (void)		didEndModalSheet: (NSSavePanel *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
+
 	- (NSInteger)		response;
 
 	- (NSURL *)		URL;
@@ -70,14 +78,16 @@ using namespace smooth::GUI::Dialogs;
 	{
 		[super init];
 
-		mode	    = SFM_OPEN;
+		mode	     = SFM_OPEN;
 
-		response    = 0;
+		response     = 0;
 
-		url	    = nil;
-		urls	    = nil;
+		url	     = nil;
+		urls	     = nil;
 
-		multiSelect = false;
+		parentWindow = NIL;
+
+		multiSelect  = false;
 
 		return self;
 	}
@@ -89,6 +99,8 @@ using namespace smooth::GUI::Dialogs;
 
 		[super dealloc];
 	}
+
+	- (void)	setParentWindow: (Window *) window	{ parentWindow = window; }
 
 	- (void)	setMultiSelect: (BOOL) val		{ multiSelect = val; }
 
@@ -130,14 +142,33 @@ using namespace smooth::GUI::Dialogs;
 
 		/* Run the panel.
 		 */
-		response = [panel runModalForDirectory: defaultPath != NIL ? [NSString stringWithUTF8String: defaultPath.ConvertTo("UTF-8")] : nil
-						  file: defaultFile != NIL ? [NSString stringWithUTF8String: defaultFile.ConvertTo("UTF-8")] : nil];
+		if (Backends::BackendCocoa::IsOSXVersionAtLeast(10, 15, 0))
+		{
+			[panel beginSheetForDirectory: defaultPath != NIL ? [NSString stringWithUTF8String: defaultPath.ConvertTo("UTF-8")] : nil
+						 file: defaultFile != NIL ? [NSString stringWithUTF8String: defaultFile.ConvertTo("UTF-8")] : nil
+				       modalForWindow: parentWindow != NIL ? (NSWindow *) parentWindow->GetSystemWindow() : [NSApp mainWindow]
+					modalDelegate: self
+				       didEndSelector: @selector(didEndModalSheet:returnCode:contextInfo:)
+					  contextInfo: nil];
+
+			[panel runModal];
+		}
+		else
+		{
+			response = [panel runModalForDirectory: defaultPath != NIL ? [NSString stringWithUTF8String: defaultPath.ConvertTo("UTF-8")] : nil
+							  file: defaultFile != NIL ? [NSString stringWithUTF8String: defaultFile.ConvertTo("UTF-8")] : nil];
+		}
 
 		/* Get selected URLs.
 		 */
 		url  = [[panel URL] retain];
 
 		if (mode == SFM_OPEN) urls = [[(NSOpenPanel *) panel URLs] retain];
+	}
+
+	- (void) didEndModalSheet: (NSSavePanel *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
+	{
+		response = returnCode;
 	}
 
 	- (NSInteger)	response	{ return response; }
@@ -153,6 +184,8 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	/* Create file chooser dialog.
 	 */
 	CocoaFilePanel	*panel = [CocoaFilePanel panelWithMode: mode];
+
+	[panel setParentWindow: parentWindow];
 
 	[panel setFilters: &filters];
 

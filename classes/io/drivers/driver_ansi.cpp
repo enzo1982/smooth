@@ -22,8 +22,14 @@
 
 #	define fopen _wfopen
 
-#	define fseek _fseeki64
-#	define ftell _ftelli64
+#	if defined __MINGW32__
+#		define fseek fseeko64
+#		define ftell ftello64
+#	else
+#		define fseek _fseeki64
+#		define ftell _ftelli64
+#	endif
+
 #	define ftruncate chsize
 #else
 #	include <unistd.h>

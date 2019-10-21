@@ -1190,8 +1190,12 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 			 */
 			if ([e subtype] == NSApplicationDropFiles)
 			{
+				Window	*window	  = Window::GetWindow((Void *) wnd);
+
+				Input::Pointer::UpdatePosition(window, [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
+
 				id	 info	  = (id) [e data1];
-				Point	 position = Window::GetWindow(wnd)->GetMousePosition();
+				Point	 position = window->GetMousePosition();
 
 				pasteBoard = [info draggingPasteboard];
 

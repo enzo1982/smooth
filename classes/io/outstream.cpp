@@ -354,7 +354,7 @@ S::Bool S::IO::OutStream::OutputString(const String &string)
 
 S::Bool S::IO::OutStream::OutputLine(const String &string)
 {
-	if (!OutputString(string)) return False;
+	if (string != NIL && !OutputString(string)) return False;
 
 #if (defined __WIN32__ || defined MSDOS) && !defined __CYGWIN32__
 	OutputNumber(13, 1);

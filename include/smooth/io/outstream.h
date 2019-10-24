@@ -63,7 +63,7 @@ namespace smooth
 				Bool		 OutputBits		(Int64, Int);
 
 				Bool		 OutputString		(const String &);
-				Bool		 OutputLine		(const String &);
+				Bool		 OutputLine		(const String & = NIL);
 				Bool		 OutputData		(const Void *, Int);
 
 				Bool		 SetPackageSize		(Int);

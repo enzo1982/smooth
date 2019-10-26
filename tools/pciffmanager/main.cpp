@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -34,7 +34,7 @@ PCIFFManager::PCIFFManager() : Application("smooth PCIFF Manager")
 
 	menu_file	= new PopupMenu();
 
-	menubar->AddEntry("File", NIL, menu_file);
+	menubar->AddEntry("File", menu_file);
 
 	menu_file->AddEntry("Open")->onAction.Connect(&PCIFFManager::OpenFile, this);
 	menu_file->AddEntry();

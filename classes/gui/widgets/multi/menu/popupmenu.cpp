@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,7 +42,7 @@ S::GUI::PopupMenu::~PopupMenu()
 	internalOnOpenPopupMenu.Disconnect(&PopupMenu::OnOpenPopupMenu, this);
 }
 
-S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntry(const String &text, const Bitmap &bitmap, PopupMenu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
+S::GUI::MenuEntry *S::GUI::PopupMenu::AddEntryInternal(const String &text, const Bitmap &bitmap, PopupMenu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
 {
 	PopupMenuEntry	*newEntry = NIL;
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,17 +45,17 @@ Designer::Designer() : Application("smooth Designer")
 	menu_widgets_add	= new PopupMenu();
 	menu_widgets_add_smooth	= new PopupMenu();
 
-	menubar->AddEntry("File", NIL, menu_file);
-	menubar->AddEntry("Dialog", NIL, menu_dialog);
-	menubar->AddEntry("Widgets", NIL, menu_widgets);
+	menubar->AddEntry("File", menu_file);
+	menubar->AddEntry("Dialog", menu_dialog);
+	menubar->AddEntry("Widgets", menu_widgets);
 
 	menu_file->AddEntry("Exit")->onAction.Connect(&Designer::Close, this);
 
 	menu_dialog->AddEntry("New")->onAction.Connect(&Designer::NewDialog, this);
 
-	menu_widgets->AddEntry("Add", NIL, menu_widgets_add);
+	menu_widgets->AddEntry("Add", menu_widgets_add);
 
-	menu_widgets_add->AddEntry("smooth controls", NIL, menu_widgets_add_smooth);
+	menu_widgets_add->AddEntry("smooth controls", menu_widgets_add_smooth);
 
 	menu_widgets_add_smooth->AddEntry("Button")->onAction.Connect(&Designer::AddButton, this);
 	menu_widgets_add_smooth->AddEntry("Layer")->onAction.Connect(&Designer::AddLayer, this);

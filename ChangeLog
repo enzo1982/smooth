@@ -4,6 +4,7 @@ dd.mm.19 hh:mm - smooth alpha 0.9.0
 
 - widget.cpp		- explicitly show/hide child widgets in Show/Hide methods
 - layer.cpp		- use standard widget implementations of Show/Hide methods
+- menu.cpp		- simplified API for adding menu entries
 - combobox.cpp		- fixed selected entry not being updated when new entry has the same memory address
 - cursor.cpp		- fixed text not being drawn correctly after undo/redo
 			- fixed multi-line cursors not responding after clicking below the last line

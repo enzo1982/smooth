@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,16 +55,16 @@ Test::Test()
 	optionbox_var		= 0;
 
 	menu_menus		= new PopupMenu();
-	menu_menus->AddEntry("2nd level popup menu", NIL, menu_2ndlevel);
+	menu_menus->AddEntry("2nd level popup menu", menu_2ndlevel);
 	menu_menus->AddEntry();
-	menu_menus->AddEntry("CheckBox menu entry", NIL, NIL, &checkbox_var);
+	menu_menus->AddEntry("CheckBox menu entry", &checkbox_var);
 	menu_menus->AddEntry();
-	menu_menus->AddEntry("OptionBox menu entry", NIL, NIL, NIL, &optionbox_var, 0);
-	menu_menus->AddEntry("OptionBox menu entry", NIL, NIL, NIL, &optionbox_var, 1);
+	menu_menus->AddEntry("OptionBox menu entry", &optionbox_var, 0);
+	menu_menus->AddEntry("OptionBox menu entry", &optionbox_var, 1);
 
-	mainWnd_menubar->AddEntry("File", NIL, menu_file);
-	mainWnd_menubar->AddEntry("Dialogs", NIL, menu_dialogs);
-	mainWnd_menubar->AddEntry("Menus", NIL, menu_menus);
+	mainWnd_menubar->AddEntry("File", menu_file);
+	mainWnd_menubar->AddEntry("Dialogs", menu_dialogs);
+	mainWnd_menubar->AddEntry("Menus", menu_menus);
 
 	text_arrows		= new Text("Arrows:", Point(10, 12));
 	widget_arrows		= new Arrows(Point(80, 10), Size(24, 17), OR_HORZ);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -109,7 +109,7 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 
 	menu_file	= new PopupMenu();
 
-	menubar->AddEntry("File", NIL, menu_file);
+	menubar->AddEntry("File", menu_file);
 
 	entry = menu_file->AddEntry("New");
 	entry->onAction.Connect(&Translator::NewFile, this);
@@ -149,7 +149,7 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 
 	menu_entry	= new PopupMenu();
 
-	entry = menubar->AddEntry("Entry", NIL, menu_entry);
+	entry = menubar->AddEntry("Entry", menu_entry);
 	entry->Deactivate();
 
 	entry = menu_entry->AddEntry("New");

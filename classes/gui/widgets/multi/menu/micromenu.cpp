@@ -47,9 +47,12 @@ S::GUI::MicroMenu::~MicroMenu()
 	DeleteObject(hotspot);
 }
 
-S::GUI::MenuEntry *S::GUI::MicroMenu::AddEntry(const String &text, const Bitmap &bitmap, PopupMenu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
+S::GUI::MenuEntry *S::GUI::MicroMenu::AddEntryInternal(const String &text, const Bitmap &bitmap, PopupMenu *popupMenu, Bool *bVar, Int *iVar, Int iCode)
 {
-	return popup->AddEntry(text, bitmap, popupMenu, bVar, iVar, iCode);
+	if	(bVar != NIL) return popup->AddEntry(text, bVar);
+	else if (iVar != NIL) return popup->AddEntry(text, iVar, iCode);
+
+	return popup->AddEntry(text, bitmap, popupMenu);
 }
 
 S::Int S::GUI::MicroMenu::Remove(Widget *widget)

@@ -129,11 +129,11 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 	main_reg1->Add(alarm);
 	main_reg1->Add(info);
 
-	main_button1 = new Button("OK", NIL, Point(175, 29), Size(0, 0));
+	main_button1 = new Button("OK", Point(175, 29), Size(0, 0));
 	main_button1->onAction.Connect(&Options::OptionsOK, this);
 	main_button1->SetOrientation(OR_LOWERRIGHT);
 
-	main_button2 = new Button("Cancel", NIL, Point(87, 29), Size(0, 0));
+	main_button2 = new Button("Cancel", Point(87, 29), Size(0, 0));
 	main_button2->onAction.Connect(&Options::OptionsCancel, this);
 	main_button2->SetOrientation(OR_LOWERRIGHT);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -43,6 +43,7 @@ namespace smooth
 			public:
 				static const Short		 classID;
 
+								 EditBox(const Point &, const Size &, Int = 0);
 								 EditBox(const String &, const Point &, const Size &, Int = 0);
 				virtual				~EditBox();
 

@@ -19,7 +19,27 @@
 
 const S::Short	 S::GUI::Hyperlink::classID = S::Object::RequestClassID();
 
-S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &iBitmap, const String &iLink, const Point &iPos, const Size &iSize) : Text(iText, iPos, Size())
+S::GUI::Hyperlink::Hyperlink(const String &iText, const String &iLink, const Point &iPos) : Text(iText, iPos, Size())
+{
+	type	= classID;
+	linkURL	= iLink;
+
+	font.SetColor(Setup::LinkColor);
+
+	ComputeTextSize();
+
+	SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
+
+	hotspot	= new Hotspot(Point(0, 0), GetSize());
+
+	hotspot->onMouseOver.Connect(&Hyperlink::OnMouseOver, this);
+	hotspot->onMouseOut.Connect(&Hyperlink::OnMouseOut, this);
+	hotspot->onLeftButtonClick.Connect(&Hyperlink::OnClickLink, this);
+
+	Add(hotspot);
+}
+
+S::GUI::Hyperlink::Hyperlink(const Bitmap &iBitmap, const String &iLink, const Point &iPos, const Size &iSize) : Text(NIL, iPos, Size())
 {
 	type	= classID;
 	linkURL	= iLink;
@@ -27,18 +47,7 @@ S::GUI::Hyperlink::Hyperlink(const String &iText, const Bitmap &iBitmap, const S
 	SetSize(iSize);
 	SetBitmap(iBitmap);
 
-	font.SetColor(Setup::LinkColor);
-
-	if (linkBitmap != NIL)
-	{
-		if (GetSize() == Size(0, 0)) SetSize(linkBitmap.GetSize());
-	}
-	else
-	{
-		ComputeTextSize();
-
-		SetSize(scaledTextSize * 96.0 / Surface().GetSurfaceDPI() + Size(0, 2));
-	}
+	if (GetSize() == Size(0, 0)) SetSize(linkBitmap.GetSize());
 
 	hotspot	= new Hotspot(Point(0, 0), GetSize());
 

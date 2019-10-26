@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,7 +21,7 @@ S::XML::XUL::Button::Button(Node *node) : Widget(node)
 
 	if (node != NIL)
 	{
-		button = new GUI::Button(GetXMLAttributeValue(node, "label"), NIL, GUI::Point(0, 0), GUI::Size(0, 0));
+		button = new GUI::Button(GetXMLAttributeValue(node, "label"), GUI::Point(0, 0), GUI::Size(0, 0));
 
 		if (GetXMLAttributeValue(node, "disabled") == "true") button->Deactivate();
 	}

@@ -18,6 +18,35 @@
 
 const S::Short	 S::GUI::EditBox::classID = S::Object::RequestClassID();
 
+S::GUI::EditBox::EditBox(const Point &iPos, const Size &iSize, Int maxSize) : Widget(iPos, iSize)
+{
+	type		= classID;
+
+	dropDownList	= NIL;
+	comboBox	= NIL;
+
+	font.SetColor(Setup::ClientTextColor);
+
+	if (GetWidth()	== 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(19);
+
+	cursor = new Cursor(Point(3, Math::Ceil(Float(GetHeight() - font.GetUnscaledTextSizeY()) / 2) - 2),
+			    GetSize() - Size(6, Math::Ceil(Float(GetHeight() - font.GetUnscaledTextSizeY()) / 2) - 1));
+	cursor->SetMaxSize(maxSize);
+	cursor->SetBackgroundColor(Setup::ClientColor);
+	cursor->SetFont(font);
+	cursor->onInput.Connect(&onInput);
+	cursor->onEnter.Connect(&onEnter);
+
+	Add(cursor);
+
+	onInput.SetParentObject(this);
+	onEnter.SetParentObject(this);
+
+	onChangeSize.Connect(&EditBox::OnChangeSize, this);
+	onLoseFocus.Connect(&cursor->onLoseFocus);
+}
+
 S::GUI::EditBox::EditBox(const String &iText, const Point &iPos, const Size &iSize, Int maxSize) : Widget(iPos, iSize)
 {
 	type		= classID;

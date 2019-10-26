@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -244,7 +244,7 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 	for (Int i = 0; i < buttonLabels.Length(); i++)
 	{
-		Button	*button = new Button(I18n::Translator::defaultTranslator->TranslateString(buttonLabels.GetNth(i)), NIL, Point((msgbox->GetWidth() - (buttonLabels.Length() * (buttonWidth + 9) - 9)) / 2 - 3 + (i * (buttonWidth + 9)), 14 + buttonHeight), Size());
+		Button	*button = new Button(I18n::Translator::defaultTranslator->TranslateString(buttonLabels.GetNth(i)), Point((msgbox->GetWidth() - (buttonLabels.Length() * (buttonWidth + 9) - 9)) / 2 - 3 + (i * (buttonWidth + 9)), 14 + buttonHeight), Size());
 
 		if	(i == 0) button->onAction.Connect(&MessageDlg::MessageButton0, this);
 		else if	(i == 1) button->onAction.Connect(&MessageDlg::MessageButton1, this);

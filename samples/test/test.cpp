@@ -76,11 +76,11 @@ Test::Test()
 	widget_activearea->onAction.Connect(&Test::OnWidgetAction, this);
 
 	text_button		= new Text("Button:", Point(10, 64));
-	widget_button		= new Button("Click", NIL, Point(80, 60), Size(80, 22));
+	widget_button		= new Button("Click", Point(80, 60), Size(80, 22));
 	widget_button->onAction.Connect(&Test::OnWidgetAction, this);
 
 	text_hyperlink		= new Text("Hyperlink:", Point(10, 85));
-	widget_hyperlink	= new Hyperlink("Click", NIL, "http://www.smooth-project.org/", Point(80, 85));
+	widget_hyperlink	= new Hyperlink("Click", "http://www.smooth-project.org/", Point(80, 85));
 
 	text_scrollbar		= new Text("Scrollbar:", Point(10, 112));
 	widget_scrollbar	= new Scrollbar(Point(80, 110), Size(120, 17), OR_HORZ);
@@ -113,16 +113,16 @@ Test::Test()
 
 	Widget	*selected_widget = widget_editbox;
 
-	button_show		= new Button("Show", NIL, Point(300, 180), Size(70, 22));
+	button_show		= new Button("Show", Point(300, 180), Size(70, 22));
 	button_show->onAction.Connect(&Widget::Show, selected_widget);
 
-	button_hide		= new Button("Hide", NIL, Point(372, 180), Size(70, 22));
+	button_hide		= new Button("Hide", Point(372, 180), Size(70, 22));
 	button_hide->onAction.Connect(&Widget::Hide, selected_widget);
 
-	button_activate		= new Button("Activate", NIL, Point(300, 204), Size(70, 22));
+	button_activate		= new Button("Activate", Point(300, 204), Size(70, 22));
 	button_activate->onAction.Connect(&Widget::Activate, selected_widget);
 
-	button_deactivate	= new Button("Deactivate", NIL, Point(372, 204), Size(70, 22));
+	button_deactivate	= new Button("Deactivate", Point(372, 204), Size(70, 22));
 	button_deactivate->onAction.Connect(&Widget::Deactivate, selected_widget);
 
 	Add(mainWnd);

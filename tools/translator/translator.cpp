@@ -50,11 +50,11 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	text_filter	= new Text("Filter:", Point(377, 10));
 	text_filter->SetOrientation(OR_UPPERRIGHT);
 
-	edit_filter	= new EditBox(NIL, Point(370 - text_filter->GetUnscaledTextWidth(), 7), Size(275 - text_filter->GetUnscaledTextWidth(), 0), 0);
+	edit_filter	= new EditBox(Point(370 - text_filter->GetUnscaledTextWidth(), 7), Size(275 - text_filter->GetUnscaledTextWidth(), 0), 0);
 	edit_filter->onInput.Connect(&Translator::FilterEntries, this);
 	edit_filter->SetOrientation(OR_UPPERRIGHT);
 
-	button_clear	= new Button("Clear", NIL, Point(87, 6), Size());
+	button_clear	= new Button("Clear", Point(87, 6), Size());
 	button_clear->onAction.Connect(&Translator::ClearFilter, this);
 	button_clear->SetOrientation(OR_UPPERRIGHT);
 
@@ -73,18 +73,18 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	list_filtered->AddTab("Translation");
 	list_filtered->Hide();
 
-	button_new	= new Button("New", NIL, Point(7, 164), Size());
+	button_new	= new Button("New", Point(7, 164), Size());
 	button_new->onAction.Connect(&Translator::NewEntry, this);
 	button_new->SetOrientation(OR_LOWERLEFT);
 
 	text_id		= new Text("ID:", Point(94, 160));
 	text_id->SetOrientation(OR_LOWERLEFT);
 
-	button_save	= new Button("Save", NIL, Point(175, 164), Size());
+	button_save	= new Button("Save", Point(175, 164), Size());
 	button_save->onAction.Connect(&Translator::SaveData, this);
 	button_save->SetOrientation(OR_LOWERRIGHT);
 
-	button_remove	= new Button("Remove", NIL, Point(87, 164), Size());
+	button_remove	= new Button("Remove", Point(87, 164), Size());
 	button_remove->onAction.Connect(&Translator::RemoveEntry, this);
 	button_remove->SetOrientation(OR_LOWERRIGHT);
 
@@ -94,15 +94,15 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	text_translated	= new Text("Translation:", Point(94, 65));
 	text_translated->SetOrientation(OR_LOWERLEFT);
 
-	edit_id		= new EditBox(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 163), Size(37, 0), 6);
+	edit_id		= new EditBox(Point(221 - text_translated->GetUnscaledTextWidth(), 163), Size(37, 0), 6);
 	edit_id->SetWidth(edit_id->GetFont().GetUnscaledTextSizeX("000000") + 6); 
 	edit_id->SetFlags(EDB_NUMERIC);
 	edit_id->SetOrientation(OR_LOWERLEFT);
 
-	edit_original	= new MultiEdit(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 136), Size(608, 60), 0);
+	edit_original	= new MultiEdit(Point(221 - text_translated->GetUnscaledTextWidth(), 136), Size(608, 60), 0);
 	edit_original->SetOrientation(OR_LOWERLEFT);
 
-	edit_translated	= new MultiEdit(NIL, Point(221 - text_translated->GetUnscaledTextWidth(), 68), Size(608, 60), 0);
+	edit_translated	= new MultiEdit(Point(221 - text_translated->GetUnscaledTextWidth(), 68), Size(608, 60), 0);
 	edit_translated->SetOrientation(OR_LOWERLEFT);
 
 	MenuEntry	*entry = NIL;

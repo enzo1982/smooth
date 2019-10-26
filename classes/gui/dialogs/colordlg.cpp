@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -58,11 +58,11 @@ S::GUI::Dialogs::ColorSelection::ColorSelection()
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
 
-	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point(87, 29), Size());
+	okbtn		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), Point(87, 29), Size());
 	okbtn->onAction.Connect(&ColorSelection::OnOK, this);
 	okbtn->SetOrientation(OR_LOWERRIGHT);
 
-	cancelbtn	= new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), NIL, Point(175, 29), Size());
+	cancelbtn	= new Button(I18n::Translator::defaultTranslator->TranslateString("Cancel"), Point(175, 29), Size());
 	cancelbtn->onAction.Connect(&ColorSelection::OnCancel, this);
 	cancelbtn->SetOrientation(OR_LOWERRIGHT);
 

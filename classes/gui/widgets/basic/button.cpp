@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,10 +16,45 @@
 
 const S::Short	 S::GUI::Button::classID = S::Object::RequestClassID();
 
+S::GUI::Button::Button(const String &iText, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
+{
+	type = classID;
+	text = iText;
+
+	if (GetWidth()	== 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(22);
+
+	ComputeTextSize();
+
+	hotspot	= new HotspotSimpleButton(flags & BF_NOFRAME ? Point() : Point(4, 4), GetSize() - (flags & BF_NOFRAME ? Size() : Size(8, 8)));
+	hotspot->onLeftButtonClick.Connect(&onAction);
+
+	Add(hotspot);
+
+	onChangeSize.Connect(&Button::OnChangeSize, this);
+}
+
+S::GUI::Button::Button(const Bitmap &iBitmap, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
+{
+	type = classID;
+
+	SetBitmap(iBitmap);
+
+	if (GetWidth()	== 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(22);
+
+	hotspot	= new HotspotSimpleButton(flags & BF_NOFRAME ? Point() : Point(4, 4), GetSize() - (flags & BF_NOFRAME ? Size() : Size(8, 8)));
+	hotspot->onLeftButtonClick.Connect(&onAction);
+
+	Add(hotspot);
+
+	onChangeSize.Connect(&Button::OnChangeSize, this);
+}
+
 S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &iPos, const Size &iSize) : Widget(iPos, iSize)
 {
-	type	= classID;
-	text	= iText;
+	type = classID;
+	text = iText;
 
 	SetBitmap(iBitmap);
 
@@ -29,7 +64,6 @@ S::GUI::Button::Button(const String &iText, const Bitmap &iBitmap, const Point &
 	ComputeTextSize();
 
 	hotspot	= new HotspotSimpleButton(flags & BF_NOFRAME ? Point() : Point(4, 4), GetSize() - (flags & BF_NOFRAME ? Size() : Size(8, 8)));
-
 	hotspot->onLeftButtonClick.Connect(&onAction);
 
 	Add(hotspot);

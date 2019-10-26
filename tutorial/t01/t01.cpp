@@ -22,7 +22,7 @@ Hello::Hello()
 {
 	mainWnd	= new Window("Hello world!", Point(100, 100), Size(200, 100));
 	title	= new Titlebar(TB_CLOSEBUTTON);
-	hello	= new Button("Hello world!", NIL, Point(20, 15), Size(160, 40));
+	hello	= new Button("Hello world!", Point(20, 15), Size(160, 40));
 
 	mainWnd->Add(hello);
 	mainWnd->Add(title);

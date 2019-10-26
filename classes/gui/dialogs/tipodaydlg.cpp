@@ -53,11 +53,11 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	titlebar	= new Titlebar(TB_CLOSEBUTTON);
 	divbar		= new Divider(39, OR_HORZ | OR_BOTTOM);
 
-	btn_ok		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), NIL, Point(87, 29), Size());
+	btn_ok		= new Button(I18n::Translator::defaultTranslator->TranslateString("OK"), Point(87, 29), Size());
 	btn_ok->onAction.Connect(&TipOfTheDay::OnOK, this);
 	btn_ok->SetOrientation(OR_LOWERRIGHT);
 
-	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), NIL, Point(175, 29), Size());
+	btn_next	= new Button(I18n::Translator::defaultTranslator->TranslateString("Next tip"), Point(175, 29), Size());
 	btn_next->onAction.Connect(&TipOfTheDay::OnNext, this);
 	btn_next->SetOrientation(OR_LOWERRIGHT);
 	btn_next->SetWidth(Math::Max(80, btn_next->GetUnscaledTextWidth() + 13));

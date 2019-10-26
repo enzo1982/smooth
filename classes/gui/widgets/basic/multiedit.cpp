@@ -19,6 +19,35 @@
 
 const S::Short	 S::GUI::MultiEdit::classID = S::Object::RequestClassID();
 
+S::GUI::MultiEdit::MultiEdit(const Point &iPos, const Size &iSize, Int maxSize) : Widget(iPos, iSize)
+{
+	type		= classID;
+
+	scrollbar	= NIL;
+	scrollbarPos	= 0;
+
+	font.SetColor(Setup::ClientTextColor);
+
+	if (GetWidth()	== 0) SetWidth(80);
+	if (GetHeight() == 0) SetHeight(19);
+
+	cursor = new Cursor(Point(3, Math::Ceil(Float(19 - font.GetUnscaledTextSizeY()) / 2) - 2),
+			    GetSize() - Size(6, Math::Ceil(Float(19 - font.GetUnscaledTextSizeY()) / 2) - 1));
+	cursor->onScroll.Connect(&MultiEdit::OnCursorScroll, this);
+	cursor->SetMaxSize(maxSize);
+	cursor->SetBackgroundColor(Setup::ClientColor);
+	cursor->SetFlags(CF_MULTILINE);
+	cursor->SetFont(font);
+	cursor->onInput.Connect(&onInput);
+
+	Add(cursor);
+
+	onInput.SetParentObject(this);
+
+	onChangeSize.Connect(&MultiEdit::OnChangeSize, this);
+	onLoseFocus.Connect(&cursor->onLoseFocus);
+}
+
 S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size &iSize, Int maxSize) : Widget(iPos, iSize)
 {
 	type		= classID;
@@ -38,7 +67,7 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	cursor->SetBackgroundColor(Setup::ClientColor);
 	cursor->SetFlags(CF_MULTILINE);
 	cursor->SetFont(font);
-	cursor->SetText(iText);
+
 	cursor->onInput.Connect(&onInput);
 
 	Add(cursor);

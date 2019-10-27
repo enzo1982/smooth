@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -111,7 +111,7 @@ S::Number S::Number::FromIntString(const String &iString)
 
 	for (Int i = 0; i < length; i++)
 	{
-		value += (string[i] - '0') * (Int64) Math::Pow(10, length - i - 1);
+		value += Int64(string[i] - '0') * (Int64) Math::Pow(10, length - i - 1);
 	}
 
 	return value * sign;
@@ -172,8 +172,8 @@ S::Number S::Number::FromHexString(const String &iString)
 
 	for (Int i = 0; i < length; i++)
 	{
-		if	(string[i] >= '0' && string[i] <= '9') value += ((string[i] - '0')	<< ((length - i - 1) * 4));
-		else if (string[i] >= 'a' && string[i] <= 'f') value += ((string[i] - 'a' + 10) << ((length - i - 1) * 4));
+		if	(string[i] >= '0' && string[i] <= '9') value += (Int64(string[i] - '0')	     << ((length - i - 1) * 4));
+		else if (string[i] >= 'a' && string[i] <= 'f') value += (Int64(string[i] - 'a' + 10) << ((length - i - 1) * 4));
 	}
 
 	return value;

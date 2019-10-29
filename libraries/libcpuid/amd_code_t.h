@@ -1,5 +1,5 @@
 /*
- * Copyright 2008  Veselin Georgiev,
+ * Copyright 2016  Veselin Georgiev,
  * anrieffNOSPAM @ mgail_DOT.com (convert to gmail)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,41 +23,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- * @File     libcpuid_types.h
- * @Author   Veselin Georgiev
- * @Brief    Type specifications for libcpuid.
+
+/*
+ * This file contains a list of internal codes we use in detection. It is
+ * of no external use and isn't a complete list of AMD products.
  */
-
-#ifndef __LIBCPUID_TYPES_H__
-#define __LIBCPUID_TYPES_H__
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1600
-#  include <stdint.h>
-#else
-/* we have to provide our own: */
-#  if !defined(__int32_t_defined)
-typedef int int32_t;
-#  endif
-
-#  if !defined(__uint32_t_defined)
-typedef unsigned uint32_t;
-#  endif
-
-typedef signed char		int8_t;
-typedef unsigned char		uint8_t;
-typedef signed short		int16_t;
-typedef unsigned short		uint16_t;
-#if (defined _MSC_VER) && (_MSC_VER <= 1300)
-	/* MSVC 6.0: no long longs ... */
-	typedef signed __int64		int64_t;
-	typedef unsigned __int64	uint64_t;
-#else
-	/* all other sane compilers: */
-	typedef signed long long   int64_t;
-	typedef unsigned long long uint64_t;
-#endif
-
-#endif
-
-#endif /* __LIBCPUID_TYPES_H__ */
+	CODE2(OPTERON_800, 1000),
+	CODE(PHENOM),
+	CODE(PHENOM2),
+	CODE(FUSION_C),
+	CODE(FUSION_E),
+	CODE(FUSION_EA),
+	CODE(FUSION_Z),
+	CODE(FUSION_A),
+	

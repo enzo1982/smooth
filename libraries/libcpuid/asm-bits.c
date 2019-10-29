@@ -32,7 +32,7 @@ int cpuid_exists_by_eflags(void)
 #if defined(PLATFORM_X64)
 	return 1; /* CPUID is always present on the x86_64 */
 #elif defined(PLATFORM_X86)
-#  if defined(COMPILER_GCC)
+#  if defined(COMPILER_GCC) || defined(COMPILER_CLANG)
 	int result;
 	__asm __volatile(
 		"	pushfl\n"
@@ -75,14 +75,14 @@ int cpuid_exists_by_eflags(void)
 #endif /* PLATFORM_X86 */
 }
 
+#ifdef INLINE_ASM_SUPPORTED
 /* 
  * with MSVC/AMD64, the exec_cpuid() and cpu_rdtsc() functions
  * are implemented in separate .asm files. Otherwise, use inline assembly
  */
 void exec_cpuid(uint32_t *regs)
 {
-#ifdef INLINE_ASM_SUPPORTED
-#ifdef COMPILER_GCC
+#  if defined(COMPILER_GCC) || defined(COMPILER_CLANG)
 #	ifdef PLATFORM_X64
 	__asm __volatile(
 		"	mov	%0,	%%rdi\n"
@@ -109,7 +109,7 @@ void exec_cpuid(uint32_t *regs)
 		:"m"(regs)
 		:"memory", "eax", "rdi"
 	);
-#	else
+#	elif defined(PLATFORM_X86)
 	__asm __volatile(
 		"	mov	%0,	%%edi\n"
 
@@ -166,20 +166,25 @@ void exec_cpuid(uint32_t *regs)
 #    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */
 #endif
-#endif /* INLINE_ASSEMBLY_SUPPORTED */
 }
+#endif /* INLINE_ASSEMBLY_SUPPORTED */
 
 #ifdef INLINE_ASM_SUPPORTED
 void cpu_rdtsc(uint64_t* result)
 {
 	uint32_t low_part, hi_part;
-#ifdef COMPILER_GCC
+#if defined(COMPILER_GCC) || defined(COMPILER_CLANG)
+#  if defined(PLATFORM_X86) || defined(PLATFORM_X64)
 	__asm __volatile (
 		"	rdtsc\n"
 		"	mov	%%eax,	%0\n"
 		"	mov	%%edx,	%1\n"
 		:"=m"(low_part), "=m"(hi_part)::"memory", "eax", "edx"
 	);
+#  else
+  low_part = 0;
+  hi_part = 0;
+#  endif
 #else
 #  ifdef COMPILER_MICROSOFT
 	__asm {
@@ -198,12 +203,13 @@ void cpu_rdtsc(uint64_t* result)
 #ifdef INLINE_ASM_SUPPORTED
 void busy_sse_loop(int cycles)
 {
-#ifdef COMPILER_GCC
+#  if defined(COMPILER_GCC) || defined(COMPILER_CLANG)
 #ifndef __APPLE__
 #	define XALIGN ".balign 16\n"
 #else
 #	define XALIGN ".align 4\n"
 #endif
+#if defined(PLATFORM_X86) || defined(PLATFORM_X64)
 	__asm __volatile (
 		"	xorps	%%xmm0,	%%xmm0\n"
 		"	xorps	%%xmm1,	%%xmm1\n"
@@ -214,7 +220,8 @@ void busy_sse_loop(int cycles)
 		"	xorps	%%xmm6,	%%xmm6\n"
 		"	xorps	%%xmm7,	%%xmm7\n"
 		XALIGN
-		".bsLoop:\n"
+		/* ".bsLoop:\n" */
+		"1:\n"
 		// 0:
 		"	addps	%%xmm1, %%xmm0\n"
 		"	addps	%%xmm2, %%xmm1\n"
@@ -505,9 +512,11 @@ void busy_sse_loop(int cycles)
 		"	addps	%%xmm0, %%xmm7\n"
 		
 		"	dec	%%eax\n"
-		"	jnz	.bsLoop\n"
+		/* "jnz	.bsLoop\n" */
+		"	jnz	1b\n"
 		::"a"(cycles)
 	);
+#endif
 #else
 #  ifdef COMPILER_MICROSOFT
 	__asm {

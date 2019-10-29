@@ -57,4 +57,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\libraries\libcpuid\masm-x64.asm">
+      <Filter>Quelldateien</Filter>
+    </None>
+  </ItemGroup>
 </Project>

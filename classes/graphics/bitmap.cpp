@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,9 +12,9 @@
 #include <smooth/graphics/backends/bitmapbackend.h>
 #include <smooth/graphics/surface.h>
 
-S::GUI::Bitmap::Bitmap(Void *iBitmap)
+S::GUI::Bitmap::Bitmap(const int nil)
 {
-	backend = BitmapBackend::CreateBackendInstance(iBitmap);
+	backend = BitmapBackend::CreateBackendInstance(nil);
 }
 
 S::GUI::Bitmap::Bitmap(const Size &iSize, Int iDepth)
@@ -22,14 +22,14 @@ S::GUI::Bitmap::Bitmap(const Size &iSize, Int iDepth)
 	backend = BitmapBackend::CreateBackendInstance(iSize, iDepth);
 }
 
-S::GUI::Bitmap::Bitmap(const int nil)
-{
-	backend = BitmapBackend::CreateBackendInstance(nil);
-}
-
 S::GUI::Bitmap::Bitmap(const Bitmap &iBitmap)
 {
 	backend = BitmapBackend::CreateBackendInstance(*(iBitmap.backend));
+}
+
+S::GUI::Bitmap::Bitmap(Void *iBitmap)
+{
+	backend = BitmapBackend::CreateBackendInstance(iBitmap);
 }
 
 S::GUI::Bitmap::~Bitmap()
@@ -136,6 +136,13 @@ S::Bool S::GUI::Bitmap::SetPixel(const Point &point, const Color &color)
 S::GUI::Color S::GUI::Bitmap::GetPixel(const Point &point) const
 {
 	return backend->GetPixel(point);
+}
+
+S::GUI::Bitmap &S::GUI::Bitmap::operator =(Void *iBitmap)
+{
+	*backend = iBitmap;
+
+	return *this;
 }
 
 S::GUI::Bitmap &S::GUI::Bitmap::operator =(const int nil)

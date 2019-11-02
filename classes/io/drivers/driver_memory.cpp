@@ -27,7 +27,7 @@ S::Int S::IO::DriverMemory::ReadData(UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	dataSize = Math::Min((Int64) dataSize, size - position);
+	dataSize = Math::Min(dataSize, size - position);
 
 	memcpy(data, (unsigned char *) stream + position, dataSize);
 
@@ -40,7 +40,7 @@ S::Int S::IO::DriverMemory::WriteData(const UnsignedByte *data, Int dataSize)
 {
 	if (dataSize <= 0) return 0;
 
-	dataSize = Math::Min((Int64) dataSize, size - position);
+	dataSize = Math::Min(dataSize, size - position);
 
 	memcpy((unsigned char *) stream + position, data, dataSize);
 

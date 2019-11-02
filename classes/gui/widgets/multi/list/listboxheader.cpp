@@ -137,7 +137,7 @@ S::Int S::GUI::ListBoxHeader::Paint(Int message)
 
 				for (Int i = 0; i < tabWidths.Length(); i++)
 				{
-					frame.right = (Int) Math::Min(frame.left + Math::Abs((Int) Math::Round(tabWidths.GetNth(i) * surface->GetSurfaceDPI() / 96.0)), realPos.x + GetRealSize().cx);
+					frame.right = (Int) Math::Min(frame.left + Math::Abs(Math::Round(tabWidths.GetNth(i) * surface->GetSurfaceDPI() / 96.0)), realPos.x + GetRealSize().cx);
 
 					surface->Box(frame, Setup::BackgroundColor, Rect::Filled);
 					surface->Frame(frame, FRAME_UP);
@@ -206,7 +206,7 @@ S::Int S::GUI::ListBoxHeader::Process(Int message, Int wParam, Int lParam)
 
 				for (Int j = 0; j < tabWidths.Length(); j++)
 				{
-					frame.right = (Int) Math::Min(frame.left + Math::Abs((Int) Math::Round(tabWidths.GetNth(j) * surface->GetSurfaceDPI() / 96.0)) - 2, realPos.x + GetRealSize().cx - 1);
+					frame.right = (Int) Math::Min(frame.left + Math::Abs(Math::Round(tabWidths.GetNth(j) * surface->GetSurfaceDPI() / 96.0)) - 2, realPos.x + GetRealSize().cx - 1);
 
 					if (window->IsMouseOn(frame) && !tabChecked.GetNth(j) && moveTab == -1)
 					{

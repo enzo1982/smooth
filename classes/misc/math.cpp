@@ -37,11 +37,6 @@ S::Float S::Math::Abs(Float f)
 	return fabs(f);
 }
 
-S::Int64 S::Math::Sign(Float f)
-{
-	return (f == 0 ? 0 : (f < 0 ? -1 : 1));
-}
-
 S::Float S::Math::Fract(Float f)
 {
 	return f - Floor(f);
@@ -141,17 +136,6 @@ S::Float S::Math::Atan2(Float fy, Float fx)
 	return atan2(fy, fx);
 }
 
-S::Int S::Math::Abs(Int i)
-{
-	return i * Sign(i);
-}
-
-
-S::Int S::Math::Mod(Int id, Int ib)
-{
-	return id % ib;
-}
-
 S::Float S::Math::Pow(Int in, Int ie)
 {
 	Float	 value = 1;
@@ -160,16 +144,6 @@ S::Float S::Math::Pow(Int in, Int ie)
 	else	     for (Int i = 0; i < -ie; i++) value /= in;
 
 	return value;
-}
-
-S::Int64 S::Math::Abs(Int64 i)
-{
-	return i * Sign(i);
-}
-
-S::Int64 S::Math::Mod(Int64 id, Int64 ib)
-{
-	return id % ib;
 }
 
 S::Float S::Math::Pow(Int64 in, Int64 ie)

@@ -836,8 +836,8 @@ S::Int S::GUI::WindowGDI::SetMinimumSize(const Size &nMinSize)
 	GetWindowRect(hwnd, &windowRect);
 
 	SetMetrics(Point(windowRect.left, windowRect.top),
-		   Size(Math::Max((Int) Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), minSize.cx),
-			Math::Max((Int) Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), minSize.cy)));
+		   Size(Math::Max(Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), minSize.cx),
+			Math::Max(Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), minSize.cy)));
 
 	return Success();
 }
@@ -851,8 +851,8 @@ S::Int S::GUI::WindowGDI::SetMaximumSize(const Size &nMaxSize)
 	GetWindowRect(hwnd, &windowRect);
 
 	SetMetrics(Point(windowRect.left, windowRect.top),
-		   Size(Math::Min((Int) Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), maxSize.cx),
-			Math::Min((Int) Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), maxSize.cy)));
+		   Size(Math::Min(Math::Round((windowRect.right  - windowRect.left - sizeModifier.cx) / fontSize), maxSize.cx),
+			Math::Min(Math::Round((windowRect.bottom - windowRect.top  - sizeModifier.cy) / fontSize), maxSize.cy)));
 
 	return Success();
 }

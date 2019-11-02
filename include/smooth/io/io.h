@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -36,7 +36,7 @@ namespace smooth
 	};
 };
 
-#define IOGetByte(x, y) ((y) > 3)  ? 0 : (((x) >> (8 * (y))) & 255)
-#define IOGetBit(x, y)  ((y) > 31) ? 0 : (((x) >>      (y) ) & 1)
+#define IOGetByte(x, y) ((y) > 7)  ? 0 : (((x) >> (8 * (y))) & 255)
+#define IOGetBit(x, y)  ((y) > 63) ? 0 : (((x) >>      (y) ) & 1)
 
 #endif

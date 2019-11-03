@@ -8,6 +8,8 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#define _FILE_OFFSET_BITS 64
+
 #include <smooth/io/drivers/driver_ansi.h>
 
 #include <smooth/io/instream.h>
@@ -22,12 +24,9 @@
 
 #	define fopen _wfopen
 
-#	if defined __MINGW32__
-#		define fseek fseeko64
-#		define ftell ftello64
-#	else
-#		define fseek _fseeki64
-#		define ftell _ftelli64
+#	if !defined __MINGW32__
+#		define fseeko _fseeki64
+#		define ftello _ftelli64
 #	endif
 
 #	define ftruncate chsize
@@ -128,7 +127,7 @@ S::Int S::IO::DriverANSI::WriteData(const UnsignedByte *data, Int dataSize)
 
 S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 {
-	if (!stream || fseek(stream, newPos, SEEK_SET) != 0) return -1;
+	if (!stream || fseeko(stream, newPos, SEEK_SET) != 0) return -1;
 
 	return GetPos();
 }
@@ -163,11 +162,11 @@ S::Int64 S::IO::DriverANSI::GetSize() const
 
 	Int64	 oldPos = GetPos();
 
-	if (fseek(stream,      0, SEEK_END) != 0) return -1;
+	if (fseeko(stream,      0, SEEK_END) != 0) return -1;
 
 	Int64	 size = GetPos();
 
-	if (fseek(stream, oldPos, SEEK_SET) != 0) return -1;
+	if (fseeko(stream, oldPos, SEEK_SET) != 0) return -1;
 
 	return size;
 }
@@ -176,7 +175,7 @@ S::Int64 S::IO::DriverANSI::GetPos() const
 {
 	if (!stream) return -1;
 
-	return ftell(stream);
+	return ftello(stream);
 }
 
 S::Bool S::IO::DriverANSI::IsBuffered() const

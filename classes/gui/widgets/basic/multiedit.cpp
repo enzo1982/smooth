@@ -67,7 +67,7 @@ S::GUI::MultiEdit::MultiEdit(const String &iText, const Point &iPos, const Size 
 	cursor->SetBackgroundColor(Setup::ClientColor);
 	cursor->SetFlags(CF_MULTILINE);
 	cursor->SetFont(font);
-
+	cursor->SetText(iText);
 	cursor->onInput.Connect(&onInput);
 
 	Add(cursor);

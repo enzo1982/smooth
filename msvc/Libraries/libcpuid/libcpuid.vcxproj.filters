@@ -58,8 +58,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\libraries\libcpuid\masm-x64.asm">
+    <MASM Include="..\..\..\libraries\libcpuid\masm-x64.asm">
       <Filter>Quelldateien</Filter>
-    </None>
+    </MASM>
   </ItemGroup>
 </Project>

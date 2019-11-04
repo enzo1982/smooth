@@ -126,7 +126,6 @@
     <Link>
       <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <OptimizeReferences>true</OptimizeReferences>
@@ -152,7 +151,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <GenerateDebugInformation>No</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <ResourceCompile>

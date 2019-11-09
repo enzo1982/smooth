@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,7 @@
 
 #include <smooth/system/event.h>
 #include <smooth/system/system.h>
+#include <smooth/system/timer.h>
 #include <smooth/system/backends/haiku/eventhaiku.h>
 #include <smooth/gui/window/backends/haiku/windowhaiku.h>
 #include <smooth/templates/nonblocking.h>
@@ -105,11 +106,22 @@ S::Bool S::System::EventHaiku::ProcessNextEvent()
 			messages.RemoveNth(0);
 			messages.Unlock();
 
-			/* Find window and process message.
-			 */
-			GUI::WindowHaiku	*window = GUI::WindowHaiku::GetWindowBackend((BWindow *) message->window);
+			if (message->messageID == B_TIMER)
+			{
+				/* Find timer and fire signal.
+				 */
+				Timer	*timer = (Timer *) Object::GetObject(message->param1, Timer::classID);
 
-			if (window != NIL) window->ProcessSystemMessages(message->messageID, message->param1, message->param2, message->currentMessage);
+				if (timer != NIL) timer->onInterval.Emit();
+			}
+			else
+			{
+				/* Find window and process message.
+				 */
+				GUI::WindowHaiku	*window = GUI::WindowHaiku::GetWindowBackend((BWindow *) message->window);
+
+				if (window != NIL) window->ProcessSystemMessages(message->messageID, message->param1, message->param2, message->currentMessage);
+			}
 
 			delete message;
 

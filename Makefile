@@ -97,7 +97,7 @@ else ifeq ($(BUILD_HAIKU),True)
 	OBJECTS += classes/gui/dialogs/file/filedlg_haiku.o
 	OBJECTS += classes/gui/window/backends/haiku/windowhaiku.o
 	OBJECTS += classes/input/backends/haiku/pointerhaiku.o
-	OBJECTS += classes/system/backends/haiku/eventhaiku.o classes/system/backends/haiku/screenhaiku.o
+	OBJECTS += classes/system/backends/haiku/eventhaiku.o classes/system/backends/haiku/screenhaiku.o classes/system/backends/haiku/timerhaiku.o
 else
 	OBJECTS += classes/gui/dialogs/directory/dirdlg_gtk.o
 	OBJECTS += classes/gui/dialogs/file/filedlg_gtk.o

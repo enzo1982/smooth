@@ -128,6 +128,9 @@ else
 	else ifeq ($(UNAME),Haiku)
 		BUILD_HAIKU = True
 
+#		Disable POSIX timer backend
+		BUILD_POSIXTIMER = False
+
 #		Disable XLib and Cairo backends
 		BUILD_XLIB = False
 		BUILD_CAIRO = False

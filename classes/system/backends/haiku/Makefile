@@ -9,7 +9,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 OBJECTS	  = 
 
 ifeq ($(BUILD_HAIKU),True)
-	OBJECTS += eventhaiku.o screenhaiku.o
+	OBJECTS += eventhaiku.o screenhaiku.o timerhaiku.o
 endif
 
 ## Do not change anything below this line. ##

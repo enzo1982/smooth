@@ -34,9 +34,10 @@ namespace smooth
 
 	DateTime FileTimeToDateTime(const FileTime &fileTime)
 	{
-		SYSTEMTIME	 time;
+		SYSTEMTIME	 utc, time;
 
-		FileTimeToSystemTime(&fileTime, &time);
+		FileTimeToSystemTime(&fileTime, &utc);
+		SystemTimeToTzSpecificLocalTime(NIL, &utc, &time);
 
 		DateTime	 dateTime;
 
@@ -48,7 +49,7 @@ namespace smooth
 
 	FileTime DateTimeToFileTime(const DateTime &dateTime)
 	{
-		SYSTEMTIME	 time;
+		SYSTEMTIME	 time, utc;
 
 		memset(&time, 0, sizeof(time));
 
@@ -62,7 +63,8 @@ namespace smooth
 
 		FileTime	 fileTime;
 
-		SystemTimeToFileTime(&time, &fileTime);
+		TzSpecificLocalTimeToSystemTime(NIL, &time, &utc);
+		SystemTimeToFileTime(&utc, &fileTime);
 
 		return fileTime;
 	}

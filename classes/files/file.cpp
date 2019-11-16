@@ -103,7 +103,7 @@ namespace smooth
 
 		DateTime	 dateTime;
 
-		dateTime.SetYMD(time.tm_year, time.tm_mon, time.tm_mday);
+		dateTime.SetYMD(time.tm_year + 1900, time.tm_mon + 1, time.tm_mday);
 		dateTime.SetHMS(time.tm_hour, time.tm_min, time.tm_sec);
 
 		return dateTime;
@@ -115,8 +115,8 @@ namespace smooth
 
 		memset(&time, 0, sizeof(time));
 
-		time.tm_year  = dateTime.GetYear();
-		time.tm_mon   = dateTime.GetMonth();
+		time.tm_year  = dateTime.GetYear() - 1900;
+		time.tm_mon   = dateTime.GetMonth() - 1;
 		time.tm_mday  = dateTime.GetDay();
 
 		time.tm_hour  = dateTime.GetHour();

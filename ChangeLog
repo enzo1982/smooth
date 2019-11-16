@@ -35,6 +35,8 @@ dd.mm.19 hh:mm - smooth alpha 0.9.0
 - thread.cpp		- added GetCurrentThreadID() method
 - math.cpp		- added methods for pseudo random number generation
 - datetime.cpp		- fixed possible crashes
+- cpu.cpp		- added support for querying CPU vendor and brand strings
+			- added support for measuring CPU clock rate
 
 - added Float32 and Float64 type defintions
 - added support for Unicode console I/O on Windows

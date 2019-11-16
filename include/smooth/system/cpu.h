@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,6 +37,9 @@ namespace smooth
 		class SMOOTHAPI CPU
 		{
 			private:
+				static String	 vendorString;
+				static String	 brandString;
+
 				static Int	 numCores;
 				static Int	 numLogicalCPUs;
 
@@ -68,7 +71,12 @@ namespace smooth
 						 CPU();
 
 				Endianness	 GetEndianness() const;
+
+				Int		 MeasureClock(Int) const;
 			accessors:
+				const String	&GetVendorString() const	{ return vendorString; }
+				const String	&GetBrandString() const		{ return brandString; }
+
 				Int		 GetNumCores() const		{ return numCores; }
 				Int		 GetNumLogicalCPUs() const	{ return numLogicalCPUs; }
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,7 +22,7 @@ static const char *smooth_sv =
 	     <property name=\"encoding\">UTF-8</property>			\
 	   </info>								\
 	   <data>								\
-	     <entry string=\"OK\">Ok</entry>					\
+	     <entry string=\"OK\">OK</entry>					\
 	     <entry string=\"Cancel\">Avbryt</entry>				\
 	     <entry string=\"Yes\">Ja</entry>					\
 	     <entry string=\"No\">Nej</entry>					\
@@ -46,7 +46,7 @@ static const char *smooth_sv =
 	     <entry string=\"Up\">Upp</entry>					\
 	     <entry string=\"Right\">Höger</entry>				\
 	     <entry string=\"Down\">Ner</entry>					\
-	     <entry string=\"Ctrl\">Strg</entry>				\
+	     <entry string=\"Ctrl\">Ctrl</entry>				\
 	     <entry string=\"Alt\">Alt</entry>					\
 	     <entry string=\"Shift\">Skift</entry>				\
 										\
@@ -60,7 +60,7 @@ static const char *smooth_sv =
 	     <entry string=\"HTML code\">HTML-kod</entry>			\
 										\
 	     <entry string=\"Tip of the day\">Dagens tips</entry>		\
-	     <entry string=\"Did you know...\">Visste du...</entry>		\
+	     <entry string=\"Did you know...\">Visste du ...</entry>		\
 	     <entry string=\"Show tips on startup\">Visa tips vid start</entry>	\
 	     <entry string=\"Next tip\">Nästa</entry>				\
 	   </data>								\

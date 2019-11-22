@@ -843,46 +843,15 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 	if (wnd != NIL)
 	{
-		/* Create input context.
+		/* Create input window.
 		 */
 		if (im != NIL)
 		{
 			XLockDisplay(display);
 
-			XIMCallback	 cbPeStart  = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditStart };
-			XIMCallback	 cbPeDone   = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditDone  };
-			XIMCallback	 cbPeDraw   = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditDraw  };
-			XIMCallback	 cbPeCaret  = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditCaret };
+			iwnd = XCreateWindow(display, wnd, 0, 0, 1, 1, 0, CopyFromParent, InputOnly, CopyFromParent, 0, NIL);
 
-			XVaNestedList	 preeditCbs = XVaCreateNestedList(0, XNPreeditStartCallback, &cbPeStart,
-									     XNPreeditDoneCallback,  &cbPeDone,
-									     XNPreeditDrawCallback,  &cbPeDraw,
-									     XNPreeditCaretCallback, &cbPeCaret, NULL);
-
-			ic = XCreateIC(im, XNClientWindow,	wnd,
-					   XNInputStyle,	XIMPreeditCallbacks | XIMStatusNothing,
-					   XNPreeditAttributes,	preeditCbs, NULL);
-
-			XFree(preeditCbs);
-
-			if (ic != NIL)
-			{
-				/* Create anchor window and set focus.
-				 */
-				iwnd = XCreateWindow(display, wnd, 0, 0, 1, 1, 0, CopyFromParent, InputOnly, CopyFromParent, 0, NIL);
-
-				XMapWindow(display, iwnd);
-
-				XSetICValues(ic, XNFocusWindow, iwnd, NULL);
-
-				/* Get mask of filter events for IC.
-				 */
-				long	 filterEvents = 0;
-
-				XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
-
-				XSelectInput(display, iwnd, filterEvents);
-			}
+			XMapWindow(display, iwnd);
 
 			XUnlockDisplay(display);
 		}
@@ -1003,12 +972,14 @@ S::Int S::GUI::WindowXLib::Close()
 
 	/* Destroy input context.
 	 */
-	if (ic != NIL)
+	DestroyInputContext();
+
+	/* Destroy input window.
+	 */
+	if (iwnd != NIL)
 	{
-		XDestroyIC(ic);
 		XDestroyWindow(display, iwnd);
 
-		ic   = NIL;
 		iwnd = NIL;
 	}
 
@@ -1347,6 +1318,61 @@ S::Void S::GUI::WindowXLib::OnXIMPreeditCaret(XIMPreeditCaretCallbackStruct *dat
 {
 }
 
+S::Void S::GUI::WindowXLib::CreateInputContext()
+{
+	XLockDisplay(display);
+
+	/* Set up callbacks.
+	 */
+	XIMCallback	 cbPeStart  = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditStart };
+	XIMCallback	 cbPeDone   = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditDone  };
+	XIMCallback	 cbPeDraw   = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditDraw  };
+	XIMCallback	 cbPeCaret  = { (XPointer) this, (XIMProc) S::GUI::OnXIMPreeditCaret };
+
+	XVaNestedList	 preeditCbs = XVaCreateNestedList(0, XNPreeditStartCallback, &cbPeStart,
+							     XNPreeditDoneCallback,  &cbPeDone,
+							     XNPreeditDrawCallback,  &cbPeDraw,
+							     XNPreeditCaretCallback, &cbPeCaret, NULL);
+
+	/* Create input context.
+	 */
+	ic = XCreateIC(im, XNClientWindow,	wnd,
+			   XNInputStyle,	XIMPreeditCallbacks | XIMStatusNothing,
+			   XNPreeditAttributes,	preeditCbs, NULL);
+
+	XFree(preeditCbs);
+
+	/* Configure input context.
+	 */
+	if (ic != NIL)
+	{
+		/* Set focus window.
+		 */
+		XSetICValues(ic, XNFocusWindow, iwnd, NULL);
+
+		/* Get mask of filter events for IC.
+		 */
+		long	 filterEvents = 0;
+
+		XGetICValues(ic, XNFilterEvents, &filterEvents, NULL);
+
+		XSelectInput(display, iwnd, filterEvents);
+	}
+
+	XUnlockDisplay(display);
+}
+
+S::Void S::GUI::WindowXLib::DestroyInputContext()
+{
+	if (ic == NIL) return;
+
+	/* Destroy input context.
+	 */
+	XDestroyIC(ic);
+
+	ic = NIL;
+}
+
 S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)
 {
 	WindowXLib	*window = GetWindowBackend((X11::Window) cursor->GetContainerWindow()->GetSystemWindow());
@@ -1356,6 +1382,13 @@ S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)
 		/* Remove active cursor.
 		 */
 		if (cursor != activeCursor && activeCursor != NIL) RemoveCursor(activeCursor);
+	}
+
+	if (window != NIL)
+	{
+		/* Create input context.
+		 */
+		window->CreateInputContext();
 
 		/* Move input window to cursor position.
 		 */
@@ -1391,11 +1424,9 @@ S::Void S::GUI::WindowXLib::RemoveCursor(Cursor *cursor)
 
 	if (window != NIL && window->ic != NIL)
 	{
-		/* Clear composition string.
+		/* Destroy input context.
 		 */
-		wchar_t	*string = XwcResetIC(window->ic);
-
-		if (string != NIL) XFree(string);
+		window->DestroyInputContext();
 
 		/* Clear preediting area.
 		 */

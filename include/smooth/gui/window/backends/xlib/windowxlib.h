@@ -100,6 +100,9 @@ namespace smooth
 
 				Void					 UpdateWMNormalHints();
 
+				Void					 CreateInputContext();
+				Void					 DestroyInputContext();
+
 				Input::Keyboard::Key			 ConvertKey(Int);
 			public:
 				static Int				 Initialize();

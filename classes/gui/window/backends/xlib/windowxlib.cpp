@@ -1377,39 +1377,39 @@ S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)
 {
 	WindowXLib	*window = GetWindowBackend((X11::Window) cursor->GetContainerWindow()->GetSystemWindow());
 
-	if (window != NIL && window->ic != NIL)
+	if (window != NIL)
 	{
 		/* Remove active cursor.
 		 */
 		if (cursor != activeCursor && activeCursor != NIL) RemoveCursor(activeCursor);
-	}
 
-	if (window != NIL)
-	{
 		/* Create input context.
 		 */
 		window->CreateInputContext();
 
-		/* Move input window to cursor position.
-		 */
-		XMoveWindow(window->display, window->iwnd, point.x - 3, point.y + cursor->GetFont().GetScaledTextSizeY() + 1);
-
-		/* Set input focus on input window.
-		 */
-		X11::Window	 focusWnd = None;
-		int		 revertTo = RevertToNone;
-
-		XGetInputFocus(window->display, &focusWnd, &revertTo);
-
-		if (focusWnd != window->iwnd)
+		if (window->ic != NIL)
 		{
-			XSetInputFocus(window->display, window->iwnd, RevertToParent, CurrentTime);
-			XFlush(window->display);
-		}
+			/* Move input window to cursor position.
+			 */
+			XMoveWindow(window->display, window->iwnd, point.x - 3, point.y + cursor->GetFont().GetScaledTextSizeY() + 1);
 
-		/* Set current input context.
-		 */
-		XSetICFocus(window->ic);
+			/* Set input focus on input window.
+			 */
+			X11::Window	 focusWnd = None;
+			int		 revertTo = RevertToNone;
+
+			XGetInputFocus(window->display, &focusWnd, &revertTo);
+
+			if (focusWnd != window->iwnd)
+			{
+				XSetInputFocus(window->display, window->iwnd, RevertToParent, CurrentTime);
+				XFlush(window->display);
+			}
+
+			/* Set current input context.
+			 */
+			XSetICFocus(window->ic);
+		}
 	}
 
 	activeCursor	= cursor;

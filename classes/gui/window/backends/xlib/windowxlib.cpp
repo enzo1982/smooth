@@ -1342,6 +1342,15 @@ S::Void S::GUI::WindowXLib::CreateInputContext()
 
 	XFree(preeditCbs);
 
+	if (ic == NIL)
+	{
+		/* Creating an IC for pre-editing can fail if the desktop environment does
+		 * not support it. Try creating one without pre-editing in that case.
+		 */
+		ic = XCreateIC(im, XNClientWindow, wnd,
+				   XNInputStyle,   XIMPreeditNothing | XIMStatusNothing, NULL);
+	}
+
 	/* Configure input context.
 	 */
 	if (ic != NIL)

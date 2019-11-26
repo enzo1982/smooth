@@ -133,6 +133,8 @@ class CocoaMenuEntryDelegate
 			}
 		}
 
+		if (!menuEntry->IsActive()) [self setEnabled: NO];
+
 		[self checkValue];
 
 		[self setTarget: self];

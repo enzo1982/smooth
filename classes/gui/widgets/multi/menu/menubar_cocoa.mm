@@ -197,6 +197,7 @@ class CocoaMenuEntryDelegate
 	    ignoreLastEntry: (BOOL)		    ignoreLastEntry
 	{
 		[super initWithTitle: [NSString stringWithUTF8String: iTitle.ConvertTo("UTF-8")]];
+		[super setAutoenablesItems: NO];
 
 		menu = iMenu;
 
@@ -243,6 +244,7 @@ class CocoaMenuEntryDelegate
 	- (id) initWithMenubar: (const S::GUI::Menubar *) iMenubar
 	{
 		[super initWithTitle: @"MainMenu"];
+		[super setAutoenablesItems: NO];
 
 		menubar = iMenubar;
 

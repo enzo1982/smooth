@@ -428,9 +428,7 @@ S::Int S::GUI::Widget::Hide()
 	{
 		if (focussed) { focussed = False; onLoseFocus.Emit(); }
 
-		Rect	 rect = GetVisibleArea();
-
-		surface->Box(rect, container->GetBackgroundColor(), Rect::Filled);
+		surface->Box(Rect(GetRealPosition(), GetRealSize()), container->GetBackgroundColor(), Rect::Filled);
 
 		DeactivateTooltip();
 	}
@@ -448,7 +446,7 @@ S::Int S::GUI::Widget::Activate()
 
 	Surface	*surface = (IsVisible() ? GetDrawSurface() : NIL);
 
-	if (surface) { surface->StartPaint(GetVisibleArea()); Hide(); }
+	if (surface) { surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
 
 	active = True;
 
@@ -465,7 +463,7 @@ S::Int S::GUI::Widget::Deactivate()
 
 	Surface	*surface = (IsVisible() ? GetDrawSurface() : NIL);
 
-	if (surface) { surface->StartPaint(GetVisibleArea()); Hide(); }
+	if (surface) { surface->StartPaint(Rect(GetRealPosition(), GetRealSize())); Hide(); }
 
 	active = False;
 

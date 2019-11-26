@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -57,10 +57,50 @@ S::GUI::MenubarEntry::~MenubarEntry()
 	if (actionHotspot != NIL) DeleteObject(actionHotspot);
 }
 
+S::Int S::GUI::MenubarEntry::Show()
+{
+	if (visible) return Success();
+
+#ifdef __APPLE__
+	if (IsRegistered() && container->GetOrientation() == OR_FREE)
+	{
+		visible = True;
+
+		onShow.Emit();
+ 
+		return container->Paint(SP_UPDATE);
+	}
+#endif
+
+	return MenuEntry::Show();
+}
+
+S::Int S::GUI::MenubarEntry::Hide()
+{
+	if (!visible) return Success();
+
+#ifdef __APPLE__
+	if (IsRegistered() && container->GetOrientation() == OR_FREE)
+	{
+		visible = False;
+
+		onHide.Emit(); 
+
+		return container->Paint(SP_UPDATE);
+	}
+#endif
+
+	return MenuEntry::Hide();
+}
+
 S::Int S::GUI::MenubarEntry::Paint(Int message)
 {
 	if (!IsRegistered()) return Error();
 	if (!IsVisible())    return Success();
+
+#ifdef __APPLE__
+	if (container->GetOrientation() == OR_FREE) return container->Paint(SP_UPDATE);
+#endif
 
 	Surface	*surface  = GetDrawSurface();
 	Point	 realPos  = GetRealPosition();

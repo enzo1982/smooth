@@ -781,6 +781,14 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 	Input::Keyboard::Key	 commandKey = Input::Keyboard::KeyControl;
 #endif
 
+	/* Make sure no other modifiers are pressed along with command key.
+	 */
+	if (Input::Keyboard::GetKeyState(commandKey) && !(Input::Keyboard::GetKeyState(Input::Keyboard::KeyCommand) ^
+							  Input::Keyboard::GetKeyState(Input::Keyboard::KeyControl) ^
+							  Input::Keyboard::GetKeyState(Input::Keyboard::KeyAlt))) return False;
+
+	/* Evaluate key code.
+	 */
 	Int	 newPos	 = 0;
 	Int	 linePos = 0;
 

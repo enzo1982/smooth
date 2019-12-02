@@ -46,8 +46,8 @@ static const char *smooth_co =
 	     <entry string=\"V\">V</entry>							\
 												\
 	     <entry string=\"Tip of the day\">Minichichja oghjinca</entry>			\
-	     <entry string=\"Did you know...\">A sapete chì...</entry>				\
-	     <entry string=\"Show tips on startup\">Affissà e minichichje à l'avvià</entry>	\
+	     <entry string=\"Did you know...\">A sapete chì…</entry>				\
+	     <entry string=\"Show tips on startup\">Affissà e minichichje à l’avvià</entry>	\
 	     <entry string=\"Next tip\">Minichichja seguente</entry>				\
 	   </data>										\
 	 </LangFile>";

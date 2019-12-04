@@ -55,7 +55,7 @@ int WINAPI WinMain(HINSTANCE shInstance, HINSTANCE shPrevInstance, LPSTR szCmdLi
 	{
 		if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
 		{
-			if (IDNO == GUI::Dialogs::QuickMessage("This program might not be compatible with the smooth library\ninstalled on your system. Continue execution?", "Warning", MB_YESNO, IDI_QUESTION))
+			if (IDNO == GUI::Dialogs::QuickMessage("This program might not be compatible with the smooth library\ninstalled on your system. Continue execution?", "Warning", GUI::Dialogs::Message::Buttons::YesNo, GUI::Dialogs::Message::Icon::Question))
 			{
 				Free();
 

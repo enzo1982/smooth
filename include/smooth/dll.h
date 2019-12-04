@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,7 +45,7 @@ extern "C"
 
 				if (System::System::GetAPIVersion() != (String) SMOOTH_APIVERSION)
 				{
-					GUI::Dialogs::QuickMessage("This DLL might not be compatible with the\nsmooth library installed on your system.", "Warning", MB_OK, IDI_QUESTION);
+					GUI::Dialogs::QuickMessage("This DLL might not be compatible with the\nsmooth library installed on your system.", "Warning", GUI::Dialogs::Message::Buttons::Ok, GUI::Dialogs::Message::Icon::Warning);
 				}
 
 				GUI::Application::GetStartupDirectory();

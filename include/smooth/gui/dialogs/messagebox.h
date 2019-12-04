@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -30,6 +30,7 @@ namespace smooth
 };
 
 #include "dialog.h"
+#include "../../graphics/bitmap.h"
 
 namespace smooth
 {
@@ -41,32 +42,32 @@ namespace smooth
 			{
 				namespace Buttons
 				{
-					const Int		 Ok		  = 0;
-					const Int		 OkCancel	  = 1;
-					const Int		 AbortRetryIgnore = 2;
-					const Int		 YesNoCancel	  = 3;
-					const Int		 YesNo		  = 4;
-					const Int		 RetryCancel	  = 5;
+					const Int	 Ok		  = 0;
+					const Int	 OkCancel	  = 1;
+					const Int	 AbortRetryIgnore = 2;
+					const Int	 YesNoCancel	  = 3;
+					const Int	 YesNo		  = 4;
+					const Int	 RetryCancel	  = 5;
 				};
 
 				namespace Button
 				{
-					const Int		 Ok		  = 1;
-					const Int		 Cancel		  = 2;
-					const Int		 Abort		  = 3;
-					const Int		 Retry		  = 4;
-					const Int		 Ignore 	  = 5;
-					const Int		 Yes		  = 6;
-					const Int		 No		  = 7;
-					const Int		 Close		  = 8;
+					const Int	 Ok		  = 1;
+					const Int	 Cancel		  = 2;
+					const Int	 Abort		  = 3;
+					const Int	 Retry		  = 4;
+					const Int	 Ignore 	  = 5;
+					const Int	 Yes		  = 6;
+					const Int	 No		  = 7;
+					const Int	 Close		  = 8;
 				};
 
 				namespace Icon
 				{
-					const wchar_t * const	 Error		  = (wchar_t *) 32513;
-					const wchar_t * const	 Question	  = (wchar_t *) 32514;
-					const wchar_t * const	 Warning	  = (wchar_t *) 32515;
-					const wchar_t * const	 Information	  = (wchar_t *) 32516;
+					const Int	 Error		  = 32513;
+					const Int	 Question	  = 32514;
+					const Int	 Warning	  = 32515;
+					const Int	 Information	  = 32516;
 				};
 			};
 
@@ -77,13 +78,11 @@ namespace smooth
 
 					static Bool		 defaultRightToLeft;
 
-					Int			 lines;
-					String			 line[256];
 					Int			 buttons;
 
 					Window			*msgbox;
 					Titlebar		*titlebar;
-					Layer			*lay;
+					Layer			*layer;
 					Image			*icon;
 
 					Array<String>		 buttonLabels;
@@ -94,6 +93,8 @@ namespace smooth
 					CheckBox		*checkbox;
 
 					Bool			*cVar;
+
+					Bool			 InitializeWidgets(const String &, const String &, Int, const Bitmap &, const String &, Bool *);
 				slots:
 					Void			 MessagePaintProc();
 					Bool			 MessageKillProc();
@@ -104,7 +105,8 @@ namespace smooth
 					Void			 MessageButton1();
 					Void			 MessageButton2();
 				public:
-								 MessageDlg(const String &, const String &, Int, const wchar_t *, const String & = NIL, Bool * = NIL);
+								 MessageDlg(const String &, const String &, Int, const Bitmap &, const String & = NIL, Bool * = NIL);
+								 MessageDlg(const String &, const String &, Int, Int, const String & = NIL, Bool * = NIL);
 					virtual			~MessageDlg();
 
 					const Error		&ShowDialog();
@@ -118,8 +120,8 @@ namespace smooth
 					static Bool		 IsDefaultRightToLeft();
 			};
 
-			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, const char *);
-			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, const wchar_t *);
+			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, const Bitmap &);
+			SMOOTHAPI Int	 QuickMessage(const String &, const String &, Int, Int);
 		}
 	}
 };

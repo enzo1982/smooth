@@ -22,6 +22,7 @@
 #include <smooth/system/screen.h>
 #include <smooth/files/file.h>
 #include <smooth/files/directory.h>
+#include <smooth/foreach.h>
 
 #if defined __WIN32__
 #	include <windows.h>
@@ -32,20 +33,7 @@
 S::Int	 S::GUI::Dialogs::MessageDlg::nOfMessageBoxes = 0;
 S::Bool	 S::GUI::Dialogs::MessageDlg::defaultRightToLeft = False;
 
-S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, Int buttons, const char *icon)
-{
-	MessageDlg	*app = new MessageDlg(text, title, buttons, (const wchar_t *) icon);
-
-	app->ShowDialog();
-
-	Int		 rVal = app->GetButtonCode();
-
-	Object::DeleteObject(app);
-
-	return rVal;
-}
-
-S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, Int buttons, const wchar_t *icon)
+S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, Int buttons, const Bitmap &icon)
 {
 	MessageDlg	*app = new MessageDlg(text, title, buttons, icon);
 
@@ -58,33 +46,38 @@ S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, In
 	return rVal;
 }
 
-S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title, Int btns, const wchar_t *cIcon, const String &checkBoxText, Bool *iCVar)
+S::Int S::GUI::Dialogs::QuickMessage(const String &text, const String &title, Int buttons, Int iconID)
 {
-	cVar = iCVar;
+	MessageDlg	*app = new MessageDlg(text, title, buttons, iconID);
 
-	msgbox		= new Window(title, Point(), Size());
-	msgbox->SetRightToLeft(defaultRightToLeft);
-	msgbox->SetFlags(msgbox->GetFlags() | WF_MODAL);
+	app->ShowDialog();
 
-	titlebar	= new Titlebar(TB_CLOSEBUTTON);
-	lay		= new Layer();
+	Int		 rVal = app->GetButtonCode();
+
+	Object::DeleteObject(app);
+
+	return rVal;
+}
+
+S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title, Int buttons, const Bitmap &icon, const String &checkBoxText, Bool *cVar)
+{
+	InitializeWidgets(text, title, buttons, icon, checkBoxText, cVar);
+}
+
+S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title, Int buttons, Int iconID, const String &checkBoxText, Bool *cVar)
+{
+	Bitmap	 icon;
 
 #ifdef __WIN32__
-	Bitmap	 bitmap = ImageLoader::Load(String("Icon:").Append(String::FromInt((Int64) cIcon)));
-
-	bitmap.SetBackgroundColor(Setup::BackgroundColor);
-
-	icon		= new Image(bitmap, Point(14, 19), Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON)));
+	icon = ImageLoader::Load(String("Icon:").Append(String::FromInt(iconID)));
 #else
 	String	 iconName;
 	Int	 iconSize = 32;
 
-	icon		= NIL;
-
-	if	(cIcon == Message::Icon::Error)	      iconName = "dialog-error.png";
-	else if (cIcon == Message::Icon::Question)    iconName = "dialog-question.png";
-	else if (cIcon == Message::Icon::Warning)     iconName = "dialog-warning.png";
-	else if (cIcon == Message::Icon::Information) iconName = "dialog-information.png";
+	if	(iconID == Message::Icon::Error)       iconName = "dialog-error.png";
+	else if (iconID == Message::Icon::Question)    iconName = "dialog-question.png";
+	else if (iconID == Message::Icon::Warning)     iconName = "dialog-warning.png";
+	else if (iconID == Message::Icon::Information) iconName = "dialog-information.png";
 
 	static const char	*iconDirs[] = { "/usr/share/icons", "/usr/local/share/icons", NIL };
 
@@ -96,85 +89,72 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 		if (!File(file).Exists()) continue;
 
-		Bitmap	 bitmap = ImageLoader::Load(file);
-
-		bitmap.SetBackgroundColor(Setup::BackgroundColor);
-
-		icon = new Image(bitmap, Point(14, 19), Size(iconSize, iconSize));
+		icon = ImageLoader::Load(file);
 
 		break;
 	}
 #endif
 
-	buttons	   = btns;
+	icon.SetBackgroundColor(Setup::BackgroundColor);
+
+	InitializeWidgets(text, title, buttons, icon, checkBoxText, cVar);
+}
+
+S::Bool S::GUI::Dialogs::MessageDlg::InitializeWidgets(const String &iText, const String &title, Int iButtons, const Bitmap &bitmap, const String &checkBoxText, Bool *iCVar)
+{
+	text	   = iText;
+	cVar	   = iCVar;
+
+	buttons	   = iButtons;
 	buttonCode = -1;
 
-	Int	 thissize     = 0;
-	Int	 maxsize      = 0;
-	Int	 titlesize    = 0;
+	msgbox		= new Window(title, Point(), Size());
+	msgbox->SetRightToLeft(defaultRightToLeft);
+	msgbox->SetFlags(msgbox->GetFlags() | WF_MODAL);
+
+	titlebar	= new Titlebar(TB_CLOSEBUTTON);
+	layer		= new Layer();
+	icon		= new Image(bitmap, Point(14, 19), Size(32, 32));
+
+	/* Compute message box size.
+	 */
+	Int	 maxSize      = 0;
 	Int	 buttonWidth  = 80;
 	Int	 buttonHeight = 22;
 
-	lines = 1;
+	GUI::Font		 font;
+	const Array<String>	&lines = text.Explode("\n");
 
-	if (text != NIL)
+	foreach (const String &line, lines)
 	{
-		Int	 actpos = 0;
+		Int	 textSize = font.GetUnscaledTextSizeX(line);
 
-		if (text[0] == 0) lines = 0;
-
-		for (Int i = 0; i < 256; i++)
-		{
-			for (Int j = 0; j < 256; j++)
-			{
-				if (text[actpos] != '\n')
-				{
-					if (text[actpos] == 0) { line[i][j] = 0; break; }
-					line[i][j] = text[actpos];
-					actpos++;
-				}
-				else
-				{
-					lines++;
-					line[i][j] = 0;
-					actpos++;
-					break;
-				}
-			}
-		}
-
-		for (Int i = 0; i < lines; i++)
-		{
-			GUI::Font	 font;
-
-			thissize = font.GetUnscaledTextSizeX(line[i]);
-
-			if (thissize > maxsize) maxsize = thissize;
-		}
-	}
-	else
-	{
-		lines = 0;
-		thissize = 0;
+		if (textSize > maxSize) maxSize = textSize;
 	}
 
-	msgbox->SetWidth(maxsize + 36);
-	msgbox->SetHeight((((Int) Math::Max(2, lines) + 1) * 16) + 70 + buttonHeight);
+	msgbox->SetWidth(maxSize + 36);
+	msgbox->SetHeight((((Int) Math::Max(2, lines.Length()) + 1) * 16) + 70 + buttonHeight);
 
-	if (icon != NIL) msgbox->SetWidth(maxsize + 36 + icon->GetWidth() + 20);
+	if (icon != NIL) msgbox->SetWidth(maxSize + 36 + icon->GetWidth() + 20);
 
-	titlesize = Font(Font::Default, Font::DefaultSize, Font::Bold).GetUnscaledTextSizeX(title);
+	Int	 titleSize = Font(Font::Default, Font::DefaultSize, Font::Bold).GetUnscaledTextSizeX(title);
 
-	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), titlesize + 80));
+	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), titleSize + 80));
 
+	/* Add widgets.
+	 */
 	Add(msgbox);
 
 	msgbox->Add(titlebar);
-	msgbox->Add(lay);
+	msgbox->Add(layer);
 	msgbox->Add(icon);
 
 	msgbox->onPaint.Connect(&MessageDlg::MessagePaintProc, this);
 	msgbox->doClose.Connect(&MessageDlg::MessageKillProc, this);
+
+	/* Add optional checkbox.
+	 */
+	checkbox = NIL;
 
 	if (cVar != NIL)
 	{
@@ -192,13 +172,11 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->GetUnscaledTextWidth() + 54 + icon->GetWidth() + 20));
 		}
 
-		lay->Add(checkbox);
-	}
-	else
-	{
-		checkbox = NIL;
+		layer->Add(checkbox);
 	}
 
+	/* Find button labels.
+	 */
 	switch (buttons)
 	{
 		default:
@@ -235,6 +213,25 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 			break;
 	}
 
+	/* Add buttons.
+	 */
+	foreach (const String &buttonLabel, buttonLabels)
+	{
+		Button	*button = new Button(I18n::Translator::defaultTranslator->TranslateString(buttonLabel), Point((msgbox->GetWidth() - (buttonLabels.Length() * (buttonWidth + 9) - 9)) / 2 - 3 + (foreachindex * (buttonWidth + 9)), 14 + buttonHeight), Size());
+
+		if	(foreachindex == 0) button->onAction.Connect(&MessageDlg::MessageButton0, this);
+		else if	(foreachindex == 1) button->onAction.Connect(&MessageDlg::MessageButton1, this);
+		else if	(foreachindex == 2) button->onAction.Connect(&MessageDlg::MessageButton2, this);
+
+		button->SetOrientation(OR_LOWERLEFT);
+
+		buttonWidgets.Add(button);
+
+		layer->Add(button);
+	}
+
+	/* Position message box on screen.
+	 */
 	Rect	 workArea    = System::Screen::GetActiveScreenWorkArea();
 	Float	 scaleFactor = Surface().GetSurfaceDPI() / 96.0;
 
@@ -242,27 +239,14 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	msgbox->SetPosition(workArea.GetPosition() + Point((workArea.GetWidth()  - Math::Round(msgbox->GetWidth()  * scaleFactor)) / 2,
 							   (workArea.GetHeight() - Math::Round(msgbox->GetHeight() * scaleFactor)) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
 
-	for (Int i = 0; i < buttonLabels.Length(); i++)
-	{
-		Button	*button = new Button(I18n::Translator::defaultTranslator->TranslateString(buttonLabels.GetNth(i)), Point((msgbox->GetWidth() - (buttonLabels.Length() * (buttonWidth + 9) - 9)) / 2 - 3 + (i * (buttonWidth + 9)), 14 + buttonHeight), Size());
-
-		if	(i == 0) button->onAction.Connect(&MessageDlg::MessageButton0, this);
-		else if	(i == 1) button->onAction.Connect(&MessageDlg::MessageButton1, this);
-		else if	(i == 2) button->onAction.Connect(&MessageDlg::MessageButton2, this);
-
-		button->SetOrientation(OR_LOWERLEFT);
-
-		buttonWidgets.Add(button);
-
-		lay->Add(button);
-	}
+	return True;
 }
 
 S::GUI::Dialogs::MessageDlg::~MessageDlg()
 {
-	for (Int i = 0; i < buttonWidgets.Length(); i++) DeleteObject(buttonWidgets.GetNth(i));
+	foreach (Button *button, buttonWidgets) DeleteObject(button);
 
-	DeleteObject(lay);
+	DeleteObject(layer);
 	DeleteObject(icon);
 	DeleteObject(titlebar);
 	DeleteObject(msgbox);
@@ -287,6 +271,10 @@ const Error &S::GUI::Dialogs::MessageDlg::ShowDialog()
 
 S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 {
+	const Array<String>	&lines = text.Explode("\n");
+
+	/* Get text bounds.
+	 */
 	Layer	*mainLayer = msgbox->GetMainLayer();
 	Surface	*surface   = msgbox->GetDrawSurface();
 
@@ -294,18 +282,20 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 
 	if (icon != NIL)
 	{
-		if (lines == 1) textRect.top += Math::Round(8 * surface->GetSurfaceDPI() / 96.0);
+		if (lines.Length() == 1) textRect.top += Math::Round(8 * surface->GetSurfaceDPI() / 96.0);
 
 		textRect.left += icon->GetRealSize().cx + Math::Round(20 * surface->GetSurfaceDPI() / 96.0);
 	}
 
+	/* Draw message text.
+	 */
 	Font	 font;
 
 	font.SetColor(Setup::TextColor);
 
-	for (int i = 0; i < lines; i++)
+	foreach (const String &line, lines)
 	{
-		surface->SetText(line[i], textRect, font);
+		surface->SetText(line, textRect, font);
 
 		textRect.top += Math::Round(16 * surface->GetSurfaceDPI() / 96.0);
 	}
@@ -322,13 +312,13 @@ S::Bool S::GUI::Dialogs::MessageDlg::MessageKillProc()
 
 S::Void S::GUI::Dialogs::MessageDlg::MessageButton(Int buttonID)
 {
-	if	(buttonLabels.GetNth(buttonID) == "OK")		buttonCode = Message::Button::Ok;
-	else if	(buttonLabels.GetNth(buttonID) == "Cancel")	buttonCode = Message::Button::Cancel;
-	else if	(buttonLabels.GetNth(buttonID) == "Yes")	buttonCode = Message::Button::Yes;
-	else if	(buttonLabels.GetNth(buttonID) == "No")		buttonCode = Message::Button::No;
-	else if	(buttonLabels.GetNth(buttonID) == "Retry")	buttonCode = Message::Button::Retry;
-	else if	(buttonLabels.GetNth(buttonID) == "Abort")	buttonCode = Message::Button::Abort;
-	else if	(buttonLabels.GetNth(buttonID) == "Ignore")	buttonCode = Message::Button::Ignore;
+	if	(buttonLabels.GetNth(buttonID) == "OK")	    buttonCode = Message::Button::Ok;
+	else if	(buttonLabels.GetNth(buttonID) == "Cancel") buttonCode = Message::Button::Cancel;
+	else if	(buttonLabels.GetNth(buttonID) == "Yes")    buttonCode = Message::Button::Yes;
+	else if	(buttonLabels.GetNth(buttonID) == "No")	    buttonCode = Message::Button::No;
+	else if	(buttonLabels.GetNth(buttonID) == "Retry")  buttonCode = Message::Button::Retry;
+	else if	(buttonLabels.GetNth(buttonID) == "Abort")  buttonCode = Message::Button::Abort;
+	else if	(buttonLabels.GetNth(buttonID) == "Ignore") buttonCode = Message::Button::Ignore;
 
 	msgbox->Close();
 }

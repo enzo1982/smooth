@@ -34,6 +34,10 @@
 #else
 #	include <unistd.h>
 
+#	ifndef O_CLOEXEC
+#		define O_CLOEXEC 0
+#	endif
+
 #	if !defined __linux__ && !defined __sun && !defined __GNU__
 #		define lseek64 lseek
 #	endif
@@ -50,9 +54,9 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &file, Int mode) : Driver()
 	Int	 options  = O_NOINHERIT | O_BINARY;
 	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
 #else
-	/* No special options on other systems.
+	/* Use O_CLOEXEC option on other systems.
 	 */
-	Int	 options  = 0;
+	Int	 options  = O_CLOEXEC;
 	String	 fileName = file;
 
 	/* Set output format to UTF-8 on non-Windows systems.

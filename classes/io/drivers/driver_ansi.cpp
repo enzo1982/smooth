@@ -45,9 +45,9 @@ S::IO::DriverANSI::DriverANSI(const String &file, Int mode) : Driver()
 	String	 options  = "N";
 	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
 #else
-	/* No special options on other systems.
+	/* Use e mode option on other systems.
 	 */
-	String	 options;
+	String	 options  = "e";
 	String	 fileName = file;
 
 	/* Set output format to UTF-8 on non-Windows systems.

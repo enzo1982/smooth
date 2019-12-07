@@ -1,4 +1,4 @@
-/* The smooth Class Library
+ /* The smooth Class Library
   * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
@@ -17,6 +17,7 @@
 #include <smooth/system/system.h>
 #include <smooth/files/file.h>
 #include <smooth/misc/math.h>
+#include <smooth/backends/cocoa/backendcocoa.h>
 #include <smooth/foreach.h>
 
 S::GUI::SurfaceBackend *CreateSurfaceCocoa(S::Void *iSurface, const S::GUI::Size &maxSize)
@@ -182,16 +183,31 @@ S::Int S::GUI::SurfaceCocoa::PaintRect(const Rect &pRect)
 		if ([NSView focusView] == contentView)
 		{
 			/* Draw cached image if focussed.
-			*/
+			 */
 			[paintImage drawInRect: rect
 				      fromRect: rect
 				     operation: NSCompositeCopy
 				      fraction: 1.0];
 		}
+		else if (!Backends::BackendCocoa::IsOSXVersionAtLeast(10, 7, 0))
+		{
+			/* Lock content view and draw on older OS X versions.
+			 */
+			[contentView lockFocus];
+
+			[paintImage drawInRect: rect
+				      fromRect: rect
+				     operation: NSCompositeCopy
+				      fraction: 1.0];
+
+			[window flushWindow];
+
+			[contentView unlockFocus];
+		}
 		else
 		{
-			/* Call displayRect: if not focussed.
-			*/
+			/* Otherwise call displayRect: if not focussed.
+			 */
 			[contentView displayRect: rect];
 		}
 

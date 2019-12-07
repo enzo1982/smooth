@@ -177,13 +177,16 @@ S::Void S::Backends::BackendCocoa::UpdateColors()
 
 S::Bool S::Backends::BackendCocoa::IsOSXVersionAtLeast(Int majorVersion, Int minorVersion, Int microVersion)
 {
-	SInt32	 osMajorVersion = 0;
-	SInt32	 osMinorVersion = 0;
-	SInt32	 osMicroVersion = 0;
+	static SInt32	 osMajorVersion = 0;
+	static SInt32	 osMinorVersion = 0;
+	static SInt32	 osMicroVersion = 0;
 
-	Gestalt(gestaltSystemVersionMajor, &osMajorVersion);
-	Gestalt(gestaltSystemVersionMinor, &osMinorVersion);
-	Gestalt(gestaltSystemVersionBugFix, &osMicroVersion);
+	if (osMajorVersion == 0)
+	{
+		Gestalt(gestaltSystemVersionMajor, &osMajorVersion);
+		Gestalt(gestaltSystemVersionMinor, &osMinorVersion);
+		Gestalt(gestaltSystemVersionBugFix, &osMicroVersion);
+	}
 
 	if ( osMajorVersion >  majorVersion ||
 	    (osMajorVersion == majorVersion && ( osMinorVersion >  minorVersion ||

@@ -693,7 +693,7 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 				if (scrollLines <= 0) scrollLines = 3;
 
-				onMouseWheel.Emit(wParam / 120 * scrollLines);
+				onMouseWheel.Emit(Float(wParam) / 120.0 * scrollLines);
 			}
 
 			break;

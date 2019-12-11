@@ -269,7 +269,7 @@ namespace smooth
 				Signal1<Void, const Point &>	 onMouseDrag;
 				Signal1<Void, const Point &>	 onMouseDragEnd;
 
-				Signal1<Void, Int>		 onMouseWheel;
+				Signal1<Void, Float>		 onMouseWheel;
 
 				Signal0<Void>			 onAction;
 

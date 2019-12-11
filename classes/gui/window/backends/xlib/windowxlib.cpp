@@ -509,10 +509,6 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				onEvent.Call(SM_GETFOCUS, 0, 0);
 			}
 
-			/* Send an event to update widget under cursor if necessary.
-			 */
-			onEvent.Call(SM_MOUSEMOVE, 0, 0);
-
 			break;
 
 		case ButtonRelease:

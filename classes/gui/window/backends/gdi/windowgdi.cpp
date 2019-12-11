@@ -440,10 +440,6 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 			 */
 			onEvent.Call(SM_MOUSEWHEEL, (short) HIWORD(wParam), 0);
 
-			/* Send an event to update widget under cursor if necessary.
-			 */
-			onEvent.Call(SM_MOUSEMOVE, 0, 0);
-
 			return MessageProcessed;
 
 		/* Keyboard messages:

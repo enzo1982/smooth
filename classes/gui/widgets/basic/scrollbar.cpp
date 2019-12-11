@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,8 +31,11 @@ S::GUI::Scrollbar::Scrollbar(const Point &iPos, const Size &iSize, Int sType, In
 	clickTimerDirection = 1;
 
 	pageSize	= 6;
+
 	dragging	= False;
-	mouseBias	= 0;
+	clickOffset	= 0;
+
+	scrollSpill	= 0;
 
 	clickHotspot->onLeftButtonDown.Connect(&Scrollbar::OnMouseClick, this);
 	clickHotspot->onLeftButtonUp.Connect(&System::Timer::Stop, clickTimer);
@@ -170,19 +173,42 @@ S::Void S::GUI::Scrollbar::OnMouseClickTimer()
 	clickTimer->Restart(100);
 }
 
-S::Void S::GUI::Scrollbar::OnMouseWheel(Int value)
+S::Void S::GUI::Scrollbar::OnMouseWheel(Float value)
 {
 	if (subtype != OR_VERT) return;
 
 	Window	*window	= container->GetContainerWindow();
 
-	if (IsMouseOver() || window->IsMouseOn(Rect(container->GetRealPosition(), container->GetRealSize()))) SetValue(*variable - (value * stepSize));
+	if (IsMouseOver() || window->IsMouseOn(Rect(container->GetRealPosition(), container->GetRealSize())))
+	{
+		Surface	*surface = GetDrawSurface();
+
+		surface->StartPaint(container->GetVisibleArea());
+
+		/* Reset spill value upon scroll direction change.
+		 */
+		if (Math::Sign(value) != Math::Sign(scrollSpill)) scrollSpill = 0;
+
+		/* Update scroll position value.
+		 */
+		Int	 amount = (value + scrollSpill) * stepSize;
+
+		SetValue(*variable - amount);
+
+		scrollSpill += value - (Float(amount) / stepSize);
+
+		/* Send an event to update widget under cursor if necessary.
+		 */
+		container->Process(SM_MOUSEMOVE, 0, 0);
+
+		surface->EndPaint();
+	}
 }
 
 S::Void S::GUI::Scrollbar::OnMouseDragStart(const Point &mousePos)
 {
-	if (subtype == OR_HORZ)	mouseBias = mousePos.x - dragHotspot->GetRealPosition().x;
-	else			mouseBias = mousePos.y - dragHotspot->GetRealPosition().y;
+	if (subtype == OR_HORZ)	clickOffset = mousePos.x - dragHotspot->GetRealPosition().x;
+	else			clickOffset = mousePos.y - dragHotspot->GetRealPosition().y;
 
 	dragging = True;
 }
@@ -199,8 +225,8 @@ S::Void S::GUI::Scrollbar::OnMouseDrag(const Point &mousePos)
 	Bool	 smallHotspots	= (subtype == OR_HORZ && (GetWidth() <= 55)) || (subtype == OR_VERT && (GetHeight() <= 55));
 	Int	 hotspotSize	= Math::Round((smallHotspots ? 10 : (subtype == OR_HORZ ? GetHeight() : GetWidth())) * surface->GetSurfaceDPI() / 96.0) - 4;
 
-	if (subtype == OR_HORZ)	value = Math::Round((((Float) (endValue - startValue)) / ((Float) realSize.cx - 3 * (hotspotSize + 4))) * ((Float) (mousePos.x - mouseBias - (realPos.x + hotspotSize + 4))));
-	else			value = Math::Round((((Float) (endValue - startValue)) / ((Float) realSize.cy - 3 * (hotspotSize + 4))) * ((Float) (mousePos.y - mouseBias - (realPos.y + hotspotSize + 4))));
+	if (subtype == OR_HORZ)	value = Math::Round((((Float) (endValue - startValue)) / ((Float) realSize.cx - 3 * (hotspotSize + 4))) * ((Float) (mousePos.x - clickOffset - (realPos.x + hotspotSize + 4))));
+	else			value = Math::Round((((Float) (endValue - startValue)) / ((Float) realSize.cy - 3 * (hotspotSize + 4))) * ((Float) (mousePos.y - clickOffset - (realPos.y + hotspotSize + 4))));
 
 	SetValue(startValue + value);
 }

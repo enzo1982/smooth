@@ -298,10 +298,6 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			 */
 			onEvent.Call(SM_MOUSEWHEEL, amount * -120.0, 0);
 
-			/* Send an event to update widget under cursor if necessary.
-			 */
-			onEvent.Call(SM_MOUSEMOVE, 0, 0);
-
 			break;
 
 		case B_MOUSE_DOWN:

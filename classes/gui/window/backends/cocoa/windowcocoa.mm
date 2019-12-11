@@ -1025,11 +1025,9 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 		case NSScrollWheel:
 			/* Pass message to smooth window.
 			 */
-			onEvent.Call(SM_MOUSEWHEEL, [e deltaY] * 1200, 0);
-
-			/* Send an event to update widget under cursor if necessary.
-			 */
-			onEvent.Call(SM_MOUSEMOVE, 0, 0);
+			if ([e respondsToSelector: @selector(hasPreciseScrollingDeltas)] &&
+			    ((BOOL (*)(id, SEL)) [e methodForSelector: @selector(hasPreciseScrollingDeltas)])(e, @selector(hasPreciseScrollingDeltas))) onEvent.Call(SM_MOUSEWHEEL, ((CGFloat (*)(id, SEL)) [e methodForSelector: @selector(scrollingDeltaY)])(e, @selector(scrollingDeltaY)), 0);
+			else																onEvent.Call(SM_MOUSEWHEEL, [e deltaY] * 50, 0);
 
 			break;
 

@@ -10,6 +10,7 @@ dd.mm.19 hh:mm - smooth alpha 0.9.0
 - cursor.cpp		- fixed text not being drawn correctly after undo/redo
 			- fixed multi-line cursors not responding after clicking below the last line
 			- performance optimizations for text input
+- scrollbar.cpp		- added support for smooth scrolling
 - container.cpp		- new common base class for menus and lists
 - tree.cpp		- draw horizontal branch lines to improve tree look
 - tabwidget.cpp		- added support for displaying bitmaps on tab handles
@@ -17,7 +18,9 @@ dd.mm.19 hh:mm - smooth alpha 0.9.0
 - hyperlink.cpp		- set background color for bitmaps
 - backendxlib.cpp	- allow console applications to run without an X display available
 - windowxlib.cpp	- fixed thread-safety issues with Xlib windows
+- windowgdi.cpp		- added support for high precision touchpad scrolling
 - windowcocoa.mm	- made drag & drop work more reliably on macOS
+			- added support for high precision scrolling on macOS 10.7 and later
 - surfacecocoa.mm	- added support for dark mode on macOS
 - keyboard.cpp		- improved thread-safety
 - crc16.cpp		- added Hash::CRC16 class to calculate 16 bit CRCs

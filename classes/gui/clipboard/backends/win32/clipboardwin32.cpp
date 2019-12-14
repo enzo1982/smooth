@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,11 +39,19 @@ S::String S::GUI::ClipboardWin32::GetClipboardText() const
 
 	if (IsClipboardFormatAvailable(CF_UNICODETEXT))
 	{
-		clipboardText = (wchar_t *) GetClipboardData(CF_UNICODETEXT);
+		HGLOBAL	 memory = GetClipboardData(CF_UNICODETEXT);
+
+		clipboardText = (wchar_t *) GlobalLock(memory);
+
+		GlobalUnlock(memory);
 	}
 	else if (IsClipboardFormatAvailable(CF_TEXT))
 	{
-		clipboardText = (char *) GetClipboardData(CF_TEXT);
+		HGLOBAL	 memory = GetClipboardData(CF_TEXT);
+
+		clipboardText = (char *) GlobalLock(memory);
+
+		GlobalUnlock(memory);
 	}
 
 	CloseClipboard();
@@ -55,11 +63,18 @@ S::Bool S::GUI::ClipboardWin32::SetClipboardText(const String &text)
 {
 	if (window == NIL) return False;
 
-	OpenClipboard((HWND) window->GetSystemWindow());
-
+	/* Allocate clipboard memory and copy text.
+	 */
 	HGLOBAL	 memory = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(wchar_t) * (text.Length() + 1));
 
 	memcpy(GlobalLock(memory), (wchar_t *) text, sizeof(wchar_t) * (text.Length() + 1));
+
+	GlobalUnlock(memory);
+
+	/* Pass data to the clipboard.
+	 */
+	OpenClipboard((HWND) window->GetSystemWindow());
+	EmptyClipboard();
 
 	SetClipboardData(CF_UNICODETEXT, memory);
 

@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-dd.mm.19 hh:mm - smooth alpha 0.9.0
+15.12.19 12:54 - smooth alpha 0.9.0
 
 - application.cpp	- new Application::Lock class implementing a global lock for UI processing
 - widget.cpp		- explicitly show/hide child widgets in Show/Hide methods

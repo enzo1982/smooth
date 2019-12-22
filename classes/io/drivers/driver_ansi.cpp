@@ -115,6 +115,14 @@ S::Int S::IO::DriverANSI::ReadData(UnsignedByte *data, Int dataSize)
 {
 	if (!stream || dataSize <= 0) return 0;
 
+	/* Switch between read and write mode.
+	 */
+	if (position == -1) fseeko(stream, 0, SEEK_CUR);
+
+	position = 1;
+
+	/* Perform actual read operation.
+	 */
 	return fread(data, 1, dataSize, stream);
 }
 
@@ -122,12 +130,24 @@ S::Int S::IO::DriverANSI::WriteData(const UnsignedByte *data, Int dataSize)
 {
 	if (!stream || dataSize <= 0) return 0;
 
+	/* Switch between read and write mode.
+	 */
+	if (position == 1) fseeko(stream, 0, SEEK_CUR);
+
+	position = -1;
+
+	/* Perform actual write operation.
+	 */
 	return fwrite(data, 1, dataSize, stream);
 }
 
 S::Int64 S::IO::DriverANSI::Seek(Int64 newPos)
 {
 	if (!stream || fseeko(stream, newPos, SEEK_SET) != 0) return -1;
+
+	/* Reset read/write mode indicator.
+	 */
+	position = 0;
 
 	return GetPos();
 }

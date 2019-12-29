@@ -30,23 +30,36 @@ namespace smooth
 						 Setup(const Setup *);
 
 			static GUI::Color	 BackgroundColor;
+
 			static GUI::Color	 ClientColor;
 			static GUI::Color	 ClientTextColor;
+
 			static GUI::Color	 LightGrayColor;
+
 			static GUI::Color	 DividerLightColor;
 			static GUI::Color	 DividerDarkColor;
+
 			static GUI::Color	 TextColor;
 			static GUI::Color	 InactiveTextColor;
+
 			static GUI::Color	 HighlightColor;
 			static GUI::Color	 HighlightTextColor;
+
 			static GUI::Color	 GradientStartColor;
 			static GUI::Color	 GradientEndColor;
 			static GUI::Color	 GradientTextColor;
-			static GUI::Color	 InactiveGradientStartColor;
-			static GUI::Color	 InactiveGradientEndColor;
-			static GUI::Color	 InactiveGradientTextColor;
+
+			static GUI::Color	 TitlebarStartColor;
+			static GUI::Color	 TitlebarEndColor;
+			static GUI::Color	 TitlebarTextColor;
+
+			static GUI::Color	 InactiveTitlebarStartColor;
+			static GUI::Color	 InactiveTitlebarEndColor;
+			static GUI::Color	 InactiveTitlebarTextColor;
+
 			static GUI::Color	 TooltipColor;
 			static GUI::Color	 TooltipTextColor;
+
 			static GUI::Color	 LinkColor;
 			static GUI::Color	 LinkHighlightColor;
 

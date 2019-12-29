@@ -149,33 +149,95 @@ S::Int S::Backends::BackendWin32::Deinit()
 
 S::Void S::Backends::BackendWin32::UpdateColors()
 {
-	Setup::BackgroundColor		  = GetSysColor(COLOR_3DFACE);
-	Setup::LightGrayColor		  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	/* Query accent color on Windows 10.
+	 */
+	GUI::Color	 accentColor(-1);
+	Bool		 accentColorPrevalence = False;
 
-	Setup::ClientColor		  = GetSysColor(COLOR_WINDOW);
-	Setup::ClientTextColor		  = GetSysColor(COLOR_WINDOWTEXT);
+	HKEY		 key;
 
-	Setup::DividerLightColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
-	Setup::DividerDarkColor		  = GetSysColor(COLOR_3DSHADOW);
+	if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM", &key) == ERROR_SUCCESS)
+	{
+		DWORD	 value = 0;
+		DWORD	 size  = sizeof(value);
 
-	Setup::TextColor		  = GetSysColor(COLOR_BTNTEXT);
-	Setup::InactiveTextColor	  = GetSysColor(COLOR_GRAYTEXT);
+		RegQueryValueEx(key, L"AccentColor", 0, NULL, (BYTE *) &value, &size);
+		accentColor = GUI::Color(value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF);
 
-	Setup::HighlightColor		  = GetSysColor(COLOR_HIGHLIGHT);
-	Setup::HighlightTextColor	  = GetSysColor(COLOR_HIGHLIGHTTEXT);
+		value = 0;
 
-	Setup::GradientStartColor	  = GetSysColor(COLOR_ACTIVECAPTION);
-	Setup::GradientEndColor		  = GetSysColor(COLOR_GRADIENTACTIVECAPTION);
-	Setup::GradientTextColor	  = GetSysColor(COLOR_CAPTIONTEXT);
-	Setup::InactiveGradientStartColor = GetSysColor(COLOR_INACTIVECAPTION);
-	Setup::InactiveGradientEndColor	  = GetSysColor(COLOR_GRADIENTINACTIVECAPTION);
-	Setup::InactiveGradientTextColor  = GetSysColor(COLOR_INACTIVECAPTIONTEXT);
+		RegQueryValueEx(key, L"ColorPrevalence", 0, NULL, (BYTE *) &value, &size);
+		accentColorPrevalence = value;
 
-	Setup::TooltipColor		  = GetSysColor(COLOR_INFOBK);
-	Setup::TooltipTextColor		  = GetSysColor(COLOR_INFOTEXT);
+		RegCloseKey(key);
+	}
 
-	Setup::LinkColor		  = GetSysColor(COLOR_HOTLIGHT);
-	Setup::LinkHighlightColor	  = GetSysColor(COLOR_HOTLIGHT);
+	/* Set theme colors.
+	 */
+	Setup::LightGrayColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+
+	Setup::ClientColor	  = GetSysColor(COLOR_WINDOW);
+	Setup::ClientTextColor	  = GetSysColor(COLOR_WINDOWTEXT);
+
+	Setup::DividerLightColor  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	Setup::DividerDarkColor	  = GetSysColor(COLOR_3DSHADOW);
+
+	Setup::TextColor	  = GetSysColor(COLOR_BTNTEXT);
+	Setup::InactiveTextColor  = GetSysColor(COLOR_GRAYTEXT);
+
+	/* Set accent colors.
+	 */
+	if (accentColor != GUI::Color(-1))
+	{
+		Setup::HighlightColor		  = accentColor;
+		Setup::HighlightTextColor	  = GUI::Color(255, 255, 255);
+
+		Setup::GradientStartColor	  = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.25, accentColor.GetGreen() - accentColor.GetGreen() * 0.25, accentColor.GetBlue() - accentColor.GetBlue() * 0.25);
+		Setup::GradientEndColor		  = GUI::Color(accentColor.GetRed() + (255 - accentColor.GetRed()) * 0.25, accentColor.GetGreen() + (255 - accentColor.GetGreen()) * 0.25, accentColor.GetBlue() + (255 - accentColor.GetBlue()) * 0.25);
+		Setup::GradientTextColor	  = GUI::Color(255, 255, 255);
+
+		if (accentColorPrevalence)
+		{
+			Setup::TitlebarStartColor = accentColor;
+			Setup::TitlebarEndColor	  = accentColor;
+			Setup::TitlebarTextColor  = GUI::Color(255, 255, 255);
+		}
+		else
+		{
+			Setup::TitlebarStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.25, accentColor.GetGreen() - accentColor.GetGreen() * 0.25, accentColor.GetBlue() - accentColor.GetBlue() * 0.25);
+			Setup::TitlebarEndColor	  = GUI::Color(accentColor.GetRed() + (255 - accentColor.GetRed()) * 0.25, accentColor.GetGreen() + (255 - accentColor.GetGreen()) * 0.25, accentColor.GetBlue() + (255 - accentColor.GetBlue()) * 0.25);
+			Setup::TitlebarTextColor  = GUI::Color(255, 255, 255);
+		}
+
+		Setup::InactiveTitlebarStartColor = Setup::TitlebarStartColor.Grayscale();
+		Setup::InactiveTitlebarEndColor	  = Setup::TitlebarEndColor.Grayscale();
+		Setup::InactiveTitlebarTextColor  = Setup::TitlebarTextColor.Grayscale();
+	}
+	else
+	{
+		Setup::HighlightColor		  = GetSysColor(COLOR_HIGHLIGHT);
+		Setup::HighlightTextColor	  = GetSysColor(COLOR_HIGHLIGHTTEXT);
+
+		Setup::GradientStartColor	  = GetSysColor(COLOR_ACTIVECAPTION);
+		Setup::GradientEndColor		  = GetSysColor(COLOR_GRADIENTACTIVECAPTION);
+		Setup::GradientTextColor	  = GetSysColor(COLOR_CAPTIONTEXT);
+
+		Setup::TitlebarStartColor	  = GetSysColor(COLOR_ACTIVECAPTION);
+		Setup::TitlebarEndColor		  = GetSysColor(COLOR_GRADIENTACTIVECAPTION);
+		Setup::TitlebarTextColor	  = GetSysColor(COLOR_CAPTIONTEXT);
+
+		Setup::InactiveTitlebarStartColor = GetSysColor(COLOR_INACTIVECAPTION);
+		Setup::InactiveTitlebarEndColor	  = GetSysColor(COLOR_GRADIENTINACTIVECAPTION);
+		Setup::InactiveTitlebarTextColor  = GetSysColor(COLOR_INACTIVECAPTIONTEXT);
+	}
+
+	/* Set tooltip and link colors.
+	 */
+	Setup::TooltipColor	  = GetSysColor(COLOR_INFOBK);
+	Setup::TooltipTextColor	  = GetSysColor(COLOR_INFOTEXT);
+
+	Setup::LinkColor	  = GetSysColor(COLOR_HOTLIGHT);
+	Setup::LinkHighlightColor = GetSysColor(COLOR_HOTLIGHT);
 }
 
 S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformId, UnsignedInt majorVersion, UnsignedInt minorVersion)

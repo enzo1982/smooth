@@ -65,8 +65,6 @@ S::Void S::Backends::BackendHaiku::UpdateColors()
 
 	rgb_color	 windowTab	    = ui_color(B_WINDOW_TAB_COLOR);
 	rgb_color	 windowText	    = ui_color(B_WINDOW_TEXT_COLOR);
-	rgb_color	 windowInactiveTab  = ui_color(B_WINDOW_INACTIVE_TAB_COLOR);
-	rgb_color	 windowInactiveText = ui_color(B_WINDOW_INACTIVE_TEXT_COLOR);
 
 	rgb_color	 tooltipBackground  = ui_color(B_TOOL_TIP_BACKGROUND_COLOR);
 	rgb_color	 tooltipText	    = ui_color(B_TOOL_TIP_TEXT_COLOR);
@@ -92,9 +90,6 @@ S::Void S::Backends::BackendHaiku::UpdateColors()
 	Setup::GradientStartColor	  = GUI::Color(windowTab.red, windowTab.green, windowTab.blue);
 	Setup::GradientEndColor		  = GUI::Color(windowTab.red + (255 - windowTab.red) * 0.6, windowTab.green + (255 - windowTab.green) * 0.6, windowTab.blue + (255 - windowTab.blue) * 0.6);
 	Setup::GradientTextColor	  = GUI::Color(windowText.red, windowText.green, windowText.blue);
-	Setup::InactiveGradientStartColor = GUI::Color(windowInactiveTab.red, windowInactiveTab.green, windowInactiveTab.blue);
-	Setup::InactiveGradientEndColor	  = GUI::Color(windowInactiveTab.red + (255 - windowInactiveTab.red) * 0.6, windowInactiveTab.green + (255 - windowInactiveTab.green) * 0.6, windowInactiveTab.blue + (255 - windowInactiveTab.blue) * 0.6);
-	Setup::InactiveGradientTextColor  = GUI::Color(windowInactiveText.red, windowInactiveText.green, windowInactiveText.blue);
 
 	Setup::TooltipColor		  = GUI::Color(tooltipBackground.red, tooltipBackground.green, tooltipBackground.blue);
 	Setup::TooltipTextColor		  = GUI::Color(tooltipText.red, tooltipText.green, tooltipText.blue);

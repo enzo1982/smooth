@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -121,9 +121,9 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 	if (flatStyle && (Binary::IsFlagSet(flags, TB_MINBUTTON) || Binary::IsFlagSet(flags, TB_MAXBUTTON))) buttonRect.left -= 2;
 
-	Color		 gradientStartColor = paintActive ? Setup::GradientStartColor : Setup::InactiveGradientStartColor;
-	Color		 gradientEndColor   = paintActive ? Setup::GradientEndColor   : Setup::InactiveGradientEndColor;
-	Color		 gradientTextColor  = paintActive ? Setup::GradientTextColor  : Setup::InactiveGradientTextColor;
+	Color		 titlebarStartColor = paintActive ? Setup::TitlebarStartColor : Setup::InactiveTitlebarStartColor;
+	Color		 titlebarEndColor   = paintActive ? Setup::TitlebarEndColor   : Setup::InactiveTitlebarEndColor;
+	Color		 titlebarTextColor  = paintActive ? Setup::TitlebarTextColor  : Setup::InactiveTitlebarTextColor;
 	Color		 buttonColor;
 
 	switch (message)
@@ -133,9 +133,9 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			if (flatStyle)
 			{
-				icon.SetBackgroundColor(gradientStartColor);
+				icon.SetBackgroundColor(titlebarStartColor);
 
-				surface->Gradient(titleFrame - Point(1, 1) + Size(2, 1), gradientStartColor, gradientEndColor, OR_HORZ);
+				surface->Gradient(titleFrame - Point(1, 1) + Size(2, 1), titlebarStartColor, titlebarEndColor, OR_HORZ);
 			}
 
 			if (icon != NIL) titleFrame.left += titleFrame.GetHeight() - 1;
@@ -145,10 +145,10 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 				icon.SetBackgroundColor(GetBackgroundColor());
 
 				surface->Frame(titleFrame, FRAME_UP);
-				surface->Gradient(titleFrame + Point(1, 1) - Size(2, 2), gradientStartColor, gradientEndColor, OR_HORZ);
+				surface->Gradient(titleFrame + Point(1, 1) - Size(2, 2), titlebarStartColor, titlebarEndColor, OR_HORZ);
 			}
 
-			font.SetColor(gradientTextColor);
+			font.SetColor(titlebarTextColor);
 
 			surface->SetText(text, titleFrame + Point(4, Math::Ceil(Float(titleFrame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1 - (flatStyle ? 1 : 0)) - Size(9, 6), font);
 
@@ -183,7 +183,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 				{
 					surface->Box(button + Point(1, -1) - Size(1, 1), buttonColor, Rect::Outlined);
 					surface->Box(button + Point(1, -2) - Size(1, 0), buttonColor, Rect::Outlined);
-					surface->Box(button + Point(-1, 2) - Size(1, 1), flatStyle ? gradientEndColor : Setup::BackgroundColor, Rect::Filled);
+					surface->Box(button + Point(-1, 2) - Size(1, 1), flatStyle ? titlebarEndColor : Setup::BackgroundColor, Rect::Filled);
 					surface->Box(button + Point(-1, 2) - Size(1, 1), buttonColor, Rect::Outlined);
 					surface->Box(button + Point(-1, 1) - Size(1, 0), buttonColor, Rect::Outlined);
 				}

@@ -4,3 +4,4 @@ dd.mm.yy hh:mm - smooth alpha 0.9.1
 
 - backendwin32.cpp	- added support for Windows 10 accent colors
 - driver_ansi.cpp	- fix switching between read and write mode
+- optionbox.cpp		- fix placement of selection indicator

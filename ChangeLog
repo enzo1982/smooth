@@ -6,3 +6,4 @@ dd.mm.yy hh:mm - smooth alpha 0.9.1
 - driver_ansi.cpp	- fix switching between read and write mode
 - widget.cpp		- fix artifacts when hiding child widgets extending outside their containers
 - optionbox.cpp		- fix placement of selection indicator
+- eventhaiku.cpp	- ensure message queue locking is enabled before enqueuing messages

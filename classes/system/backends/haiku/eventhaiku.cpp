@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,8 +15,11 @@
 #include <smooth/gui/window/backends/haiku/windowhaiku.h>
 #include <smooth/templates/nonblocking.h>
 #include <smooth/foreach.h>
+#include <smooth/init.h>
 
 #include <Window.h>
+
+S::Int	 addEventHaikuInitTmp = S::AddInitFunction(&S::System::EventHaiku::Initialize);
 
 S::System::EventBackend *CreateEventHaiku()
 {
@@ -33,8 +36,6 @@ S::System::EventHaiku::EventHaiku()
 {
 	type = EVENT_HAIKU;
 
-	messages.EnableLocking();
-
 	/* Deny timer interrupts outside of any event loops
 	 * to prevent interruption of sensitive code.
 	 */
@@ -47,6 +48,13 @@ S::System::EventHaiku::~EventHaiku()
 	 * outermost event processor.
 	 */
 	if (!--nested) EventProcessor::allowTimerInterrupts.Call();
+}
+
+S::Int S::System::EventHaiku::Initialize()
+{
+	messages.EnableLocking();
+
+	return Success();
 }
 
 S::Void S::System::EventHaiku::EnqueueMessage(Void *window, const BMessage &currentMessage, Int messageID, Int param1, Int param2)

@@ -602,6 +602,10 @@ S::Int S::GUI::WindowHaiku::RequestClose()
 
 S::Bool S::GUI::WindowHaiku::IsModalWindowActive()
 {
+	/* Ignore modal windows if this is a topmost window.
+	 */
+	if (flags & WF_TOPMOST) return False;
+
 	/* Look for modal windows opened after ourselves.
 	 */
 	foreachreverse (WindowHaiku *backend, windowBackends)

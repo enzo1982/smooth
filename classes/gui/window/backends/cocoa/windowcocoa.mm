@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -1205,10 +1205,12 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 	/* Return from the active loop after processing an event.
 	 */
-	NSWindow	*modalWindow = [NSApp modalWindow];
-	NSWindow	*keyWindow   = [NSApp keyWindow];
+	NSWindow	*modalWindow	  = [NSApp modalWindow];
 
-	if ((modalWindow == wnd && (keyWindow != nil && keyWindow != wnd && Window::GetWindow(keyWindow) != NIL)) ||
+	NSWindow	*keyWindow	  = [NSApp keyWindow];
+	WindowCocoa	*keyWindowBackend = GetWindowBackend(keyWindow);
+
+	if ((modalWindow == wnd && (keyWindow != nil && keyWindow != wnd && keyWindowBackend != NIL && !(keyWindowBackend->flags & WF_TOPMOST))) ||
 	    (keyWindow	 == wnd && (modalWindow == nil || ![modalWindow isVisible]))) [NSApp stop: nil];
 
 	return Success();

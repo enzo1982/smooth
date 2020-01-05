@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -1012,6 +1012,10 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::FindLeaderWindow()
 
 S::Bool S::GUI::WindowXLib::IsModalWindowActive()
 {
+	/* Ignore modal windows if this is a topmost window.
+	 */
+	if (flags & WF_TOPMOST) return False;
+
 	/* Look for modal windows opened after ourselves.
 	 */
 	foreachreverse (WindowXLib *backend, windowBackends)

@@ -8,5 +8,6 @@ dd.mm.yy hh:mm - smooth alpha 0.9.1
 - optionbox.cpp		- fixed placement of selection indicator
 - windowhaiku.cpp	- fixed possible crash when exiting programs
 - eventhaiku.cpp	- ensure message queue locking is enabled before enqueuing messages
+- windowxlib.cpp	- actually keep topmost windows on top
 
 - fixed interaction with topmost windows when a modal window is active on non-Windows platforms

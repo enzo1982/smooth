@@ -814,6 +814,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	static Atom	 wmIconAtom	       = XInternAtom(display, "_NET_WM_ICON", False);
 
 	static Atom	 windowStateAtom       = XInternAtom(display, "_NET_WM_STATE", False);
+	static Atom	 windowStateAboveAtom  = XInternAtom(display, "_NET_WM_STATE_ABOVE", False);
 	static Atom	 windowStateModalAtom  = XInternAtom(display, "_NET_WM_STATE_MODAL", False);
 
 	static Atom	 windowTypeAtom	       = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
@@ -922,6 +923,11 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 		if ((flags & WF_TOPMOST) && (flags & WF_NOTASKBUTTON) && (flags & WF_THINBORDER))
 		{
 			XChangeProperty(display, wnd, windowTypeAtom, XA_ATOM, 32, PropModeReplace, (unsigned char *) &windowTypeUtilityAtom, 1);
+		}
+		else if (flags & WF_TOPMOST)
+		{
+			XChangeProperty(display, wnd, windowTypeAtom, XA_ATOM, 32, PropModeReplace, (unsigned char *) &windowTypeDialogAtom, 1);
+			XChangeProperty(display, wnd, windowStateAtom, XA_ATOM, 32, PropModeReplace, (unsigned char *) &windowStateAboveAtom, 1);
 		}
 		else if (flags & WF_MODAL)
 		{

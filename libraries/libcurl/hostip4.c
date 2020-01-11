@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -21,6 +21,11 @@
  ***************************************************************************/
 
 #include "curl_setup.h"
+
+/***********************************************************************
+ * Only for plain IPv4 builds
+ **********************************************************************/
+#ifdef CURLRES_IPV4 /* plain IPv4 code coming up */
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -53,10 +58,6 @@
 #include "curl_memory.h"
 #include "memdebug.h"
 
-/***********************************************************************
- * Only for plain IPv4 builds
- **********************************************************************/
-#ifdef CURLRES_IPV4 /* plain IPv4 code coming up */
 /*
  * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
@@ -130,6 +131,16 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
   struct in_addr in;
   struct hostent *buf = NULL;
 
+#ifdef ENABLE_IPV6
+  {
+    struct in6_addr in6;
+    /* check if this is an IPv6 address string */
+    if(Curl_inet_pton(AF_INET6, hostname, &in6) > 0)
+      /* This is an IPv6 address literal */
+      return Curl_ip2addr(AF_INET6, &in6, hostname, port);
+  }
+#endif /* ENABLE_IPV6 */
+
   if(Curl_inet_pton(AF_INET, hostname, &in) > 0)
     /* This is a dotted IP address 123.123.123.123-style */
     return Curl_ip2addr(AF_INET, &in, hostname, port);
@@ -144,7 +155,7 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
     hints.ai_family = PF_INET;
     hints.ai_socktype = SOCK_STREAM;
     if(port) {
-      snprintf(sbuf, sizeof(sbuf), "%d", port);
+      msnprintf(sbuf, sizeof(sbuf), "%d", port);
       sbufptr = sbuf;
     }
 

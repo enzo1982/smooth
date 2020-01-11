@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_CYASSL_H
-#define HEADER_CURL_CYASSL_H
+#ifndef HEADER_CURL_SHA256_H
+#define HEADER_CURL_SHA256_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Florin Petriuc, <petriuc.florin@gmail.com>
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -21,11 +21,12 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "curl_setup.h"
 
-#ifdef USE_CYASSL
+#ifndef CURL_DISABLE_CRYPTO_AUTH
 
-extern const struct Curl_ssl Curl_ssl_cyassl;
+void Curl_sha256it(unsigned char *outbuffer,
+                const unsigned char *input);
 
-#endif /* USE_CYASSL */
-#endif /* HEADER_CURL_CYASSL_H */
+#endif
+
+#endif /* HEADER_CURL_SHA256_H */

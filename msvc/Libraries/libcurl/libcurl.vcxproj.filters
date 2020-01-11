@@ -25,17 +25,14 @@
     <Filter Include="Quelldateien\vtls">
       <UniqueIdentifier>{e2c4410c-428b-444c-a824-67b8890a9adb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Quelldateien\vquic">
+      <UniqueIdentifier>{f4dbe088-ab6c-469c-92eb-8dee29af0690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\vssh">
+      <UniqueIdentifier>{f6490e49-c2d6-480e-bac6-77d6b9faedb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\libraries\libcurl\vtls\axtls.c">
-      <Filter>Quelldateien\vtls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vtls\cyassl.c">
-      <Filter>Quelldateien\vtls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vtls\darwinssl.c">
-      <Filter>Quelldateien\vtls</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\gskit.c">
       <Filter>Quelldateien\vtls</Filter>
     </ClCompile>
@@ -306,9 +303,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\pingpong.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\pipeline.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\pop3.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -357,9 +351,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\splay.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\ssh.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\strcase.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -406,6 +397,66 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\mime.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\bearssl.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\mesalink.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\schannel_verify.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\sectransp.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\wolfssl.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh.c">
+      <Filter>Quelldateien\vssh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh2.c">
+      <Filter>Quelldateien\vssh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\ngtcp2.c">
+      <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\quiche.c">
+      <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\altsvc.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\curl_ctype.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\curl_get_line.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\curl_path.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\curl_range.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\doh.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\psl.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\setopt.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\sha256.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\socketpair.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\urlapi.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

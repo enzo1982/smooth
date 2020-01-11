@@ -1,6 +1,9 @@
 /* lib/curl_config.h.  Generated from curl_config.h.in by configure.  */
 /* lib/curl_config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* to enable curl debug memory tracking */
+/* #undef CURLDEBUG */
+
 /* Location of default ca bundle */
 /* #undef CURL_CA_BUNDLE */
 
@@ -22,6 +25,9 @@
 /* to disable DICT */
 /* #undef CURL_DISABLE_DICT */
 
+/* disable DoH */
+/* #undef CURL_DISABLE_DOH */
+
 /* to disable FILE */
 /* #undef CURL_DISABLE_FILE */
 
@@ -33,6 +39,9 @@
 
 /* to disable HTTP */
 /* #undef CURL_DISABLE_HTTP */
+
+/* disable HTTP authentication */
+/* #undef CURL_DISABLE_HTTP_AUTH */
 
 /* to disable IMAP */
 /* #undef CURL_DISABLE_IMAP */
@@ -46,14 +55,32 @@
 /* to disable --libcurl C code generation option */
 /* #undef CURL_DISABLE_LIBCURL_OPTION */
 
+/* disable mime API */
+/* #undef CURL_DISABLE_MIME */
+
+/* disable netrc parsing */
+/* #undef CURL_DISABLE_NETRC */
+
+/* if the OpenSSL configuration won't be loaded automatically */
+/* #undef CURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG */
+
+/* disable date parsing */
+/* #undef CURL_DISABLE_PARSEDATE */
+
 /* to disable POP3 */
 /* #undef CURL_DISABLE_POP3 */
+
+/* disable progress-meter */
+/* #undef CURL_DISABLE_PROGRESS_METER */
 
 /* to disable proxies */
 /* #undef CURL_DISABLE_PROXY */
 
 /* to disable RTSP */
 /* #undef CURL_DISABLE_RTSP */
+
+/* disable DNS shuffling */
+/* #undef CURL_DISABLE_SHUFFLE_DNS */
 
 /* to disable SMB/CIFS */
 /* #undef CURL_DISABLE_SMB */
@@ -67,17 +94,20 @@
 /* to disable TFTP */
 /* #undef CURL_DISABLE_TFTP */
 
-/* to disable TLS-SRP authentication */
-/* #undef CURL_DISABLE_TLS_SRP */
-
 /* to disable verbose strings */
 /* #undef CURL_DISABLE_VERBOSE_STRINGS */
 
 /* Definition to make a library symbol externally visible. */
 #define CURL_EXTERN_SYMBOL __attribute__ ((__visibility__ ("default")))
 
+/* IP address type in sockaddr */
+#define CURL_SA_FAMILY_T sa_family_t
+
 /* built with multiple SSL backends */
 /* #undef CURL_WITH_MULTI_SSL */
+
+/* enable debug build options */
+/* #undef DEBUGBUILD */
 
 /* your Entropy Gathering Daemon socket pathname */
 /* #undef EGD_SOCKET */
@@ -87,21 +117,6 @@
 
 /* Define to the type of arg 2 for gethostname. */
 #define GETHOSTNAME_TYPE_ARG2 size_t
-
-/* Define to the type qualifier of arg 1 for getnameinfo. */
-#define GETNAMEINFO_QUAL_ARG1 const
-
-/* Define to the type of arg 1 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG1 struct sockaddr *
-
-/* Define to the type of arg 2 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG2 socklen_t
-
-/* Define to the type of args 4 and 6 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG46 socklen_t
-
-/* Define to the type of arg 7 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG7 int
 
 /* Specifies the number of arguments to getservbyport_r */
 /* #undef GETSERVBYPORT_R_ARGS */
@@ -133,6 +148,12 @@
 /* Define to 1 if using BoringSSL. */
 /* #undef HAVE_BORINGSSL */
 
+/* if BROTLI is in use */
+/* #undef HAVE_BROTLI */
+
+/* Define to 1 if you have the <brotli/decode.h> header file. */
+/* #undef HAVE_BROTLI_DECODE_H */
+
 /* Define to 1 if you have the __builtin_available function. */
 /* #undef HAVE_BUILTIN_AVAILABLE */
 
@@ -151,26 +172,15 @@
 /* Define to 1 if you have the <crypto.h> header file. */
 /* #undef HAVE_CRYPTO_H */
 
-/* Define to 1 if you have the `CyaSSL_CTX_UseSupportedCurve' function. */
-/* #undef HAVE_CYASSL_CTX_USESUPPORTEDCURVE */
+/* Define to 1 if you have the declaration of `getpwuid_r', and to 0 if you
+   don't. */
+#define HAVE_DECL_GETPWUID_R 1
 
-/* Define to 1 if you have the <cyassl/error-ssl.h> header file. */
-/* #undef HAVE_CYASSL_ERROR_SSL_H */
-
-/* Define to 1 if you have the `CyaSSL_get_peer_certificate' function. */
-/* #undef HAVE_CYASSL_GET_PEER_CERTIFICATE */
-
-/* Define to 1 if you have the <cyassl/options.h> header file. */
-/* #undef HAVE_CYASSL_OPTIONS_H */
+/* "Set if getpwuid_r() declaration is missing" */
+/* #undef HAVE_DECL_GETPWUID_R_MISSING */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
-
-/* Define to 1 if you have the `ENGINE_cleanup' function. */
-/* #undef HAVE_ENGINE_CLEANUP */
-
-/* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
-/* #undef HAVE_ENGINE_LOAD_BUILTIN_ENGINES */
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -187,8 +197,8 @@
 /* Define to 1 if you have a working fcntl O_NONBLOCK function. */
 #define HAVE_FCNTL_O_NONBLOCK 1
 
-/* Define to 1 if you have the fdopen function. */
-#define HAVE_FDOPEN 1
+/* Define to 1 if you have the `fnmatch' function. */
+#define HAVE_FNMATCH 1
 
 /* Define to 1 if you have the freeaddrinfo function. */
 #define HAVE_FREEADDRINFO 1
@@ -256,11 +266,11 @@
 /* Define to 1 if you have a working getifaddrs function. */
 #define HAVE_GETIFADDRS 1
 
-/* Define to 1 if you have the getnameinfo function. */
-#define HAVE_GETNAMEINFO 1
-
 /* Define to 1 if you have the `getpass_r' function. */
 /* #undef HAVE_GETPASS_R */
+
+/* Define to 1 if you have the getpeername function. */
+#define HAVE_GETPEERNAME 1
 
 /* Define to 1 if you have the `getppid' function. */
 #define HAVE_GETPPID 1
@@ -276,6 +286,9 @@
 
 /* Define to 1 if you have the getservbyport_r function. */
 /* #undef HAVE_GETSERVBYPORT_R */
+
+/* Define to 1 if you have the getsockname function. */
+#define HAVE_GETSOCKNAME 1
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
@@ -393,6 +406,9 @@
 /* Define to 1 if you have the `ldap_url_parse' function. */
 #define HAVE_LDAP_URL_PARSE 1
 
+/* Define to 1 if you have the `brotlidec' library (-lbrotlidec). */
+/* #undef HAVE_LIBBROTLIDEC */
+
 /* Define to 1 if you have the <libgen.h> header file. */
 #define HAVE_LIBGEN_H 1
 
@@ -405,11 +421,17 @@
 /* Define to 1 if you have the <librtmp/rtmp.h> header file. */
 /* #undef HAVE_LIBRTMP_RTMP_H */
 
+/* Define to 1 if you have the `ssh' library (-lssh). */
+/* #undef HAVE_LIBSSH */
+
 /* Define to 1 if you have the `ssh2' library (-lssh2). */
 /* #undef HAVE_LIBSSH2 */
 
 /* Define to 1 if you have the <libssh2.h> header file. */
 /* #undef HAVE_LIBSSH2_H */
+
+/* Define to 1 if you have the <libssh/libssh.h> header file. */
+/* #undef HAVE_LIBSSH_LIBSSH_H */
 
 /* Define to 1 if you have the `ssl' library (-lssl). */
 /* #undef HAVE_LIBSSL */
@@ -417,8 +439,8 @@
 /* if zlib is available */
 #define HAVE_LIBZ 1
 
-/* Define to 1 if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
+/* Define to 1 if you have the <linux/tcp.h> header file. */
+/* #undef HAVE_LINUX_TCP_H */
 
 /* if your compiler supports LL */
 #define HAVE_LL 1
@@ -431,6 +453,9 @@
 
 /* Define to 1 if the compiler supports the 'long long' data type. */
 #define HAVE_LONGLONG 1
+
+/* Define to 1 if you have the `mach_absolute_time' function. */
+#define HAVE_MACH_ABSOLUTE_TIME 1
 
 /* Define to 1 if you have the malloc.h header file. */
 /* #undef HAVE_MALLOC_H */
@@ -447,6 +472,9 @@
 /* Define to 1 if you have the <netdb.h> header file. */
 #define HAVE_NETDB_H 1
 
+/* Define to 1 if you have the <netinet/in6.h> header file. */
+/* #undef HAVE_NETINET_IN6_H */
+
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #define HAVE_NETINET_IN_H 1
 
@@ -459,8 +487,14 @@
 /* Define to 1 if you have the <nghttp2/nghttp2.h> header file. */
 /* #undef HAVE_NGHTTP2_NGHTTP2_H */
 
-/* Define to 1 if NI_WITHSCOPEID exists and works. */
-/* #undef HAVE_NI_WITHSCOPEID */
+/* Define to 1 if you have the <nghttp3/nghttp3.h> header file. */
+/* #undef HAVE_NGHTTP3_NGHTTP3_H */
+
+/* Define to 1 if you have the <ngtcp2/ngtcp2_crypto.h> header file. */
+/* #undef HAVE_NGTCP2_NGTCP2_CRYPTO_H */
+
+/* Define to 1 if you have the <ngtcp2/ngtcp2.h> header file. */
+/* #undef HAVE_NGTCP2_NGTCP2_H */
 
 /* if you have an old MIT Kerberos version, lacking GSS_C_NT_HOSTBASED_SERVICE
    */
@@ -468,9 +502,6 @@
 
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
 /* #undef HAVE_OPENSSL_CRYPTO_H */
-
-/* Define to 1 if you have the <openssl/engine.h> header file. */
-/* #undef HAVE_OPENSSL_ENGINE_H */
 
 /* Define to 1 if you have the <openssl/err.h> header file. */
 /* #undef HAVE_OPENSSL_ERR_H */
@@ -487,6 +518,9 @@
 /* Define to 1 if you have the <openssl/ssl.h> header file. */
 /* #undef HAVE_OPENSSL_SSL_H */
 
+/* Define to 1 if you have the `OpenSSL_version' function. */
+/* #undef HAVE_OPENSSL_VERSION */
+
 /* Define to 1 if you have the <openssl/x509.h> header file. */
 /* #undef HAVE_OPENSSL_X509_H */
 
@@ -495,6 +529,9 @@
 
 /* Define to 1 if you have the `pipe' function. */
 #define HAVE_PIPE 1
+
+/* if you have the PK11_CreateManagedGenericObject function */
+/* #undef HAVE_PK11_CREATEMANAGEDGENERICOBJECT */
 
 /* Define to 1 if you have a working poll function. */
 /* #undef HAVE_POLL */
@@ -508,11 +545,17 @@
 /* Define to 1 if you have a working POSIX-style strerror_r function. */
 #define HAVE_POSIX_STRERROR_R 1
 
+/* Define to 1 if you have the <proto/bsdsocket.h> header file. */
+/* #undef HAVE_PROTO_BSDSOCKET_H */
+
 /* if you have <pthread.h> */
 /* #undef HAVE_PTHREAD_H */
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
+
+/* Define to 1 if you have the <quiche.h> header file. */
+/* #undef HAVE_QUICHE_H */
 
 /* Define to 1 if you have the `RAND_egd' function. */
 /* #undef HAVE_RAND_EGD */
@@ -586,8 +629,8 @@
 /* Define to 1 if you have the `SSLv2_client_method' function. */
 /* #undef HAVE_SSLV2_CLIENT_METHOD */
 
-/* Define to 1 if you have the `SSL_get_shutdown' function. */
-/* #undef HAVE_SSL_GET_SHUTDOWN */
+/* Define to 1 if you have the `SSL_get_esni_status' function. */
+/* #undef HAVE_SSL_GET_ESNI_STATUS */
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -597,9 +640,6 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdio.h> header file. */
-#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -709,14 +749,20 @@
 /* Define to 1 if you have the <time.h> header file. */
 #define HAVE_TIME_H 1
 
+/* Define this if time_t is unsigned */
+/* #undef HAVE_TIME_T_UNSIGNED */
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
+
+/* Define to 1 if you have the `usleep' function. */
+#define HAVE_USLEEP 1
 
 /* Define to 1 if you have the `utime' function. */
 #define HAVE_UTIME 1
 
 /* Define to 1 if you have the `utimes' function. */
-/* #undef HAVE_UTIMES */
+#define HAVE_UTIMES 1
 
 /* Define to 1 if you have the <utime.h> header file. */
 #define HAVE_UTIME_H 1
@@ -745,9 +791,6 @@
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
 
-/* Define to 1 if you have the `wolfSSL_CTX_UseSupportedCurve' function. */
-/* #undef HAVE_WOLFSSL_CTX_USESUPPORTEDCURVE */
-
 /* Define to 1 if you have the `wolfSSL_get_peer_certificate' function. */
 /* #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE */
 
@@ -755,7 +798,7 @@
 /* #undef HAVE_WOLFSSL_USEALPN */
 
 /* Define this symbol if your OS supports changing the contents of argv */
-#define HAVE_WRITABLE_ARGV 1
+/* #undef HAVE_WRITABLE_ARGV */
 
 /* Define to 1 if you have the writev function. */
 #define HAVE_WRITEV 1
@@ -871,28 +914,28 @@
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV ssize_t
 
-/* The size of `curl_off_t', as computed by sizeof. */
+/* The number of bytes in type curl_off_t */
 #define SIZEOF_CURL_OFF_T 8
 
-/* The size of `int', as computed by sizeof. */
+/* The number of bytes in type int */
 #define SIZEOF_INT 4
 
-/* The size of `long', as computed by sizeof. */
+/* The number of bytes in type long */
 #define SIZEOF_LONG 4
 
-/* The size of `long long', as computed by sizeof. */
+/* The number of bytes in type long long */
 /* #undef SIZEOF_LONG_LONG */
 
-/* The size of `off_t', as computed by sizeof. */
+/* The number of bytes in type off_t */
 #define SIZEOF_OFF_T 8
 
-/* The size of `short', as computed by sizeof. */
+/* The number of bytes in type short */
 #define SIZEOF_SHORT 2
 
-/* The size of `size_t', as computed by sizeof. */
+/* The number of bytes in type size_t */
 #define SIZEOF_SIZE_T 4
 
-/* The size of `time_t', as computed by sizeof. */
+/* The number of bytes in type time_t */
 #define SIZEOF_TIME_T 4
 
 /* Define to 1 if you have the ANSI C header files. */
@@ -904,17 +947,20 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME 1
 
+/* to enable alt-svc */
+/* #undef USE_ALTSVC */
+
+/* if AmiSSL is in use */
+/* #undef USE_AMISSL */
+
 /* Define to enable c-ares support */
 /* #undef USE_ARES */
 
-/* if axTLS is enabled */
-/* #undef USE_AXTLS */
+/* if BearSSL is enabled */
+/* #undef USE_BEARSSL */
 
-/* if CyaSSL/WolfSSL is enabled */
-/* #undef USE_CYASSL */
-
-/* to enable Apple OS native SSL/TLS support */
-#define USE_DARWINSSL 1
+/* if ESNI support is available */
+/* #undef USE_ESNI */
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
@@ -928,6 +974,9 @@
 /* if librtmp is in use */
 /* #undef USE_LIBRTMP */
 
+/* if libSSH is in use */
+/* #undef USE_LIBSSH */
+
 /* if libSSH2 is in use */
 /* #undef USE_LIBSSH2 */
 
@@ -937,11 +986,23 @@
 /* if mbedTLS is enabled */
 /* #undef USE_MBEDTLS */
 
+/* if MesaLink is enabled */
+/* #undef USE_MESALINK */
+
 /* Define to enable metalink support */
 /* #undef USE_METALINK */
 
 /* if nghttp2 is in use */
 /* #undef USE_NGHTTP2 */
+
+/* if nghttp3 is in use */
+/* #undef USE_NGHTTP3 */
+
+/* if ngtcp2 is in use */
+/* #undef USE_NGTCP2 */
+
+/* if ngtcp2_crypto_openssl is in use */
+/* #undef USE_NGTCP2_CRYPTO_OPENSSL */
 
 /* if NSS is enabled */
 /* #undef USE_NSS */
@@ -952,11 +1013,14 @@
 /* if OpenSSL is in use */
 /* #undef USE_OPENSSL */
 
-/* if PolarSSL is enabled */
-/* #undef USE_POLARSSL */
+/* if quiche is in use */
+/* #undef USE_QUICHE */
 
 /* to enable Windows native SSL/TLS support */
 /* #undef USE_SCHANNEL */
+
+/* enable Secure Transport */
+#define USE_SECTRANSP 1
 
 /* if you want POSIX threaded DNS lookup */
 /* #undef USE_THREADS_POSIX */
@@ -986,6 +1050,9 @@
 
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */
+
+/* if wolfSSL is enabled */
+/* #undef USE_WOLFSSL */
 
 /* Version number of package */
 #define VERSION "-"

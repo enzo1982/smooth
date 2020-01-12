@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-dd.mm.yy hh:mm - smooth alpha 0.9.1
+12.01.20 17:52 - smooth alpha 0.9.1
 
 - backendwin32.cpp	- added support for Windows 10 accent colors
 - driver_ansi.cpp	- fixed switching between read and write mode

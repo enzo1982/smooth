@@ -1381,11 +1381,25 @@ S::Void S::GUI::WindowXLib::DestroyInputContext()
 {
 	if (ic == NIL) return;
 
+	XLockDisplay(display);
+
+	/* Reset event mask.
+	 */
+	XSelectInput(display, iwnd, 0);
+
+	/* Clear input context.
+	 */
+	char *string = Xutf8ResetIC(ic);
+
+	if (string != NIL) XFree(string);
+
 	/* Destroy input context.
 	 */
 	XDestroyIC(ic);
 
 	ic = NIL;
+
+	XUnlockDisplay(display);
 }
 
 S::Void S::GUI::WindowXLib::SetCursor(Cursor *cursor, const Point &point)

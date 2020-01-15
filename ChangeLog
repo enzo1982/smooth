@@ -2,6 +2,8 @@ ChangeLog for smooth
 
 dd.mm.20 hh:mm - smooth alpha 0.9.2
 
+- windowxlib.cpp	- fixed a crash when placing a text cursor on some systems without an input manager
+
 - upgraded libjpeg to version 9d
 
 12.01.20 17:52 - smooth alpha 0.9.1

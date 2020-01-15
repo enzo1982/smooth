@@ -1326,6 +1326,8 @@ S::Void S::GUI::WindowXLib::OnXIMPreeditCaret(XIMPreeditCaretCallbackStruct *dat
 
 S::Void S::GUI::WindowXLib::CreateInputContext()
 {
+	if (im == NIL) return;
+
 	XLockDisplay(display);
 
 	/* Set up callbacks.

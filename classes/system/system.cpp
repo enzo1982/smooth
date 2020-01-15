@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -557,6 +557,8 @@ S::String S::System::System::GetResourcesDirectory()
 #else
 	resourcesDir.Append("share");
 #endif
+
+	if (!Directory(resourcesDir).Exists()) resourcesDir = GUI::Application::GetApplicationDirectory();
 #endif
 
 	if (!resourcesDir.EndsWith(Directory::GetDirectoryDelimiter())) resourcesDir.Append(Directory::GetDirectoryDelimiter());

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,6 +20,7 @@
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/system/screen.h>
+#include <smooth/system/system.h>
 #include <smooth/files/file.h>
 #include <smooth/files/directory.h>
 #include <smooth/foreach.h>
@@ -79,13 +80,15 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	else if (iconID == Message::Icon::Warning)     iconName = "dialog-warning.png";
 	else if (iconID == Message::Icon::Information) iconName = "dialog-information.png";
 
-	static const char	*iconDirs[] = { "/usr/share/icons", "/usr/local/share/icons", NIL };
+	static const char	*iconDirs[] = { "%RESOURCESDIR%/icons", "/usr/share/icons", "/usr/local/share/icons", NIL };
 
 	for (Int i = 0; iconDirs[i] != NIL; i++)
 	{
-		if (!Directory(iconDirs[i]).Exists()) continue;
+		String	 iconDir = String(iconDirs[i]).Replace("%RESOURCESDIR%", S::System::System::GetResourcesDirectory());
 
-		String	 file = String(iconDirs[i]).Append("/gnome/").Append(String::FromInt(iconSize)).Append("x").Append(String::FromInt(iconSize)).Append("/status/").Append(iconName);
+		if (!Directory(iconDir).Exists()) continue;
+
+		String	 file = String(iconDir).Append("/gnome/").Append(String::FromInt(iconSize)).Append("x").Append(String::FromInt(iconSize)).Append("/status/").Append(iconName);
 
 		if (!File(file).Exists()) continue;
 
@@ -135,7 +138,7 @@ S::Bool S::GUI::Dialogs::MessageDlg::InitializeWidgets(const String &iText, cons
 	msgbox->SetWidth(maxSize + 36);
 	msgbox->SetHeight((((Int) Math::Max(2, lines.Length()) + 1) * 16) + 70 + buttonHeight);
 
-	if (icon != NIL) msgbox->SetWidth(maxSize + 36 + icon->GetWidth() + 20);
+	if (bitmap != NIL) msgbox->SetWidth(maxSize + 36 + icon->GetWidth() + 20);
 
 	Int	 titleSize = Font(Font::Default, Font::DefaultSize, Font::Bold).GetUnscaledTextSizeX(title);
 
@@ -165,7 +168,7 @@ S::Bool S::GUI::Dialogs::MessageDlg::InitializeWidgets(const String &iText, cons
 		msgbox->SetWidth(Math::Max(msgbox->GetWidth(), checkbox->GetUnscaledTextWidth() + 54));
 		msgbox->SetHeight(msgbox->GetHeight() + 22);
 
-		if (icon !=  NIL)
+		if (bitmap != NIL)
 		{
 			checkbox->SetX(checkbox->GetX() + icon->GetWidth() + 20);
 
@@ -215,6 +218,8 @@ S::Bool S::GUI::Dialogs::MessageDlg::InitializeWidgets(const String &iText, cons
 
 	/* Add buttons.
 	 */
+	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonLabels.Length() * (buttonWidth + 9) + 21));
+
 	foreach (const String &buttonLabel, buttonLabels)
 	{
 		Button	*button = new Button(I18n::Translator::defaultTranslator->TranslateString(buttonLabel), Point((msgbox->GetWidth() - (buttonLabels.Length() * (buttonWidth + 9) - 9)) / 2 - 3 + (foreachindex * (buttonWidth + 9)), 14 + buttonHeight), Size());
@@ -235,7 +240,6 @@ S::Bool S::GUI::Dialogs::MessageDlg::InitializeWidgets(const String &iText, cons
 	Rect	 workArea    = System::Screen::GetActiveScreenWorkArea();
 	Float	 scaleFactor = Surface().GetSurfaceDPI() / 96.0;
 
-	msgbox->SetWidth(Math::Max(msgbox->GetWidth(), buttonLabels.Length() * (buttonWidth + 9) + 21));
 	msgbox->SetPosition(workArea.GetPosition() + Point((workArea.GetWidth()  - Math::Round(msgbox->GetWidth()  * scaleFactor)) / 2,
 							   (workArea.GetHeight() - Math::Round(msgbox->GetHeight() * scaleFactor)) / 2) + Point(nOfMessageBoxes * 25, nOfMessageBoxes * 25));
 
@@ -280,7 +284,7 @@ S::Void S::GUI::Dialogs::MessageDlg::MessagePaintProc()
 
 	Rect	 textRect  = Rect(mainLayer->GetRealPosition() + Point(14, 19) * surface->GetSurfaceDPI() / 96.0, mainLayer->GetRealSize() - Size(28, 19) * surface->GetSurfaceDPI() / 96.0);
 
-	if (icon != NIL)
+	if (icon->GetBitmap() != NIL)
 	{
 		if (lines.Length() == 1) textRect.top += Math::Round(8 * surface->GetSurfaceDPI() / 96.0);
 

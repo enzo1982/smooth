@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -207,9 +207,11 @@ S::Bool S::IO::DriverANSI::SetBufferSize(Int size)
 {
 	if (!stream) return False;
 
+	Int64	 pos  = GetPos();
 	Int	 mode = size > 0 ? _IOFBF : _IONBF;
 
 	if (setvbuf(stream, NULL, mode, size) != 0) return False;
+	if (Seek(pos) < 0)			    return False;
 
 	return True;
 }

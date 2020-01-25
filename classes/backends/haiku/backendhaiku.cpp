@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,8 @@
 #include <smooth/files/file.h>
 
 #include <interface/InterfaceDefs.h>
+
+#include <locale.h>
 
 namespace smooth
 {
@@ -43,6 +45,10 @@ S::Backends::BackendHaiku::~BackendHaiku()
 
 S::Int S::Backends::BackendHaiku::Init()
 {
+	/* Set locale to user default.
+	 */
+	setlocale(LC_ALL, "");
+
 	/* Get default colors.
 	 */
 	UpdateColors();

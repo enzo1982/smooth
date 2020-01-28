@@ -1,4 +1,4 @@
-# Makefile for smooth v0.8
+# Makefile for smooth v0.9
 
 SMOOTH_PATH = .
 
@@ -288,9 +288,9 @@ CHMOD = chmod
 
 ### Targets ###
 
-.PHONY: all folders objects lib programs libs install uninstall clean distclean doc doc-clean
+.PHONY: all codesign folders objects lib programs libs install uninstall clean distclean doc doc-clean
 
-all: folders lib programs
+all: lib programs
 
 folders:
 	mkdir -p $(SMOOTH_PATH)/$(BINDIR) $(SMOOTH_PATH)/$(LIBDIR)
@@ -300,7 +300,7 @@ objects:
 	+ $(call makein,misc)
 	+ $(call makein,resources)
 
-lib: $(DLLNAME)
+lib: folders $(DLLNAME)
 
 programs: lib
 	+ $(call makein,tools)
@@ -308,6 +308,10 @@ programs: lib
 
 libs:
 	+ $(call makein,libraries)
+
+codesign: all
+	signtool sign -fd sha1 -tr http://timestamp.digicert.com -td sha1 $(BINDIR)/smooth*.dll $(BINDIR)/translator.exe
+	signtool sign -fd sha256 -tr http://timestamp.digicert.com -td sha256 -as $(BINDIR)/smooth*.dll $(BINDIR)/translator.exe
 
 install: all
 ifneq ($(BUILD_WIN32),True)

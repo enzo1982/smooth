@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -149,12 +149,25 @@ S::Int S::Backends::BackendWin32::Deinit()
 
 S::Void S::Backends::BackendWin32::UpdateColors()
 {
-	/* Query accent color on Windows 10.
+	/* Query dark mode and accent color on Windows 10.
 	 */
+	Bool		 darkModeEnabled = False;
+
 	GUI::Color	 accentColor(-1);
 	Bool		 accentColorPrevalence = False;
 
 	HKEY		 key;
+
+	if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", &key) == ERROR_SUCCESS)
+	{
+		DWORD	 value = 1;
+		DWORD	 size  = sizeof(value);
+
+		RegQueryValueEx(key, L"AppsUseLightTheme", 0, NULL, (BYTE *) &value, &size);
+		darkModeEnabled = !value;
+
+		RegCloseKey(key);
+	}
 
 	if (RegOpenKey(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM", &key) == ERROR_SUCCESS)
 	{
@@ -174,16 +187,40 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 
 	/* Set theme colors.
 	 */
-	Setup::LightGrayColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+	if (darkModeEnabled)
+	{
+		Setup::BackgroundColor	  = GUI::Color(64, 64, 70);
+		Setup::LightGrayColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
 
-	Setup::ClientColor	  = GetSysColor(COLOR_WINDOW);
-	Setup::ClientTextColor	  = GetSysColor(COLOR_WINDOWTEXT);
+		Setup::ClientColor	  = GUI::Color(32, 32, 35);
+		Setup::ClientTextColor	  = GUI::Color(255, 255, 255);
 
-	Setup::DividerLightColor  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
-	Setup::DividerDarkColor	  = GetSysColor(COLOR_3DSHADOW);
+		Setup::DividerLightColor  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+		Setup::DividerDarkColor	  = GetSysColor(COLOR_3DSHADOW);
 
-	Setup::TextColor	  = GetSysColor(COLOR_BTNTEXT);
-	Setup::InactiveTextColor  = GetSysColor(COLOR_GRAYTEXT);
+		Setup::TextColor	  = GUI::Color(245, 245, 245);
+		Setup::InactiveTextColor  = GUI::Color(160, 160, 160);
+
+		Setup::LinkColor	  = GUI::Color(100, 160, 225);
+		Setup::LinkHighlightColor = GUI::Color(100, 160, 225);
+	}
+	else
+	{
+		Setup::BackgroundColor	  = GetSysColor(COLOR_3DFACE);
+		Setup::LightGrayColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+
+		Setup::ClientColor	  = GetSysColor(COLOR_WINDOW);
+		Setup::ClientTextColor	  = GetSysColor(COLOR_WINDOWTEXT);
+
+		Setup::DividerLightColor  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+		Setup::DividerDarkColor	  = GetSysColor(COLOR_3DSHADOW);
+
+		Setup::TextColor	  = GetSysColor(COLOR_BTNTEXT);
+		Setup::InactiveTextColor  = GetSysColor(COLOR_GRAYTEXT);
+
+		Setup::LinkColor	  = GetSysColor(COLOR_HOTLIGHT);
+		Setup::LinkHighlightColor = GetSysColor(COLOR_HOTLIGHT);
+	}
 
 	/* Set accent colors.
 	 */
@@ -192,9 +229,18 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 		Setup::HighlightColor		  = accentColor;
 		Setup::HighlightTextColor	  = GUI::Color(255, 255, 255);
 
-		Setup::GradientStartColor	  = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.25, accentColor.GetGreen() - accentColor.GetGreen() * 0.25, accentColor.GetBlue() - accentColor.GetBlue() * 0.25);
-		Setup::GradientEndColor		  = GUI::Color(accentColor.GetRed() + (255 - accentColor.GetRed()) * 0.25, accentColor.GetGreen() + (255 - accentColor.GetGreen()) * 0.25, accentColor.GetBlue() + (255 - accentColor.GetBlue()) * 0.25);
-		Setup::GradientTextColor	  = GUI::Color(255, 255, 255);
+		if (darkModeEnabled)
+		{
+			Setup::GradientStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.55, accentColor.GetGreen() - accentColor.GetGreen() * 0.55, accentColor.GetBlue() - accentColor.GetBlue() * 0.55);
+			Setup::GradientEndColor	  = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.35, accentColor.GetGreen() - accentColor.GetGreen() * 0.35, accentColor.GetBlue() - accentColor.GetBlue() * 0.35);
+			Setup::GradientTextColor  = GUI::Color(245, 245, 245);
+		}
+		else
+		{
+			Setup::GradientStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.25, accentColor.GetGreen() - accentColor.GetGreen() * 0.25, accentColor.GetBlue() - accentColor.GetBlue() * 0.25);
+			Setup::GradientEndColor	  = GUI::Color(accentColor.GetRed() + (255 - accentColor.GetRed()) * 0.25, accentColor.GetGreen() + (255 - accentColor.GetGreen()) * 0.25, accentColor.GetBlue() + (255 - accentColor.GetBlue()) * 0.25);
+			Setup::GradientTextColor  = GUI::Color(255, 255, 255);
+		}
 
 		if (accentColorPrevalence)
 		{
@@ -204,9 +250,9 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 		}
 		else
 		{
-			Setup::TitlebarStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.25, accentColor.GetGreen() - accentColor.GetGreen() * 0.25, accentColor.GetBlue() - accentColor.GetBlue() * 0.25);
-			Setup::TitlebarEndColor	  = GUI::Color(accentColor.GetRed() + (255 - accentColor.GetRed()) * 0.25, accentColor.GetGreen() + (255 - accentColor.GetGreen()) * 0.25, accentColor.GetBlue() + (255 - accentColor.GetBlue()) * 0.25);
-			Setup::TitlebarTextColor  = GUI::Color(255, 255, 255);
+			Setup::TitlebarStartColor = Setup::GradientStartColor;
+			Setup::TitlebarEndColor	  = Setup::GradientEndColor;
+			Setup::TitlebarTextColor  = Setup::GradientTextColor;
 		}
 
 		Setup::InactiveTitlebarStartColor = Setup::TitlebarStartColor.Grayscale();
@@ -233,11 +279,8 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 
 	/* Set tooltip and link colors.
 	 */
-	Setup::TooltipColor	  = GetSysColor(COLOR_INFOBK);
-	Setup::TooltipTextColor	  = GetSysColor(COLOR_INFOTEXT);
-
-	Setup::LinkColor	  = GetSysColor(COLOR_HOTLIGHT);
-	Setup::LinkHighlightColor = GetSysColor(COLOR_HOTLIGHT);
+	Setup::TooltipColor	= GetSysColor(COLOR_INFOBK);
+	Setup::TooltipTextColor	= GetSysColor(COLOR_INFOTEXT);
 }
 
 S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformId, UnsignedInt majorVersion, UnsignedInt minorVersion)

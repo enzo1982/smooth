@@ -23,6 +23,7 @@ OBJECTS += classes/gui/clipboard/backends/clipboardbackend.o
 OBJECTS += classes/gui/dialogs/colordlg.o classes/gui/dialogs/dialog.o classes/gui/dialogs/fontdlg.o classes/gui/dialogs/messagebox.o classes/gui/dialogs/splashscreen.o classes/gui/dialogs/tipodaydlg.o
 OBJECTS += classes/gui/dialogs/directory/dirdlg.o
 OBJECTS += classes/gui/dialogs/file/filedlg.o
+OBJECTS += classes/gui/dialogs/icons/light.o
 OBJECTS += classes/gui/widgets/layer.o classes/gui/widgets/widget.o
 OBJECTS += classes/gui/widgets/basic/activearea.o classes/gui/widgets/basic/arrows.o classes/gui/widgets/basic/button.o classes/gui/widgets/basic/checkbox.o classes/gui/widgets/basic/client.o classes/gui/widgets/basic/divider.o classes/gui/widgets/basic/editbox.o classes/gui/widgets/basic/groupbox.o classes/gui/widgets/basic/hyperlink.o classes/gui/widgets/basic/image.o classes/gui/widgets/basic/multiedit.o classes/gui/widgets/basic/optionbox.o classes/gui/widgets/basic/progressbar.o classes/gui/widgets/basic/scrollbar.o classes/gui/widgets/basic/slider.o classes/gui/widgets/basic/statusbar.o classes/gui/widgets/basic/tabwidget.o classes/gui/widgets/basic/text.o classes/gui/widgets/basic/titlebar.o
 OBJECTS += classes/gui/widgets/hotspot/hotspot.o classes/gui/widgets/hotspot/simplebutton.o

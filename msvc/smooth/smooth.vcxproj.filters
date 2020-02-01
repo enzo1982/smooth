@@ -472,6 +472,12 @@
     <Filter Include="Quelldateien\classes\gui\widgets\multi\generic">
       <UniqueIdentifier>{314b3865-2fe5-421a-a924-7c5ab11ece13}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Quelldateien\classes\gui\dialogs\icons">
+      <UniqueIdentifier>{6c302715-ce00-4df8-a46f-1b1bb82d015d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\gui\dialogs\icons">
+      <UniqueIdentifier>{9e22754e-00ff-4058-9090-4b0ec70af36b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\classes\basic\object.cpp">
@@ -1112,6 +1118,9 @@
     </ClCompile>
     <ClCompile Include="..\..\classes\gui\widgets\multi\generic\entry.cpp">
       <Filter>Quelldateien\classes\gui\widgets\multi\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\gui\dialogs\icons\light.cpp">
+      <Filter>Quelldateien\classes\gui\dialogs\icons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1879,6 +1888,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\smooth\gui\widgets\multi\generic\entry.h">
       <Filter>Headerdateien\smooth\gui\widgets\multi\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\dialogs\icons\light.h">
+      <Filter>Headerdateien\smooth\gui\dialogs\icons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

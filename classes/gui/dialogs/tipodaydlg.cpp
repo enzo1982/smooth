@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,17 +9,14 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/dialogs/tipodaydlg.h>
+#include <smooth/gui/dialogs/icons/light.h>
 
-#include <smooth/definitions.h>
 #include <smooth/gui/application/application.h>
 
-#include <smooth/graphics/surface.h>
-#include <smooth/system/screen.h>
+#include <smooth/gui/window/window.h>
 
 #include <smooth/gui/widgets/basic/titlebar.h>
 #include <smooth/gui/widgets/basic/divider.h>
-
-#include <smooth/gui/window/window.h>
 
 #include <smooth/gui/widgets/basic/button.h>
 #include <smooth/gui/widgets/basic/text.h>
@@ -30,16 +27,17 @@
 
 #include <smooth/gui/widgets/layer.h>
 
+#include <smooth/graphics/surface.h>
+#include <smooth/graphics/imageloader/imageloader.h>
+
+#include <smooth/system/screen.h>
+
 #include <smooth/misc/string.h>
 #include <smooth/misc/math.h>
+
 #include <smooth/i18n/translator.h>
 
 #include <smooth/foreach.h>
-#include <smooth/resources.h>
-
-#ifdef __WIN32__
-#	include <smooth/backends/win32/backendwin32.h>
-#endif
 
 S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 {
@@ -67,17 +65,13 @@ S::GUI::Dialogs::TipOfTheDay::TipOfTheDay(Bool *iShowTips)
 	check_showtips->SetOrientation(OR_LOWERLEFT);
 	check_showtips->SetWidth(check_showtips->GetUnscaledTextWidth() + 21);
 
-	Bitmap	 bmp;
+	Buffer<UnsignedByte> light(sizeof(Icons::Light));
 
-#ifdef __WIN32__
-	bmp = Bitmap((HBITMAP) LoadImage(hDllInstance, MAKEINTRESOURCE(IDB_LIGHT), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_SHARED));
-#endif
+	memcpy(light, Icons::Light, sizeof(Icons::Light));
 
-	bmp.ReplaceColor(Color(192, 192, 192, Color::RGBA), Setup::BackgroundColor);
+	img_light	= new Image(ImageLoader::Load(light, IMAGE_FORMAT_PNG), Point(8, 3), Size(32, 32));
 
-	img_light	= new Image(bmp, Point(5, 3), Size(32, 32));
-
-	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(8 + bmp.GetSize().cx, 7));
+	txt_didyouknow	= new Text(I18n::Translator::defaultTranslator->TranslateString("Did you know..."), Point(11 + img_light->GetWidth(), 7));
 	txt_didyouknow->SetFont(Font(Font::Default, 14, Font::Bold, 0, txt_didyouknow->GetFont().GetColor()));
 
 	txt_tip		= new Cursor(Point(6, 4), Size(328, 182));

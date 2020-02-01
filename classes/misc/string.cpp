@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -85,15 +85,22 @@ const char *S::String::GetDefaultEncoding()
 #ifdef __WIN32__
 	static char	 encoding[16] = { };
 
-	if (strlen(encoding) == 0)
+	if (strlen(encoding) > 0) return encoding;
+
+	/* Find system codepage.
+	 */
+	Int	 codePage = GetACP();
+
+	if (codePage != CP_UTF8)
 	{
-		/* Find system codepage.
-		 */
-		Int	 codePage = GetACP();
 		char	 buffer[12];
 
 		strncpy(encoding, "CP", 3);
 		strncat(encoding, itoa(codePage, buffer, 10), 12);
+	}
+	else
+	{
+		strncpy(encoding, "UTF-8", 6);
 	}
 
 	return encoding;
@@ -861,13 +868,11 @@ S::String S::String::Implode(const Array<String> &array, const String &delimiter
 
 S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncoding, char *outBuffer, Int outBytes, const char *outEncoding)
 {
-	/* Convert string to requested format.
+	/* Copy string if both encodings are the same.
 	 */
-	Int	 size = 0;
-
 	if (strcmp(inEncoding, outEncoding) == 0)
 	{
-		size = inBytes;
+		Int	 size = inBytes;
 
 		if (outBuffer != NIL)
 		{
@@ -875,10 +880,15 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 			if (size >= outBytes) size = 0;
 		}
+
+		return size;
 	}
-	else if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
+
+	/* Switch bytes for conversion between little and big endian.
+	 */
+	if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
 	{
-		size = inBytes;
+		Int	 size = inBytes;
 
 		if (outBuffer != NIL)
 		{
@@ -886,62 +896,73 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 			if (size >= outBytes) size = 0;
 		}
+
+		return size;
 	}
-	else if (Setup::useIconv)
+
+	/* Convert using iconv/libiconv.
+	 */
+	if (Setup::useIconv)
 	{
 		/* Open and configure iconv.
 		 */
 		iconv_t	 cd = iconv_open(outEncoding, inEncoding);
 
-		if (cd == (iconv_t) -1) return -1;
-
+		if (cd != (iconv_t) -1)
+		{
 #if _LIBICONV_VERSION >= 0x0108
-		int	 on = 1;
+			int	 on = 1;
 
-		iconvctl(cd, ICONV_SET_TRANSLITERATE, &on);
+			iconvctl(cd, ICONV_SET_TRANSLITERATE, &on);
 #endif
 
-		/* Assign output buffer if not provided.
-		 */
-		if (outBuffer == NIL)
-		{
-			static multithread (Buffer<char> *)	 buffer = NIL;
+			/* Assign output buffer if not provided.
+			 */
+			if (outBuffer == NIL)
+			{
+				static multithread (Buffer<char> *)	 buffer = NIL;
 
-			if (buffer == NIL) buffer = new Buffer<char>();
+				if (buffer == NIL) buffer = new Buffer<char>();
 
-			if (buffer->Size() > 4096 && inBytes * 8 < 256) buffer->Free();
+				if (buffer->Size() > 4096 && inBytes * 8 < 256) buffer->Free();
 
-			buffer->Resize(inBytes * 8);
+				buffer->Resize(inBytes * 8);
 
-			outBytes  = buffer->Size();
-			outBuffer = *buffer;
-		}
+				outBytes  = buffer->Size();
+				outBuffer = *buffer;
+			}
 
-		/* Perform actual conversion.
-		 */
-		size_t		 inBytesLeft  = inBytes;
-		size_t		 outBytesLeft = outBytes;
-		char	       **outPointer   = &outBuffer;
+			/* Perform actual conversion.
+			 */
+			size_t		 inBytesLeft  = inBytes;
+			size_t		 outBytesLeft = outBytes;
+			char	       **outPointer   = &outBuffer;
 
 #if defined __NetBSD__ || defined __sun
-		const char     **inPointer    = &inBuffer;
+			const char     **inPointer    = &inBuffer;
 #else
-		char	       **inPointer    = const_cast<char **>(&inBuffer);
+			char	       **inPointer    = const_cast<char **>(&inBuffer);
 #endif
 
-		while (inBytesLeft)
-		{
-			if (iconv(cd, inPointer, &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
+			while (inBytesLeft)
+			{
+				if (iconv(cd, inPointer, &inBytesLeft, outPointer, &outBytesLeft) == (size_t) -1) break;
+			}
+
+			iconv_close(cd);
+
+			Int	 size = !outBytesLeft ? 0 : outBytes - outBytesLeft;
+
+			if (inBytesLeft) size *= -1;
+
+			return size;
 		}
-
-		iconv_close(cd);
-
-		size = !outBytesLeft ? 0 : outBytes - outBytesLeft;
-
-		if (inBytesLeft) size *= -1;
 	}
+
 #ifdef __WIN32__
-	else if (strcmp(outEncoding, "UTF-16LE") == 0)
+	/* Convert to UTF-16LE on Windows.
+	 */
+	if (strcmp(outEncoding, "UTF-16LE") == 0)
 	{
 		Int	 codePage = CP_ACP;
 
@@ -968,7 +989,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		if (inEncoding[0] == 'C' && inEncoding[1] == 'P') codePage = atoi(inEncoding + 2);
 
-		size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * sizeof(wchar_t);
+		Int	 size = MultiByteToWideChar(codePage, 0, inBuffer, -1, NIL, 0) * sizeof(wchar_t);
 
 		/* Codepage not installed? Let's try CP_ACP!
 		 */
@@ -980,8 +1001,13 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 			if (size >= outBytes) size = 0;
 		}
+
+		return size;
 	}
-	else if (strcmp(inEncoding, "UTF-16LE") == 0)
+
+	/* Convert from UTF-16LE on Windows.
+	 */
+	if (strcmp(inEncoding, "UTF-16LE") == 0)
 	{
 		Int	 codePage = CP_ACP;
 
@@ -1008,7 +1034,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 		if (outEncoding[0] == 'C' && outEncoding[1] == 'P') codePage = atoi(outEncoding + 2);
 
-		size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
+		Int	 size = WideCharToMultiByte(codePage, 0, (wchar_t *) inBuffer, -1, NIL, 0, NIL, NIL);
 
 		/* Codepage not installed? Let's try CP_ACP!
 		 */
@@ -1020,8 +1046,10 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 			if (size >= outBytes) size = 0;
 		}
+
+		return size;
 	}
 #endif
 
-	return size;
+	return -1;
 }

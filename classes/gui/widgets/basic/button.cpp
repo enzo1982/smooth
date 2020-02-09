@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -134,7 +134,18 @@ S::Int S::GUI::Button::Paint(Int message)
 					bmpRect.right	= bmpRect.left + bmpSize.cx;
 					bmpRect.bottom	= bmpRect.top + bmpSize.cy;
 
-					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+					if (IsActive())
+					{
+						surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+					}
+					else
+					{
+						Bitmap	 graymap(bitmap);
+
+						graymap.GrayscaleBitmap();
+
+						surface->BlitFromBitmap(graymap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+					}
 				}
 			}
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -213,7 +213,12 @@ S::Int S::GUI::BitmapBackend::GrayscaleBitmap()
 	{
 		for (point.x = 0; point.x < size.cx; point.x++)
 		{
-			SetPixel(point, GetPixel(point).Grayscale());
+			Color	 pixel = GetPixel(point);
+
+			Int	 gray  = (pixel.GetRed() + pixel.GetGreen() + pixel.GetBlue()) / 3;
+
+			if (depth == 32) SetPixel(point, Color(gray | (gray << 8) | (gray << 16) | (pixel.GetAlpha() << 24), Color::RGBA));
+			else		 SetPixel(point, Color(gray, gray, gray));
 		}
 	}
 
@@ -230,7 +235,12 @@ S::Int S::GUI::BitmapBackend::InvertColors()
 		{
 			Color	 pixel = GetPixel(point);
 
-			SetPixel(point, Color(255 - pixel.GetRed(), 255 - pixel.GetGreen(), 255 - pixel.GetBlue()));
+			Int	 red   = 255 - pixel.GetRed();
+			Int	 green = 255 - pixel.GetGreen();
+			Int	 blue  = 255 - pixel.GetBlue();
+
+			if (depth == 32) SetPixel(point, Color(red | (green << 8) | (blue << 16) | (pixel.GetAlpha() << 24), Color::RGBA));
+			else		 SetPixel(point, Color(red, green, blue));
 		}
 	}
 
@@ -239,8 +249,8 @@ S::Int S::GUI::BitmapBackend::InvertColors()
 
 S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &iColor1, const Color &iColor2)
 {
-	Color	 color1 = iColor1.ConvertTo(depth == 32 ? Color::RGBA : Color::RGB);
-	Color	 color2 = iColor2.ConvertTo(depth == 32 ? Color::RGBA : Color::RGB);
+	Color	 color1 = iColor1.ConvertTo(Color::RGB);
+	Color	 color2 = iColor2.ConvertTo(Color::RGB);
 
 	Point	 point;
 
@@ -248,7 +258,12 @@ S::Int S::GUI::BitmapBackend::ReplaceColor(const Color &iColor1, const Color &iC
 	{
 		for (point.x = 0; point.x < size.cx; point.x++)
 		{
-			if (GetPixel(point) == color1) SetPixel(point, color2);
+			Color	 pixel = GetPixel(point);
+
+			if (pixel.ConvertTo(Color::RGB) != color1) continue;
+
+			if (depth == 32) SetPixel(point, Color(Long(color2) | (pixel.GetAlpha() << 24), Color::RGBA));
+			else		 SetPixel(point, color2);
 		}
 	}
 

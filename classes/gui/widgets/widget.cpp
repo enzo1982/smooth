@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -653,14 +653,18 @@ S::Int S::GUI::Widget::Process(Int message, Int wParam, Int lParam)
 
 			break;
 		case SM_LBUTTONUP:
-			if (leftButtonDown)
+			if (mouseOver)
 			{
-				leftButtonDown = False;
-
 				Paint(SP_MOUSEUP);
 
 				onLeftButtonUp.Emit(mousePos);
-				onLeftButtonClick.Emit(mousePos);
+
+				if (leftButtonDown)
+				{
+					leftButtonDown = False;
+
+					onLeftButtonClick.Emit(mousePos);
+				}
 			}
 
 			if (mouseDragging)

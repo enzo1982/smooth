@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 dd.mm.20 hh:mm - smooth alpha 0.9.3
 
+- popupmenuentry.cpp	- react on mouse up even if mouse down was not on the same entry
 - windowgdi.cpp		- fixed positioning of IME in non-resizable windows
 - bitmapbackend.cpp	- retain alpha channel when grayscaling bitmaps
 

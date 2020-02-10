@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -45,7 +45,7 @@ S::GUI::PopupMenuEntry::PopupMenuEntry(const String &iText, const Bitmap &iBitma
 		hotspot->onMouseOver.Connect(&PopupMenuEntry::OnMouseOver, this);
 		hotspot->onMouseOut.Connect(&PopupMenuEntry::OnMouseOut, this);
 		hotspot->onLeftButtonDown.Connect(&PopupMenuEntry::OpenPopupMenu, this);
-		hotspot->onLeftButtonClick.Connect(&PopupMenuEntry::OnClickEntry, this);
+		hotspot->onLeftButtonUp.Connect(&PopupMenuEntry::OnClickEntry, this);
 
 		Add(hotspot);
 

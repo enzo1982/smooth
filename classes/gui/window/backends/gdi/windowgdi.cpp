@@ -1018,8 +1018,9 @@ S::Int S::GUI::WindowGDI::SetProgressIndicator(Window::ProgressIndicatorState st
 
 S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 {
-	HWND	 hwnd = (HWND) cursor->GetContainerWindow()->GetSystemWindow();
-	HIMC	 himc = ImmGetContext(hwnd);
+	Window	*window = cursor->GetContainerWindow();
+	HWND	 hwnd	= (HWND) window->GetSystemWindow();
+	HIMC	 himc	= ImmGetContext(hwnd);
 
 	/* Clear composition string.
 	 */
@@ -1036,6 +1037,12 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 	info.dwStyle	    = CFS_POINT;
 	info.ptCurrentPos.x = point.x - GetSystemMetrics(SM_CXFRAME) - GetSystemMetrics(SM_CXPADDEDBORDER);
 	info.ptCurrentPos.y = point.y - GetSystemMetrics(SM_CYFRAME) - GetSystemMetrics(SM_CXPADDEDBORDER);
+
+	if (window->GetFlags() & WF_NORESIZE)
+	{
+		info.ptCurrentPos.x = point.x - GetSystemMetrics(SM_CXDLGFRAME) - 1;
+		info.ptCurrentPos.y = point.y - GetSystemMetrics(SM_CYDLGFRAME) - 1;
+	}
 
 	ImmSetCompositionWindow(himc, &info);
 

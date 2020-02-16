@@ -95,7 +95,7 @@ S::Int S::Backends::BackendWin32::Init()
 {
 	/* Init COM library.
 	 */
-	CoInitialize(NIL);
+	OleInitialize(NIL);
 
 	/* Init Windows sockets.
 	 */
@@ -142,7 +142,7 @@ S::Int S::Backends::BackendWin32::Deinit()
 
 	/* Uninit COM library.
 	 */
-	CoUninitialize();
+	OleUninitialize();
 
 	return Success();
 }

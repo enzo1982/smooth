@@ -9,7 +9,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 OBJECTS	  = 
 
 ifeq ($(BUILD_WIN32),True)
-	OBJECTS += windowgdi.o
+	OBJECTS += droptarget.o windowgdi.o
 endif
 
 ## Do not change anything below this line. ##

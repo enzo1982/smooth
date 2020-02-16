@@ -60,7 +60,7 @@ ifeq ($(BUILD_WIN32),True)
 	OBJECTS += classes/gui/clipboard/backends/win32/clipboardwin32.o
 	OBJECTS += classes/gui/dialogs/directory/dirdlg_win32.o
 	OBJECTS += classes/gui/dialogs/file/filedlg_win32.o
-	OBJECTS += classes/gui/window/backends/gdi/windowgdi.o
+	OBJECTS += classes/gui/window/backends/gdi/droptarget.o classes/gui/window/backends/gdi/windowgdi.o
 	OBJECTS += classes/input/backends/win32/pointerwin32.o
 	OBJECTS += classes/io/drivers/driver_win32.o
 	OBJECTS += classes/system/backends/win32/eventwin32.o classes/system/backends/win32/screenwin32.o classes/system/backends/win32/timerwin32.o

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/window/backends/gdi/windowgdi.h>
+#include <smooth/gui/window/backends/gdi/droptarget.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/cursor.h>
 #include <smooth/gui/application/application.h>
@@ -101,6 +102,7 @@ S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 	destroyIcon	= False;
 
 	hDrop		= NIL;
+	dropTarget	= NIL;
 	enableDropFiles	= False;
 
 	nonMaxWndStyle	= 0;
@@ -587,6 +589,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 
 			DragFinish(hDrop);
 
+			hDrop = NIL;
+
 			return MessageProcessed;
 	}
 
@@ -833,6 +837,20 @@ S::Int S::GUI::WindowGDI::EnableDropFiles(Bool nEnableDropFiles)
 
 	DragAcceptFiles(hwnd, enableDropFiles);
 
+	if (enableDropFiles && dropTarget == NIL)
+	{
+		dropTarget = new DropTarget(this);
+
+		RegisterDragDrop(hwnd, dropTarget);
+	}
+	else if (!enableDropFiles && dropTarget != NIL)
+	{
+		RevokeDragDrop(hwnd);
+
+		dropTarget->Release();
+		dropTarget = NIL;
+	}
+
 	/* Resume the application lock.
 	 */
 	Application::Lock::ResumeLock(suspendCount);
@@ -842,33 +860,24 @@ S::Int S::GUI::WindowGDI::EnableDropFiles(Bool nEnableDropFiles)
 
 const S::Array<S::String> &S::GUI::WindowGDI::GetDroppedFiles() const
 {
-	if (hDrop == NIL) return WindowBackend::GetDroppedFiles();
+	if (hDrop == NIL && dropTarget == NIL) return WindowBackend::GetDroppedFiles();
 
 	static Array<String>	 fileNames;
 
 	fileNames.RemoveAll();
 
-	/* Query number of files dropped.
-	 */
-	Int	 nOfFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
-
-	/* Create file name buffer.
-	 */
-	Int	 bufferSize = 32768;
-	wchar_t	*buffer	    = new wchar_t [bufferSize];
-
-	/* Query dropped files.
-	 */
-	for (Int i = 0; i < nOfFiles; i++)
+	if (hDrop == NIL)
 	{
-		DragQueryFile(hDrop, i, buffer, bufferSize);
+		/* Query files from drop target.
+		 */
+		const Array<String>	&files = ((DropTarget *) dropTarget)->GetDroppedFiles();
 
-		fileNames.Add(String(buffer));
+		foreach (const String &file, files) fileNames.Add(file);
 	}
-
-	/* Delete file name buffer.
-	 */
-	delete [] buffer;
+	else
+	{
+		fileNames = DropTarget::GetFilesFromHDROP(hDrop);
+	}
 
 	return fileNames;
 }

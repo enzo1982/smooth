@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -31,11 +31,11 @@ namespace smooth
 	};
 };
 
-#include "../../basic/object.h"
-#include "../../graphics/font.h"
-#include "../../templates/signals.h"
-#include "../../templates/callbacks.h"
-#include "../../graphics/forms/rect.h"
+#include <smooth/basic/object.h>
+#include <smooth/graphics/font.h>
+#include <smooth/templates/signals.h>
+#include <smooth/templates/callbacks.h>
+#include <smooth/graphics/forms/rect.h>
 
 namespace smooth
 {

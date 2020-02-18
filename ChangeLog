@@ -7,6 +7,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.3
 			- fixed positioning of IME in non-resizable windows
 - bitmapbackend.cpp	- retain alpha channel when grayscaling bitmaps
 
+- adapt include files to work around long path issue when building on Windows
 - adapt Makefiles to allow spaces in build path
 
 09.02.20 16:26 - smooth alpha 0.9.2

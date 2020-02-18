@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -7,8 +7,6 @@
   * THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
-
-#include "../definitions.h"
 
 #ifndef H_OBJSMOOTH_STRING
 #define H_OBJSMOOTH_STRING
@@ -23,8 +21,8 @@ namespace smooth
 	};
 };
 
-#include "../templates/array.h"
-#include "../templates/buffer.h"
+#include <smooth/templates/array.h>
+#include <smooth/templates/buffer.h>
 
 namespace smooth
 {

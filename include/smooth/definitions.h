@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -35,12 +35,12 @@
 #define abstract
 #define sealed
 
-#include "types/generic.h"
+#include <smooth/types/generic.h>
 
-#include "types/bool.h"
-#include "types/float.h"
-#include "types/int.h"
-#include "types/void.h"
+#include <smooth/types/bool.h>
+#include <smooth/types/float.h>
+#include <smooth/types/int.h>
+#include <smooth/types/void.h>
 
 namespace S = smooth;
 
@@ -50,12 +50,12 @@ namespace smooth
 	const Bool	 False	= (Bool) 0;
 };
 
-#include "errors/error.h"
-#include "errors/success.h"
+#include <smooth/errors/error.h>
+#include <smooth/errors/success.h>
 
-#include "templates/array.h"
-#include "misc/string.h"
-#include "basic/setup.h"
+#include <smooth/templates/array.h>
+#include <smooth/misc/string.h>
+#include <smooth/basic/setup.h>
 
 using namespace smooth::Errors;
 

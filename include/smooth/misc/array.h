@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,7 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#include "../definitions.h"
+#include <smooth/definitions.h>
 
 #ifndef H_OBJSMOOTH_INDEX_ARRAY
 #define H_OBJSMOOTH_INDEX_ARRAY
@@ -18,8 +18,8 @@ namespace smooth
 	class IndexArray;
 };
 
-#include "../templates/buffer.h"
-#include "../threads/rwlock.h"
+#include <smooth/templates/buffer.h>
+#include <smooth/threads/rwlock.h>
 
 namespace smooth
 {

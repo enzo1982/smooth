@@ -15,7 +15,7 @@ endif
 endif
 
 ifeq ($(USE_BUNDLED_LIBCPUID),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support
+	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support
 endif
 
 # Enter object files here:

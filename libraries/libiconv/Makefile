@@ -13,7 +13,7 @@ else
 	GLOBALLIB   = libiconv.a
 endif
 
-MYCCOPTS    = -DBUILDING_LIBICONV -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libiconv
+MYCCOPTS    = -DBUILDING_LIBICONV -I"$(SRCDIR)" -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libiconv
 
 # Enter object files here:
 OBJECTS	    = iconv.o localcharset.o

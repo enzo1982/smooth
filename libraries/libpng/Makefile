@@ -7,10 +7,10 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 GLOBALLIB   = libpng.a
-MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng
+MYCCOPTS    = -I"$(SRCDIR)" -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libpng
 
 ifeq ($(USE_BUNDLED_ZLIB),True)
-MYCCOPTS   += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/zlib
+MYCCOPTS   += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/zlib
 endif
 
 ifeq ($(BUILD_ARM),True)

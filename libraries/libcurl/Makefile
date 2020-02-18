@@ -7,7 +7,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 GLOBALLIB   = libcurl.a
-MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support -DBUILDING_LIBCURL -DCURL_STATICLIB
+MYCCOPTS    = -I"$(SRCDIR)" -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support -DBUILDING_LIBCURL -DCURL_STATICLIB
 
 ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS += -DUSE_SCHANNEL -DUSE_WINDOWS_SSPI

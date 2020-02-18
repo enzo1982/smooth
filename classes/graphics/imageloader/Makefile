@@ -7,7 +7,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifeq ($(USE_BUNDLED_LIBJPEG),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libjpeg
+	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libjpeg
 else ifeq ($(BUILD_NETBSD),True)
 	MYCCOPTS += -I/usr/pkg/include
 else
@@ -15,7 +15,7 @@ else
 endif
 
 ifeq ($(USE_BUNDLED_LIBPNG),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libpng
+	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libpng
 else
 	MYCCOPTS += $(shell pkg-config --cflags libpng)
 endif

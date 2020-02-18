@@ -15,7 +15,7 @@ endif
 GLOBALDLL   = smooth-js
 IMPORTLIB   = libsmooth-js.a
 
-MYCCOPTS    = -fpermissive -I$(SRCDIR) -I$(SRCDIR)/include
+MYCCOPTS    = -fpermissive -I"$(SRCDIR)" -I"$(SRCDIR)"/include
 
 ifeq ($(BUILD_WIN32),True)
 	MYCCOPTS += -Wno-unused-local-typedefs
@@ -140,7 +140,7 @@ endif
 ALLCMD1	  = mkdir -p extensions platform utils arm ia32 mips x64
 CLEANCMD1 = rm -f experimental-libraries.cc libraries.cc jsmin.pyc
 
-ifneq ($(SRCDIR),$(CURDIR))
+ifneq ("$(SRCDIR)","$(CURDIR)")
 CLEANCMD2 = rmdir extensions platform utils arm ia32 mips x64 || true
 endif
 
@@ -150,16 +150,16 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-commands
 
 libraries.cc: runtime.js v8natives.js array.js string.js uri.js math.js messages.js apinatives.js debug-debugger.js mirror-debugger.js liveedit-debugger.js date.js json.js regexp.js arraybuffer.js typedarray.js macros.py
 ifeq ($(BUILD_HAIKU),True)
-	python $(SRCDIR)/js2c.py $@ CORE off $^
+	python "$(SRCDIR)"/js2c.py $@ CORE off $^
 else
-	chmod a+x $(SRCDIR)/js2c.py
-	$(SRCDIR)/js2c.py $@ CORE off $^
+	chmod a+x "$(SRCDIR)"/js2c.py
+	"$(SRCDIR)"/js2c.py $@ CORE off $^
 endif
 
 experimental-libraries.cc: symbol.js proxy.js collection.js object-observe.js generator.js array-iterator.js harmony-string.js harmony-array.js harmony-math.js macros.py
 ifeq ($(BUILD_HAIKU),True)
-	python $(SRCDIR)/js2c.py $@ EXPERIMENTAL off $^
+	python "$(SRCDIR)"/js2c.py $@ EXPERIMENTAL off $^
 else
-	chmod a+x $(SRCDIR)/js2c.py
-	$(SRCDIR)/js2c.py $@ EXPERIMENTAL off $^
+	chmod a+x "$(SRCDIR)"/js2c.py
+	"$(SRCDIR)"/js2c.py $@ EXPERIMENTAL off $^
 endif

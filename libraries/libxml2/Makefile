@@ -7,10 +7,10 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 GLOBALLIB   = libxml2.a
-MYCCOPTS    = -I$(SRCDIR) -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libxml2 -DNOLIBTOOL -DLIBXML_STATIC -DHAVE_INTTYPES_H=1
+MYCCOPTS    = -I"$(SRCDIR)" -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libxml2 -DNOLIBTOOL -DLIBXML_STATIC -DHAVE_INTTYPES_H=1
 
 ifeq ($(USE_BUNDLED_LIBICONV),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libiconv
+	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libiconv
 endif
 
 # Enter object files here:

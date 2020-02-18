@@ -7,7 +7,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifeq ($(USE_BUNDLED_LIBICONV),True)
-	MYCCOPTS += -I$(SRCDIR)/$(SMOOTH_PATH)/include/support/libiconv
+	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libiconv
 endif
 
 # Enter object files here:

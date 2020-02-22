@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2010 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,10 @@
 
 #ifndef H_OBJSMOOTH_DEFS_WIN32
 #define H_OBJSMOOTH_DEFS_WIN32
+
+#if defined _WIN32 && !defined __WIN32__
+#	define __WIN32__
+#endif
 
 #if defined SMOOTH_DLL
 #	define SMOOTHAPI __declspec (dllexport)

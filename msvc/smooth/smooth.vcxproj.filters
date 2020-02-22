@@ -1122,6 +1122,9 @@
     <ClCompile Include="..\..\classes\gui\dialogs\icons\light.cpp">
       <Filter>Quelldateien\classes\gui\dialogs\icons</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\classes\gui\window\backends\gdi\droptarget.cpp">
+      <Filter>Quelldateien\classes\gui\window\backends\gdi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\classes\i18n\locales\smooth_ar.h">
@@ -1891,6 +1894,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\smooth\gui\dialogs\icons\light.h">
       <Filter>Headerdateien\smooth\gui\dialogs\icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\gui\window\backends\gdi\droptarget.h">
+      <Filter>Headerdateien\smooth\gui\window\backends\gdi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

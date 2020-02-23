@@ -153,6 +153,8 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 	 */
 	Bool		 darkModeEnabled = False;
 
+	GUI::Color	 colorizationColor(-1);
+
 	GUI::Color	 accentColor(-1);
 	Bool		 accentColorPrevalence = False;
 
@@ -172,6 +174,8 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 	{
 		DWORD	 value = 0;
 		DWORD	 size  = sizeof(value);
+
+		if (RegQueryValueEx(key, L"ColorizationColor", 0, NULL, (BYTE *) &value, &size) == ERROR_SUCCESS) colorizationColor	= GUI::Color((value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF);
 
 		if (RegQueryValueEx(key, L"AccentColor",       0, NULL, (BYTE *) &value, &size) == ERROR_SUCCESS) accentColor		= GUI::Color(value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF);
 		if (RegQueryValueEx(key, L"ColorPrevalence",   0, NULL, (BYTE *) &value, &size) == ERROR_SUCCESS) accentColorPrevalence = value;
@@ -252,6 +256,36 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 		Setup::InactiveTitlebarStartColor = Setup::TitlebarStartColor.Grayscale();
 		Setup::InactiveTitlebarEndColor	  = Setup::TitlebarEndColor.Grayscale();
 		Setup::InactiveTitlebarTextColor  = Setup::TitlebarTextColor.Grayscale();
+	}
+	else if (colorizationColor != GUI::Color(-1))
+	{
+		Setup::HighlightColor		  = colorizationColor.Grayscale().GetRed() < 245 ? colorizationColor : GUI::Color(colorizationColor.GetRed() - colorizationColor.GetRed() * 0.15, colorizationColor.GetGreen() - colorizationColor.GetGreen() * 0.15, colorizationColor.GetBlue() - colorizationColor.GetBlue() * 0.15);
+		Setup::HighlightTextColor	  = Setup::HighlightColor.Grayscale().GetRed() > 190 ? GUI::Color(0) : GUI::Color(255, 255, 255);
+
+		Setup::GradientStartColor	  = GUI::Color(colorizationColor.GetRed() - colorizationColor.GetRed() * 0.15, colorizationColor.GetGreen() - colorizationColor.GetGreen() * 0.15, colorizationColor.GetBlue() - colorizationColor.GetBlue() * 0.15);
+		Setup::GradientEndColor		  = GUI::Color(colorizationColor.GetRed() + (255 - colorizationColor.GetRed()) * 0.25, colorizationColor.GetGreen() + (255 - colorizationColor.GetGreen()) * 0.25, colorizationColor.GetBlue() + (255 - colorizationColor.GetBlue()) * 0.25);
+		Setup::GradientTextColor	  = Setup::GradientStartColor.Average(Setup::GradientEndColor).Grayscale().GetRed() > 190 ? GUI::Color(0) : GUI::Color(255, 255, 255);
+
+		if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
+		{
+			Setup::TitlebarStartColor	  = colorizationColor.Grayscale().GetRed() < 250 ? colorizationColor : GUI::Color(colorizationColor.GetRed() - colorizationColor.GetRed() * 0.02, colorizationColor.GetGreen() - colorizationColor.GetGreen() * 0.02, colorizationColor.GetBlue() - colorizationColor.GetBlue() * 0.02);
+			Setup::TitlebarEndColor		  = Setup::TitlebarStartColor;
+			Setup::TitlebarTextColor	  = Setup::TitlebarStartColor.Grayscale().GetRed() < 120 ? GUI::Color(245, 245, 245) : GUI::Color(0);
+
+			Setup::InactiveTitlebarStartColor = GUI::Color(235, 235, 235);
+			Setup::InactiveTitlebarEndColor	  = GUI::Color(235, 235, 235);
+			Setup::InactiveTitlebarTextColor  = GUI::Color(0);
+		}
+		else
+		{
+			Setup::TitlebarStartColor	  = Setup::GradientStartColor;
+			Setup::TitlebarEndColor		  = Setup::GradientEndColor;
+			Setup::TitlebarTextColor	  = Setup::TitlebarStartColor.Grayscale().GetRed() < 120 ? GUI::Color(245, 245, 245) : GUI::Color(0);
+
+			Setup::InactiveTitlebarStartColor = Setup::TitlebarStartColor.Grayscale();
+			Setup::InactiveTitlebarEndColor	  = Setup::TitlebarEndColor.Grayscale();
+			Setup::InactiveTitlebarTextColor  = Setup::TitlebarTextColor.Grayscale();
+		}
 	}
 	else
 	{

@@ -5,6 +5,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.3
 - popupmenuentry.cpp	- react on mouse up even if mouse down was not on the same entry
 - windowgdi.cpp		- fixed drag & drop not accepting long file paths
 			- fixed positioning of IME in non-resizable windows
+- backendwin32.cpp	- fixed black title bar color on Windows Vista, 7 and 8/8.1
 - bitmapbackend.cpp	- retain alpha channel when grayscaling bitmaps
 
 - also check for _WIN32 definition on Windows instead of requiring __WIN32__ to be defined

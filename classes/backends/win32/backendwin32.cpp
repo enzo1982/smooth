@@ -163,8 +163,7 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 		DWORD	 value = 1;
 		DWORD	 size  = sizeof(value);
 
-		RegQueryValueEx(key, L"AppsUseLightTheme", 0, NULL, (BYTE *) &value, &size);
-		darkModeEnabled = !value;
+		if (RegQueryValueEx(key, L"AppsUseLightTheme", 0, NULL, (BYTE *) &value, &size) == ERROR_SUCCESS) darkModeEnabled	= !value;
 
 		RegCloseKey(key);
 	}
@@ -174,13 +173,8 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 		DWORD	 value = 0;
 		DWORD	 size  = sizeof(value);
 
-		RegQueryValueEx(key, L"AccentColor", 0, NULL, (BYTE *) &value, &size);
-		accentColor = GUI::Color(value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF);
-
-		value = 0;
-
-		RegQueryValueEx(key, L"ColorPrevalence", 0, NULL, (BYTE *) &value, &size);
-		accentColorPrevalence = value;
+		if (RegQueryValueEx(key, L"AccentColor",       0, NULL, (BYTE *) &value, &size) == ERROR_SUCCESS) accentColor		= GUI::Color(value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF);
+		if (RegQueryValueEx(key, L"ColorPrevalence",   0, NULL, (BYTE *) &value, &size) == ERROR_SUCCESS) accentColorPrevalence = value;
 
 		RegCloseKey(key);
 	}

@@ -220,27 +220,27 @@ S::Void S::Backends::BackendWin32::UpdateColors()
 	 */
 	if (accentColor != GUI::Color(-1))
 	{
-		Setup::HighlightColor		  = accentColor;
-		Setup::HighlightTextColor	  = GUI::Color(255, 255, 255);
+		Setup::HighlightColor		  = accentColor.Grayscale().GetRed() < 245 ? accentColor : GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.15, accentColor.GetGreen() - accentColor.GetGreen() * 0.15, accentColor.GetBlue() - accentColor.GetBlue() * 0.15);
+		Setup::HighlightTextColor	  = Setup::HighlightColor.Grayscale().GetRed() > 190 ? GUI::Color(0) : GUI::Color(255, 255, 255);
 
 		if (darkModeEnabled)
 		{
-			Setup::GradientStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.55, accentColor.GetGreen() - accentColor.GetGreen() * 0.55, accentColor.GetBlue() - accentColor.GetBlue() * 0.55);
-			Setup::GradientEndColor	  = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.35, accentColor.GetGreen() - accentColor.GetGreen() * 0.35, accentColor.GetBlue() - accentColor.GetBlue() * 0.35);
+			Setup::GradientStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.45, accentColor.GetGreen() - accentColor.GetGreen() * 0.45, accentColor.GetBlue() - accentColor.GetBlue() * 0.45);
+			Setup::GradientEndColor	  = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.30, accentColor.GetGreen() - accentColor.GetGreen() * 0.30, accentColor.GetBlue() - accentColor.GetBlue() * 0.30);
 			Setup::GradientTextColor  = GUI::Color(245, 245, 245);
 		}
 		else
 		{
-			Setup::GradientStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.25, accentColor.GetGreen() - accentColor.GetGreen() * 0.25, accentColor.GetBlue() - accentColor.GetBlue() * 0.25);
+			Setup::GradientStartColor = GUI::Color(accentColor.GetRed() - accentColor.GetRed() * 0.15, accentColor.GetGreen() - accentColor.GetGreen() * 0.15, accentColor.GetBlue() - accentColor.GetBlue() * 0.15);
 			Setup::GradientEndColor	  = GUI::Color(accentColor.GetRed() + (255 - accentColor.GetRed()) * 0.25, accentColor.GetGreen() + (255 - accentColor.GetGreen()) * 0.25, accentColor.GetBlue() + (255 - accentColor.GetBlue()) * 0.25);
-			Setup::GradientTextColor  = GUI::Color(255, 255, 255);
+			Setup::GradientTextColor  = Setup::GradientStartColor.Average(Setup::GradientEndColor).Grayscale().GetRed() > 190 ? GUI::Color(0) : GUI::Color(255, 255, 255);
 		}
 
 		if (accentColorPrevalence)
 		{
 			Setup::TitlebarStartColor = accentColor;
-			Setup::TitlebarEndColor	  = accentColor;
-			Setup::TitlebarTextColor  = GUI::Color(255, 255, 255);
+			Setup::TitlebarEndColor	  = Setup::TitlebarStartColor;
+			Setup::TitlebarTextColor  = Setup::TitlebarStartColor.Grayscale().GetRed() > 190 ? GUI::Color(0) : GUI::Color(255, 255, 255);
 		}
 		else
 		{

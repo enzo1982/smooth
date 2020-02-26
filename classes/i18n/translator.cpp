@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,6 +24,28 @@
 #	include <stdlib.h>
 #	include <unistd.h>
 #endif
+
+namespace smooth
+{
+	static String GetApplicationName()
+	{
+		String	 appName;
+
+		for (Int i = 0; i < Object::GetNOfObjects(); i++)
+		{
+			if (Object::GetNthObject(i)->GetObjectType() != GUI::Application::classID) continue;
+
+			GUI::Application	*application = (GUI::Application *) Object::GetNthObject(i);
+
+			appName = application->GetText();
+			appName.Replace(":", NIL).Replace("/", NIL);
+
+			break;
+		}
+
+		return appName;
+	}
+}
 
 S::I18n::Translator	*S::I18n::Translator::defaultTranslator = NIL;
 
@@ -332,6 +354,8 @@ S::Int S::I18n::Translator::SelectUserDefaultLanguage()
 
 S::Int S::I18n::Translator::GetSupportedLanguages()
 {
+	/* Add default translation.
+	 */
 	{
 		Language	*language = new Language();
 
@@ -346,15 +370,21 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 		languages.Add(language);
 	}
 
-	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
+	/* Get translation files' folder.
+	 */
+	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang"));
 
 #ifndef __WIN32__
-	if (Directory(S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
-	{
-		dir = S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
-	}
+	/* Check resources folders.
+	 */
+	String	 appName = GetApplicationName();
+
+	if (!dir.Exists() || dir.GetFilesByPattern(String(appPrefix).Append("_*.xml")).Length() == 0) dir = S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang");
+	if (!dir.Exists() || dir.GetFilesByPattern(String(appPrefix).Append("_*.xml")).Length() == 0) dir = S::System::System::GetResourcesDirectory().Append(appName).Append(Directory::GetDirectoryDelimiter()).Append("lang");
 #endif
 
+	/* Load translation files.
+	 */
 	const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).Append("_*.xml"));
 
 	foreach (const File &file, files)
@@ -499,13 +529,15 @@ S::Int S::I18n::Translator::ActivateLanguage(const String &magic)
 		 */
 		if (magic != "internal" && activeLanguage->strings.Length() == 0 && activeLanguage->sections.Length() == 0)
 		{
-			Directory	 dir(GUI::Application::GetApplicationDirectory().Append("lang").Append(Directory::GetDirectoryDelimiter()));
+			Directory	 dir(GUI::Application::GetApplicationDirectory().Append("lang"));
 
 #ifndef __WIN32__
-			if (Directory(S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang")).Exists())
-			{
-				dir = S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang").Append(Directory::GetDirectoryDelimiter());
-			}
+			/* Check resources folders.
+			 */
+			String	 appName = GetApplicationName();
+
+			if (!dir.Exists() || dir.GetFilesByPattern(String(appPrefix).Append("_*.xml")).Length() == 0) dir = S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang");
+			if (!dir.Exists() || dir.GetFilesByPattern(String(appPrefix).Append("_*.xml")).Length() == 0) dir = S::System::System::GetResourcesDirectory().Append(appName).Append(Directory::GetDirectoryDelimiter()).Append("lang");
 #endif
 
 			String		 file = String(dir).Append(Directory::GetDirectoryDelimiter()).Append(magic);

@@ -7,6 +7,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.3
 			- fixed positioning of IME in non-resizable windows
 - backendwin32.cpp	- fixed black title bar color on Windows Vista, 7 and 8/8.1
 			- respect colorization tint color on Windows Vista, 7 and 8/8.1
+- translator.cpp	- fixed loading translations with different prefix from resources folder
 - bitmapbackend.cpp	- retain alpha channel when grayscaling bitmaps
 
 - also check for _WIN32 definition on Windows instead of requiring __WIN32__ to be defined

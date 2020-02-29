@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -8,11 +8,16 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#ifndef __WIN32__
+#	include <gdk/gdk.h>
+#endif
+
 #include <smooth/graphics/backends/cairo/surfacecairo.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
 #include <smooth/gui/application/application.h>
+#include <smooth/system/dynamicloader.h>
 #include <smooth/files/file.h>
 #include <smooth/misc/math.h>
 #include <smooth/misc/number.h>
@@ -280,10 +285,22 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 
 	ReleaseDC(0, dc);
 #else
-	/* Evaluate GDK_SCALE setting.
+	/* Init GDK.
+	 */
+	gdk_init(NULL, NULL);
+
+	/* Load gdk_screen_get_monitor_scale_factor dynamically.
+	 */
+	System::DynamicLoader	 gdk("gdk-3");
+	gint			 (*ex_gdk_screen_get_monitor_scale_factor)(GdkScreen *, gint) = (gint (*)(GdkScreen *, gint)) gdk.GetFunctionAddress("gdk_screen_get_monitor_scale_factor");
+
+	/* Get scale factor.
 	 */
 	Short	 dpi   = 96;
-	Int	 scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
+	Int	 scale = 1.0;
+
+	if (ex_gdk_screen_get_monitor_scale_factor != NIL) scale = ex_gdk_screen_get_monitor_scale_factor(gdk_screen_get_default(), 0);
+	else						   scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
 
 	if (scale > 0) dpi *= scale;
 #endif

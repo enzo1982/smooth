@@ -8,16 +8,14 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 # Change these variables to fit your project:
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
-ifneq ($(BUILD_SOLARIS),True)
 ifneq ($(BUILD_HAIKU),True)
+ifneq ($(BUILD_SOLARIS),True)
 	MYCCOPTS += $(shell pkg-config --cflags gtk+-3.0)
-endif
-endif
-endif
-endif
-
-ifeq ($(BUILD_SOLARIS),True)
+else
 	MYCCOPTS += $(shell pkg-config --cflags gtk+-2.0)
+endif
+endif
+endif
 endif
 
 # Enter object files here:

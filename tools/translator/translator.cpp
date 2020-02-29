@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -65,13 +65,16 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	list_entries->AddTab("String");
 	list_entries->AddTab("Translation");
 
-	list_filtered	= new ListBox(Point(7, 34), Size(757, 161));
+	list_filtered	= new ListBox(list_entries->GetPosition(), list_entries->GetSize());
 	list_filtered->onSelectEntry.Connect(&Translator::SelectEntry, this);
 	list_filtered->SetFlags(LF_ALLOWRESELECT);
 	list_filtered->AddTab("ID", 80);
 	list_filtered->AddTab("String");
 	list_filtered->AddTab("Translation");
 	list_filtered->Hide();
+
+	droparea = new DropArea(list_entries->GetPosition(), list_entries->GetSize());
+	droparea->onDropFiles.Connect(&Translator::HandleDropFile, this);
 
 	button_new	= new Button("New", Point(7, 164), Size());
 	button_new->onAction.Connect(&Translator::NewEntry, this);
@@ -200,6 +203,8 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	wnd->Add(list_entries);
 	wnd->Add(list_filtered);
 
+	wnd->GetMainLayer()->Add(droparea);
+
 	wnd->Add(title);
 	wnd->Add(menubar);
 	wnd->Add(statusbar);
@@ -239,6 +244,8 @@ Translator::~Translator()
 
 	DeleteObject(list_entries);
 	DeleteObject(list_filtered);
+
+	DeleteObject(droparea);
 
 	DeleteObject(text_id);
 	DeleteObject(edit_id);
@@ -294,10 +301,12 @@ Void Translator::ResizeProc()
 	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 
 	list_entries->SetSize(Size(clientSize.cx - 14, clientSize.cy - 204));
-	list_filtered->SetSize(Size(clientSize.cx - 14, clientSize.cy - 204));
+	list_filtered->SetSize(list_entries->GetSize());
+
+	droparea->SetSize(list_entries->GetSize());
 
 	edit_original->SetWidth(clientSize.cx - edit_original->GetX() - 7);
-	edit_translated->SetWidth(clientSize.cx - edit_original->GetX() - 7);
+	edit_translated->SetWidth(edit_original->GetWidth());
 }
 
 Void Translator::NewFile()
@@ -484,22 +493,24 @@ Int Translator::OpenTemplate(const String &fileName)
 
 Void Translator::OpenFileName(const String &openFile)
 {
+	/* Open document and check format.
+	 */
+	XML::Document	 doc;
+
+	if (doc.LoadFile(openFile) == Error())
+	{
+		QuickMessage(String("Invalid file format: ").Append(GetShortFileName(openFile)), "smooth Translator", Message::Buttons::Ok, Message::Icon::Error);
+
+		return;
+	}
+
+	/* Setup new file and load document.
+	 */
 	NewFile();
 
 	fileName = openFile;
 
 	wnd->SetText(String("smooth Translator v").Append(SMOOTH_VERSION).Append(" - ").Append(GetShortFileName(fileName)));
-
-	XML::Document	 doc;
-
-	if (doc.LoadFile(fileName) == Error())
-	{
-		CloseFile();
-
-		QuickMessage(String("Invalid file format: ").Append(GetShortFileName(openFile)), "smooth Translator", Message::Buttons::Ok, Message::Icon::Error);
-
-		return;
-	}
 
 	XML::Node	*info = doc.GetRootNode()->GetNodeByName("info");
 
@@ -656,6 +667,11 @@ Void Translator::ExportAs()
 
 		dataSection->Export(stream, 0);
 	}
+}
+
+Void Translator::HandleDropFile(const Array<String> &files)
+{
+	OpenFileName(files.GetFirst());
 }
 
 Void Translator::ReplaceLineEndings(const String &file)

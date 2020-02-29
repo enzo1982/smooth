@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,6 +37,8 @@ class Translator : public Application
 
 		ListBox			*list_entries;
 		ListBox			*list_filtered;
+
+		DropArea		*droparea;
 
 		Button			*button_new;
 		Text			*text_id;
@@ -88,6 +90,8 @@ class Translator : public Application
 		Void			 SaveFileAs();
 
 		Void			 ExportAs();
+
+		Void			 HandleDropFile(const Array<String> &);
 
 		Bool			 ExitProc();
 		Void			 ResizeProc();

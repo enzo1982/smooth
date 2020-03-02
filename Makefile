@@ -250,12 +250,7 @@ else
 	endif
 
 	LIBS += -lpthread
-
-	ifeq ($(BUILD_SOLARIS),True)
-		LIBS += $(shell pkg-config --libs gtk+-2.0)
-	else
-		LIBS += $(shell pkg-config --libs gtk+-3.0)
-	endif
+	LIBS += $(shell pkg-config --libs gtk+-3.0)
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 endif

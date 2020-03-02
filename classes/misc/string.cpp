@@ -937,12 +937,7 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 			size_t		 inBytesLeft  = inBytes;
 			size_t		 outBytesLeft = outBytes;
 			char	       **outPointer   = &outBuffer;
-
-#if defined __NetBSD__ || defined __sun
-			const char     **inPointer    = &inBuffer;
-#else
 			char	       **inPointer    = const_cast<char **>(&inBuffer);
-#endif
 
 			while (inBytesLeft)
 			{

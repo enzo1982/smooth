@@ -10,12 +10,7 @@ ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_HAIKU),True)
 	MYCCOPTS += $(shell pkg-config --cflags pangocairo)
-
-ifneq ($(BUILD_SOLARIS),True)
 	MYCCOPTS += $(shell pkg-config --cflags gdk-3.0)
-else
-	MYCCOPTS += $(shell pkg-config --cflags gdk-2.0)
-endif
 endif
 endif
 else

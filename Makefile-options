@@ -182,6 +182,11 @@ endif
 LDCONFIG	= /sbin/ldconfig
 
 INSTALL		= install
+
+ifeq ($(BUILD_SOLARIS),True)
+	INSTALL = ginstall
+endif
+
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA	= $(INSTALL) -m 644
 
@@ -280,6 +285,8 @@ else ifeq ($(findstring systemlibjpeg,$(config)),systemlibjpeg)
 	USE_BUNDLED_LIBJPEG = False
 else
 	ifeq ($(BUILD_OSX),True)
+		USE_BUNDLED_LIBJPEG = True
+	else ifeq ($(BUILD_SOLARIS),True)
 		USE_BUNDLED_LIBJPEG = True
 	else ifeq ($(BUILD_WIN32),True)
 		USE_BUNDLED_LIBJPEG = True

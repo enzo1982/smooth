@@ -40,6 +40,12 @@ class Translator : public Application
 
 		DropArea		*droparea;
 
+		Divider			*splitter;
+		Float			 splitFactor;
+		Bool			 updateSplitter;
+
+		Layer			*layer_edit;
+
 		Button			*button_new;
 		Text			*text_id;
 		EditBox			*edit_id;
@@ -75,6 +81,11 @@ class Translator : public Application
 		ListEntry		*GetSelectedEntry(List *);
 		List			*GetEntryList(List *, Int);
 	slots:
+		Void			 OnChangeSize(const Size &);
+		Void			 OnChangeEditLayerSize(const Size &);
+
+		Void			 OnDragSplitter(Int);
+
 		Void			 NewEntry();
 		Void			 SaveData();
 		Void			 RemoveEntry();
@@ -94,7 +105,6 @@ class Translator : public Application
 		Void			 HandleDropFile(const Array<String> &);
 
 		Bool			 ExitProc();
-		Void			 ResizeProc();
 	public:
 					 Translator(const String &);
 					~Translator();

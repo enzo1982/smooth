@@ -34,13 +34,16 @@ Int smooth::Main(const Array<String> &args)
 
 Translator::Translator(const String &openFile) : Application("smooth Translator")
 {
-	fileName     = NIL;
-	templateName = NIL;
+	fileName	= NIL;
+	templateName	= NIL;
 
-	dataSection  = NIL;
-	modified     = False;
+	dataSection	= NIL;
+	modified	= False;
 
-	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(700, 480));
+	splitFactor	= 0.58;
+	updateSplitter	= False;
+
+	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(740, 490));
 	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");
@@ -76,37 +79,35 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	droparea = new DropArea(list_entries->GetPosition(), list_entries->GetSize());
 	droparea->onDropFiles.Connect(&Translator::HandleDropFile, this);
 
-	button_new	= new Button("New", Point(7, 164), Size());
+	splitter	= new Divider(200, OR_HORZ | DIV_MOVABLE);
+	splitter->onDrag.Connect(&Translator::OnDragSplitter, this);
+
+	layer_edit	= new Layer();
+	layer_edit->SetMetrics(Point(8, 202), Size(500, 200));
+	layer_edit->onChangeSize.Connect(&Translator::OnChangeEditLayerSize, this);
+
+	button_new	= new Button("New", Point(7, 7), Size());
 	button_new->onAction.Connect(&Translator::NewEntry, this);
-	button_new->SetOrientation(OR_LOWERLEFT);
 
-	text_id		= new Text("ID:", Point(94, 160));
-	text_id->SetOrientation(OR_LOWERLEFT);
+	text_id		= new Text("ID:", Point(94, 11));
 
-	button_save	= new Button("Save", Point(175, 164), Size());
+	button_save	= new Button("Save", Point(175, 7), Size());
 	button_save->onAction.Connect(&Translator::SaveData, this);
-	button_save->SetOrientation(OR_LOWERRIGHT);
+	button_save->SetOrientation(OR_UPPERRIGHT);
 
-	button_remove	= new Button("Remove", Point(87, 164), Size());
+	button_remove	= new Button("Remove", Point(87, 7), Size());
 	button_remove->onAction.Connect(&Translator::RemoveEntry, this);
-	button_remove->SetOrientation(OR_LOWERRIGHT);
+	button_remove->SetOrientation(OR_UPPERRIGHT);
 
-	text_original	= new Text("Original:", Point(94, 133));
-	text_original->SetOrientation(OR_LOWERLEFT);
+	text_original	= new Text("Original:", Point(94, 38));
+	text_translated	= new Text("Translation:", Point(94, 106));
 
-	text_translated	= new Text("Translation:", Point(94, 65));
-	text_translated->SetOrientation(OR_LOWERLEFT);
-
-	edit_id		= new EditBox(Point(221 - text_translated->GetUnscaledTextWidth(), 163), Size(37, 0), 6);
+	edit_id		= new EditBox(Point(221 - text_translated->GetUnscaledTextWidth(), 8), Size(37, 0), 6);
 	edit_id->SetWidth(edit_id->GetFont().GetUnscaledTextSizeX("000000") + 6); 
 	edit_id->SetFlags(EDB_NUMERIC);
-	edit_id->SetOrientation(OR_LOWERLEFT);
 
-	edit_original	= new MultiEdit(Point(221 - text_translated->GetUnscaledTextWidth(), 136), Size(608, 60), 0);
-	edit_original->SetOrientation(OR_LOWERLEFT);
-
-	edit_translated	= new MultiEdit(Point(221 - text_translated->GetUnscaledTextWidth(), 68), Size(608, 60), 0);
-	edit_translated->SetOrientation(OR_LOWERLEFT);
+	edit_original	= new MultiEdit(Point(221 - text_translated->GetUnscaledTextWidth(), 35), Size(608, 60), 0);
+	edit_translated	= new MultiEdit(Point(221 - text_translated->GetUnscaledTextWidth(), 103), Size(608, 60), 0);
 
 	MenuEntry	*entry = NIL;
 
@@ -190,26 +191,30 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	wnd->Add(edit_filter);
 	wnd->Add(button_clear);
 
-	wnd->Add(text_id);
-	wnd->Add(edit_id);
-	wnd->Add(text_original);
-	wnd->Add(edit_original);
-	wnd->Add(text_translated);
-	wnd->Add(edit_translated);
-	wnd->Add(button_save);
-	wnd->Add(button_remove);
-	wnd->Add(button_new);
-
 	wnd->Add(list_entries);
 	wnd->Add(list_filtered);
 
 	wnd->GetMainLayer()->Add(droparea);
 
+	wnd->Add(splitter);
+
+	wnd->Add(layer_edit);
+
+	layer_edit->Add(text_id);
+	layer_edit->Add(edit_id);
+	layer_edit->Add(text_original);
+	layer_edit->Add(edit_original);
+	layer_edit->Add(text_translated);
+	layer_edit->Add(edit_translated);
+	layer_edit->Add(button_save);
+	layer_edit->Add(button_remove);
+	layer_edit->Add(button_new);
+
 	wnd->Add(title);
 	wnd->Add(menubar);
 	wnd->Add(statusbar);
 
-	wnd->SetMinimumSize(Size(400, 350));
+	wnd->SetMinimumSize(Size(400, 356));
 	wnd->SetIcon(NIL);
 
 #ifdef __WIN32__
@@ -218,9 +223,9 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 #endif
 
 	wnd->doClose.Connect(&Translator::ExitProc, this);
-	wnd->onChangeSize.Connect(&Translator::ResizeProc, this);
+	wnd->onChangeSize.Connect(&Translator::OnChangeSize, this);
 
-	ResizeProc();
+	OnChangeSize(wnd->GetSize());
 
 	if (openFile != NIL) OpenFileName(openFile);
 
@@ -246,6 +251,10 @@ Translator::~Translator()
 	DeleteObject(list_filtered);
 
 	DeleteObject(droparea);
+
+	DeleteObject(splitter);
+
+	DeleteObject(layer_edit);
 
 	DeleteObject(text_id);
 	DeleteObject(edit_id);
@@ -295,18 +304,71 @@ Bool Translator::ExitProc()
 	return True;
 }
 
-Void Translator::ResizeProc()
+Void Translator::OnChangeSize(const Size &size)
+{
+	Size	 clientSize  = wnd->GetClientRect().GetSize();
+
+	Float	 splitFactor = this->splitFactor;
+	Int	 splitterPos = Float(clientSize.cy) * splitFactor;
+
+	updateSplitter = True;
+
+	OnDragSplitter(splitterPos);
+
+	this->splitFactor = splitFactor;
+}
+
+Void Translator::OnChangeEditLayerSize(const Size &size)
+{
+	edit_original->SetSize(Size(size.cx - edit_original->GetX() - 7, (size.cy - 50) / 2));
+
+	text_translated->SetY(edit_original->GetY() + edit_original->GetHeight() + 11);
+	edit_translated->SetY(text_translated->GetY() - 3);
+
+	edit_translated->SetSize(Size(edit_original->GetWidth(), edit_original->GetHeight() + (size.cy & 1)));
+}
+
+Void Translator::OnDragSplitter(Int splitterPos)
 {
 	Rect	 clientRect = wnd->GetClientRect();
-	Size	 clientSize = Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+	Size	 clientSize = clientRect.GetSize();
 
-	list_entries->SetSize(Size(clientSize.cx - 14, clientSize.cy - 204));
+	if (splitterPos > clientSize.cy - 118) splitterPos = clientSize.cy - 118;
+	if (splitterPos <		  158) splitterPos =		     158;
+
+	if (splitter->GetPos() == splitterPos && !updateSplitter) return;
+
+	Surface	*surface = wnd->GetDrawSurface();
+
+	surface->StartPaint(clientRect);
+
+	Bool	 filtered = list_filtered->IsVisible();
+
+	splitter->Hide();
+	list_entries->Hide();
+	list_filtered->Hide();
+	layer_edit->Hide();
+
+	list_entries->SetSize(Size(clientSize.cx - 14, splitterPos - 42));
 	list_filtered->SetSize(list_entries->GetSize());
 
 	droparea->SetSize(list_entries->GetSize());
 
-	edit_original->SetWidth(clientSize.cx - edit_original->GetX() - 7);
-	edit_translated->SetWidth(edit_original->GetWidth());
+	layer_edit->SetY(clientRect.top + splitterPos + 2);
+	layer_edit->SetSize(clientSize - Size(0, splitterPos + 2));
+
+	updateSplitter = False;
+	splitFactor    = Float(splitterPos) / clientSize.cy;
+
+	splitter->SetPos(splitterPos);
+	splitter->Show();
+
+	if (filtered) list_filtered->Show();
+	else	      list_entries->Show();
+
+	layer_edit->Show();
+
+	surface->EndPaint();
 }
 
 Void Translator::NewFile()

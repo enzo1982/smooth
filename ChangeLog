@@ -12,6 +12,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.3
 - bitmapbackend.cpp	- retain alpha channel when grayscaling bitmaps
 
 - added support for drag and drop in Translator utility
+- made editing area resizable in Translator utility
 - also check for _WIN32 definition on Windows instead of requiring __WIN32__ to be defined
 - adapt include files to work around long path issue when building on Windows
 - adapt Makefiles to allow spaces in build path

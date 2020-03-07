@@ -88,16 +88,24 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 
 	button_new	= new Button("New", Point(7, 7), Size());
 	button_new->onAction.Connect(&Translator::NewEntry, this);
+	button_new->SetTooltipText("Create a new entry");
 
 	text_id		= new Text("ID:", Point(94, 11));
 
-	button_save	= new Button("Save", Point(175, 7), Size());
-	button_save->onAction.Connect(&Translator::SaveData, this);
-	button_save->SetOrientation(OR_UPPERRIGHT);
-
-	button_remove	= new Button("Remove", Point(87, 7), Size());
+	button_remove	= new Button("Remove", Point(263, 7), Size());
 	button_remove->onAction.Connect(&Translator::RemoveEntry, this);
+	button_remove->SetTooltipText("Remove entry from translation");
 	button_remove->SetOrientation(OR_UPPERRIGHT);
+
+	button_copy	= new Button("Copy", Point(175, 7), Size());
+	button_copy->onAction.Connect(&Translator::CopyOriginal, this);
+	button_copy->SetTooltipText("Copy original to translation");
+	button_copy->SetOrientation(OR_UPPERRIGHT);
+
+	button_save	= new Button("Save", Point(87, 7), Size());
+	button_save->onAction.Connect(&Translator::SaveData, this);
+	button_save->SetTooltipText("Save entry and show next");
+	button_save->SetOrientation(OR_UPPERRIGHT);
 
 	text_original	= new Text("Original:", Point(94, 38));
 	text_translated	= new Text("Translation:", Point(94, 106));
@@ -171,16 +179,11 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	entry->SetShortcut(SC_ALT, 'R', wnd);
 	entry->Deactivate();
 
-	text_id->Deactivate();
-	edit_id->Deactivate();
-	text_original->Deactivate();
-	edit_original->Deactivate();
-	text_translated->Deactivate();
-	edit_translated->Deactivate();
-	button_save->Deactivate();
-	button_remove->Deactivate();
-	button_new->Deactivate();
 	list_entries->Deactivate();
+	list_filtered->Deactivate();
+
+	layer_edit->Deactivate();
+
 	text_filter->Deactivate();
 	edit_filter->Deactivate();
 	button_clear->Deactivate();
@@ -209,12 +212,13 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	layer_edit->Add(button_save);
 	layer_edit->Add(button_remove);
 	layer_edit->Add(button_new);
+	layer_edit->Add(button_copy);
 
 	wnd->Add(title);
 	wnd->Add(menubar);
 	wnd->Add(statusbar);
 
-	wnd->SetMinimumSize(Size(400, 356));
+	wnd->SetMinimumSize(Size(488, 308));
 	wnd->SetIcon(NIL);
 
 #ifdef __WIN32__
@@ -334,7 +338,7 @@ Void Translator::OnDragSplitter(Int splitterPos)
 	Size	 clientSize = clientRect.GetSize();
 
 	if (splitterPos > clientSize.cy - 118) splitterPos = clientSize.cy - 118;
-	if (splitterPos <		  158) splitterPos =		     158;
+	if (splitterPos <		  110) splitterPos =		     110;
 
 	if (splitter->GetPos() == splitterPos && !updateSplitter) return;
 
@@ -380,16 +384,11 @@ Void Translator::NewFile()
 	fileName = "unnamed";
 	modified = False;
 
-	text_id->Activate();
-	edit_id->Activate();
-	text_original->Activate();
-	edit_original->Activate();
-	text_translated->Activate();
-	edit_translated->Activate();
-	button_save->Activate();
-	button_remove->Activate();
-	button_new->Activate();
 	list_entries->Activate();
+	list_filtered->Activate();
+
+	layer_edit->Activate();
+
 	text_filter->Activate();
 	edit_filter->Activate();
 
@@ -508,8 +507,11 @@ Void Translator::CloseFile()
 
 	SelectEntry(NIL);
 
-	button_new->Deactivate();
 	list_entries->Deactivate();
+	list_filtered->Deactivate();
+
+	layer_edit->Deactivate();
+
 	text_filter->Deactivate();
 	edit_filter->Deactivate();
 
@@ -817,6 +819,7 @@ Void Translator::SaveData()
 				edit_id->Activate();
 				edit_original->Activate();
 				button_remove->Activate();
+				button_copy->Activate();
 
 				menu_entry->GetNthEntry(3)->Activate();
 
@@ -917,6 +920,7 @@ Void Translator::SelectEntry(ListEntry *entry)
 		edit_translated->Deactivate();
 		button_save->Deactivate();
 		button_remove->Deactivate();
+		button_copy->Deactivate();
 
 		menu_entry->GetNthEntry(2)->Deactivate();
 		menu_entry->GetNthEntry(3)->Deactivate();
@@ -938,6 +942,7 @@ Void Translator::SelectEntry(ListEntry *entry)
 		edit_translated->Activate();
 		button_save->Activate();
 		button_remove->Deactivate();
+		button_copy->Deactivate();
 
 		menu_entry->GetNthEntry(2)->Activate();
 		menu_entry->GetNthEntry(3)->Deactivate();
@@ -961,6 +966,7 @@ Void Translator::SelectEntry(ListEntry *entry)
 		edit_translated->Activate();
 		button_save->Activate();
 		button_remove->Activate();
+		button_copy->Activate();
 
 		menu_entry->GetNthEntry(2)->Activate();
 		menu_entry->GetNthEntry(3)->Activate();
@@ -991,6 +997,7 @@ Void Translator::NewEntry()
 	edit_translated->Activate();
 	button_save->Activate();
 	button_remove->Activate();
+	button_copy->Activate();
 
 	menu_entry->GetNthEntry(2)->Activate();
 	menu_entry->GetNthEntry(3)->Activate();
@@ -1088,6 +1095,11 @@ List *Translator::GetEntryList(List *list, Int id)
 	}
 
 	return NIL;
+}
+
+Void Translator::CopyOriginal()
+{
+	edit_translated->SetText(edit_original->GetText());
 }
 
 Void Translator::FilterEntries()

@@ -23,7 +23,7 @@ class Translator : public Application
 	private:
 		static const Short	 numInfoItems = 7;
 
-		GUI::Window		*wnd;
+		Window			*wnd;
 		Titlebar		*title;
 		Menubar			*menubar;
 		Statusbar		*statusbar;
@@ -55,6 +55,7 @@ class Translator : public Application
 		MultiEdit		*edit_translated;
 		Button			*button_save;
 		Button			*button_remove;
+		Button			*button_copy;
 
 		String			 fileName;
 		String			 templateName;
@@ -90,6 +91,7 @@ class Translator : public Application
 		Void			 SaveData();
 		Void			 RemoveEntry();
 		Void			 SelectEntry(ListEntry *);
+		Void			 CopyOriginal();
 		Void			 FilterEntries();
 		Void			 ClearFilter();
 		Void			 ClearFilter(List *);

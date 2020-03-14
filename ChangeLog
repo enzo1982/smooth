@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+dd.mm.20 hh:mm - smooth alpha 0.9.4
+
+- allow compilation for Windows on ARM with Visual Studio
+
 08.03.20 11:36 - smooth alpha 0.9.3
 
 - popupmenuentry.cpp	- react on mouse up even if mouse down was not on the same entry

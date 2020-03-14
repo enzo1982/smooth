@@ -59,7 +59,7 @@
 
 /* Under Windows/AMD64 with MSVC, inline assembly isn't supported */
 #if (defined(COMPILER_GCC) || defined(COMPILER_CLANG)) || \
-	(defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86))
+	(defined(COMPILER_MICROSOFT) && !defined(PLATFORM_X64))
 #	define INLINE_ASM_SUPPORTED
 #endif
 

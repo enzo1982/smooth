@@ -137,7 +137,7 @@ void exec_cpuid(uint32_t *regs)
 	);
 #	endif /* COMPILER_GCC */
 #else
-#  ifdef COMPILER_MICROSOFT
+#  if defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86)
 	__asm {
 		push	ebx
 		push	ecx
@@ -162,8 +162,6 @@ void exec_cpuid(uint32_t *regs)
 		pop	ecx
 		pop	ebx
 	}
-#  else
-#    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */
 #endif
 }
@@ -172,7 +170,7 @@ void exec_cpuid(uint32_t *regs)
 #ifdef INLINE_ASM_SUPPORTED
 void cpu_rdtsc(uint64_t* result)
 {
-	uint32_t low_part, hi_part;
+	uint32_t low_part = 0, hi_part = 0;
 #if defined(COMPILER_GCC) || defined(COMPILER_CLANG)
 #  if defined(PLATFORM_X86) || defined(PLATFORM_X64)
 	__asm __volatile (
@@ -181,19 +179,14 @@ void cpu_rdtsc(uint64_t* result)
 		"	mov	%%edx,	%1\n"
 		:"=m"(low_part), "=m"(hi_part)::"memory", "eax", "edx"
 	);
-#  else
-  low_part = 0;
-  hi_part = 0;
 #  endif
 #else
-#  ifdef COMPILER_MICROSOFT
+#  if defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86)
 	__asm {
 		rdtsc
 		mov	low_part,	eax
 		mov	hi_part,	edx
 	};
-#  else
-#    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */
 #endif /* COMPILER_GCC */
 	*result = (uint64_t)low_part + (((uint64_t) hi_part) << 32);
@@ -518,7 +511,7 @@ void busy_sse_loop(int cycles)
 	);
 #endif
 #else
-#  ifdef COMPILER_MICROSOFT
+#  if defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86)
 	__asm {
 		mov	eax,	cycles
 		xorps	xmm0,	xmm0
@@ -824,8 +817,6 @@ bsLoop:
 		dec		eax
 		jnz		bsLoop
 	}
-#  else
-#    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */
 #endif /* COMPILER_GCC */
 }

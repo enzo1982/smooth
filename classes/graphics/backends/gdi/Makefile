@@ -15,11 +15,7 @@ OBJECTS	  =
 
 ifeq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_GDIPLUS),True)
-	OBJECTS += bitmapgdi.o
-
-ifneq ($(BUILD_CAIRO),True)
-	OBJECTS += fontgdi.o surfacegdi.o
-endif
+	OBJECTS += bitmapgdi.o fontgdi.o surfacegdi.o
 endif
 endif
 

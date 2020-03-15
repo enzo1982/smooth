@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,28 +21,24 @@ namespace smooth
 
 #include "../surfacebackend.h"
 
-#ifdef __WIN32__
-#	include <windows.h>
-#else
-	namespace X11
+namespace X11
+{
+	extern "C"
 	{
-		extern "C"
-		{
-#			define True	1
-#			define False	0
-#			define Bool	int
-#			define Success	0
+#		define True	1
+#		define False	0
+#		define Bool	int
+#		define Success	0
 
-#			include <X11/Xlib.h>
-#			include <X11/Xutil.h>
+#		include <X11/Xlib.h>
+#		include <X11/Xutil.h>
 
-#			undef True
-#			undef False
-#			undef Bool
-#			undef Success
-		}
-	};
-#endif
+#		undef True
+#		undef False
+#		undef Bool
+#		undef Success
+	}
+};
 
 #include <cairo/cairo.h>
 
@@ -58,20 +54,14 @@ namespace smooth
 				static Short		 surfaceDPI;
 			protected:
 				Size			 allocSize;
-#ifdef __WIN32__
-				HWND			 window;
-				HDC			 gdi_dc;
 
-				HDC			 paintContext;
-				HBITMAP			 paintBitmap;
-#else
 				X11::Display		*display;
 				X11::Visual		*visual;
 
 				X11::Window		 window;
 
 				X11::Pixmap		 paintBitmap;
-#endif
+
 				Array<Rect>		 paintRects;
 
 				cairo_surface_t		*surface;

@@ -9,11 +9,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 OBJECTS	  = 
 
 ifeq ($(BUILD_GDIPLUS),True)
-	OBJECTS += bitmapgdiplus.o
-
-ifneq ($(BUILD_CAIRO),True)
-	OBJECTS += fontgdiplus.o surfacegdiplus.o
-endif
+	OBJECTS += bitmapgdiplus.o fontgdiplus.o surfacegdiplus.o
 endif
 
 ## Do not change anything below this line. ##

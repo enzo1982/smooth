@@ -8,9 +8,7 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
-#ifndef __WIN32__
-#	include <gdk/gdk.h>
-#endif
+#include <gdk/gdk.h>
 
 #include <smooth/graphics/backends/cairo/surfacecairo.h>
 #include <smooth/graphics/surface.h>
@@ -23,23 +21,16 @@
 #include <smooth/misc/number.h>
 #include <smooth/foreach.h>
 
-#ifdef __WIN32__
-#	include <smooth/backends/win32/backendwin32.h>
+using namespace X11;
 
-#	include <cairo/cairo-win32.h>
-#	include <fribidi/fribidi.h>
-#else
-	using namespace X11;
+#include <cairo/cairo-xlib.h>
+#include <pango/pangocairo.h>
 
-#	include <cairo/cairo-xlib.h>
-#	include <pango/pangocairo.h>
+#include <smooth/backends/xlib/backendxlib.h>
 
-#	include <smooth/backends/xlib/backendxlib.h>
-
-#	include <unistd.h>
-#	include <stdio.h>
-#	include <stdlib.h>
-#endif
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #if (CAIRO_VERSION_MAJOR == 0							     ) || \
     (CAIRO_VERSION_MAJOR == 1 && CAIRO_VERSION_MINOR <= 8			     ) || \
@@ -60,14 +51,6 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 {
 	type	     = SURFACE_CAIRO;
 
-#ifdef __WIN32__
-	window	     = (HWND) iWindow;
-
-	paintBitmap  = NIL;
-	paintContext = NIL;
-
-	gdi_dc	     = NIL;
-#else
 	window	     = (X11::Window) iWindow;
 
 	paintBitmap  = NIL;
@@ -76,7 +59,6 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 
 	if (display != NIL) visual = XDefaultVisual(display, XDefaultScreen(display));
 	else		    visual = NIL;
-#endif
 
 	context	     = NIL;
 	surface	     = NIL;
@@ -88,45 +70,23 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 	{
 		size = maxSize;
 
-#ifdef __WIN32__
-		HDC	 gdi_dc = GetWindowDC(window);
-
-		if (maxSize == Size())
-		{
-			size.cx	= GetDeviceCaps(gdi_dc, HORZRES) + 2;
-			size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
-		}
-#else
 		if (maxSize == Size())
 		{
 			size.cx = XDisplayWidth(display, XDefaultScreen(display)) + 2;
 			size.cy = XDisplayHeight(display, XDefaultScreen(display)) + 2;
 		}
-#endif
 
 		rightToLeft.SetSurfaceSize(size);
 
-#ifdef __WIN32__
-		paintContext = CreateCompatibleDC(gdi_dc);
-
-		HBITMAP	 bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
-
-		paintBitmap	  = (HBITMAP) SelectObject(paintContext, bitmap);
-		paintSurfaceCairo = cairo_win32_surface_create(paintContext);
-
-		ReleaseDC(window, gdi_dc);
-#else
 		XWindowAttributes	 windowAttributes;
 
 		XGetWindowAttributes(display, window, &windowAttributes);
 
 		paintBitmap	  = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
 		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
-#endif
+		paintContextCairo = cairo_create(paintSurfaceCairo);
 
 		paintRects.Add(Rect(Point(0, 0), size));
-
-		paintContextCairo = cairo_create(paintSurfaceCairo);
 
 		cairo_set_antialias(paintContextCairo, CAIRO_ANTIALIAS_NONE);
 
@@ -143,14 +103,7 @@ S::GUI::SurfaceCairo::~SurfaceCairo()
 		cairo_destroy(paintContextCairo);
 		cairo_surface_destroy(paintSurfaceCairo);
 
-#ifdef __WIN32__
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(paintContext, paintBitmap);
-
-		DeleteDC(paintContext);
-		::DeleteObject(bitmap);
-#else
 		XFreePixmap(display, paintBitmap);
-#endif
 	}
 }
 
@@ -167,37 +120,19 @@ S::Int S::GUI::SurfaceCairo::SetSize(const Size &nSize)
 		cairo_destroy(paintContextCairo);
 		cairo_surface_destroy(paintSurfaceCairo);
 
-#ifdef __WIN32__
-		HBITMAP	 bitmap = (HBITMAP) SelectObject(paintContext, paintBitmap);
-
-		::DeleteObject(bitmap);
-#else
 		XFreePixmap(display, paintBitmap);
-#endif
 
 		paintRects.RemoveAll();
 
-#ifdef __WIN32__
-		HDC	 gdi_dc = GetWindowDC(window);
-
-		bitmap = CreateCompatibleBitmap(gdi_dc, size.cx, size.cy);
-
-		paintBitmap	  = (HBITMAP) SelectObject(paintContext, bitmap);
-		paintSurfaceCairo = cairo_win32_surface_create(paintContext);
-
-		ReleaseDC(window, gdi_dc);
-#else
 		XWindowAttributes	 windowAttributes;
 
 		XGetWindowAttributes(display, window, &windowAttributes);
 
 		paintBitmap	  = XCreatePixmap(display, DefaultRootWindow(display), size.cx, size.cy, windowAttributes.depth);
 		paintSurfaceCairo = cairo_xlib_surface_create(display, paintBitmap, visual, size.cx, size.cy);
-#endif
+		paintContextCairo = cairo_create(paintSurfaceCairo);
 
 		paintRects.Add(Rect(Point(0, 0), size));
-
-		paintContextCairo = cairo_create(paintSurfaceCairo);
 
 		cairo_set_antialias(paintContextCairo, CAIRO_ANTIALIAS_NONE);
 	}
@@ -218,19 +153,11 @@ S::Int S::GUI::SurfaceCairo::PaintRect(const Rect &pRect)
 
 	if (window != NIL)
 	{
-#ifdef __WIN32__
-		HDC	 gdi_dc = GetWindowDC(window);
-
-		BitBlt(gdi_dc, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight(), paintContext, pRect.left, pRect.top, SRCCOPY);
-
-		ReleaseDC(window, gdi_dc);
-#else
 		GC	 gc = XCreateGC(display, window, 0, NIL);
 
 		XCopyArea(display, paintBitmap, window, gc, pRect.left, pRect.top, pRect.GetWidth(), pRect.GetHeight(), pRect.left, pRect.top);
 
 		XFreeGC(display, gc);
-#endif
 	}
 
 	return Success();
@@ -279,12 +206,6 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
-#ifdef __WIN32__
-	HDC	 dc  = GetWindowDC(0);
-	Short	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
-
-	ReleaseDC(0, dc);
-#else
 	/* Init GDK.
 	 */
 	gdk_init(NULL, NULL);
@@ -303,7 +224,6 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 	else						   scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
 
 	if (scale > 0) dpi *= scale;
-#endif
 
 	surfaceDPI = dpi;
 
@@ -314,14 +234,7 @@ S::Void S::GUI::SurfaceCairo::CreateCairoContext()
 {
 	if (context != NIL || surface != NIL) return;
 
-#ifdef __WIN32__
-	gdi_dc = GetWindowDC(window);
-
-	surface = cairo_win32_surface_create(gdi_dc);
-#else
 	surface = cairo_xlib_surface_create(display, window, visual, size.cx, size.cy);
-#endif
-
 	context = cairo_create(surface);
 
 	cairo_set_antialias(context, CAIRO_ANTIALIAS_NONE);
@@ -336,12 +249,6 @@ S::Void S::GUI::SurfaceCairo::DestroyCairoContext()
 
 	context = NIL;
 	surface = NIL;
-
-#ifdef __WIN32__
-	ReleaseDC(window, gdi_dc);
-
-	gdi_dc = NIL;
-#endif
 }
 
 S::Int S::GUI::SurfaceCairo::SetPixel(const Point &iPoint, const Color &color)
@@ -542,29 +449,16 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 	Rect	 rect	      = iRect;
 	Int	 lineHeight   = 0;
 
-#ifdef __WIN32__
-	/* Fall back to Tahoma when trying to draw Hebrew on pre Windows 8 using Segoe UI.
-	 */
-	Int	 stringLength = string.Length();
-
-	if (font.GetName() == "Segoe UI" && !Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 6, 2))
-	{
-		for (Int i = 0; i < stringLength; i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
-	}
-#endif
-
 	/* Set up Cairo font.
 	 */
 	Rect	 tRect = rightToLeft.TranslateRect(rect);
 
-#if !defined __WIN32__
 	PangoLayout		*layout = NIL;
 	PangoFontDescription	*desc	= pango_font_description_from_string(String(font.GetName())
 									    .Append(" ")
 									    .Append(font.GetStyle() & Font::Italic ? "Italic " : "")
 									    .Append(font.GetWeight() >= Font::Bold ? "Bold " : "")
 									    .Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0))));
-#endif
 
 	if (!painting)
 	{
@@ -576,16 +470,9 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		cairo_set_source_rgb(context, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
-#if defined __WIN32__
-		cairo_select_font_face(context, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-								(font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
-
-		cairo_set_font_size(context, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
-#else
 		layout = pango_cairo_create_layout(context);
 
 		pango_layout_set_font_description(layout, desc);
-#endif
 	}
 
 	cairo_save(paintContextCairo);
@@ -594,17 +481,10 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 	cairo_set_source_rgb(paintContextCairo, font.GetColor().GetRed() / 255.0, font.GetColor().GetGreen() / 255.0, font.GetColor().GetBlue() / 255.0);
 
-#if defined __WIN32__
-	cairo_select_font_face(paintContextCairo, font.GetName(), (font.GetStyle() & Font::Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL),
-								  (font.GetWeight() >= Font::Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL));
-
-	cairo_set_font_size(paintContextCairo, Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0));
-#else
 	PangoLayout	*paintLayout = pango_cairo_create_layout(paintContextCairo);
 
 	pango_layout_set_font_description(paintLayout, desc);
 	pango_font_description_free(desc);
-#endif
 
 	/* Draw text line by line.
 	 */
@@ -612,11 +492,7 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 	if (lines.Length() > 1) lineHeight = font.GetScaledTextSizeY() + 3;
 
-#ifdef __WIN32__
-	foreach (String line, lines)
-#else
 	foreach (const String &line, lines)
-#endif
 	{
 		Int	 lineLength = line.Length();
 
@@ -626,40 +502,6 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
 
-#ifdef __WIN32__
-		/* Check for right to left characters in text.
-		 */
-		Bool	 rtlCharacters = False;
-
-		for (Int i = 0; i < lineLength; i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
-
-		if (rtlCharacters && Setup::useIconv)
-		{
-			/* Reorder the string with fribidi.
-			 */
-			FriBidiChar	*visual = new FriBidiChar [lineLength + 1];
-			FriBidiParType	 type = (rightToLeft.GetRightToLeft() ? FRIBIDI_PAR_RTL : FRIBIDI_PAR_LTR);
-
-			fribidi_log2vis((FriBidiChar *) line.ConvertTo("UCS-4LE"), lineLength, &type, visual, NIL, NIL, NIL);
-
-			visual[lineLength] = 0;
-
-			line.ImportFrom("UCS-4LE", (char *) visual);
-
-			delete [] visual;
-		}
-#endif
-
-#if defined __WIN32__
-		if (!painting)
-		{
-			cairo_move_to(context, tRect.left, tRect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
-			cairo_show_text(context, line.ConvertTo("UTF-8"));
-		}
-
-		cairo_move_to(paintContextCairo, tRect.left, tRect.top + font.GetSize() * fontSize.TranslateY(96) / 72.0);
-		cairo_show_text(paintContextCairo, line.ConvertTo("UTF-8"));
-#else
 		Int	 utf8Length = (line != NIL ? strlen(line.ConvertTo("UTF-8")) : 0);
 
 		PangoAttrList	*attributes    = pango_attr_list_new();
@@ -690,25 +532,20 @@ S::Int S::GUI::SurfaceCairo::SetText(const String &string, const Rect &iRect, co
 		pango_cairo_show_layout(paintContextCairo, paintLayout);
 
 		pango_attr_list_unref(attributes);
-#endif
 
 		rect.top += lineHeight;
 	}
 
 	if (!painting)
 	{
-#if !defined __WIN32__
 		g_object_unref(layout);
-#endif
 
 		cairo_restore(context);
 
 		DestroyCairoContext();
 	}
 
-#if !defined __WIN32__
 	g_object_unref(paintLayout);
-#endif
 
 	cairo_restore(paintContextCairo);
 
@@ -764,43 +601,6 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
 
-#ifdef __WIN32__
-	/* Copy the image.
-	 */
-	HDC	 gdi_dc = painting ? NIL : GetWindowDC(window);
-	HDC	 cdc	= CreateCompatibleDC(paintContext);
-
-	if (destRect.GetSize() == srcRect.GetSize())
-	{
-		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
-
-		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
-
-		BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
-
-		SelectObject(cdc, backup);
-	}
-	else
-	{
-		Float	 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
-		Float	 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
-
-		Size		 srcSize   = bitmap.GetSize();
-		const Bitmap	&srcBitmap = bitmap.Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
-
-		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, srcBitmap.GetSystemBitmap());
-
-		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
-
-		BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
-
-		SelectObject(cdc, backup);
-	}
-
-	DeleteDC(cdc);
-
-	if (!painting) ReleaseDC(window, gdi_dc);
-#else
 	/* Copy the image.
 	 */
 	cairo_surface_t	*srcSurface = cairo_image_surface_create_for_data(bitmap.GetBytes(), CAIRO_FORMAT_RGB24, bitmap.GetSize().cx, bitmap.GetSize().cy, bitmap.GetSize().cx * 4);
@@ -831,7 +631,6 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	cairo_restore(paintContextCairo);
 
 	cairo_surface_destroy(srcSurface);
-#endif
 
 	return Success();
 }
@@ -846,26 +645,6 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 	if (srcRect.GetWidth()  == 0 || srcRect.GetHeight()  == 0 ||
 	    destRect.GetWidth() == 0 || destRect.GetHeight() == 0) return Success();
 
-#ifdef __WIN32__
-	/* Copy the image.
-	 */
-	HDC	 cdc	 = CreateCompatibleDC(paintContext);
-	HBITMAP	 backup	 = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
-
-	if (destRect.GetSize() == srcRect.GetSize())
-	{
-		BitBlt(cdc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), paintContext, srcRect.left, srcRect.top, SRCCOPY);
-	}
-	else
-	{
-		SetStretchBltMode(cdc, HALFTONE);
-		StretchBlt(cdc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), paintContext, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), SRCCOPY);
-	}
-
-	SelectObject(cdc, backup);
-
-	DeleteDC(cdc);
-#else
 	/* Copy the image.
 	 */
 	cairo_surface_t	*bitmapSurface = cairo_image_surface_create_for_data(bitmap.GetBytes(), CAIRO_FORMAT_RGB24, bitmap.GetSize().cx, bitmap.GetSize().cy, bitmap.GetSize().cx * 4);
@@ -880,7 +659,6 @@ S::Int S::GUI::SurfaceCairo::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, 
 
 	cairo_destroy(bitmapContext);
 	cairo_surface_destroy(bitmapSurface);
-#endif
 
 	return Success();
 }

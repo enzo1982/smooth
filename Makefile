@@ -68,17 +68,9 @@ ifeq ($(BUILD_WIN32),True)
 
 	ifeq ($(BUILD_GDIPLUS),True)
 		OBJECTS += classes/backends/gdiplus/backendgdiplus.o
-		OBJECTS += classes/graphics/backends/gdiplus/bitmapgdiplus.o
-
-		ifneq ($(BUILD_CAIRO),True)
-			OBJECTS += classes/graphics/backends/gdiplus/fontgdiplus.o classes/graphics/backends/gdiplus/surfacegdiplus.o
-		endif 
+		OBJECTS += classes/graphics/backends/gdiplus/bitmapgdiplus.o classes/graphics/backends/gdiplus/fontgdiplus.o classes/graphics/backends/gdiplus/surfacegdiplus.o
 	else
-		OBJECTS += classes/graphics/backends/gdi/bitmapgdi.o
-
-		ifneq ($(BUILD_CAIRO),True)
-			OBJECTS += classes/graphics/backends/gdi/fontgdi.o classes/graphics/backends/gdi/surfacegdi.o
-		endif
+		OBJECTS += classes/graphics/backends/gdi/bitmapgdi.o classes/graphics/backends/gdi/fontgdi.o classes/graphics/backends/gdi/surfacegdi.o
 	endif
 else ifeq ($(BUILD_OSX),True)
 	OBJECTS += classes/backends/cocoa/backendcocoa.o
@@ -112,14 +104,12 @@ ifeq ($(BUILD_XLIB),True)
 	OBJECTS += classes/input/backends/xlib/pointerxlib.o
 	OBJECTS += classes/system/backends/xlib/eventxlib.o classes/system/backends/xlib/screenxlib.o
 
-	ifneq ($(BUILD_CAIRO),True)
+	ifeq ($(BUILD_CAIRO),True)
+		OBJECTS += classes/graphics/backends/cairo/fontcairo.o classes/graphics/backends/cairo/surfacecairo.o
+	else
 		OBJECTS += classes/graphics/backends/xlib/fontxlib.o classes/graphics/backends/xlib/surfacexlib.o
 	endif
 endif
-
-ifeq ($(BUILD_CAIRO),True)
-	OBJECTS += classes/graphics/backends/cairo/fontcairo.o classes/graphics/backends/cairo/surfacecairo.o
-endif 
 
 ifeq ($(BUILD_POSIXTIMER),True)
 	OBJECTS += classes/system/backends/posix/timerposix.o
@@ -216,19 +206,11 @@ ifeq ($(BUILD_WIN32),True)
 		LIBS += -lgdiplus
 	endif
 
-	ifeq ($(BUILD_CAIRO),True)
-		LIBS += -lcairo.dll
-	endif
-
 	LIBS += -lws2_32 -limm32 -lole32 -luuid
 
 	DLLNAME = $(BINDIR)/smooth$(SHARED)
 	LIBNAME = $(LIBDIR)/libsmooth.a
 else ifeq ($(BUILD_OSX),True)
-	ifeq ($(BUILD_CAIRO),True)
-		LIBS += -lcairo
-	endif
-
 	LIBS += -lpthread
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)

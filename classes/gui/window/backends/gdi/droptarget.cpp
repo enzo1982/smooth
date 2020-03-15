@@ -17,6 +17,8 @@ smooth::GUI::DropTarget::DropTarget(WindowGDI *backend)
 {
 	refCount      = 1;
 
+	data	      = NIL;
+
 	this->backend = backend;
 }
 

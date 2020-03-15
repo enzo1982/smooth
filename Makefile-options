@@ -128,8 +128,9 @@ else
 #		Disable POSIX timer backend
 		BUILD_POSIXTIMER = False
 
-#		Disable XLib backend
+#		Disable XLib and Cairo backends
 		BUILD_XLIB = False
+		BUILD_CAIRO = False
 	else ifeq ($(UNAME),GNU)
 		BUILD_GNU = True
 
@@ -153,8 +154,9 @@ else
 			BUILD_PPC = True
 		endif
 
-#		Disable XLib backend
+#		Disable XLib and Cairo backends
 		BUILD_XLIB = False
+		BUILD_CAIRO = False
 
 # 		Disable POSIX timers
 		BUILD_POSIXTIMER = False

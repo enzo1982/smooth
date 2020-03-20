@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -59,6 +59,12 @@ S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text) const
 		for (Int i = 0; i < textLength; i++) if (text[i] >= 0x0590 && text[i] <= 0x05FF) { fontName = "Tahoma"; break; }
 	}
 
+	/* Check for right to left characters in text.
+	 */
+	Bool	 rtlCharacters = False;
+
+	for (Int i = 0; i < textLength; i++) if (text[i] >= 0x0590 && text[i] <= 0x08FF) { rtlCharacters = True; break; }
+
 	/* Set up Windows font and calculate text size.
 	 */
 	Float	 dpi	  = Surface().GetSurfaceDPI();
@@ -67,14 +73,14 @@ S::GUI::Size S::GUI::FontGDI::GetTextSize(const String &text) const
 	HFONT	 hFont	  = CreateFont(-Math::Round(fontSize * dpi / 72.0), 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
 
 	HFONT	 hOldFont = (HFONT) SelectObject(dc, hFont);
-	SIZE	 tSize;
+	RECT	 tRect;
 
-	GetTextExtentPoint32(dc, text, textLength, &tSize);
+	DrawTextEx(dc, text, -1, &tRect, DT_EXPANDTABS | DT_NOPREFIX | DT_LEFT | (rtlCharacters ? DT_RTLREADING : 0) | DT_CALCRECT, NIL);
 
 	SelectObject(dc, hOldFont);
 	::DeleteObject(hFont);
 
 	DeleteDC(dc);
 
-	return Size(tSize.cx, tSize.cy);
+	return Size(tRect.right - tRect.left, tRect.bottom - tRect.top);
 }

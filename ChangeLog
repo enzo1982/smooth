@@ -2,6 +2,8 @@ ChangeLog for smooth
 
 dd.mm.20 hh:mm - smooth alpha 0.9.4
 
+- fontgdi.cpp		- fixed text length calculation for fonts using kerning
+
 - allow compilation for Windows on ARM with Visual Studio
 - removed support for using Cairo graphics backend on Windows
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -486,7 +486,7 @@ S::Int S::GUI::Cursor::DrawWidget()
 					Int	 markRegionStart = GetDisplayCursorPositionFromVisual(line, markRegionStarts.GetNth(i));
 					Int	 markRegionEnd	 = GetDisplayCursorPositionFromVisual(line, markRegionEnds.GetNth(i));
 
-					Rect	 markRect = Rect(realPos + Point(markRegionStart, (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), Size(markRegionEnd - markRegionStart, font.GetScaledTextSizeY() + 3));
+					Rect	 markRect = Rect(realPos + Point(Math::Min(markRegionStart, markRegionEnd), (lineNumber - scrollPos) * (font.GetScaledTextSizeY() + 3)) + Point(0, 1) * surface->GetSurfaceDPI() / 96.0 - Point(0, 1), Size(Math::Abs(markRegionEnd - markRegionStart), font.GetScaledTextSizeY() + 3));
 					Font	 nFont = font;
 
 					nFont.SetColor(Setup::HighlightTextColor);
@@ -1431,8 +1431,9 @@ S::Int S::GUI::Cursor::GetLogicalCursorPositionFromDisplay(const String &line, I
 		Int	 m   = (startPos + endPos) / 2;
 		Int	 pos = GetDisplayCursorPositionFromVisual(line, m);
 
-		if (pos > displayPos) endPos   = m - 1;
-		else		      startPos = m + 1;
+		if ((!IsRightToLeft() && pos > displayPos) ||
+		    ( IsRightToLeft() && pos < displayPos)) endPos   = m - 1;
+		else					    startPos = m + 1;
 
 		if (Math::Abs(pos - displayPos) < bestValue)
 		{

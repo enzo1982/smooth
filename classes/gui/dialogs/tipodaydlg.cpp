@@ -223,6 +223,8 @@ S::Void S::GUI::Dialogs::TipOfTheDay::OnNext()
 	}
 
 	txt_tip->SetText(tip);
+
+	OnPaint();
 }
 
 S::Void S::GUI::Dialogs::TipOfTheDay::OnPaint()

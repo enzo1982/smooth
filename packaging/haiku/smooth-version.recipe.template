@@ -14,7 +14,7 @@ HOMEPAGE="http://www.smooth-project.org/"
 COPYRIGHT="1998-2020 Robert Kausch"
 LICENSE="Artistic v2.0"
 REVISION="1"
-SOURCE_URI="https://downloads.sourceforge.net/smooth/smooth-${portVersion/\~/-}.tar.gz"
+SOURCE_URI="https://github.com/enzo1982/smooth/releases/download/v${portVersion/\~/-}/smooth-${portVersion/\~/-}.tar.gz"
 CHECKSUM_SHA256="<checksum>"
 SOURCE_DIR="smooth-${portVersion/\~/-}"
 

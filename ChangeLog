@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+dd.mm.20 hh:mm - smooth alpha 0.9.5
+
+- surfacecairo.cpp	- fixed crash when DISPLAY variable is not set
+
 22.03.20 11:44 - smooth alpha 0.9.4
 
 - fontgdi.cpp		- fixed text length calculation for fonts using kerning

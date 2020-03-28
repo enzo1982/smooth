@@ -206,24 +206,28 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	/* Init GDK.
-	 */
-	gdk_init(NULL, NULL);
+	Short	 dpi = 96;
 
-	/* Load gdk_screen_get_monitor_scale_factor dynamically.
-	 */
-	System::DynamicLoader	 gdk("gdk-3");
-	gint			 (*ex_gdk_screen_get_monitor_scale_factor)(GdkScreen *, gint) = (gint (*)(GdkScreen *, gint)) gdk.GetFunctionAddress("gdk_screen_get_monitor_scale_factor");
+	if (display != NIL)
+	{
+		/* Init GDK.
+		 */
+		gdk_init(NULL, NULL);
 
-	/* Get scale factor.
-	 */
-	Short	 dpi   = 96;
-	Int	 scale = 1.0;
+		/* Load gdk_screen_get_monitor_scale_factor dynamically.
+		 */
+		System::DynamicLoader	 gdk("gdk-3");
+		gint			 (*ex_gdk_screen_get_monitor_scale_factor)(GdkScreen *, gint) = (gint (*)(GdkScreen *, gint)) gdk.GetFunctionAddress("gdk_screen_get_monitor_scale_factor");
 
-	if (ex_gdk_screen_get_monitor_scale_factor != NIL) scale = ex_gdk_screen_get_monitor_scale_factor(gdk_screen_get_default(), 0);
-	else						   scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
+		/* Get scale factor.
+		 */
+		Int	 scale = 1.0;
 
-	if (scale > 0) dpi *= scale;
+		if (ex_gdk_screen_get_monitor_scale_factor != NIL) scale = ex_gdk_screen_get_monitor_scale_factor(gdk_screen_get_default(), 0);
+		else						   scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
+
+		if (scale > 0) dpi *= scale;
+	}
 
 	surfaceDPI = dpi;
 

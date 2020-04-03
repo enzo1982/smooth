@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/xml/document.h>
+#include <smooth/files/file.h>
 
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
@@ -54,9 +55,11 @@ S::Int S::XML::Document::SetEncoding(const String &newEncoding)
 
 S::Int S::XML::Document::LoadFile(const String &fileName)
 {
+	if (!File(fileName).Exists()) return Error();
+
 	xmlTextReaderPtr reader = xmlNewTextReaderFilename(fileName.ConvertTo("UTF-8"));
 
-	if (reader == NIL) { return Error(); }
+	if (reader == NIL) return Error();
 
 	Int	 ret = 1;
 

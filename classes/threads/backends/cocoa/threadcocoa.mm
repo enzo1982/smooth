@@ -10,6 +10,8 @@
 
 #include <smooth/threads/backends/cocoa/threadcocoa.h>
 
+#include <sys/resource.h>
+
 S::Threads::ThreadBackend *CreateThreadCocoa(S::Void *iThread)
 {
 	return new S::Threads::ThreadCocoa(iThread);
@@ -45,7 +47,26 @@ S::Int S::Threads::ThreadCocoa::Start(Void (*threadProc)(Void *), Void *threadPa
 	thread	 = new pthread_t;
 	myThread = True;
 
-	pthread_create(thread, NULL, Caller, &info);
+	/* Get process stack size in order to use it for created threads.
+	 * Otherwise, the default stack size on macOS is only 512 kB which
+	 * may be too small for some deeply recursive calls.
+	 */
+	rlimit	 limit;
+
+	getrlimit(RLIMIT_STACK, &limit);
+
+	/* Set stack size to process stack size value and create thread.
+	 */
+	pthread_attr_t	 attributes;
+
+	pthread_attr_init(&attributes);
+
+	if (limit.rlim_cur >= PTHREAD_STACK_MIN &&
+	    limit.rlim_cur != RLIM_INFINITY) pthread_attr_setstacksize(&attributes, limit.rlim_cur);
+
+	pthread_create(thread, &attributes, Caller, &info);
+
+	pthread_attr_destroy(&attributes);
 
 	return Success();
 }

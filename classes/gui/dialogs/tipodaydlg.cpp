@@ -146,6 +146,8 @@ const Error &S::GUI::Dialogs::TipOfTheDay::ShowDialog()
 
 	/* Set next tip and display dialog.
 	 */
+	if (offset >= tips.Length()) offset = 0;
+
 	OnNext();
 
 	if (tips.Length() <= 1) btn_next->Deactivate();

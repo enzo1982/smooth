@@ -354,8 +354,8 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 	rect.left   = Math::Min(point1.x, point2.x);
 	rect.top    = Math::Min(point1.y, point2.y);
-	rect.right  = Math::Max(point1.x, point2.x);
-	rect.bottom = Math::Max(point1.y, point2.y);
+	rect.right  = Math::Max(point1.x, point2.x) + 1;
+	rect.bottom = Math::Max(point1.y, point2.y) + 1;
 
 	Bool	 endPaint = painting ? False : StartPaint(rect) == Success();
 

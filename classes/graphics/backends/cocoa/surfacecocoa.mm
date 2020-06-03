@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -288,6 +288,20 @@ S::Short S::GUI::SurfaceCocoa::GetSurfaceDPI() const
 	return dpi;
 }
 
+S::Float S::GUI::SurfaceCocoa::GetScaleFactor() const
+{
+	/* Get screen information.
+	 */
+	static SEL	 scaleFactorSelector = @selector(backingScaleFactor);
+	static Bool	 canQueryScaleFactor = [[NSScreen mainScreen] respondsToSelector: scaleFactorSelector];
+
+	if (!canQueryScaleFactor || window == NIL || ![window isVisible]) return 1.0;
+
+	NSScreen	*screen = [window screen];
+
+	return ((CGFloat (*)(id, SEL)) [screen methodForSelector: scaleFactorSelector])(screen, scaleFactorSelector);
+}
+
 S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 {
 	if (window == NIL || ![window isVisible]) return Success();
@@ -310,14 +324,6 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 {
 	if (window == NIL || ![window isVisible]) return Success();
 
-	/* Get screen information.
-	 */
-	static SEL	 scaleFactorSelector = @selector(backingScaleFactor);
-	static Bool	 canQueryScaleFactor = [[NSScreen mainScreen] respondsToSelector: scaleFactorSelector];
-
-	NSScreen	*screen	     = [window screen];
-	Float		 scaleFactor = canQueryScaleFactor ? ((CGFloat (*)(id, SEL)) [screen methodForSelector: scaleFactorSelector])(screen, scaleFactorSelector) : 1.0;
-
 	/* Convert coordinates.
 	 */
 	Point	 pos1	= rightToLeft.TranslatePoint(iPos1);
@@ -328,6 +334,8 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 	/* Adjust to Windows GDI behavior for diagonal lines.
 	 */
+	Float	 scaleFactor = GetScaleFactor();
+
 	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y) && scaleFactor == 1.0)
 	{
 		if (pos1.x < pos2.x && pos1.y < pos2.y) { point2.x--; point2.y--; }
@@ -409,7 +417,8 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 	}
 	else if (style & Rect::Inverted)
 	{
-		Bitmap	 area(rect.GetSize());
+		Float	 scaleFactor = GetScaleFactor();
+		Bitmap	 area(rect.GetSize() * scaleFactor);
 
 		BlitToBitmap(iRect, area, Rect(Point(0, 0), area.GetSize()));
 

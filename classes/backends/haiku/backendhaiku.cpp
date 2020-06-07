@@ -13,6 +13,7 @@
 #include <smooth/files/file.h>
 
 #include <interface/InterfaceDefs.h>
+#include <storage/Resources.h>
 
 #include <locale.h>
 
@@ -20,8 +21,21 @@ namespace smooth
 {
 	class HaikuApplication : public BApplication
 	{
+		private:
+			static String GetAppSignature()
+			{
+				BResources	 resources(GUI::Application::GetCommand());
+
+				size_t		 size	   = 0;
+				const char	*signature = (const char *) resources.LoadResource('MIMS', "BEOS:APP_SIG", &size);
+
+				if (signature) return signature;
+
+				return String("application/x-vnd.").Append(File(GUI::Application::GetCommand()).GetFileName());
+			}
+
 		public:
-			HaikuApplication() : BApplication(String("application/x-vnd.").Append(File(GUI::Application::GetCommand()).GetFileName()))
+			HaikuApplication() : BApplication(GetAppSignature())
 			{
 			}
 	};

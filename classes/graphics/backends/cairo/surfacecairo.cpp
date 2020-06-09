@@ -210,10 +210,6 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 
 	if (display != NIL)
 	{
-		/* Init GDK.
-		 */
-		gdk_init(NULL, NULL);
-
 		/* Load gdk_screen_get_monitor_scale_factor dynamically.
 		 */
 		System::DynamicLoader	 gdk("gdk-3");

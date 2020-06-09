@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,8 +29,6 @@ S::GUI::CheckBox::CheckBox(const String &iText, const Point &iPos, const Size &i
 	else			variable = iVariable;
 
 	state		= *variable;
-
-	font.SetColor(Setup::ClientTextColor);
 
 	if (GetWidth() == 0) SetWidth(80);
 	if (GetHeight() == 0) SetHeight(17);

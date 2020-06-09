@@ -25,8 +25,6 @@ S::GUI::OptionBox::OptionBox(const String &iText, const Point &iPos, const Size 
 	variable	= var;
 	code		= iCode;
 
-	font.SetColor(Setup::ClientTextColor);
-
 	if (*variable == code)	state = True;
 	else			state = False;
 

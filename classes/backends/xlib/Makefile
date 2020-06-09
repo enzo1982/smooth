@@ -10,6 +10,7 @@ ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_HAIKU),True)
 	MYCCOPTS += $(shell pkg-config --cflags x11)
+	MYCCOPTS += $(shell pkg-config --cflags gtk+-3.0)
 endif
 endif
 endif

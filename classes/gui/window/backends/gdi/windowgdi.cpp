@@ -886,6 +886,8 @@ S::Int S::GUI::WindowGDI::SetMinimumSize(const Size &nMinSize)
 {
 	minSize = nMinSize;
 
+	if (hwnd == NIL) return Success();
+
 	RECT	 windowRect;
 
 	GetWindowRect(hwnd, &windowRect);
@@ -901,6 +903,8 @@ S::Int S::GUI::WindowGDI::SetMaximumSize(const Size &nMaxSize)
 {
 	maxSize = nMaxSize;
 
+	if (hwnd == NIL) return Success();
+
 	RECT	 windowRect;
 
 	GetWindowRect(hwnd, &windowRect);
@@ -914,6 +918,8 @@ S::Int S::GUI::WindowGDI::SetMaximumSize(const Size &nMaxSize)
 
 S::Int S::GUI::WindowGDI::Show()
 {
+	if (hwnd == NIL) return Success();
+
 	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId()) ShowWindowAsync(hwnd, SW_SHOW);
 	else								 ShowWindow(hwnd, SW_SHOW);
 
@@ -922,6 +928,8 @@ S::Int S::GUI::WindowGDI::Show()
 
 S::Int S::GUI::WindowGDI::Hide()
 {
+	if (hwnd == NIL) return Success();
+
 	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId()) ShowWindowAsync(hwnd, SW_HIDE);
 	else								 ShowWindow(hwnd, SW_HIDE);
 
@@ -935,6 +943,8 @@ S::GUI::Rect S::GUI::WindowGDI::GetRestoredWindowRect() const
 
 S::Int S::GUI::WindowGDI::SetMetrics(const Point &nPos, const Size &nSize)
 {
+	if (hwnd == NIL) return Success();
+
 	SetWindowPos(hwnd, 0, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy, SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
 
 	return Success();
@@ -942,6 +952,8 @@ S::Int S::GUI::WindowGDI::SetMetrics(const Point &nPos, const Size &nSize)
 
 S::Int S::GUI::WindowGDI::Minimize()
 {
+	if (hwnd == NIL) return Success();
+
 	if (GetWindowThreadProcessId(hwnd, NIL) != GetCurrentThreadId()) ShowWindowAsync(hwnd, SW_MINIMIZE);
 	else								 ShowWindow(hwnd, SW_MINIMIZE);
 
@@ -950,6 +962,8 @@ S::Int S::GUI::WindowGDI::Minimize()
 
 S::Int S::GUI::WindowGDI::Maximize()
 {
+	if (hwnd == NIL) return Success();
+
 	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
 
 	{
@@ -975,6 +989,8 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 S::Int S::GUI::WindowGDI::Restore()
 {
+	if (hwnd == NIL) return Success();
+
 	SetWindowLong(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
 
 	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.GetWidth()), (Int) Math::Max(minSize.cy, nonMaxRect.GetHeight())));
@@ -988,6 +1004,8 @@ S::Int S::GUI::WindowGDI::Restore()
 
 S::Int S::GUI::WindowGDI::Raise()
 {
+	if (hwnd == NIL) return Success();
+
 	SetForegroundWindow(hwnd);
 	SetFocus(hwnd);
 

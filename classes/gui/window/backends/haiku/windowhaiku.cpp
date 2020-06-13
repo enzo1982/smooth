@@ -725,6 +725,8 @@ S::Int S::GUI::WindowHaiku::Hide()
 
 S::Int S::GUI::WindowHaiku::SetMetrics(const Point &nPos, const Size &nSize)
 {
+	if (wnd == NIL) return Success();
+
 	/* If the window belongs to another thread, we
 	 * need to suspend our application lock in order
 	 * for the move and resize operations to finish.

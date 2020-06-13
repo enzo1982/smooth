@@ -37,6 +37,8 @@ namespace smooth
 		{
 			private:
 				static Array<WindowCocoa *, Void *>	 windowBackends;
+
+				Void					 UpdateMetrics(Bool);
 			protected:
 				Int					 wid;
 

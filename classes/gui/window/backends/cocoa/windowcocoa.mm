@@ -1151,23 +1151,12 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 			if ([e subtype] == NSApplicationMove || [e subtype] == NSApplicationResize)
 			{
-				/* Set metrics and emit window metrics event.
+				/* Update window metrics.
 				 */
-				NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
+				UpdateMetrics([e subtype] == NSApplicationResize);
 
-				contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
-
-				Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
-				Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
-
-				if ([e subtype] == NSApplicationResize)
-				{
-					if (drawSurface != NIL) drawSurface->SetSize(Size(contentRect.size.width, contentRect.size.height));
-				}
-
-				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
-							       ((size.cx + 32768) << 16) | (size.cy + 32768));
-
+				/* Update zoom state and restored rect.
+				 */
 				if (![wnd isZoomed] && ![(CocoaWindow *) wnd isZooming]) restoredRect = Rect(pos, size);
 
 				if	( [wnd isZoomed] && !zoomed) onMaximize.Emit();
@@ -1293,17 +1282,9 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 		 */
 		SetTitle(title);
 
-		/* Set metrics to actually allocated window.
+		/* Update metrics for actually allocated window.
 		 */
-		NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
-
-		contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
-
-		Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
-		Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
-
-		onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
-					       ((size.cx + 32768) << 16) | (size.cy + 32768));
+		UpdateMetrics(False);
 
 		/* Set window level for topmost windows.
 		 */
@@ -1463,15 +1444,7 @@ S::Int S::GUI::WindowCocoa::Show()
 
 	/* Update window metrics.
 	 */
-	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
-
-	contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
-
-	Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
-	Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
-
-	onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
-				       ((size.cx + 32768) << 16) | (size.cy + 32768));
+	UpdateMetrics(False);
 
 	/* Set update rect and send paint event for new window.
 	 */
@@ -1524,6 +1497,23 @@ S::Int S::GUI::WindowCocoa::Raise()
 	else			     [wnd performSelectorOnMainThread: @selector(makeKeyAndOrderFront:) withObject: nil waitUntilDone: YES];
 
 	return Success();
+}
+
+S::Void S::GUI::WindowCocoa::UpdateMetrics(Bool resized)
+{
+	/* Update metrics and emit window metrics event.
+	 */
+	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
+
+	contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
+
+	Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
+	Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
+
+	if (resized && drawSurface != NIL) drawSurface->SetSize(Size(contentRect.size.width, contentRect.size.height));
+
+	onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+				       ((size.cx + 32768) << 16) | (size.cy + 32768));
 }
 
 S::Int S::GUI::WindowCocoa::SetProgressIndicator(Window::ProgressIndicatorState state, Float value)

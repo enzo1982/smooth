@@ -113,6 +113,8 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 
 	minSize		= Size(160, 24);
 
+	maximized	= False;
+
 	fontSize	= Surface().GetSurfaceDPI() / 96.0;
 
 	flags		= 0;
@@ -256,26 +258,30 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 {
 	static Int	 focusWndID = -1;
 
-	static Atom	 mimeURIListAtom       = XInternAtom(display, "text/uri-list", False);
+	static Atom	 mimeURIListAtom	  = XInternAtom(display, "text/uri-list", False);
 
-	static Atom	 wmProtocolsAtom       = XInternAtom(display, "WM_PROTOCOLS", False);
-	static Atom	 wmDeleteWindowAtom    = XInternAtom(display, "WM_DELETE_WINDOW", False);
+	static Atom	 wmProtocolsAtom	  = XInternAtom(display, "WM_PROTOCOLS", False);
+	static Atom	 wmDeleteWindowAtom	  = XInternAtom(display, "WM_DELETE_WINDOW", False);
 
-	static Atom	 wmPingAtom	       = XInternAtom(display, "_NET_WM_PING", False);
+	static Atom	 wmPingAtom		  = XInternAtom(display, "_NET_WM_PING", False);
 
-	static Atom	 xaTargets	       = XInternAtom(display, "TARGETS", True);
-	static Atom	 xaClipboard	       = XInternAtom(display, "CLIPBOARD", True);
-	static Atom	 xaUtf8String	       = XInternAtom(display, "UTF8_STRING", True);
+	static Atom	 wmStateAtom		  = XInternAtom(display, "_NET_WM_STATE", False);
+	static Atom	 wmStateMaximizedHorzAtom = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	static Atom	 wmStateMaximizedVertAtom = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
 
-	static Atom	 xdndEnterAtom	       = XInternAtom(display, "XdndEnter", False);
-	static Atom	 xdndTypeListAtom      = XInternAtom(display, "XdndTypeList", False);
-	static Atom	 xdndPositionAtom      = XInternAtom(display, "XdndPosition", False);
-	static Atom	 xdndStatusAtom	       = XInternAtom(display, "XdndStatus", False);
-	static Atom	 xdndDropAtom	       = XInternAtom(display, "XdndDrop", False);
-	static Atom	 xdndLeaveAtom	       = XInternAtom(display, "XdndLeave", False);
-	static Atom	 xdndFinishedAtom      = XInternAtom(display, "XdndFinished", False);
+	static Atom	 xaTargets		  = XInternAtom(display, "TARGETS", True);
+	static Atom	 xaClipboard		  = XInternAtom(display, "CLIPBOARD", True);
+	static Atom	 xaUtf8String		  = XInternAtom(display, "UTF8_STRING", True);
 
-	static Atom	 xdndActionPrivateAtom = XInternAtom(display, "XdndActionPrivate", False);
+	static Atom	 xdndEnterAtom		  = XInternAtom(display, "XdndEnter", False);
+	static Atom	 xdndTypeListAtom	  = XInternAtom(display, "XdndTypeList", False);
+	static Atom	 xdndPositionAtom	  = XInternAtom(display, "XdndPosition", False);
+	static Atom	 xdndStatusAtom		  = XInternAtom(display, "XdndStatus", False);
+	static Atom	 xdndDropAtom		  = XInternAtom(display, "XdndDrop", False);
+	static Atom	 xdndLeaveAtom		  = XInternAtom(display, "XdndLeave", False);
+	static Atom	 xdndFinishedAtom	  = XInternAtom(display, "XdndFinished", False);
+
+	static Atom	 xdndActionPrivateAtom	  = XInternAtom(display, "XdndActionPrivate", False);
 
 	/* Lock application while processing messages.
 	 */
@@ -337,6 +343,40 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			/* Clear internal focus window.
 			 */
 			if (focusWndID == id) focusWndID = -1;
+
+			break;
+
+		case PropertyNotify:
+			if (e->xproperty.atom == wmStateAtom && e->xproperty.state == PropertyNewValue)
+			{
+				Bool		 maximizedNow	= False;
+
+				Int		 atomsRead	= 0;
+				unsigned long	 bytesRemaining = 4;
+
+				while (bytesRemaining)
+				{
+					Atom		 actualType;
+					int		 actualFormat;
+					unsigned long	 actualItems;
+					Atom		*wmStateValueAtom;
+
+					XGetWindowProperty(display, wnd, wmStateAtom, atomsRead++, 1, False, XA_ATOM, &actualType, &actualFormat, &actualItems, &bytesRemaining, (unsigned char **) &wmStateValueAtom);
+
+					if (actualItems == 1)
+					{
+						if (*wmStateValueAtom == wmStateMaximizedHorzAtom ||
+						    *wmStateValueAtom == wmStateMaximizedVertAtom) maximizedNow = True;
+
+						XFree(wmStateValueAtom);
+					}
+				}
+
+				if	( maximizedNow && !maximized) onMaximize.Emit();
+				else if (!maximizedNow &&  maximized) onRestore.Emit();
+
+				maximized = maximizedNow;
+			}
 
 			break;
 
@@ -636,6 +676,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				 */
 				if (size != prevSize)
 				{
+					if (!maximized) restoredRect = Rect(pos, size);
+
 					updateRect.left	  = Math::Min(updateRect.left, 0);
 					updateRect.top	  = Math::Min(updateRect.top, 0);
 					updateRect.right  = Math::Max(updateRect.right, e->xconfigure.width);
@@ -822,7 +864,8 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 	static Atom	 windowTypeDialogAtom  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	static Atom	 windowTypeUtilityAtom = XInternAtom(display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
 
-	flags = iFlags;
+	flags	     = iFlags;
+	restoredRect = Rect(pos, size);
 
 	XSetWindowAttributes	 attributes;
 
@@ -855,7 +898,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 		/* Select event types we want to receive.
 		 */
-		XSelectInput(display, wnd, ExposureMask | FocusChangeMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask);
+		XSelectInput(display, wnd, ExposureMask | FocusChangeMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask);
 
 		/* Opt in to the WM_DELETE_WINDOW and _NET_WM_PING protocols.
 		 */
@@ -1253,6 +1296,25 @@ S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 
 	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy);
 	XFlush(display);
+
+	return Success();
+}
+
+S::Int S::GUI::WindowXLib::Maximize()
+{
+	if (wnd == NIL) return Success();
+
+	static Atom	 wmStateAtom		  = XInternAtom(display, "_NET_WM_STATE", False);
+	static Atom	 wmStateMaximizedHorzAtom = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+	static Atom	 wmStateMaximizedVertAtom = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+
+	static Atom	 wmStateMaximizedAtoms[2] = { wmStateMaximizedHorzAtom, wmStateMaximizedVertAtom };
+
+	if (!maximized)
+	{
+		XChangeProperty(display, wnd, wmStateAtom, XA_ATOM, 32, PropModeAppend, (unsigned char *) wmStateMaximizedAtoms, 2);
+		XFlush(display);
+	}
 
 	return Success();
 }

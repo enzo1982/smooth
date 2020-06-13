@@ -6,6 +6,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.5
 - surfacecairo.cpp	- fixed crash when DISPLAY variable is not set
 - surfacecocoa.mm	- fixed drawing inverted rects with scale factors greater than 1.0
 			- fixed paint rect calculation for drawing lines
+- windowxlib.cpp	- implemented handling of maximized state and restore
 - backendxlib.cpp	- added support for theme colors and dark mode
 - backendhaiku.cpp	- load actual app signature from application binary
 

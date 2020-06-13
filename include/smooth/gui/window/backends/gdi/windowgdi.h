@@ -73,8 +73,8 @@ namespace smooth
 
 				ITaskbarList3				*taskbar;
 
-				Rect					 nonMaxRect;
-				Int					 nonMaxWndStyle;
+				Rect					 restoredRect;
+				Int					 restoredWndStyle;
 
 				Size					 frameSize;
 				Float					 fontSize;
@@ -118,7 +118,7 @@ namespace smooth
 				Int					 Show();
 				Int					 Hide();
 
-				Rect					 GetRestoredWindowRect() const;
+				Rect					 GetRestoredWindowRect() const	{ return restoredRect; }
 
 				Int					 SetMetrics(const Point &, const Size &);
 

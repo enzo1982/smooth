@@ -76,36 +76,36 @@ S::Int S::GUI::WindowGDI::Free()
 
 S::GUI::WindowGDI::WindowGDI(Void *iWindow)
 {
-	type		= WINDOW_GDI;
+	type		 = WINDOW_GDI;
 
-	hwnd		= NIL;
-	wndclass	= NIL;
+	hwnd		 = NIL;
+	wndclass	 = NIL;
 
-	taskbar		= NIL;
+	taskbar		 = NIL;
 
-	className	= String::FromInt(System::System::RequestGUID());
+	className	 = String::FromInt(System::System::RequestGUID());
 
-	id		= windowBackends.Add(this);
+	id		 = windowBackends.Add(this);
 
-	minSize		= Size(160, 24);
+	minSize		 = Size(160, 24);
 
-	minimized	= False;
-	maximized	= False;
+	minimized	 = False;
+	maximized	 = False;
 
-	frameSize	= Size(GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER), GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER));
-	fontSize	= Surface().GetSurfaceDPI() / 96.0;
+	frameSize	 = Size(GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER), GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER));
+	fontSize	 = Surface().GetSurfaceDPI() / 96.0;
 
-	flags		= 0;
+	flags		 = 0;
 
-	sysIcon		= (HICON) LoadImage(NIL, MAKEINTRESOURCE(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
+	sysIcon		 = (HICON) LoadImage(NIL, MAKEINTRESOURCE(32512), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADMAP3DCOLORS | LR_SHARED);
 
-	destroyIcon	= False;
+	destroyIcon	 = False;
 
-	hDrop		= NIL;
-	dropTarget	= NIL;
-	enableDropFiles	= False;
+	hDrop		 = NIL;
+	dropTarget	 = NIL;
+	enableDropFiles	 = False;
 
-	nonMaxWndStyle	= 0;
+	restoredWndStyle = 0;
 }
 
 S::GUI::WindowGDI::~WindowGDI()
@@ -933,11 +933,6 @@ S::Int S::GUI::WindowGDI::Hide()
 	return Success();
 }
 
-S::GUI::Rect S::GUI::WindowGDI::GetRestoredWindowRect() const
-{
-	return nonMaxRect;
-}
-
 S::Int S::GUI::WindowGDI::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (hwnd == NIL) return Success();
@@ -968,12 +963,12 @@ S::Int S::GUI::WindowGDI::Maximize()
 
 		GetWindowRect(hwnd, &rect);
 
-		nonMaxRect = Rect(Point(rect.left, rect.top), (Size(rect.right - rect.left, rect.bottom - rect.top) - sizeModifier) / fontSize);
+		restoredRect = Rect(Point(rect.left, rect.top), (Size(rect.right - rect.left, rect.bottom - rect.top) - sizeModifier) / fontSize);
 	}
 
-	nonMaxWndStyle = GetWindowLong(hwnd, GWL_STYLE);
+	restoredWndStyle = GetWindowLong(hwnd, GWL_STYLE);
 
-	SetWindowLong(hwnd, GWL_STYLE, nonMaxWndStyle ^ (WS_THICKFRAME | WS_SYSMENU));
+	SetWindowLong(hwnd, GWL_STYLE, restoredWndStyle ^ (WS_THICKFRAME | WS_SYSMENU));
 
 	SetMetrics(Point(workArea.left - (frameSize.cx - 1), workArea.top - (frameSize.cy - 1)), (Size(workArea.GetWidth() + (2 * frameSize.cx - 2), workArea.GetHeight() + (2 * frameSize.cy - 2)) - sizeModifier) / fontSize);
 
@@ -988,9 +983,9 @@ S::Int S::GUI::WindowGDI::Restore()
 {
 	if (hwnd == NIL) return Success();
 
-	SetWindowLong(hwnd, GWL_STYLE, nonMaxWndStyle | WS_VISIBLE);
+	SetWindowLong(hwnd, GWL_STYLE, restoredWndStyle | WS_VISIBLE);
 
-	SetMetrics(Point(nonMaxRect.left, nonMaxRect.top), Size((Int) Math::Max(minSize.cx, nonMaxRect.GetWidth()), (Int) Math::Max(minSize.cy, nonMaxRect.GetHeight())));
+	SetMetrics(Point(restoredRect.left, restoredRect.top), Size((Int) Math::Max(minSize.cx, restoredRect.GetWidth()), (Int) Math::Max(minSize.cy, restoredRect.GetHeight())));
 
 	maximized = False;
 

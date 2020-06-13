@@ -1121,7 +1121,7 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 				if (focusWndID == wid) focusWndID = -1;
 			}
 
-			if ([e subtype] == NSApplicationMove)
+			if ([e subtype] == NSApplicationMove || [e subtype] == NSApplicationResize)
 			{
 				/* Set metrics and emit window metrics event.
 				 */
@@ -1129,22 +1129,16 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 				contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
 
-				onEvent.Call(SM_WINDOWMETRICS, ((	     Int(contentRect.origin.x)		     + 32768) << 16) | (	    Int(contentRect.origin.y)		     + 32768),
-							       ((Math::Floor(Int(contentRect.size.width) / fontSize) + 32768) << 16) | (Math::Floor(Int(contentRect.size.height) / fontSize) + 32768));
-			}
+				Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
+				Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
 
-			if ([e subtype] == NSApplicationResize)
-			{
-				/* Set metrics and emit window metrics event.
-				 */
-				NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
+				if ([e subtype] == NSApplicationResize)
+				{
+					if (drawSurface != NIL) drawSurface->SetSize(Size(contentRect.size.width, contentRect.size.height));
+				}
 
-				contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
-
-				if (drawSurface != NIL) drawSurface->SetSize(Size(contentRect.size.width, contentRect.size.height));
-
-				onEvent.Call(SM_WINDOWMETRICS, ((	     Int(contentRect.origin.x)		     + 32768) << 16) | (	    Int(contentRect.origin.y)		     + 32768),
-							       ((Math::Floor(Int(contentRect.size.width) / fontSize) + 32768) << 16) | (Math::Floor(Int(contentRect.size.height) / fontSize) + 32768));
+				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+							       ((size.cx + 32768) << 16) | (size.cy + 32768));
 			}
 
 			/* Focus events:
@@ -1267,8 +1261,11 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 
 		contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
 
-		onEvent.Call(SM_WINDOWMETRICS, ((	     Int(contentRect.origin.x)		     + 32768) << 16) | (	    Int(contentRect.origin.y)		     + 32768),
-					       ((Math::Floor(Int(contentRect.size.width) / fontSize) + 32768) << 16) | (Math::Floor(Int(contentRect.size.height) / fontSize) + 32768));
+		Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
+		Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
+
+		onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+					       ((size.cx + 32768) << 16) | (size.cy + 32768));
 
 		/* Set window level for topmost windows.
 		 */
@@ -1432,8 +1429,11 @@ S::Int S::GUI::WindowCocoa::Show()
 
 	contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
 
-	onEvent.Call(SM_WINDOWMETRICS, ((	     Int(contentRect.origin.x)		     + 32768) << 16) | (	    Int(contentRect.origin.y)		     + 32768),
-				       ((Math::Floor(Int(contentRect.size.width) / fontSize) + 32768) << 16) | (Math::Floor(Int(contentRect.size.height) / fontSize) + 32768));
+	Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
+	Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
+
+	onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+				       ((size.cx + 32768) << 16) | (size.cy + 32768));
 
 	/* Set update rect and send paint event for new window.
 	 */

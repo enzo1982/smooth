@@ -413,10 +413,13 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			{
 				BRect	 windowRect = wnd->Frame();
 
+				Point	 pos  =  Point(windowRect.left, windowRect.top);
+				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1) - sizeModifier) / fontSize;
+
 				if (drawSurface != NIL) drawSurface->SetSize(Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
-				onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
-							       ((Math::Round((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Round((windowRect.Height() + 1) / fontSize) + 32768));
+				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+							       ((size.cx + 32768) << 16) | (size.cy + 32768));
 
 				updateRect = Rect(Point((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768),
 						   Size((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768) + Size(1, 1));
@@ -432,10 +435,13 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			{
 				BRect	 windowRect = wnd->Frame();
 
+				Point	 pos  =  Point(windowRect.left, windowRect.top);
+				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1) - sizeModifier) / fontSize;
+
 				if (drawSurface != NIL) drawSurface->SetSize(Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
-				onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
-							       ((Math::Round((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Round((windowRect.Height() + 1) / fontSize) + 32768));
+				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+							       ((size.cx + 32768) << 16) | (size.cy + 32768));
 
 				updateRect = Rect(Point(0, 0), Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
@@ -448,8 +454,11 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			{
 				BRect	 windowRect = wnd->Frame();
 
-				onEvent.Call(SM_WINDOWMETRICS, ((	(int) windowRect.left			  + 32768) << 16) | (	    (int) windowRect.top		       + 32768),
-							       ((Math::Round((windowRect.Width() + 1) / fontSize) + 32768) << 16) | (Math::Round((windowRect.Height() + 1) / fontSize) + 32768));
+				Point	 pos  =  Point(windowRect.left, windowRect.top);
+				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1) - sizeModifier) / fontSize;
+
+				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+							       ((size.cx + 32768) << 16) | (size.cy + 32768));
 			}
 
 			return Success();

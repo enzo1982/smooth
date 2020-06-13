@@ -519,31 +519,28 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 			{
 				WINDOWPOS	*windowPos = (LPWINDOWPOS) lParam;
 
-				if (!(windowPos->flags & SWP_NOMOVE) && !(windowPos->flags & SWP_NOSIZE))
+				if (!(windowPos->flags & SWP_NOMOVE && windowPos->flags & SWP_NOSIZE))
 				{
-					if (drawSurface != NIL) drawSurface->SetSize(Size(windowPos->cx, windowPos->cy));
+					Point	 pos  =  Point(windowPos->x, windowPos->y);
+					Size	 size = (Size(windowPos->cx, windowPos->cy) - sizeModifier) / fontSize;
 
-					onEvent.Call(SM_WINDOWMETRICS, ((	     windowPos->x	       + 32768) << 16) | (	      windowPos->y		+ 32768),
-								       ((Math::Floor(windowPos->cx / fontSize) + 32768) << 16) | (Math::Floor(windowPos->cy / fontSize) + 32768));
-				}
-				else if (!(windowPos->flags & SWP_NOMOVE && windowPos->flags & SWP_NOSIZE))
-				{
-					RECT	 windowRect;
+					if (windowPos->flags & SWP_NOMOVE || windowPos->flags & SWP_NOSIZE)
+					{
+						RECT	 windowRect;
 
-					GetWindowRect(hwnd, &windowRect);
+						GetWindowRect(hwnd, &windowRect);
 
-					if (windowPos->flags & SWP_NOMOVE)
+						if	(windowPos->flags & SWP_NOMOVE) pos  =  Point(windowRect.left, windowRect.top);
+						else if (windowPos->flags & SWP_NOSIZE) size = (Size(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top) - sizeModifier) / fontSize;
+					}
+
+					if (!(windowPos->flags & SWP_NOSIZE))
 					{
 						if (drawSurface != NIL) drawSurface->SetSize(Size(windowPos->cx, windowPos->cy));
+					}
 
-						onEvent.Call(SM_WINDOWMETRICS, ((	      windowRect.left				      + 32768) << 16) | (	      windowRect.top				      + 32768),
-									       ((Math::Floor( windowPos->cx			  / fontSize) + 32768) << 16) | (Math::Floor( windowPos->cy			  / fontSize) + 32768));
-					}
-					else if (windowPos->flags & SWP_NOSIZE)
-					{
-						onEvent.Call(SM_WINDOWMETRICS, ((	      windowPos->x				      + 32768) << 16) | (	      windowPos->y				      + 32768),
-									       ((Math::Floor((windowRect.right - windowRect.left) / fontSize) + 32768) << 16) | (Math::Floor((windowRect.bottom - windowRect.top) / fontSize) + 32768));
-					}
+					onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
+								       ((size.cx + 32768) << 16) | (size.cy + 32768));
 				}
 			}
 

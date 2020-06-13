@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -52,6 +52,10 @@ namespace smooth
 				Size					 minSize;
 				Size					 maxSize;
 
+				Bool					 zoomed;
+
+				Rect					 restoredRect;
+
 				Int					 flags;
 
 				String					 selection;
@@ -88,8 +92,12 @@ namespace smooth
 
 				Int					 Show();
 				Int					 Hide();
+				
+				Rect					 GetRestoredWindowRect() const		{ return restoredRect; }
 
 				Int					 SetMetrics(const Point &, const Size &);
+
+				Int					 Maximize();
 
 				Int					 Raise();
 			accessors:

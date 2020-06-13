@@ -380,8 +380,11 @@ S::GUI::Rect S::GUI::Window::GetClientRect() const
 
 S::GUI::Rect S::GUI::Window::GetRestoredWindowRect() const
 {
-	if (IsMaximized()) return backend->GetRestoredWindowRect();
-	else		   return GetWindowRect();
+	Rect	 restoredRect = backend->GetRestoredWindowRect();
+
+	if (restoredRect != Rect()) return restoredRect;
+
+	return GetWindowRect();
 }
 
 S::GUI::Rect S::GUI::Window::GetVisibleArea() const

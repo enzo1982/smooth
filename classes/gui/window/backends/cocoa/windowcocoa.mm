@@ -436,62 +436,6 @@ const int	 NSApplicationDropFiles	 = 9;
 	}
 @end
 
-#if defined MAC_OS_X_VERSION_10_6 && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-@interface CocoaWindowDelegate : NSObject <NSWindowDelegate> { }
-#else
-@interface CocoaWindowDelegate : NSObject { }
-#endif
-	- (void) handleNotification: (NSNotification *) note as: (int) type;
-
-	- (BOOL) windowShouldClose:  (id) sender;
-
-	- (void) windowDidMove:	     (NSNotification *) note;
-	- (void) windowDidResize:    (NSNotification *) note;
-
-	- (void) windowDidBecomeKey: (NSNotification *) note;
-	- (void) windowDidResignKey: (NSNotification *) note;
-@end
-
-@implementation CocoaWindowDelegate
-	- (BOOL) windowShouldClose: (id) sender
-	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend(sender);
-
-		if (backend != NIL)
-		{
-			if (backend->doClose.Call()) backend->Close();
-
-			/* Return no in any case. Either the user decided not to
-			 * close the window or we closed it on our own above.
-			 */
-			return NO;
-		}
-
-		return YES;
-	}
-
-	- (void) handleNotification: (NSNotification *) note as: (int) type
-	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([note object]);
-		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
-								      location: NSMakePoint(0, 0)
-								 modifierFlags: 0
-								     timestamp: 0
-								  windowNumber: [[note object] windowNumber]
-								       context: [[note object] graphicsContext]
-								       subtype: type
-									 data1: nil
-									 data2: nil];
-
-		if (backend != NIL) backend->ProcessSystemMessages(event);
-	}
-
-	- (void) windowDidMove:	     (NSNotification *) note { [self handleNotification: note as: NSApplicationMove];	 }
-	- (void) windowDidResize:    (NSNotification *) note { [self handleNotification: note as: NSApplicationResize];	 }
-	- (void) windowDidBecomeKey: (NSNotification *) note { [self handleNotification: note as: NSApplicationFocus];	 }
-	- (void) windowDidResignKey: (NSNotification *) note { [self handleNotification: note as: NSApplicationUnfocus]; }
-@end
-
 @interface CocoaWindow : NSWindow
 {
 	@private
@@ -502,6 +446,8 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		NSSize		 minSize;
 		NSSize		 maxSize;
+
+		BOOL		 zooming;
 }
 
 	/* NSObject methods.
@@ -516,6 +462,8 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (void)	    orderOut:			 (id) sender;
 	- (void)	    makeKeyAndOrderFront:	 (id) sender;
 
+	- (void)	    zoom:			 (id) sender;
+
 	/* Helper Methods.
 	 */
 	- (id)		    initWithContentRect:	 (NSRect) rect styleMask: (NSUInteger) style;
@@ -523,6 +471,9 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (void)	    setFrame:			 (NSRect) rect;
 	- (void)	    setMinSize:			 (NSSize) size;
 	- (void)	    setMaxSize:			 (NSSize) size;
+
+	- (BOOL)	    isZooming;
+	- (void)	    setZooming:			 (BOOL) value;
 
 	- (void)	    processEvent:		 (int) type;
 	- (void)	    processEvent:		 (int) type withData: (NSInteger) data;
@@ -567,12 +518,21 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (void) orderOut:	       (id) sender { [super orderOut: sender];		   [self processEvent: NSApplicationUnmap]; }
 	- (void) makeKeyAndOrderFront: (id) sender { [super makeKeyAndOrderFront: sender]; [self processEvent: NSApplicationMap];   }
 
+	- (void) zoom: (id) sender
+	{
+		if (![self isZoomed]) zooming = YES;
+
+		[super zoom: sender];
+	}
+
 	/* Helper Methods.
 	 */
 	- (id) initWithContentRect: (NSRect) rect styleMask: (NSUInteger) style
 	{
 		contentRect = rect;
 		styleMask   = style;
+
+		zooming	    = NO;
 
 		if ([NSThread isMainThread]) [self internalInitWithAttributes];
 		else			     [self performSelectorOnMainThread: @selector(internalInitWithAttributes) withObject: NIL waitUntilDone: YES];
@@ -603,6 +563,9 @@ const int	 NSApplicationDropFiles	 = 9;
 		if ([NSThread isMainThread]) [self internalSetMaxSizeWithAttributes];
 		else			     [self performSelectorOnMainThread: @selector(internalSetMaxSizeWithAttributes) withObject: NIL waitUntilDone: YES];
 	}
+
+	- (BOOL) isZooming		  { return zooming; }
+	- (void) setZooming: (BOOL) value { zooming = value; }
 
 	- (void) processEvent: (int) type
 	{
@@ -664,6 +627,69 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (void) internalSetMinSizeWithAttributes { [self setContentMinSize: minSize]; }
 	- (void) internalSetMaxSizeWithAttributes { [self setContentMaxSize: maxSize]; }
 
+@end
+
+#if defined MAC_OS_X_VERSION_10_6 && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+@interface CocoaWindowDelegate : NSObject <NSWindowDelegate> { }
+#else
+@interface CocoaWindowDelegate : NSObject { }
+#endif
+	- (void) handleNotification:	    (NSNotification *) note as: (int) type;
+
+	- (BOOL) windowShouldClose:	    (id) sender;
+
+	- (void) windowDidMove:		    (NSNotification *) note;
+	- (void) windowDidResize:	    (NSNotification *) note;
+
+	- (void) windowWillEnterFullScreen: (NSNotification *) note;
+	- (void) windowDidExitFullScreen:   (NSNotification *) note;
+
+	- (void) windowDidBecomeKey:	    (NSNotification *) note;
+	- (void) windowDidResignKey:	    (NSNotification *) note;
+@end
+
+@implementation CocoaWindowDelegate
+	- (BOOL) windowShouldClose: (id) sender
+	{
+		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend(sender);
+
+		if (backend != NIL)
+		{
+			if (backend->doClose.Call()) backend->Close();
+
+			/* Return no in any case. Either the user decided not to
+			 * close the window or we closed it on our own above.
+			 */
+			return NO;
+		}
+
+		return YES;
+	}
+
+	- (void) handleNotification: (NSNotification *) note as: (int) type
+	{
+		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([note object]);
+		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
+								      location: NSMakePoint(0, 0)
+								 modifierFlags: 0
+								     timestamp: 0
+								  windowNumber: [[note object] windowNumber]
+								       context: [[note object] graphicsContext]
+								       subtype: type
+									 data1: nil
+									 data2: nil];
+
+		if (backend != NIL) backend->ProcessSystemMessages(event);
+	}
+
+	- (void) windowDidMove:		    (NSNotification *) note { [self handleNotification: note as: NSApplicationMove];	}
+	- (void) windowDidResize:	    (NSNotification *) note { [self handleNotification: note as: NSApplicationResize];	}
+
+	- (void) windowWillEnterFullScreen: (NSNotification *) note { [(CocoaWindow *) [note object] setZooming: YES];		}
+	- (void) windowDidExitFullScreen:   (NSNotification *) note { [(CocoaWindow *) [note object] setZooming: NO];		}
+
+	- (void) windowDidBecomeKey:	    (NSNotification *) note { [self handleNotification: note as: NSApplicationFocus];	}
+	- (void) windowDidResignKey:	    (NSNotification *) note { [self handleNotification: note as: NSApplicationUnfocus]; }
 @end
 
 @interface CocoaCircularProgress : NSView
@@ -819,6 +845,8 @@ S::GUI::WindowCocoa::WindowCocoa(Void *iWindow)
 
 	minSize		 = Size(160, 24);
 	maxSize		 = Size(32768, 32768);
+	
+	zoomed		 = False;
 
 	fontSize	 = Surface().GetSurfaceDPI() / 96.0;
 
@@ -1139,6 +1167,15 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
 							       ((size.cx + 32768) << 16) | (size.cy + 32768));
+
+				if (![wnd isZoomed] && ![(CocoaWindow *) wnd isZooming]) restoredRect = Rect(pos, size);
+
+				if	( [wnd isZoomed] && !zoomed) onMaximize.Emit();
+				else if (![wnd isZoomed] &&  zoomed) onRestore.Emit();
+
+				zoomed = [wnd isZoomed];
+
+				if (zoomed) [(CocoaWindow *) wnd setZooming: NO];
 			}
 
 			/* Focus events:
@@ -1212,7 +1249,8 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Size &size, Int iFlags)
 {
-	flags = iFlags;
+	flags	     = iFlags;
+	restoredRect = Rect(pos, size);
 
 	NSRect		 contentRect = NSMakeRect(pos.x, [[NSScreen mainScreen] frame].size.height - (pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy);
 	NSUInteger	 styleMask   = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
@@ -1459,6 +1497,19 @@ S::Int S::GUI::WindowCocoa::SetMetrics(const Point &nPos, const Size &nSize)
 	if (wnd == nil) return Success();
 
 	[(CocoaWindow *) wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(nPos.x, [[wnd screen] frame].size.height - (nPos.y + Math::Round(nSize.cy * fontSize) + sizeModifier.cy), Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy)]];
+
+	return Success();
+}
+
+S::Int S::GUI::WindowCocoa::Maximize()
+{
+	if (wnd == nil) return Success();
+
+	if (!zoomed)
+	{
+		if ([NSThread isMainThread]) [wnd zoom: nil];
+		else			     [wnd performSelectorOnMainThread: @selector(zoom:) withObject: nil waitUntilDone: YES];
+	}
 
 	return Success();
 }

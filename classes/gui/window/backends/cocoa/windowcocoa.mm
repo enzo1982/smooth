@@ -251,7 +251,7 @@ const int	 NSApplicationDropFiles	 = 9;
 								 modifierFlags: 0
 								     timestamp: 0
 								  windowNumber: [[self window] windowNumber]
-								       context: [[self window] graphicsContext]
+								       context: nil
 								       subtype: NSApplicationPaint
 									 data1: (NSInteger) &rect
 									 data2: nil];
@@ -292,7 +292,7 @@ const int	 NSApplicationDropFiles	 = 9;
 								 modifierFlags: 0
 								     timestamp: 0
 								  windowNumber: [[self window] windowNumber]
-								       context: [[self window] graphicsContext]
+								       context: nil
 								       subtype: NSApplicationInsertText
 									 data1: (NSInteger) string
 									 data2: nil];
@@ -581,7 +581,7 @@ const int	 NSApplicationDropFiles	 = 9;
 								 modifierFlags: 0
 								     timestamp: 0
 								  windowNumber: [self windowNumber]
-								       context: [self graphicsContext]
+								       context: nil
 								       subtype: type
 									 data1: data
 									 data2: nil];
@@ -674,7 +674,7 @@ const int	 NSApplicationDropFiles	 = 9;
 								 modifierFlags: 0
 								     timestamp: 0
 								  windowNumber: [[note object] windowNumber]
-								       context: [[note object] graphicsContext]
+								       context: nil
 								       subtype: type
 									 data1: nil
 									 data2: nil];
@@ -1478,6 +1478,8 @@ S::Int S::GUI::WindowCocoa::Show()
 	updateRect = Rect(Point(0, 0), Size(contentRect.size.width, contentRect.size.height));
 
 	onEvent.Call(SM_PAINT, 0, 0);
+
+	updateRect = Rect();
 
 	return Success();
 }

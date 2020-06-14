@@ -1157,6 +1157,13 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 				/* Update zoom state and restored rect.
 				 */
+				NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
+
+				contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
+
+				Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
+				Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
+
 				if (![wnd isZoomed] && ![(CocoaWindow *) wnd isZooming]) restoredRect = Rect(pos, size);
 
 				if	( [wnd isZoomed] && !zoomed) onMaximize.Emit();
@@ -1448,6 +1455,8 @@ S::Int S::GUI::WindowCocoa::Show()
 
 	/* Set update rect and send paint event for new window.
 	 */
+	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
+
 	updateRect = Rect(Point(0, 0), Size(contentRect.size.width, contentRect.size.height));
 
 	onEvent.Call(SM_PAINT, 0, 0);

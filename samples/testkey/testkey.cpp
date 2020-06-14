@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,13 +14,7 @@
 
 Int smooth::Main()
 {
-	TestKey	*app = new TestKey();
-
-	app->Loop();
-
-	Object::DeleteObject(app);
-
-	return 0;
+	return TestKey().Loop();
 }
 
 TestKey::TestKey()
@@ -30,9 +24,9 @@ TestKey::TestKey()
 	pos.x = 85;
 	pos.y = 28;
 
-	wnd	= new GUI::Window("TestKey - by Robert Kausch 2000-2019", Point(80, 80), Size(300, 160));
+	wnd	= new GUI::Window("TestKey - by Robert Kausch 2000-2020", Point(80, 80), Size(300, 160));
 	title	= new Titlebar(TB_MINBUTTON | TB_CLOSEBUTTON);
-	text	= new Text("ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000", pos);
+	text	= new Text("ASCII code: 000\nUnicode character: 00000\n\nScan code: 000\nVirtual keycode: 000", pos);
 
 	Add(wnd);
 
@@ -51,7 +45,7 @@ TestKey::~TestKey()
 
 Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 {
-	Byte		 newText[77]	= "ASCII-Code: 000\nUnicode character: 00000\n\nScanCode: 000\nVirtual keycode: 000";
+	String		 newText	= "ASCII code: %1\nUnicode character: %2\n\nScan code: %3\nVirtual keycode: %4";
 	UnsignedByte	 asciiCode	= 0;
 	wchar_t		 unicode	= 0;
 	Int		 scanCode	= 0;
@@ -67,26 +61,13 @@ Void TestKey::EventProc(Int message, Int wParam, Int lParam)
 		ToUnicode(wParam, Binary::GetBits(lParam, 16, 23), (UnsignedByte *) &keys, &unicode, 1, 0);
 #endif
 
-		scanCode	= Binary::GetBits(lParam, 16, 23);
-		vkCode		= wParam;
+		scanCode = Binary::GetBits(lParam, 16, 23);
+		vkCode	 = wParam;
 
-		newText[12] = asciiCode / 100 + 48;
-		newText[13] = asciiCode % 100 / 10 + 48;
-		newText[14] = asciiCode % 100 % 10 + 48;
-
-		newText[35] = unicode / 10000 + 48;
-		newText[36] = unicode % 10000 / 1000 + 48;
-		newText[37] = unicode % 10000 % 1000 / 100 + 48;
-		newText[38] = unicode % 10000 % 1000 % 100 / 10 + 48;
-		newText[39] = unicode % 10000 % 1000 % 100 % 10 + 48;
-
-		newText[52] = scanCode / 100 + 48;
-		newText[53] = scanCode % 100 / 10 + 48;
-		newText[54] = scanCode % 100 % 10 + 48;
-
-		newText[73] = vkCode / 100 + 48;
-		newText[74] = vkCode % 100 / 10 + 48;
-		newText[75] = vkCode % 100 % 10 + 48;
+		newText.Replace("%1", String().FillN('0', 2 - Math::Floor(Math::Log10(asciiCode))).Append(String::FromInt(asciiCode)));
+		newText.Replace("%2", String().FillN('0', 4 - Math::Floor(Math::Log10(unicode))).Append(String::FromInt(unicode)));
+		newText.Replace("%3", String().FillN('0', 2 - Math::Floor(Math::Log10(scanCode))).Append(String::FromInt(scanCode)));
+		newText.Replace("%4", String().FillN('0', 2 - Math::Floor(Math::Log10(vkCode))).Append(String::FromInt(vkCode)));
 
 		text->SetText(newText);
 	}

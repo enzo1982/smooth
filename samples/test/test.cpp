@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,13 +17,7 @@ using namespace smooth;
 
 Int smooth::Main()
 {
-	Test	*application = new Test();
-
-	application->Loop();
-
-	Object::DeleteObject(application);
-
-	return 0;
+	return Test().Loop();
 }
 
 Test::Test()
@@ -243,12 +237,10 @@ Test::~Test()
 
 Void Test::ColorDlg()
 {
-	ColorSelection	*dialog = new ColorSelection();
+	ColorSelection	 dialog;
 
-	dialog->SetParentWindow(mainWnd);
-	dialog->ShowDialog();
-
-	DeleteObject(dialog);
+	dialog.SetParentWindow(mainWnd);
+	dialog.ShowDialog();
 }
 
 Void Test::OnArrowsValueChange(Int value)

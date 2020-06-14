@@ -9,13 +9,7 @@
 
 Int smooth::Main()
 {
-	Hello	*app = new Hello();
-
-	app->Loop();
-
-	Object::DeleteObject(app);
-
-	return 0;
+	return Hello().Loop();
 }
 
 Hello::Hello()

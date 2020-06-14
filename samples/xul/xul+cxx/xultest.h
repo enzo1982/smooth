@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2009 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -20,7 +20,7 @@ using namespace smooth::XML::XUL;
 class XULTest : public Application
 {
 	private:
-		Renderer	*xulRenderer;
+		Renderer	 xulRenderer;
 	public:
 				 XULTest();
 				~XULTest();

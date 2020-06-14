@@ -23,13 +23,7 @@ using namespace smooth::Input;
 
 Int smooth::Main(const Array<String> &args)
 {
-	Translator	*app = new Translator(args.GetNth(0));
-
-	app->Loop();
-
-	delete app;
-
-	return 0;
+	return Translator(args.GetNth(0)).Loop();
 }
 
 Translator::Translator(const String &openFile) : Application("smooth Translator")

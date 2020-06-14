@@ -19,13 +19,7 @@ using namespace smooth::GUI::Dialogs;
 
 Int smooth::Main()
 {
-	BeatClock	*app = new BeatClock();
-
-	app->Loop();
-
-	delete app;
-
-	return 0;
+	return BeatClock().Loop();
 }
 
 BeatClock::BeatClock() : Application("BeatClock")
@@ -106,7 +100,6 @@ Void BeatClock::ShowOptionsDialog()
 	Options	 options(timeformat, centi, isalarm, alarmbeats, alarmsecs, modechange, timezone, alarmtext, alarmoption);
 
 	options.onOptionChange.Connect(&BeatClock::PaintAll, this);
-
 	options.ShowDialog();
 }
 
@@ -384,7 +377,7 @@ Void BeatClock::PaintAll()
 
 Void BeatClock::Info()
 {
-	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2019\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Information);
+	QuickMessage("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2020\nGive it to all your friends!\n\neMail: robert.kausch@gmx.net", "Info", Message::Buttons::Ok, Message::Icon::Information);
 }
 
 Void BeatClock::StoreConfig()

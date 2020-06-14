@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -114,7 +114,7 @@ Options::Options(Int &itimeformat, Bool &icenti, Bool &iisalarm, Int &ialarmbeat
 	 */
 	info		= new Layer("Info");
 
-	info_text1	= new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2019\nGive it to all your friends!", Point(6, 5));
+	info_text1	= new Text("BeatClock version 2.0\n\nDeveloped by Robert Kausch 2000-2020\nGive it to all your friends!", Point(6, 5));
 	info_text2	= new Text("\n\neMail: robert.kausch@gmx.net", Point(227, 5));
 
 	info->Add(info_text1);

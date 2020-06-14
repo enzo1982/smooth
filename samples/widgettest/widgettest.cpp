@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2012 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -17,13 +17,7 @@ using namespace smooth::GUI::Dialogs;
 
 Int smooth::Main()
 {
-	WidgetTest	*app = new WidgetTest();
-
-	app->Loop();
-
-	Object::DeleteObject(app);
-
-	return 0;
+	return WidgetTest().Loop();
 }
 
 WidgetTest::WidgetTest()
@@ -60,5 +54,5 @@ WidgetTest::~WidgetTest()
 
 Void WidgetTest::activeAreaProc()
 {
-	QuickMessage("This is a custom smooth widget!", "Info", SMB_OK, SDI_INFORMATION);
+	QuickMessage("This is a custom smooth widget!", "Info", Message::Buttons::Ok, Message::Icon::Information);
 }

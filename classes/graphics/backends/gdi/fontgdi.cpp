@@ -32,6 +32,8 @@ S::Int S::GUI::FontGDI::Initialize()
 
 	Font::Default = ncm.lfMessageFont.lfFaceName;
 
+	Setup::FontSize = Float(-ncm.lfMessageFont.lfHeight) / 96.0 * 72.0 / Font::DefaultSize;
+
 	return Success();
 }
 

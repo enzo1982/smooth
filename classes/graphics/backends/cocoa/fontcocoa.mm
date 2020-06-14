@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,7 +23,17 @@ S::Int	 addFontCocoaInitTmp = S::AddInitFunction(&S::GUI::FontCocoa::Initialize)
 
 S::Int S::GUI::FontCocoa::Initialize()
 {
-	Font::Default.ImportFrom("UTF-8", [[[NSFont systemFontOfSize: [NSFont systemFontSize]] familyName] UTF8String]);
+	/* The default font size on macOS is 13pt. However, apps like Finder and other Apple
+	 * software use various font sizes between 11 and 13pt depending on the kind of label.
+	 *
+	 * smooth apps look too bulky with the default 13pt font size, so we apply a scale
+	 * factor to reduce the standard size to 12pt.
+	 */
+	Float	 fontSize = [NSFont systemFontSize] / 13.0 * 12.0;
+
+	Font::Default.ImportFrom("UTF-8", [[[NSFont systemFontOfSize: fontSize] familyName] UTF8String]);
+
+	Setup::FontSize = fontSize / 96.0 * 72.0 / Font::DefaultSize;
 
 	return Success();
 }
@@ -40,8 +50,6 @@ S::GUI::FontCocoa::~FontCocoa()
 S::GUI::Size S::GUI::FontCocoa::GetTextSize(const String &text) const
 {
 	if (text == NIL) return Size();
-
-	Float			 dpi	    = Surface().GetSurfaceDPI();
 
 	NSAutoreleasePool	*pool	    = [[NSAutoreleasePool alloc] init];
 

@@ -109,10 +109,6 @@ S::Int S::Backends::BackendXLib::Init()
 		im = XOpenIM(display, NIL, NIL, NIL);
 	}
 
-	/* Set default font size.
-	 */
-	Setup::FontSize = 1.00;
-
 	return Success();
 }
 

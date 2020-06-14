@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,6 +49,7 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 			size.cy	= GetDeviceCaps(gdi_dc, VERTRES) + 2;
 		}
 
+		fontSize.SetFontSize(GetSurfaceDPI());
 		rightToLeft.SetSurfaceSize(size);
 
 		paintContext = CreateCompatibleDC(gdi_dc);
@@ -62,8 +63,6 @@ S::GUI::SurfaceGDI::SurfaceGDI(Void *iWindow, const Size &maxSize)
 
 		allocSize = size;
 	}
-
-	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceGDI::~SurfaceGDI()
@@ -170,18 +169,18 @@ S::Void *S::GUI::SurfaceGDI::GetSystemSurface() const
 
 S::Short S::GUI::SurfaceGDI::GetSurfaceDPI() const
 {
-	if (Application::GetScaleFactor() != 0)	surfaceDPI = 96 * Application::GetScaleFactor();
+	if (Application::GetScaleFactor() != 0)	surfaceDPI = Math::Round(96.0 * Application::GetScaleFactor());
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
 	HDC	 dc  = GetWindowDC(0);
-	Short	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
+	Float	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
 
 	ReleaseDC(0, dc);
 
-	surfaceDPI = dpi;
+	surfaceDPI = Math::Round(dpi * Setup::FontSize);
 
-	return dpi;
+	return surfaceDPI;
 }
 
 S::Int S::GUI::SurfaceGDI::SetPixel(const Point &iPoint, const Color &color)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,6 +56,7 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 			size.cy = XDisplayHeight(display, XDefaultScreen(display)) + 2;
 		}
 
+		fontSize.SetFontSize(GetSurfaceDPI());
 		rightToLeft.SetSurfaceSize(size);
 
 		XWindowAttributes	 windowAttributes;
@@ -69,8 +70,6 @@ S::GUI::SurfaceXLib::SurfaceXLib(Void *iWindow, const Size &maxSize)
 
 		allocSize = size;
 	}
-
-	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceXLib::~SurfaceXLib()
@@ -187,20 +186,20 @@ S::Void *S::GUI::SurfaceXLib::GetSystemSurface() const
 
 S::Short S::GUI::SurfaceXLib::GetSurfaceDPI() const
 {
-	if (Application::GetScaleFactor() != 0)	surfaceDPI = 96 * Application::GetScaleFactor();
+	if (Application::GetScaleFactor() != 0)	surfaceDPI = Math::Round(96.0 * Application::GetScaleFactor());
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
 	/* Evaluate GDK_SCALE setting.
 	 */
-	Short	 dpi   = 96;
+	Float	 dpi   = 96.0;
 	Int	 scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
 
 	if (scale > 0) dpi *= scale;
 
-	surfaceDPI = dpi;
+	surfaceDPI = Math::Round(dpi * Setup::FontSize);
 
-	return dpi;
+	return surfaceDPI;
 }
 
 S::Int S::GUI::SurfaceXLib::SetPixel(const Point &iPoint, const Color &color)

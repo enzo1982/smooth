@@ -117,14 +117,6 @@ S::Int S::Backends::BackendWin32::Init()
 	 */
 	UpdateColors();
 
-	/* Get default font size.
-	 */
-	HDC	 dc = GetWindowDC(0);
-
-	Setup::FontSize = (Float) GetDeviceCaps(dc, LOGPIXELSY) / 96;
-
-	ReleaseDC(0, dc);
-
 	/* Get mouse hover time and tolerance.
 	 */
 	SystemParametersInfo(SPI_GETMOUSEHOVERTIME, 0, &Setup::HoverTime, 0);

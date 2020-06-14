@@ -69,6 +69,7 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 			size.cy = frame.size.height;
 		}
 
+		fontSize.SetFontSize(GetSurfaceDPI());
 		rightToLeft.SetSurfaceSize(size);
 
 		paintImage  = [[NSImage alloc] initWithSize: NSMakeSize(size.cx, size.cy)];
@@ -82,8 +83,6 @@ S::GUI::SurfaceCocoa::SurfaceCocoa(Void *iWindow, const Size &maxSize)
 
 		allocSize = size;
 	}
-
-	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceCocoa::~SurfaceCocoa()
@@ -277,15 +276,15 @@ S::Void *S::GUI::SurfaceCocoa::GetSystemSurface() const
 
 S::Short S::GUI::SurfaceCocoa::GetSurfaceDPI() const
 {
-	if (Application::GetScaleFactor() != 0)	surfaceDPI = 96 * Application::GetScaleFactor();
+	if (Application::GetScaleFactor() != 0)	surfaceDPI = Math::Round(96.0 * Application::GetScaleFactor());
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	Short	 dpi = 96;
+	Float	 dpi = 96.0;
 
-	surfaceDPI = dpi;
+	surfaceDPI = Math::Round(dpi * Setup::FontSize);
 
-	return dpi;
+	return surfaceDPI;
 }
 
 S::Float S::GUI::SurfaceCocoa::GetScaleFactor() const

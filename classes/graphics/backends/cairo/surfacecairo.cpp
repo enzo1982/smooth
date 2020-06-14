@@ -76,6 +76,7 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 			size.cy = XDisplayHeight(display, XDefaultScreen(display)) + 2;
 		}
 
+		fontSize.SetFontSize(GetSurfaceDPI());
 		rightToLeft.SetSurfaceSize(size);
 
 		XWindowAttributes	 windowAttributes;
@@ -92,8 +93,6 @@ S::GUI::SurfaceCairo::SurfaceCairo(Void *iWindow, const Size &maxSize)
 
 		allocSize = size;
 	}
-
-	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceCairo::~SurfaceCairo()
@@ -202,11 +201,11 @@ S::Void *S::GUI::SurfaceCairo::GetSystemSurface() const
 
 S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 {
-	if (Application::GetScaleFactor() != 0)	surfaceDPI = 96 * Application::GetScaleFactor();
+	if (Application::GetScaleFactor() != 0)	surfaceDPI = Math::Round(96.0 * Application::GetScaleFactor());
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	Short	 dpi = 96;
+	Float	 dpi = 96.0;
 
 	if (display != NIL)
 	{
@@ -225,9 +224,9 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 		if (scale > 0) dpi *= scale;
 	}
 
-	surfaceDPI = dpi;
+	surfaceDPI = Math::Round(dpi * Setup::FontSize);
 
-	return dpi;
+	return surfaceDPI;
 }
 
 S::Void S::GUI::SurfaceCairo::CreateCairoContext()

@@ -11,6 +11,8 @@ dd.mm.20 hh:mm - smooth alpha 0.9.5
 - backendxlib.cpp	- added support for theme colors and dark mode
 - backendhaiku.cpp	- load actual app signature from application binary
 
+- scale UI to adjust to system font size on all operating systems
+
 22.03.20 11:44 - smooth alpha 0.9.4
 
 - fontgdi.cpp		- fixed text length calculation for fonts using kerning

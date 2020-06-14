@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -55,6 +55,7 @@ S::GUI::SurfaceHaiku::SurfaceHaiku(Void *iView, const Size &maxSize)
 			size.cy	= 1 + frame.bottom + 2;
 		}
 
+		fontSize.SetFontSize(GetSurfaceDPI());
 		rightToLeft.SetSurfaceSize(size);
 
 		bitmap	   = new BBitmap(BRect(0, 0, size.cx, size.cy), screen.ColorSpace(), true);
@@ -66,8 +67,6 @@ S::GUI::SurfaceHaiku::SurfaceHaiku(Void *iView, const Size &maxSize)
 
 		allocSize = size;
 	}
-
-	fontSize.SetFontSize(GetSurfaceDPI());
 }
 
 S::GUI::SurfaceHaiku::~SurfaceHaiku()
@@ -208,17 +207,15 @@ S::Void *S::GUI::SurfaceHaiku::GetSystemSurface() const
 
 S::Short S::GUI::SurfaceHaiku::GetSurfaceDPI() const
 {
-	if (Application::GetScaleFactor() != 0)	surfaceDPI = 96 * Application::GetScaleFactor();
+	if (Application::GetScaleFactor() != 0)	surfaceDPI = Math::Round(96.0 * Application::GetScaleFactor());
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	Short	 dpi = 96;
+	Float	 dpi = 96.0;
 
-	dpi *= be_plain_font->Size() / 12.0;
+	surfaceDPI = Math::Round(dpi * Setup::FontSize);
 
-	surfaceDPI = dpi;
-
-	return dpi;
+	return surfaceDPI;
 }
 
 S::Int S::GUI::SurfaceHaiku::SetPixel(const Point &iPoint, const Color &color)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -61,6 +61,8 @@ S::Int S::GUI::FontXLib::Initialize()
 					String	 font = fontName;
 
 					Font::Default = font.SubString(1, font.FindLast(" ") - 1);
+
+					Setup::FontSize = font.SubString(font.FindLast(" ") + 1, font.Length() - font.FindLast(" ") - 2).ToFloat() / Font::DefaultSize;
 				}
 
 				pclose(pstdin);

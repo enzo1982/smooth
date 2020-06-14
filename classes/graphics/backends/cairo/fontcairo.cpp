@@ -62,6 +62,8 @@ S::Int S::GUI::FontCairo::Initialize()
 					String	 font = fontName;
 
 					Font::Default = font.SubString(1, font.FindLast(" ") - 1);
+
+					Setup::FontSize = font.SubString(font.FindLast(" ") + 1, font.Length() - font.FindLast(" ") - 2).ToFloat() / Font::DefaultSize;
 				}
 
 				pclose(pstdin);

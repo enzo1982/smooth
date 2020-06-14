@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,6 +33,8 @@ S::Int S::GUI::FontGDIPlus::Initialize()
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
 
 	Font::Default = ncm.lfMessageFont.lfFaceName;
+
+	Setup::FontSize = Float(-ncm.lfMessageFont.lfHeight) / 96.0 * 72.0 / Font::DefaultSize;
 
 	return Success();
 }

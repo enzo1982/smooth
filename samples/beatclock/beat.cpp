@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -49,7 +49,7 @@ BeatClock::BeatClock() : Application("BeatClock")
 
 	ReadConfig();
 
-	wnd		= new GUI::Window("BeatClock", Point(wpx, wpy), Size(Math::Round(164 * Setup::FontSize), Math::Round(103 * Setup::FontSize)));
+	wnd		= new GUI::Window("BeatClock", Point(wpx, wpy), Size(164, 103));
 	title		= new Titlebar(TB_CLOSEBUTTON);
 	menubar		= new Menubar();
 	timer		= new Timer();
@@ -344,17 +344,17 @@ Void BeatClock::PaintAll()
 
 	if (actbeats != beats || actcbeats != cbeats || actccbeats != ccbeats || wmpaint)
 	{
-		textRect.left	= (Int) ((16 * Setup::FontSize) + 0.5) * surface->GetSurfaceDPI() / 96.0;
-		textRect.top	= (Int) ((53 * Setup::FontSize) + 0.5) * surface->GetSurfaceDPI() / 96.0;
-		textRect.right	= wnd->GetWidth() * surface->GetSurfaceDPI() / 96.0 - (Int) ((16 * Setup::FontSize) + 0.5) * surface->GetSurfaceDPI() / 96.0;
-		textRect.bottom = textRect.top + (Int) ((40 * Setup::FontSize) + 0.5) * surface->GetSurfaceDPI() / 96.0;
+		textRect.left	= 16 * surface->GetSurfaceDPI() / 96.0;
+		textRect.top	= 53 * surface->GetSurfaceDPI() / 96.0;
+		textRect.right	= wnd->GetWidth() * surface->GetSurfaceDPI() / 96.0 - 16 * surface->GetSurfaceDPI() / 96.0;
+		textRect.bottom = textRect.top + 40 * surface->GetSurfaceDPI() / 96.0;
 
 		switch (centi)
 		{
 			case True:
 				surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
-				if (timeformat == 1) textRect.left = (Int) ((25 * Setup::FontSize) + 0.5) * surface->GetSurfaceDPI() / 96.0;
+				if (timeformat == 1) textRect.left = 25 * surface->GetSurfaceDPI() / 96.0;
 
 				surface->SetText(btext, textRect, font);
 
@@ -364,9 +364,9 @@ Void BeatClock::PaintAll()
 				{
 					surface->Box(textRect, Setup::BackgroundColor, Rect::Filled);
 
-					textRect.left = (Int) (44 * Setup::FontSize) * surface->GetSurfaceDPI() / 96.0;
+					textRect.left = 44 * surface->GetSurfaceDPI() / 96.0;
 
-					if (timeformat == 1) textRect.left = (Int) ((45 * Setup::FontSize) + 0.5) * surface->GetSurfaceDPI() / 96.0;
+					if (timeformat == 1) textRect.left = 45 * surface->GetSurfaceDPI() / 96.0;
 
 					surface->SetText(btext2, textRect, font);
 				}

@@ -413,8 +413,8 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			{
 				BRect	 windowRect = wnd->Frame();
 
-				Point	 pos  =  Point(windowRect.left, windowRect.top);
-				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1) - sizeModifier) / fontSize;
+				Point	 pos  = Point(windowRect.left, windowRect.top);
+				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1)) / fontSize;
 
 				if (drawSurface != NIL) drawSurface->SetSize(Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
@@ -436,7 +436,7 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 				BRect	 windowRect = wnd->Frame();
 
 				Point	 pos  =  Point(windowRect.left, windowRect.top);
-				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1) - sizeModifier) / fontSize;
+				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1)) / fontSize;
 
 				if (drawSurface != NIL) drawSurface->SetSize(Size(windowRect.Width(), windowRect.Height()) + Size(1, 1));
 
@@ -454,8 +454,8 @@ S::Int S::GUI::WindowHaiku::ProcessSystemMessages(Int message, Int wParam, Int l
 			{
 				BRect	 windowRect = wnd->Frame();
 
-				Point	 pos  =  Point(windowRect.left, windowRect.top);
-				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1) - sizeModifier) / fontSize;
+				Point	 pos  = Point(windowRect.left, windowRect.top);
+				Size	 size = (Size(windowRect.Width(), windowRect.Height()) + Size(1, 1)) / fontSize;
 
 				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
 							       ((size.cx + 32768) << 16) | (size.cy + 32768));

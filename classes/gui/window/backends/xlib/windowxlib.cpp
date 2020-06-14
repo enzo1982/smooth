@@ -331,8 +331,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				if (drawSurface != NIL) drawSurface->SetSize(Size(attributes.width, attributes.height));
 
-				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
-							       ((size.cx + 32768) << 16) | (size.cy + 32768));
+				onEvent.Call(SM_WINDOWMETRICS, ((	     attributes.x		  + 32768) << 16) | (		 attributes.y		       + 32768),
+							       ((Math::Round(attributes.width / fontSize) + 32768) << 16) | (Math::Round(attributes.height / fontSize) + 32768));
 
 				onEvent.Call(SM_GETFOCUS, 0, 0);
 			}
@@ -669,8 +669,8 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				if (drawSurface != NIL) drawSurface->SetSize(Size(e->xconfigure.width, e->xconfigure.height));
 
-				onEvent.Call(SM_WINDOWMETRICS, ((pos.x	 + 32768) << 16) | (pos.y   + 32768),
-							       ((size.cx + 32768) << 16) | (size.cy + 32768));
+				onEvent.Call(SM_WINDOWMETRICS, ((	     e->xconfigure.x		     + 32768) << 16) | (	    e->xconfigure.y		     + 32768),
+							       ((Math::Round(e->xconfigure.width / fontSize) + 32768) << 16) | (Math::Round(e->xconfigure.height / fontSize) + 32768));
 
 				/* Update window rect and emit paint event if necessary.
 				 */

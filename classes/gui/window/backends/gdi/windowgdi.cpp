@@ -521,8 +521,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 
 				if (!(windowPos->flags & SWP_NOMOVE && windowPos->flags & SWP_NOSIZE))
 				{
-					Point	 pos  =  Point(windowPos->x, windowPos->y);
-					Size	 size = (Size(windowPos->cx, windowPos->cy) - sizeModifier) / fontSize;
+					Point	 pos  = Point(windowPos->x, windowPos->y);
+					Size	 size = Size(windowPos->cx, windowPos->cy) / fontSize;
 
 					if (windowPos->flags & SWP_NOMOVE || windowPos->flags & SWP_NOSIZE)
 					{
@@ -530,8 +530,8 @@ S::Int S::GUI::WindowGDI::ProcessSystemMessages(UINT message, WPARAM wParam, LPA
 
 						GetWindowRect(hwnd, &windowRect);
 
-						if	(windowPos->flags & SWP_NOMOVE) pos  =  Point(windowRect.left, windowRect.top);
-						else if (windowPos->flags & SWP_NOSIZE) size = (Size(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top) - sizeModifier) / fontSize;
+						if	(windowPos->flags & SWP_NOMOVE) pos  = Point(windowRect.left, windowRect.top);
+						else if (windowPos->flags & SWP_NOSIZE) size = Size(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top) / fontSize;
 					}
 
 					if (!(windowPos->flags & SWP_NOSIZE))

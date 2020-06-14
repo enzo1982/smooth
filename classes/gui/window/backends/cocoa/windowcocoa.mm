@@ -1516,8 +1516,8 @@ S::Void S::GUI::WindowCocoa::UpdateMetrics(Bool resized)
 
 	contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
 
-	Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
-	Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
+	Point	 pos  = Point(contentRect.origin.x, contentRect.origin.y);
+	Size	 size = Size(contentRect.size.width, contentRect.size.height) / fontSize;
 
 	if (resized && drawSurface != NIL) drawSurface->SetSize(Size(contentRect.size.width, contentRect.size.height));
 

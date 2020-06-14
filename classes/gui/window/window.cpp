@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -370,7 +370,7 @@ S::Int S::GUI::Window::Raise()
 
 S::GUI::Rect S::GUI::Window::GetWindowRect() const
 {
-	return Rect(GetPosition(), GetSize() - backend->GetSizeModifier());
+	return Rect(GetPosition(), GetSize());
 }
 
 S::GUI::Rect S::GUI::Window::GetClientRect() const
@@ -561,12 +561,12 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				Point	 nPos((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768);
 				Size	 nSize((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768);
 
-				Bool	 resized	= (GetSize() != nSize + backend->GetSizeModifier());
+				Bool	 resized	= (GetSize() != nSize);
 				Bool	 prevVisible	= visible;
 
 				visible = False;
 
-				Widget::SetMetrics(nPos, nSize + backend->GetSizeModifier());
+				Widget::SetMetrics(nPos, nSize);
 
 				if (resized) CalculateOffsets();
 

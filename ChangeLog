@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-dd.mm.20 hh:mm - smooth alpha 0.9.5
+17.06.20 23:22 - smooth alpha 0.9.5
 
 - threadcocoa.mm	- set stack size for new threads to process stack size
 - surfacecairo.cpp	- fixed crash when DISPLAY variable is not set

@@ -173,10 +173,7 @@ S::Short S::GUI::SurfaceGDI::GetSurfaceDPI() const
 
 	if (surfaceDPI != -1) return surfaceDPI;
 
-	HDC	 dc  = GetWindowDC(0);
-	Float	 dpi = GetDeviceCaps(dc, LOGPIXELSY);
-
-	ReleaseDC(0, dc);
+	Float	 dpi = 96.0;
 
 	surfaceDPI = Math::Round(dpi * Setup::FontSize);
 

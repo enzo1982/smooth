@@ -1,5 +1,10 @@
 ChangeLog for smooth
 
+dd.mm.20 hh:mm - smooth alpha 0.9.6
+
+- surfacegdi.cpp	- fixed too high DPI values being reported
+- surfacegdiplus.cpp	- fixed too high DPI values being reported
+
 17.06.20 23:22 - smooth alpha 0.9.5
 
 - threadcocoa.mm	- set stack size for new threads to process stack size

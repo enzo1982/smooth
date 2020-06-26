@@ -370,34 +370,52 @@ S::Int S::I18n::Translator::GetSupportedLanguages()
 		languages.Add(language);
 	}
 
-	/* Get translation files' folder.
+	/* Collect translation folders.
 	 */
-	Directory		 dir(GUI::Application::GetApplicationDirectory().Append("lang"));
+	Array<Directory>	 dirs;
 
-#ifndef __WIN32__
-	/* Check resources folders.
+	/* Add application data folders.
 	 */
 	String	 appName = GetApplicationName();
 
-	if (!dir.Exists() || dir.GetFilesByPattern(String(appPrefix).Append("_*.xml")).Length() == 0) dir = S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang");
-	if (!dir.Exists() || dir.GetFilesByPattern(String(appPrefix).Append("_*.xml")).Length() == 0) dir = S::System::System::GetResourcesDirectory().Append(appName).Append(Directory::GetDirectoryDelimiter()).Append("lang");
+	dirs.Add(S::System::System::GetApplicationDataDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang"));
+
+	if (appName != NIL && appName != appPrefix) dirs.Add(S::System::System::GetApplicationDataDirectory().Append(appName).Append(Directory::GetDirectoryDelimiter()).Append("lang"));
+
+	/* Add application folder.
+	 */
+	dirs.Add(GUI::Application::GetApplicationDirectory().Append("lang"));
+
+#ifndef __WIN32__
+	/* Add resources folders.
+	 */
+	dirs.Add(S::System::System::GetResourcesDirectory().Append(appPrefix).Append(Directory::GetDirectoryDelimiter()).Append("lang"));
+
+	if (appName != NIL && appName != appPrefix) dirs.Add(S::System::System::GetResourcesDirectory().Append(appName).Append(Directory::GetDirectoryDelimiter()).Append("lang"));
 #endif
 
-	/* Load translation files.
+	/* Check translation folders.
 	 */
-	const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).Append("_*.xml"));
-
-	foreach (const File &file, files)
+	foreach (const Directory &dir, dirs)
 	{
-		XML::Document	 doc;
+		if (!dir.Exists() || dir.GetFilesByPattern(String(appPrefix).Append("_*.xml")).Length() == 0) continue;
 
-		if (doc.LoadFile(file) == Success())
+		/* Load translation files.
+		 */
+		const Array<File>	&files = dir.GetFilesByPattern(String(appPrefix).Append("_*.xml"));
+
+		foreach (const File &file, files)
 		{
-			Language	*language = new Language();
+			XML::Document	 doc;
 
-			language->magic = file.GetFileName();
+			if (doc.LoadFile(file) == Success())
+			{
+				Language	*language = new Language();
 
-			if (LoadDescription(doc, language) == Success()) AddLanguage(language);
+				language->magic = file.GetFileName();
+
+				if (LoadDescription(doc, language) == Success()) AddLanguage(language);
+			}
 		}
 	}
 
@@ -588,6 +606,8 @@ S::Int S::I18n::Translator::AddLanguage(Language *language)
 
 		for (Int j = 0; j < Math::Max(langName.Length(), compName.Length()); j++)
 		{
+			if (langName == compName) return Error();
+
 			if ((langName[j] < compName[j] && !(langName[j] == '(' && compName[j] == '/')) || (langName[j] == '/' && compName[j] == '('))
 			{
 				languages.InsertAtPos(i, language);

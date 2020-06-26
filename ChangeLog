@@ -4,6 +4,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.6
 
 - surfacegdi.cpp	- fixed too high DPI values being reported
 - surfacegdiplus.cpp	- fixed too high DPI values being reported
+- translator.cpp	- also look for translations in application data folder
 
 17.06.20 23:22 - smooth alpha 0.9.5
 

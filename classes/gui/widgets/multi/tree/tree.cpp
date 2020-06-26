@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -217,7 +217,7 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 	Rect	 cbRect = Rect(GetRealPosition() + Point(2, 3) * surface->GetSurfaceDPI() / 96.0, Size(9, 9) * surface->GetSurfaceDPI() / 96.0);
 
-	if (cbRect.GetWidth() % 2 == 0) cbRect = cbRect - Size(1, 1);
+	if (cbRect.GetWidth() % 2 == 0) cbRect = cbRect + Point(1, 1) - Size(1, 1);
 
 	if (cbRect.top <= cbRect.bottom - 1)
 	{
@@ -226,8 +226,8 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 		if (cbRect.top <= cbRect.bottom - 3)
 		{
-			Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + Math::Round(4 * surface->GetSurfaceDPI() / 96.0));
-			Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + Math::Round(4 * surface->GetSurfaceDPI() / 96.0));
+			Point	 p1 = Point(cbRect.left + 2 + (IsRightToLeft() ? 1 : 0), (cbRect.top + cbRect.bottom) / 2);
+			Point	 p2 = Point(cbRect.right - 2 + (IsRightToLeft() ? 1 : 0), (cbRect.top + cbRect.bottom) / 2);
 
 			Color	 darkColor = Setup::ClientTextColor;
 
@@ -237,8 +237,8 @@ S::Void S::GUI::Tree::PaintText(const Color &color, Bool drawGradient)
 
 			if (!IsMarked())
 			{
-				p1 = Point(cbRect.left + Math::Round(4 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
-				p2 = Point(cbRect.left + Math::Round(4 * surface->GetSurfaceDPI() / 96.0) + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
+				p1 = Point((cbRect.left + cbRect.right) / 2 + (IsRightToLeft() ? 1 : 0), cbRect.top + 2);
+				p2 = Point((cbRect.left + cbRect.right) / 2 + (IsRightToLeft() ? 1 : 0), cbRect.bottom - 2);
 
 				surface->Line(p1, p2, darkColor);
 			}

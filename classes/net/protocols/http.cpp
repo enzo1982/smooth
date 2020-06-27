@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -388,9 +388,20 @@ size_t S::Net::Protocols::httpHeader(char *buffer, size_t size, size_t n, void *
 		http->out = new IO::OutStream(IO::STREAM_FILE, http->file, IO::OS_REPLACE);
 
 		http->responseFields.RemoveAll();
+
+		/* Add status code to header fields.
+		 */
+		Parameter	 field;
+
+		field.key	= "Status-Code";
+		field.value	= header.Tail(header.Length() - header.Find(" ") - 1);
+
+		http->responseFields.Add(field);
 	}
 	else if (header.Contains(": "))
 	{
+		/* Split header into key and value.
+		 */
 		Parameter	 field;
 		Int		 colon	= header.Find(": ");
 

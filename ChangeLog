@@ -6,6 +6,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.6
 - surfacegdiplus.cpp	- fixed too high DPI values being reported
 - translator.cpp	- also look for translations in application data folder
 - tree.cpp		- improved rendering of tree widget in scaled mode
+- http.cpp		- include status code in response header fields
 
 17.06.20 23:22 - smooth alpha 0.9.5
 

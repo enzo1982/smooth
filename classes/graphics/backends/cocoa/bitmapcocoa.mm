@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -240,9 +240,9 @@ S::GUI::Color S::GUI::BitmapCocoa::GetPixel(const Point &point) const
 	switch (depth)
 	{
 		case 24:
-			return Color(			      data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0]);
+			return Color(			      data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0], Color::RGB);
 		case 32:
-			return Color(data[offset + 3] << 24 | data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0]);
+			return Color(data[offset + 3] << 24 | data[offset + 2] << 16 | data[offset + 1] << 8 | data[offset + 0], Color::RGBA);
 	}
 
 	return 0;

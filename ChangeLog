@@ -8,6 +8,8 @@ dd.mm.20 hh:mm - smooth alpha 0.9.6
 - tree.cpp		- improved rendering of tree widget in scaled mode
 - http.cpp		- include status code in response header fields
 
+- fixed wrong color space returned in BitmapBackend::GetPixel for multiple backends
+
 17.06.20 23:22 - smooth alpha 0.9.5
 
 - threadcocoa.mm	- set stack size for new threads to process stack size

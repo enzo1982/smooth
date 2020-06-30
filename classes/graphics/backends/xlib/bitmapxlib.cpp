@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -185,9 +185,9 @@ S::GUI::Color S::GUI::BitmapXLib::GetPixel(const Point &iPoint) const
 
 	Long	 value = XGetPixel(bitmap, iPoint.x, iPoint.y);
 
-	if	(depth == 16) return				   Color(((value >> 11) &  31) << 3, ((value >> 5) &  63) << 2, (value &  31) << 3);
-	else if (depth == 24) return				   Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      );
-	else if (depth == 32) return ((value >> 24) & 255) << 24 | Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      );
+	if	(depth == 16) return				   Color(((value >> 11) &  31) << 3, ((value >> 5) &  63) << 2, (value &  31) << 3, Color::RGB);
+	else if (depth == 24) return				   Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      , Color::RGB);
+	else if (depth == 32) return ((value >> 24) & 255) << 24 | Color( (value >> 16) & 255,	      (value >> 8) & 255,	 value & 255      , Color::RGBA);
 
 	return Color();
 }

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -216,11 +216,11 @@ S::GUI::Color S::GUI::BitmapGDI::GetPixel(const Point &point) const
 		case 24:
 			offset = (size.cy - point.y - 1) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
 
-			return Color(			      data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2]);
+			return Color(			      data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2], Color::RGB);
 		case 32:
 			offset = (size.cy - point.y - 1) * (				      size.cx * 4) + point.x * 4;
 
-			return Color(data[offset + 3] << 24 | data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2]);
+			return Color(data[offset + 3] << 24 | data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2], Color::RGBA);
 	}
 
 	return 0;

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -353,10 +353,16 @@ S::GUI::MenubarCocoa::MenubarCocoa(Menubar *iMenubar) : Widget(Point(), Size())
 
 	menubar		= iMenubar;
 	menubarCocoa	= NIL;
+
+	CheckBox::internalCheckValues.Connect(&MenubarCocoa::UpdateCocoaMenubar, this);
+	OptionBox::internalCheckValues.Connect(&MenubarCocoa::UpdateCocoaMenubar, this);
 }
 
 S::GUI::MenubarCocoa::~MenubarCocoa()
 {
+	CheckBox::internalCheckValues.Disconnect(&MenubarCocoa::UpdateCocoaMenubar, this);
+	OptionBox::internalCheckValues.Disconnect(&MenubarCocoa::UpdateCocoaMenubar, this);
+
 	if (menubarCocoa != NIL)
 	{
 		[(CocoaMenubar *) menubarCocoa dispose];
@@ -372,21 +378,22 @@ S::Int S::GUI::MenubarCocoa::Paint(Int message)
 	Window	*window = GetContainerWindow();
 
 	if (GetSize() == Size()) SetSize(window->GetSize());
-
-	if (GetSize() == window->GetSize())
-	{
-		if (menubarCocoa != NIL)
-		{
-			[(CocoaMenubar *) menubarCocoa dispose];
-			[(CocoaMenubar *) menubarCocoa release];
-		}
-
-		menubarCocoa = [[CocoaMenubar alloc] initWithMenubar: menubar];
-	}
+	if (GetSize() == window->GetSize()) UpdateCocoaMenubar();
 
 	SetVisibleDirect(False);
 	SetSize(window->GetSize());
 	SetVisibleDirect(True);
 
 	return Success();
+}
+
+S::Void S::GUI::MenubarCocoa::UpdateCocoaMenubar()
+{
+	if (menubarCocoa != NIL)
+	{
+		[(CocoaMenubar *) menubarCocoa dispose];
+		[(CocoaMenubar *) menubarCocoa release];
+	}
+
+	menubarCocoa = [[CocoaMenubar alloc] initWithMenubar: menubar];
 }

@@ -132,7 +132,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
@@ -150,7 +150,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -167,7 +167,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -187,7 +187,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -203,7 +203,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -220,7 +220,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -237,7 +237,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -257,7 +257,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>

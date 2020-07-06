@@ -10,6 +10,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.6
 - http.cpp		- include status code in response header fields
 
 - fixed wrong color space returned in BitmapBackend::GetPixel for multiple backends
+- upgraded fribidi to version 1.0.10
 
 17.06.20 23:22 - smooth alpha 0.9.5
 

@@ -123,7 +123,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
@@ -131,14 +131,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -148,7 +148,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
@@ -156,21 +156,21 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -180,7 +180,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>../../../include; ../../../libraries/fribidi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FRIBIDI_LIB_STATIC;HAVE_STDLIB_H=1;HAVE_STRING_H=1;HAVE_STRINGIZE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>

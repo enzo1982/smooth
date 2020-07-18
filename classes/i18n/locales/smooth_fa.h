@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,6 +22,8 @@ static const char *smooth_fa =
 	     <property name=\"encoding\">UTF-8</property>				\
 	   </info>									\
 	   <data>									\
+	     <entry string=\"?\">؟</entry>						\
+											\
 	     <entry string=\"OK\">تأیید</entry>						\
 	     <entry string=\"Cancel\">لغو</entry>					\
 	     <entry string=\"Yes\">بله</entry>						\

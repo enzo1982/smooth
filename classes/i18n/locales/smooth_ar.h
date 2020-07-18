@@ -23,6 +23,7 @@ static const char *smooth_ar =
 	   </info>										\
 	   <data>										\
 	     <entry string=\"%1%\">%%1</entry>							\
+	     <entry string=\"?\">؟</entry>							\
 												\
 	     <entry string=\"OK\">موافق</entry>							\
 	     <entry string=\"Cancel\">ألغِ</entry>						\

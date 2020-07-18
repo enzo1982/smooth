@@ -67,6 +67,8 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 
 S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title, Int buttons, Int iconID, const String &checkBoxText, Bool *cVar)
 {
+	/* Load message box icon if any.
+	 */
 	Bitmap	 icon;
 
 #ifdef __WIN32__
@@ -98,8 +100,30 @@ S::GUI::Dialogs::MessageDlg::MessageDlg(const String &text, const String &title,
 	}
 #endif
 
-	icon.SetBackgroundColor(Setup::BackgroundColor);
+	/* Mirror question mark icon for Arabic script languages.
+	 */
+	if (iconID == Message::Icon::Question && I18n::Translator::defaultTranslator->TranslateString("?")[0] == 0x61F)
+	{
+		Point	 point;
+		Size	 size = icon.GetSize();
 
+		for (point.y = 0; point.y < size.cy; point.y++)
+		{
+			for (point.x = 0; point.x < size.cx / 2; point.x++)
+			{
+				Point	 mirror = Point(size.cx - point.x - 1, point.y);
+
+				Color	 pointPixel  = icon.GetPixel(point);
+				Color	 mirrorPixel = icon.GetPixel(mirror);
+
+				icon.SetPixel(point, mirrorPixel);
+				icon.SetPixel(mirror, pointPixel);
+			}
+		}
+	}
+
+	/* Create message box widgets.
+	 */
 	InitializeWidgets(text, title, buttons, icon, checkBoxText, cVar);
 }
 

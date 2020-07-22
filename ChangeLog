@@ -5,6 +5,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.6
 - surfacegdi.cpp	- fixed too high DPI values being reported
 - surfacegdiplus.cpp	- fixed too high DPI values being reported
 - menubar_cocoa.mm	- fixed possible crash after menubar contents change
+- droptarget.cpp	- fixed rare crash related to drag & drop handling
 - translator.cpp	- also look for translations in application data folder
 - tree.cpp		- improved rendering of tree widget in scaled mode
 - http.cpp		- include status code in response header fields

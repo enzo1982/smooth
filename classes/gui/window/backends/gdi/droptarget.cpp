@@ -205,6 +205,8 @@ STDMETHODIMP smooth::GUI::DropTarget::DragOver(DWORD grfKeyState, POINTL pt, LPD
 
 STDMETHODIMP smooth::GUI::DropTarget::DragLeave()
 {
+	/* Free data if any.
+	 */
 	if (data == NIL) return S_OK;
 
 	data->Release();
@@ -215,6 +217,8 @@ STDMETHODIMP smooth::GUI::DropTarget::DragLeave()
 
 STDMETHODIMP smooth::GUI::DropTarget::Drop(LPDATAOBJECT pDataObj, DWORD grfKeyState, POINTL pt, LPDWORD pdwEffect)
 {
+	/* Fire drop event.
+	 */
 	RECT	 windowRect;
 
 	GetWindowRect((HWND) backend->GetSystemWindow(), &windowRect);
@@ -222,6 +226,10 @@ STDMETHODIMP smooth::GUI::DropTarget::Drop(LPDATAOBJECT pDataObj, DWORD grfKeySt
 	backend->onEvent.Call(SM_DROPFILES, pt.x - windowRect.left, pt.y - windowRect.top);
 
 	*pdwEffect = DROPEFFECT_COPY;
+
+	/* Free data if any.
+	 */
+	if (data == NIL) return S_OK;
 
 	data->Release();
 	data = NIL;

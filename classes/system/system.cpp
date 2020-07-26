@@ -434,12 +434,10 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
 			break;
 		case PersonalFilesPictures:
-			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5)   ) SHGetSpecialFolderLocation(NIL, CSIDL_MYPICTURES, &idlist);
-			else										  SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			SHGetSpecialFolderLocation(NIL, CSIDL_MYPICTURES, &idlist);
 			break;
 		case PersonalFilesMusic:
-			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5)   ) SHGetSpecialFolderLocation(NIL, CSIDL_MYMUSIC, &idlist);
-			else										  SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			SHGetSpecialFolderLocation(NIL, CSIDL_MYMUSIC, &idlist);
 			break;
 		case PersonalFilesMovies:
 			if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5, 1)) SHGetSpecialFolderLocation(NIL, CSIDL_MYVIDEO, &idlist);

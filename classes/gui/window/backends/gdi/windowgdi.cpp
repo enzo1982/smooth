@@ -777,15 +777,12 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 {
 	if (destroyIcon) DestroyIcon(sysIcon);
 
-	ICONINFO	 icon;
-	Bitmap		 mask = newIcon;
-	Int		 transparentPixel = 0;
-
-	if (Backends::BackendWin32::IsWindowsVersionAtLeast(VER_PLATFORM_WIN32_NT, 5)) transparentPixel = 16777215;
-	else									       transparentPixel = 0;
-
-	Size	 size  = newIcon.GetSize();
-	Int	 depth = newIcon.GetDepth();
+	/* Set up alpha mask.
+	 */
+	Bitmap	 mask		  = newIcon;
+	Size	 size		  = newIcon.GetSize();
+	Int	 depth		  = newIcon.GetDepth();
+	Int	 transparentPixel = 16777215;
 
 	for (Int y = 0; y < size.cy; y++)
 	{
@@ -793,10 +790,14 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 		{
 			Color	 pixel = newIcon.GetPixel(Point(x, y));
 
-			if (depth == 32) mask.SetPixel(Point(x, y), pixel.GetAlpha() >=    128  ? transparentPixel : 0);
-			else		 mask.SetPixel(Point(x, y), pixel == Color(192,192,192) ? transparentPixel : 0);
+			if (depth == 32) mask.SetPixel(Point(x, y), pixel.GetAlpha() >=	     128  ? transparentPixel : 0);
+			else		 mask.SetPixel(Point(x, y), pixel == Color(192, 192, 192) ? transparentPixel : 0);
 		}
 	}
+
+	/* Create icon.
+	 */
+	ICONINFO	 icon;
 
 	icon.fIcon	= true;
 	icon.xHotspot	= 0;

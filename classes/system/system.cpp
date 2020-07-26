@@ -428,7 +428,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 	{
 		default:
 		case PersonalFilesGeneric:
-			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);
+			SHGetSpecialFolderLocation(NIL, CSIDL_PROFILE, &idlist);
 			break;
 		case PersonalFilesDocuments:
 			SHGetSpecialFolderLocation(NIL, CSIDL_PERSONAL, &idlist);

@@ -10,6 +10,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.6
 - tree.cpp		- improved rendering of tree widget in scaled mode
 - http.cpp		- include status code in response header fields
 
+- added support for macOS 11.0 Big Sur
 - fixed wrong color space returned in BitmapBackend::GetPixel for multiple backends
 - upgraded fribidi to version 1.0.10
 

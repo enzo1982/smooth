@@ -561,8 +561,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				Point	 nPos((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768);
 				Size	 nSize((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768);
 
-				Bool	 resized	= (GetSize() != nSize);
-				Bool	 prevVisible	= visible;
+				Bool	 resized     = (GetSize() != nSize);
+				Bool	 prevVisible = visible;
 
 				visible = False;
 
@@ -572,20 +572,21 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				visible = prevVisible;
 
-				rVal = MessageProcessed;
+				updateRect = Rect(Point(-1, -1), Size(0, 0));
 			}
+
+			rVal = MessageProcessed;
 
 			break;
 		case SM_PAINT:
-			updateRect = backend->GetUpdateRect();
-
 			{
-				Size	 realSize = GetRealSize();
+				Bool	 resized = (updateRect == Rect(Point(-1, -1), Size(0, 0)));
 
-				if (Math::Abs(updateRect.GetWidth() - realSize.cx) < 20 && Math::Abs(updateRect.GetHeight() - realSize.cy) < 20) Paint(SP_PAINT);
-				else														 Paint(SP_UPDATE);
+				updateRect = backend->GetUpdateRect();
 
-				updateRect = Rect(Point(0, 0), realSize);
+				Paint(resized ? SP_PAINT : SP_UPDATE);
+
+				updateRect = Rect(Point(0, 0), GetRealSize());
 			}
 
 			rVal = MessageProcessed;

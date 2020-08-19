@@ -973,6 +973,7 @@
     <ClInclude Include="..\..\classes\i18n\locales\smooth_el.h" />
     <ClInclude Include="..\..\classes\i18n\locales\smooth_es.h" />
     <ClInclude Include="..\..\classes\i18n\locales\smooth_et.h" />
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_fa.h" />
     <ClInclude Include="..\..\classes\i18n\locales\smooth_fi.h" />
     <ClInclude Include="..\..\classes\i18n\locales\smooth_fr.h" />
     <ClInclude Include="..\..\classes\i18n\locales\smooth_gl.h" />

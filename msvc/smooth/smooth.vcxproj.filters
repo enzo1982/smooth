@@ -1898,6 +1898,9 @@
     <ClInclude Include="..\..\include\smooth\gui\window\backends\gdi\droptarget.h">
       <Filter>Headerdateien\smooth\gui\window\backends\gdi</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\classes\i18n\locales\smooth_fa.h">
+      <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\resources\resources.rc">

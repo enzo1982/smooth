@@ -59,7 +59,8 @@ S::IO::DriverWin32::DriverWin32(const String &file, Int mode) : Driver()
 	 */
 	if (stream == INVALID_HANDLE_VALUE)
 	{
-		lastError = IO_ERROR_UNEXPECTED;
+		if (::GetLastError() == ERROR_ACCESS_DENIED) lastError = IO_ERROR_NOACCESS;
+		else					     lastError = IO_ERROR_UNEXPECTED;
 
 		return;
 	}

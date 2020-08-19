@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,6 +33,7 @@ namespace smooth
 		const Short	 IO_ERROR_OPNOTAVAIL	= 6;	// the requested operation is not available on the connected stream
 		const Short	 IO_ERROR_WRONGOS	= 7;	// the requested functionality is not available under the current operating system
 		const Short	 IO_ERROR_NODATA	= 8;	// no data is available in the queue
+		const Short	 IO_ERROR_NOACCESS	= 9;	// access to the requested resource has been denied
 	};
 };
 

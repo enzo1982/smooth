@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #if defined __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
@@ -99,7 +100,8 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &file, Int mode) : Driver()
 	 */
 	if (stream == -1)
 	{
-		lastError = IO_ERROR_UNEXPECTED;
+		if (errno == EACCES) lastError = IO_ERROR_NOACCESS;
+		else		     lastError = IO_ERROR_UNEXPECTED;
 
 		return;
 	}

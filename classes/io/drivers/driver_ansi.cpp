@@ -16,6 +16,7 @@
 #include <smooth/io/outstream.h>
 
 #include <stdio.h>
+#include <errno.h>
 
 #if defined __WIN32__
 #	include <smooth/backends/win32/backendwin32.h>
@@ -90,7 +91,8 @@ S::IO::DriverANSI::DriverANSI(const String &file, Int mode) : Driver()
 	 */
 	if (stream == NIL)
 	{
-		lastError = IO_ERROR_UNEXPECTED;
+		if (errno == EACCES) lastError = IO_ERROR_NOACCESS;
+		else		     lastError = IO_ERROR_UNEXPECTED;
 
 		return;
 	}

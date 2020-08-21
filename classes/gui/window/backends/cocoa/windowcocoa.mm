@@ -88,6 +88,8 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (BOOL)	isFlipped;
 	- (void)	drawRect:	   (NSRect) rect;
 
+	- (void)	setFrameSize:	   (NSSize) newSize;
+
 	- (BOOL)	acceptsFirstResponder;
 
 	/* NSTextInputClient methods.
@@ -275,6 +277,24 @@ const int	 NSApplicationDropFiles	 = 9;
 
 			[NSGraphicsContext restoreGraphicsState];
 		}
+	}
+
+	- (void) setFrameSize: (NSSize) newSize
+	{
+		[super setFrameSize: newSize];
+
+		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([self window]);
+		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
+								      location: NSMakePoint(0, 0)
+								 modifierFlags: 0
+								     timestamp: 0
+								  windowNumber: [[self window] windowNumber]
+								       context: nil
+								       subtype: NSApplicationResize
+									 data1: nil
+									 data2: nil];
+
+		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
 
 	- (BOOL) acceptsFirstResponder

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,7 +27,7 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 	stream	    = -1;
 	size	    = -1;
 
-	if (hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
+	if (hostName == NIL || hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
 
 	/* Open TCP/IP socket.
 	 */
@@ -97,7 +97,9 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 	}
 	else
 	{
-		unsigned char	*socksdata = new unsigned char [10 + strlen(hostName)];
+		Int	 hostNameLen = strlen(hostName);
+
+		unsigned char	*socksdata = new unsigned char [10 + hostNameLen];
 
 		socksdata[0] = 4;
 		socksdata[1] = 1;
@@ -109,11 +111,11 @@ S::IO::DriverSOCKS4::DriverSOCKS4(const String &proxy, Int socksPort, const Stri
 		socksdata[7] = 1;
 		socksdata[8] = 0;
 
-		for (Int i = 0; i < (Int) strlen(hostName); i++) socksdata[9 + i] = hostName[i];
+		for (Int i = 0; i < hostNameLen; i++) socksdata[9 + i] = hostName[i];
 
-		socksdata[9 + strlen(hostName)] = 0;
+		socksdata[9 + hostNameLen] = 0;
 
-		if (send(stream, (char *) socksdata, 10 + strlen(hostName), 0) < signed(10 + strlen(hostName))) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
+		if (send(stream, (char *) socksdata, 10 + hostNameLen, 0) < 10 + hostNameLen) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 		delete [] socksdata;
 	}

@@ -1213,6 +1213,8 @@ const S::Array<S::String> &S::GUI::WindowXLib::GetDroppedFiles() const
 		if (bytes > 0) XGetWindowProperty(display, wnd, XA_PRIMARY, 0, bytes, 0, AnyPropertyType, &type, &format, &items, &bytes, &data);
 	}
 
+	if (data == NIL) return fileNames;
+
 	/* Query data.
 	 */
 	IO::InStream	 in(IO::STREAM_BUFFER, data, strlen((char *) data) + 1);

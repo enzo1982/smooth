@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,7 +27,7 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	stream	    = -1;
 	size	    = -1;
 
-	if (hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
+	if (hostName == NIL || hostName.Length() > 255) { lastError = IO_ERROR_BADPARAM; return; }
 
 	/* Open TCP/IP socket.
 	 */
@@ -120,18 +120,21 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 			 */
 			delete [] socksdata;
 
-			socksdata = new unsigned char [3 + strlen(uname) + strlen(passwd)];
+			Int	 unameLen  = strlen(uname);
+			Int	 passwdLen = passwd != NIL ? strlen(passwd) : 0;
+
+			socksdata = new unsigned char [3 + unameLen + passwdLen];
 
 			socksdata[0] = 1;
-			socksdata[1] = strlen(uname);
+			socksdata[1] = unameLen;
 
-			for (Int i = 0; i < (Int) strlen(uname); i++) socksdata[2 + i] = uname[i];
+			for (Int i = 0; i < unameLen; i++) socksdata[2 + i] = uname[i];
 
-			socksdata[2 + strlen(uname)] = strlen(passwd);
+			socksdata[2 + unameLen] = passwdLen;
 
-			for (Int i = 0; i < (Int) strlen(passwd); i++) socksdata[3 + strlen(uname) + i] = passwd[i];
+			for (Int i = 0; i < passwdLen; i++) socksdata[3 + unameLen + i] = passwd[i];
 
-			if (send(stream, (char *) socksdata, 3 + strlen(uname) + strlen(passwd), 0) < signed(3 + strlen(uname) + strlen(passwd))) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
+			if (send(stream, (char *) socksdata, 3 + unameLen + passwdLen, 0) < 3 + unameLen + passwdLen) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 			/* Read and evaluate response.
 			 */
@@ -158,18 +161,20 @@ S::IO::DriverSOCKS5::DriverSOCKS5(const String &proxy, Int socksPort, const Stri
 	 */
 	unsigned char	*socksdata = new unsigned char [5 + 255 + 2];
 
+	Int	 hostNameLen = strlen(hostName);
+
 	socksdata[0] = 5;	// SOCKS version 5
 	socksdata[1] = 0x01;	// Command: Connect
 	socksdata[2] = 0x00;	// Reserved field
 	socksdata[3] = 0x03;	// Connect type: Domain name
-	socksdata[4] = strlen(hostName);
+	socksdata[4] = hostNameLen;
 
-	for (Int i = 0; i < (Int) strlen(hostName); i++) socksdata[5 + i] = hostName[i];
+	for (Int i = 0; i < hostNameLen; i++) socksdata[5 + i] = hostName[i];
 
-	socksdata[5 + strlen(hostName)] = htons((short) port) % 256;
-	socksdata[6 + strlen(hostName)] = htons((short) port) / 256;
+	socksdata[5 + hostNameLen] = htons((short) port) % 256;
+	socksdata[6 + hostNameLen] = htons((short) port) / 256;
 
-	if (send(stream, (char *) socksdata, 7 + strlen(hostName), 0) < signed(7 + strlen(hostName))) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
+	if (send(stream, (char *) socksdata, 7 + hostNameLen, 0) < 7 + hostNameLen) { delete [] socksdata; Close(); lastError = IO_ERROR_UNEXPECTED; return; }
 
 	/* Receive and evaluate first 4 bytes of answer.
 	 */

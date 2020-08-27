@@ -288,8 +288,8 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 		curl_easy_setopt(curl, CURLOPT_PROXY, (char *) proxy);
 		curl_easy_setopt(curl, CURLOPT_PROXYPORT, proxyPort);
 
-		char	*curlProxyUser = curl_easy_escape(curl, proxyUser, 0);
-		char	*curlProxyPass = curl_easy_escape(curl, proxyPass, 0);
+		char	*curlProxyUser = proxyUser != NIL ? curl_easy_escape(curl, proxyUser, 0) : NIL;
+		char	*curlProxyPass = proxyPass != NIL ? curl_easy_escape(curl, proxyPass, 0) : NIL;
 
 		curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, (char *) String(curlProxyUser).Append(":").Append(curlProxyPass));
 

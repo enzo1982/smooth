@@ -11,6 +11,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.6
 - tree.cpp		- improved rendering of tree widget in scaled mode
 - http.cpp		- include status code in response header fields
 
+- implemented proper multi-monitor support for macOS
 - added support for macOS 11.0 Big Sur
 - added a separate error code for denied access to file IO drivers
 - fixed wrong color space returned in BitmapBackend::GetPixel for multiple backends

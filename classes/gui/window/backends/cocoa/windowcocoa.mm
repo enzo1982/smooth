@@ -980,6 +980,9 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 
 	/* Convert Cocoa events to smooth messages.
 	 */
+	NSArray	*screens     = [NSScreen screens];
+	NSRect	 firstScreen = [[screens objectAtIndex: 0] frame];
+
 	switch ([e type])
 	{
 		/* Mouse events:
@@ -997,8 +1000,8 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 		case NSRightMouseUp:
 			/* Update pointer position in Input::Pointer.
 			 */
-			if ([e type] == NSMouseExited) Input::Pointer::UpdatePosition(NIL,				      [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
-			else			       Input::Pointer::UpdatePosition(Window::GetWindow((Void *) [e window]), [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
+			if ([e type] == NSMouseExited) Input::Pointer::UpdatePosition(NIL,				      [NSEvent mouseLocation].x, firstScreen.size.height - [NSEvent mouseLocation].y);
+			else			       Input::Pointer::UpdatePosition(Window::GetWindow((Void *) [e window]), [NSEvent mouseLocation].x, firstScreen.size.height - [NSEvent mouseLocation].y);
 
 			/* Reject if a modal window is active.
 			 */
@@ -1039,7 +1042,7 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 		case NSOtherMouseUp:
 			/* Update pointer position in Input::Pointer.
 			 */
-			Input::Pointer::UpdatePosition(Window::GetWindow((Void *) [e window]), [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
+			Input::Pointer::UpdatePosition(Window::GetWindow((Void *) [e window]), [NSEvent mouseLocation].x, firstScreen.size.height - [NSEvent mouseLocation].y);
 
 			/* Reject if a modal window is active.
 			 */
@@ -1179,7 +1182,7 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 				 */
 				NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
 
-				contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
+				contentRect.origin.y = firstScreen.size.height - (contentRect.origin.y + contentRect.size.height);
 
 				Point	 pos  =  Point(contentRect.origin.x, contentRect.origin.y);
 				Size	 size = (Size(contentRect.size.width, contentRect.size.height) - sizeModifier) / fontSize;
@@ -1237,7 +1240,7 @@ S::Int S::GUI::WindowCocoa::ProcessSystemMessages(NSEvent *e)
 			{
 				Window	*window	  = Window::GetWindow((Void *) wnd);
 
-				Input::Pointer::UpdatePosition(window, [NSEvent mouseLocation].x, [[wnd screen] frame].size.height - [NSEvent mouseLocation].y);
+				Input::Pointer::UpdatePosition(window, [NSEvent mouseLocation].x, firstScreen.size.height - [NSEvent mouseLocation].y);
 
 				id	 info	  = (id) [e data1];
 				Point	 position = window->GetMousePosition();
@@ -1268,7 +1271,10 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 	flags	     = iFlags;
 	restoredRect = Rect(pos, size);
 
-	NSRect		 contentRect = NSMakeRect(pos.x, [[NSScreen mainScreen] frame].size.height - (pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy);
+	NSArray		*screens     = [NSScreen screens];
+	NSRect		 firstScreen = [[screens objectAtIndex: 0] frame];
+
+	NSRect		 contentRect = NSMakeRect(pos.x, firstScreen.size.height - (pos.y + Math::Round(size.cy * fontSize) + sizeModifier.cy), Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy);
 	NSUInteger	 styleMask   = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
 
 	if (flags & WF_NORESIZE  ) styleMask ^= NSResizableWindowMask;
@@ -1500,7 +1506,10 @@ S::Int S::GUI::WindowCocoa::SetMetrics(const Point &nPos, const Size &nSize)
 {
 	if (wnd == nil) return Success();
 
-	[(CocoaWindow *) wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(nPos.x, [[wnd screen] frame].size.height - (nPos.y + Math::Round(nSize.cy * fontSize) + sizeModifier.cy), Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy)]];
+	NSArray	*screens     = [NSScreen screens];
+	NSRect	 firstScreen = [[screens objectAtIndex: 0] frame];
+
+	[(CocoaWindow *) wnd setFrame: [wnd frameRectForContentRect: NSMakeRect(nPos.x, firstScreen.size.height - (nPos.y + Math::Round(nSize.cy * fontSize) + sizeModifier.cy), Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy)]];
 
 	return Success();
 }
@@ -1532,9 +1541,12 @@ S::Void S::GUI::WindowCocoa::UpdateMetrics(Bool resized)
 {
 	/* Update metrics and emit window metrics event.
 	 */
+	NSArray	*screens     = [NSScreen screens];
+	NSRect	 firstScreen = [[screens objectAtIndex: 0] frame];
+
 	NSRect	 contentRect = [wnd contentRectForFrameRect: [wnd frame]];
 
-	contentRect.origin.y = [[wnd screen] frame].size.height - (contentRect.origin.y + contentRect.size.height);
+	contentRect.origin.y = firstScreen.size.height - (contentRect.origin.y + contentRect.size.height);
 
 	Point	 pos  = Point(contentRect.origin.x, contentRect.origin.y);
 	Size	 size = Size(contentRect.size.width, contentRect.size.height) / fontSize;

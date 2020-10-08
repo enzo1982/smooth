@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,6 +16,7 @@
 #include <smooth/graphics/color.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/misc/binary.h>
+#include <smooth/system/screen.h>
 #include <smooth/system/system.h>
 
 const S::Short	 S::GUI::MenubarEntry::classID = S::Object::RequestClassID();
@@ -260,18 +261,40 @@ S::Void S::GUI::MenubarEntry::OpenPopupMenu()
 		return;
 	}
 
-	Window	*window	    = container->GetContainerWindow();
-	Surface	*surface    = GetDrawSurface();
-	Size	 realSize   = GetRealSize();
-	Rect	 popupFrame = Rect(GetRealPosition() + Point(realSize.cx - 11 * surface->GetSurfaceDPI() / 96.0, 0), Size(11 * surface->GetSurfaceDPI() / 96.0, realSize.cy));
+	Window	*window	     = container->GetContainerWindow();
+	Surface	*surface     = GetDrawSurface();
+	Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
+
+	Point	 realPos     = GetRealPosition();
+	Size	 realSize    = GetRealSize();
+
+	Rect	 popupFrame  = Rect(realPos + Point(realSize.cx - 11 * scaleFactor, 0), Size(11 * scaleFactor, realSize.cy));
 
 	if (onAction.GetNOfConnectedSlots() == 0 || window->IsMouseOn(popupFrame))
 	{
 		hotspot->Deactivate();
 
+		Rect	 monitor   = System::Screen::GetActiveScreenWorkArea();
+
 		popup->CalculateSize();
 
-		popup->SetPosition(GetRealPosition() + Point(orientation == OR_LEFT ? -1 : realSize.cx + 2 - popup->GetWidth() * surface->GetSurfaceDPI() / 96.0, realSize.cy + 1));
+		Point	 popupPos  = realPos + Point(orientation == OR_LEFT ? -1 : realSize.cx + 1 - popup->GetWidth() * scaleFactor, realSize.cy + 1);
+		Size	 popupSize = popup->GetSize();
+
+		if (orientation == OR_LEFT)
+		{
+			if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + Math::Round(popupSize.cx * scaleFactor) >= monitor.right) popupPos.x = realPos.x + realSize.cx + 1 - Math::Round(popupSize.cx * scaleFactor); }
+			else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - Math::Round(popupSize.cx * scaleFactor) <  monitor.left)  popupPos.x = realPos.x + realSize.cx + 1 - Math::Round(popupSize.cx * scaleFactor); }
+		}
+		else
+		{
+			if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       <  monitor.left)  popupPos.x = realPos.x - 1; }
+			else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) >= monitor.right) popupPos.x = realPos.x - 1; }
+		}
+
+		if (window->GetY() + popupPos.y + Math::Round(popupSize.cy * scaleFactor) >= monitor.bottom) popupPos.y = realPos.y - Math::Round(popupSize.cy * scaleFactor) - 1;
+
+		popup->SetPosition(popupPos);
 		popup->internalRequestClose.Connect(&MenubarEntry::ClosePopupMenu, this);
 
 		Add(popup);

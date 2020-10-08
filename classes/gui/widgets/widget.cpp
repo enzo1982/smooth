@@ -822,17 +822,17 @@ S::Void S::GUI::Widget::OpenContextMenu()
 		onOpenContextMenu.Emit();
 
 		Window	*window	   = container->GetContainerWindow();
-		Rect	 monitor   = System::Screen::GetActiveScreenMetrics();
+		Rect	 monitor   = System::Screen::GetActiveScreenWorkArea();
 
 		contextMenu->CalculateSize();
 
 		Point	 popupPos  = window->GetMousePosition();
 		Size	 popupSize = contextMenu->GetRealSize();
 
-		if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popupSize.cx >= monitor.GetWidth()) popupPos.x = popupPos.x - popupSize.cx; }
-		else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popupSize.cx <= 0)		     popupPos.x = popupPos.x - popupSize.cx; }
+		if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popupSize.cx >= monitor.right) popupPos.x = popupPos.x - popupSize.cx; }
+		else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popupSize.cx <  monitor.left)	popupPos.x = popupPos.x - popupSize.cx; }
 
-		if (window->GetY() + popupPos.y + popupSize.cy >= monitor.GetHeight()) popupPos.y = popupPos.y - popupSize.cy;
+		if (window->GetY() + popupPos.y + popupSize.cy >= monitor.bottom) popupPos.y = popupPos.y - popupSize.cy;
 
 		contextMenu->SetPosition(popupPos);
 		contextMenu->SetAlwaysActive(True);

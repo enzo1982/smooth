@@ -142,7 +142,7 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 
 	hotspot->Deactivate();
 
-	Rect	 monitor     = System::Screen::GetActiveScreenMetrics();
+	Rect	 monitor     = System::Screen::GetActiveScreenWorkArea();
 	Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
 
 	popup->CalculateSize();
@@ -153,10 +153,10 @@ S::Void S::GUI::MicroMenu::OpenPopupMenu()
 	Point	 popupPos    = realPos + Point(subtype == OR_HORZ ? realSize.cx : 0, subtype == OR_VERT ? realSize.cy : 0);
 	Size	 popupSize   = popup->GetSize();
 
-	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + Math::Round(popupSize.cx * scaleFactor) >= monitor.GetWidth()) popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor) + (subtype == OR_VERT ? realSize.cx : 0); }
-	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - Math::Round(popupSize.cx * scaleFactor) <= 0)			popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor) + (subtype == OR_VERT ? realSize.cx : 0); }
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + Math::Round(popupSize.cx * scaleFactor) >= monitor.right) popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor) + (subtype == OR_VERT ? realSize.cx : 0); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - Math::Round(popupSize.cx * scaleFactor) <  monitor.left)  popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor) + (subtype == OR_VERT ? realSize.cx : 0); }
 
-	if (window->GetY() + popupPos.y + Math::Round(popupSize.cy * scaleFactor) >= monitor.GetHeight()) popupPos.y = realPos.y - Math::Round(popupSize.cy * scaleFactor) + (subtype == OR_HORZ ? GetHeight() : 0);
+	if (window->GetY() + popupPos.y + Math::Round(popupSize.cy * scaleFactor) >= monitor.bottom) popupPos.y = realPos.y - Math::Round(popupSize.cy * scaleFactor) + (subtype == OR_HORZ ? GetHeight() : 0);
 
 	popup->SetPosition(popupPos);
 	popup->internalRequestClose.Connect(&MicroMenu::ClosePopupMenu, this);

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -164,13 +164,13 @@ S::Void S::GUI::ComboBox::OpenListBox()
 		return;
 	}
 
-	Rect	 monitor     = System::Screen::GetActiveScreenMetrics();
+	Rect	 monitor     = System::Screen::GetActiveScreenWorkArea();
 	Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
 
 	Size	 listBoxSize = Size(GetWidth(), 16 * Math::Min(Length(), Math::Max(5, Math::Min(16, Length() / 3))) + 4);
 	Point	 listBoxPos  = Point(GetRealPosition() + Point(0, GetRealSize().cy));
 
-	if (window->GetY() + listBoxPos.y + Math::Round(listBoxSize.cy * scaleFactor) >= monitor.GetHeight()) listBoxPos = Point(GetRealPosition() - Point(0, Math::Round(listBoxSize.cy * scaleFactor)));
+	if (window->GetY() + listBoxPos.y + Math::Round(listBoxSize.cy * scaleFactor) >= monitor.bottom) listBoxPos = Point(GetRealPosition() - Point(0, Math::Round(listBoxSize.cy * scaleFactor)));
 
 	listBox	   = new ListBox(Point(), listBoxSize);
 	listBox->onSelectEntry.Connect(&onSelectEntry);

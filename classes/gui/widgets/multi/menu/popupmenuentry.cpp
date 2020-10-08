@@ -278,7 +278,7 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 
 	hotspot->Deactivate();
 
-	Rect	 monitor     = System::Screen::GetActiveScreenMetrics();
+	Rect	 monitor     = System::Screen::GetActiveScreenWorkArea();
 	Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
 
 	popup->CalculateSize();
@@ -289,10 +289,10 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 	Point	 popupPos    = realPos + Point(realSize.cx, Math::Round(-3 * scaleFactor));
 	Size	 popupSize   = popup->GetSize();
 
-	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + Math::Round(popupSize.cx * scaleFactor) >= monitor.GetWidth()) popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor); }
-	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - Math::Round(popupSize.cx * scaleFactor) <= 0)			popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor); }
+	if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + Math::Round(popupSize.cx * scaleFactor) >= monitor.right) popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor); }
+	else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - Math::Round(popupSize.cx * scaleFactor) <  monitor.left)  popupPos.x = realPos.x - Math::Round(popupSize.cx * scaleFactor); }
 
-	if (window->GetY() + popupPos.y + Math::Round(popupSize.cy * scaleFactor) >= monitor.GetHeight()) popupPos.y = realPos.y - Math::Round(popupSize.cy * scaleFactor) + realSize.cy + Math::Round(3 * scaleFactor);
+	if (window->GetY() + popupPos.y + Math::Round(popupSize.cy * scaleFactor) >= monitor.bottom) popupPos.y = realPos.y - Math::Round(popupSize.cy * scaleFactor) + realSize.cy + Math::Round(3 * scaleFactor);
 
 	popup->SetPosition(popupPos);
 	popup->internalRequestClose.Connect(&PopupMenuEntry::ClosePopupMenu, this);

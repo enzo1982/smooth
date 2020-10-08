@@ -37,7 +37,9 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	splitFactor	= 0.58;
 	updateSplitter	= False;
 
-	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(50, 50), Size(740, 490));
+	Rect	 workArea = System::Screen::GetActiveScreenWorkArea();
+
+	wnd		= new GUI::Window(String("smooth Translator v").Append(SMOOTH_VERSION), Point(workArea.left, workArea.top) + Point(50, 50), Size(740, 490));
 	title		= new Titlebar();
 	menubar		= new Menubar();
 	statusbar	= new Statusbar("Ready");

@@ -410,13 +410,6 @@ S::Bool S::GUI::Window::Create()
 {
 	if (!IsRegistered() || created) return False;
 
-	Rect	 monitorRect = System::Screen::GetActiveScreenMetrics();
-
-	if (GetPosition().x >= 0 && GetPosition().y >= 0 && GetPosition().x < monitorRect.GetSize().cx && GetPosition().y < monitorRect.GetSize().cy)
-	{
-		SetPosition(Point(monitorRect.left, monitorRect.top) + GetPosition());
-	}
-
 #ifdef __WIN32__
 	if (flags & WF_NORESIZE) frameWidth = 4;
 #endif

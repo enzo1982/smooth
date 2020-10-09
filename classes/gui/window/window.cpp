@@ -561,11 +561,14 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 
 				Widget::SetMetrics(nPos, nSize);
 
-				if (resized) CalculateOffsets();
+				if (resized)
+				{
+					CalculateOffsets();
+
+					updateRect = Rect(Point(-1, -1), Size(0, 0));
+				}
 
 				visible = prevVisible;
-
-				updateRect = Rect(Point(-1, -1), Size(0, 0));
 			}
 
 			rVal = MessageProcessed;

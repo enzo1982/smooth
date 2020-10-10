@@ -821,18 +821,21 @@ S::Void S::GUI::Widget::OpenContextMenu()
 	{
 		onOpenContextMenu.Emit();
 
-		Window	*window	   = container->GetContainerWindow();
-		Rect	 monitor   = System::Screen::GetActiveScreenWorkArea();
+		Window	*window	     = container->GetContainerWindow();
+		Surface	*surface     = GetDrawSurface();
+
+		Rect	 monitor     = System::Screen::GetActiveScreenWorkArea();
+		Float	 scaleFactor = surface->GetSurfaceDPI() / 96.0;
 
 		contextMenu->CalculateSize();
 
 		Point	 popupPos  = window->GetMousePosition();
-		Size	 popupSize = contextMenu->GetRealSize();
+		Size	 popupSize = contextMenu->GetSize();
 
-		if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + popupSize.cx >= monitor.right) popupPos.x = popupPos.x - popupSize.cx; }
-		else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - popupSize.cx <  monitor.left)	popupPos.x = popupPos.x - popupSize.cx; }
+		if (!IsRightToLeft()) { if (window->GetX() + popupPos.x			       + Math::Round(popupSize.cx * scaleFactor) >= monitor.right) popupPos.x = popupPos.x - Math::Round(popupSize.cx * scaleFactor); }
+		else		      { if (window->GetX() + (window->GetWidth() - popupPos.x) - Math::Round(popupSize.cx * scaleFactor) <  monitor.left)  popupPos.x = popupPos.x - Math::Round(popupSize.cx * scaleFactor); }
 
-		if (window->GetY() + popupPos.y + popupSize.cy >= monitor.bottom) popupPos.y = popupPos.y - popupSize.cy;
+		if (window->GetY() + popupPos.y + Math::Round(popupSize.cy * scaleFactor) >= monitor.bottom) popupPos.y = popupPos.y - Math::Round(popupSize.cy * scaleFactor);
 
 		contextMenu->SetPosition(popupPos);
 		contextMenu->SetAlwaysActive(True);

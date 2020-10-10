@@ -15,10 +15,10 @@
 #define SMOOTH_APIVERSION "0.9.0"
 
 #ifdef SMOOTH_DLL
-# define SMOOTH_RESVERS	   0,9,6,5332
-# define SMOOTH_RESPROD	   0,9,6,5332
+# define SMOOTH_RESVERS	   0,9,6,5504
+# define SMOOTH_RESPROD	   0,9,6,5504
 # define SMOOTH_PRODUCT	  "0.9\0"
-# define SMOOTH_FILEVER	  "0.9.6.5332\0"
+# define SMOOTH_FILEVER	  "0.9.6.5504\0"
 #endif
 
 #endif

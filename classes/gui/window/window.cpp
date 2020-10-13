@@ -578,7 +578,8 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 			{
 				Bool	 resized = (updateRect == Rect(Point(-1, -1), Size(0, 0)));
 
-				updateRect = backend->GetUpdateRect();
+				if (resized) updateRect = Rect(Point(0, 0), GetRealSize());
+				else	     updateRect = backend->GetUpdateRect();
 
 				Paint(resized ? SP_PAINT : SP_UPDATE);
 

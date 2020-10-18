@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 dd.mm.20 hh:mm - smooth alpha 0.9.7
 
+- screenxlib.cpp	- improved multi-monitor support for X11 based systems
 - window.cpp		- fixed drawing issues on KDE systems
 
 10.10.20 18:20 - smooth alpha 0.9.6

@@ -11,6 +11,7 @@
 #include <smooth/backends/cocoa/backendcocoa.h>
 
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/widgets/special/droparea.h>
 
 using namespace smooth;
 using namespace smooth::GUI;
@@ -27,7 +28,11 @@ S::Int	 backendCocoaTmp = S::Backends::Backend::AddBackend(&CreateBackendCocoa);
 #else
 @interface CocoaApplicationDelegate : NSObject { }
 #endif
-	- (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender;
+	- (NSApplicationTerminateReply)	 applicationShouldTerminate: (NSApplication *) sender;
+
+	- (void)			 application:		     (NSApplication *) sender openFiles: (NSArray *) fileNames;
+
+	- (DropArea *)			 findDropArea:		     (Widget *) container;
 @end
 
 @implementation CocoaApplicationDelegate
@@ -46,6 +51,65 @@ S::Int	 backendCocoaTmp = S::Backends::Backend::AddBackend(&CreateBackendCocoa);
 		 */
 		if (Window::nOfActiveWindows == 0) return NSTerminateNow;
 		else				   return NSTerminateCancel;
+	}
+
+	- (void) application: (NSApplication *) sender openFiles: (NSArray *) fileNames
+	{
+		/* Look for a window with a drop area.
+		 */
+		DropArea	*dropArea = NIL;
+
+		for (Int n = 0; n < Window::GetNOfWindows(); n++)
+		{
+			Window		*window = Window::GetNthWindow(n);
+
+			if (!window->IsVisible()) continue;
+
+			if ((dropArea = [self findDropArea: window]) != NIL) break;
+		}
+
+		/* Check whether a drop area has been found.
+		 */
+		if (dropArea == NIL)
+		{
+			[sender replyToOpenOrPrint: NSApplicationDelegateReplyFailure];
+
+			return;
+		}
+
+		/* Simulate arrival of the files via drag & drop.
+		 */
+		Array<String>	 files;
+
+		for (UnsignedInt i = 0; i < [fileNames count]; i++)
+		{
+			String	 file;
+
+			file.ImportFrom("UTF-8", [[fileNames objectAtIndex: i] UTF8String]);
+			files.Add(file);
+
+			dropArea->onDropFile.Emit(file);
+		}
+
+		dropArea->onDropFiles.Emit(files);
+
+		[sender replyToOpenOrPrint: NSApplicationDelegateReplySuccess];
+	}
+
+	- (DropArea *) findDropArea: (Widget *) container
+	{
+		for (Int n = 0; n < container->GetNOfObjects(); n++)
+		{
+			Widget		*widget	  = container->GetNthObject(n);
+
+			if (widget->GetObjectType() == DropArea::classID && widget->IsActive()) return (DropArea *) widget;
+
+			DropArea	*dropArea = [self findDropArea: widget];
+
+			if (dropArea != NIL) return dropArea;
+		}
+
+		return NIL;		
 	}
 @end
 

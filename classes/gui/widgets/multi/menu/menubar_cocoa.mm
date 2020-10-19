@@ -19,6 +19,9 @@
 #include <smooth/input/keyboard.h>
 #include <smooth/foreach.h>
 
+using namespace smooth;
+using namespace smooth::GUI;
+
 const S::Short	 S::GUI::MenubarCocoa::classID = S::Object::RequestClassID();
 
 class CocoaMenuEntryDelegate;
@@ -29,12 +32,12 @@ class CocoaMenuEntryDelegate;
 @interface CocoaMenuEntry : NSMenuItem
 {
 	@private
-		const S::GUI::MenuEntry	*menuEntry;
+		const MenuEntry		*menuEntry;
 		CocoaMenuEntryDelegate	*menuEntryDelegate;
 }
 
-	- (id)		initWithMenuEntry:	(const S::GUI::MenuEntry *) iMenuEntry
-			  ignoreLastEntry:	(BOOL)			    ignoreLastEntry;
+	- (id)		initWithMenuEntry:	(const MenuEntry *) iMenuEntry
+			  ignoreLastEntry:	(BOOL)		    ignoreLastEntry;
 	- (void)	dispose;
 
 	- (void)	checkValue;
@@ -48,14 +51,14 @@ class CocoaMenuEntryDelegate;
 @interface CocoaMenu : NSMenu
 {
 	@private
-		const S::GUI::Menu			*menu;
+		const Menu			*menu;
 	@protected
-		S::Array<NSMenuItem *, S::Void *>	 menuItems;
+		Array<NSMenuItem *, Void *>	 menuItems;
 }
 
-	- (id)		initWithMenu:	(const S::GUI::Menu *) iMenu
-			       title:	(const S::String &)    iTitle
-		     ignoreLastEntry:	(BOOL)		       ignoreLastEntry;
+	- (id)		initWithMenu:	(const Menu *)	 iMenu
+			       title:	(const String &) iTitle
+		     ignoreLastEntry:	(BOOL)		 ignoreLastEntry;
 	- (void)	dispose;
 @end
 
@@ -65,13 +68,13 @@ class CocoaMenuEntryDelegate;
 @interface CocoaMenubar : CocoaMenu
 {
 	@private
-		const S::GUI::Menubar	*menubar;
+		const Menubar	*menubar;
 
-		CocoaMenuEntry		*aboutItem;
-		CocoaMenuEntry		*quitItem;
+		CocoaMenuEntry	*aboutItem;
+		CocoaMenuEntry	*quitItem;
 }
 
-	- (id)		initWithMenubar:	(const S::GUI::Menubar *) iMenubar;
+	- (id)		initWithMenubar:	(const Menubar *) iMenubar;
 	- (void)	dispose;
 @end
 
@@ -83,15 +86,15 @@ class CocoaMenuEntryDelegate
 	private:
 		CocoaMenuEntry	*menuEntry;
 	public:
-				 CocoaMenuEntryDelegate(CocoaMenuEntry *iMenuEntry) : menuEntry(iMenuEntry)	{ S::GUI::CheckBox::internalCheckValues.Connect(&CocoaMenuEntryDelegate::OnCheckValues, this);    S::GUI::OptionBox::internalCheckValues.Connect(&CocoaMenuEntryDelegate::OnCheckValues, this);	   }
-				~CocoaMenuEntryDelegate()							{ S::GUI::CheckBox::internalCheckValues.Disconnect(&CocoaMenuEntryDelegate::OnCheckValues, this); S::GUI::OptionBox::internalCheckValues.Disconnect(&CocoaMenuEntryDelegate::OnCheckValues, this); }
+				 CocoaMenuEntryDelegate(CocoaMenuEntry *iMenuEntry) : menuEntry(iMenuEntry)	{ CheckBox::internalCheckValues.Connect(&CocoaMenuEntryDelegate::OnCheckValues, this);    OptionBox::internalCheckValues.Connect(&CocoaMenuEntryDelegate::OnCheckValues, this);	   }
+				~CocoaMenuEntryDelegate()							{ CheckBox::internalCheckValues.Disconnect(&CocoaMenuEntryDelegate::OnCheckValues, this); OptionBox::internalCheckValues.Disconnect(&CocoaMenuEntryDelegate::OnCheckValues, this); }
 	slots:
-		S::Void		 OnCheckValues()								{ [menuEntry checkValue]; }
+		Void		 OnCheckValues()								{ [menuEntry checkValue]; }
 };
 
 @implementation CocoaMenuEntry
-	- (id) initWithMenuEntry: (const S::GUI::MenuEntry *) iMenuEntry
-		 ignoreLastEntry: (BOOL)		      ignoreLastEntry
+	- (id) initWithMenuEntry: (const MenuEntry *) iMenuEntry
+		 ignoreLastEntry: (BOOL)	      ignoreLastEntry
 	{
 		[super initWithTitle: [NSString stringWithUTF8String: iMenuEntry->GetText().ConvertTo("UTF-8")]
 			      action: @selector(onAction)
@@ -112,24 +115,24 @@ class CocoaMenuEntryDelegate
 
 		if (menuEntry->GetShortcut() != NIL)
 		{
-			const S::GUI::Shortcut	*shortcut = menuEntry->GetShortcut();
-			S::Int			 key	  = shortcut->GetKey();
-			S::Int			 flags	  = shortcut->GetFlags();
+			const Shortcut	*shortcut = menuEntry->GetShortcut();
+			Int		 key	  = shortcut->GetKey();
+			Int		 flags	  = shortcut->GetFlags();
 
-			S::String		 keyString;
+			String		 keyString;
 
-			if	(key >= S::Input::Keyboard::Key0  && key <= S::Input::Keyboard::Key9)	keyString[0] = '0'    + key - S::Input::Keyboard::Key0;
-			else if (key >= S::Input::Keyboard::KeyA  && key <= S::Input::Keyboard::KeyZ)	keyString[0] = 'a'    + key - S::Input::Keyboard::KeyA;
-			else if (key >= S::Input::Keyboard::KeyF1 && key <= S::Input::Keyboard::KeyF24) keyString[0] = 0xF704 + key - S::Input::Keyboard::KeyF1;
+			if	(key >= Input::Keyboard::Key0  && key <= Input::Keyboard::Key9)	  keyString[0] = '0'    + key - Input::Keyboard::Key0;
+			else if (key >= Input::Keyboard::KeyA  && key <= Input::Keyboard::KeyZ)	  keyString[0] = 'a'    + key - Input::Keyboard::KeyA;
+			else if (key >= Input::Keyboard::KeyF1 && key <= Input::Keyboard::KeyF24) keyString[0] = 0xF704 + key - Input::Keyboard::KeyF1;
 
 			if (keyString != NIL)
 			{
 				[self setKeyEquivalent: [NSString stringWithUTF8String: keyString.ConvertTo("UTF-8")]];
 
-				[self setKeyEquivalentModifierMask: (flags & S::GUI::SC_CTRL  ? NSControlKeyMask   : 0) |
-								    (flags & S::GUI::SC_CMD   ? NSCommandKeyMask   : 0) |
-								    (flags & S::GUI::SC_ALT   ? NSAlternateKeyMask : 0) |
-								    (flags & S::GUI::SC_SHIFT ? NSShiftKeyMask	   : 0)];
+				[self setKeyEquivalentModifierMask: (flags & SC_CTRL  ? NSControlKeyMask   : 0) |
+								    (flags & SC_CMD   ? NSCommandKeyMask   : 0) |
+								    (flags & SC_ALT   ? NSAlternateKeyMask : 0) |
+								    (flags & SC_SHIFT ? NSShiftKeyMask	   : 0)];
 			}
 		}
 
@@ -177,13 +180,13 @@ class CocoaMenuEntryDelegate
 
 			[self setState: *menuEntry->GetCheckVariable()];
 
-			S::GUI::CheckBox::internalCheckValues.Emit();
+			CheckBox::internalCheckValues.Emit();
 		}
 		else if (menuEntry->GetOptionVariable() != NIL)
 		{
 			*menuEntry->GetOptionVariable() = menuEntry->GetOptionCode();
 
-			S::GUI::OptionBox::internalCheckValues.Emit();
+			OptionBox::internalCheckValues.Emit();
 		}
 
 		menuEntry->onAction.Emit();
@@ -194,18 +197,18 @@ class CocoaMenuEntryDelegate
  * from smooth menus to Cocoa menus.
  */
 @implementation CocoaMenu
-	- (id) initWithMenu: (const S::GUI::Menu *) iMenu
-		      title: (const S::String &)    iTitle
-	    ignoreLastEntry: (BOOL)		    ignoreLastEntry
+	- (id) initWithMenu: (const Menu *)   iMenu
+		      title: (const String &) iTitle
+	    ignoreLastEntry: (BOOL)	      ignoreLastEntry
 	{
 		[super initWithTitle: [NSString stringWithUTF8String: iTitle.ConvertTo("UTF-8")]];
 		[super setAutoenablesItems: NO];
 
 		menu = iMenu;
 
-		for (S::Int i = 0; i < menu->Length(); i++)
+		for (Int i = 0; i < menu->Length(); i++)
 		{
-			const S::GUI::MenuEntry	*entry = menu->GetNthEntry(i);
+			const MenuEntry	*entry = menu->GetNthEntry(i);
 
 			if (ignoreLastEntry && ( i == menu->Length() - 1 ||
 						(i == menu->Length() - 2 && entry->GetText() == NIL))) break;
@@ -243,7 +246,7 @@ class CocoaMenuEntryDelegate
  * for the menubar such as filling the application menu.
  */
 @implementation CocoaMenubar
-	- (id) initWithMenubar: (const S::GUI::Menubar *) iMenubar
+	- (id) initWithMenubar: (const Menubar *) iMenubar
 	{
 		[super initWithTitle: @"MainMenu"];
 		[super setAutoenablesItems: NO];
@@ -261,7 +264,7 @@ class CocoaMenuEntryDelegate
 		 */
 		if (menubar->Length() >= 1 && menubar->GetNthEntry(menubar->Length() - 1)->GetOrientation() == OR_RIGHT && menubar->GetNthEntry(menubar->Length() - 1)->GetPopupMenu() != NIL)
 		{
-			const S::GUI::Menu	*lastMenu = menubar->GetNthEntry(menubar->Length() - 1)->GetPopupMenu();
+			const Menu	*lastMenu = menubar->GetNthEntry(menubar->Length() - 1)->GetPopupMenu();
 
 			aboutItem = [[CocoaMenuEntry alloc] initWithMenuEntry: lastMenu->GetNthEntry(lastMenu->Length() - 1)
 							      ignoreLastEntry: NO];
@@ -288,7 +291,7 @@ class CocoaMenuEntryDelegate
 		 */
 		if (menubar->Length() >= 1 && menubar->GetNthEntry(0)->GetPopupMenu() != NIL)
 		{
-			const S::GUI::Menu	*firstMenu = menubar->GetNthEntry(0)->GetPopupMenu();
+			const Menu	*firstMenu = menubar->GetNthEntry(0)->GetPopupMenu();
 
 			quitItem = [[CocoaMenuEntry alloc] initWithMenuEntry: firstMenu->GetNthEntry(firstMenu->Length() - 1)
 							     ignoreLastEntry: NO];
@@ -312,9 +315,9 @@ class CocoaMenuEntryDelegate
 
 		/* Add other menus.
 		 */
-		for (S::Int i = 0; i < menubar->Length(); i++)
+		for (Int i = 0; i < menubar->Length(); i++)
 		{
-			const S::GUI::MenuEntry	*entry = menubar->GetNthEntry(i);
+			const MenuEntry	*entry = menubar->GetNthEntry(i);
 
 			if (entry->GetText() == NIL) continue;
 

@@ -18,6 +18,9 @@
 #include <smooth/system/system.h>
 #include <smooth/init.h>
 
+using namespace smooth;
+using namespace smooth::GUI;
+
 S::GUI::WindowBackend *CreateWindowCocoa()
 {
 	return new S::GUI::WindowCocoa();
@@ -50,8 +53,8 @@ const int	 NSApplicationDropFiles	 = 9;
 		NSRange				 markedRange;
 		NSMutableDictionary		*markedAttributes;
 
-		S::GUI::Cursor			*cursor;
-		S::GUI::Point			 cursorPosition;
+		GUI::Cursor			*cursor;
+		GUI::Point			 cursorPosition;
 }
 
 	/* NSView methods.
@@ -113,8 +116,8 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	/* Helper methods.
 	 */
-	- (void)	setCursor:    (S::GUI::Cursor *) aCursor position: (const S::GUI::Point &) aPoint;
-	- (void)	removeCursor: (S::GUI::Cursor *) aCursor;
+	- (void)	setCursor:    (GUI::Cursor *) aCursor position: (const GUI::Point &) aPoint;
+	- (void)	removeCursor: (GUI::Cursor *) aCursor;
 @end
 
 @implementation CocoaView
@@ -155,7 +158,7 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void) handleEvent: (NSEvent *) event
 	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([event window]);
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend([event window]);
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
@@ -223,13 +226,13 @@ const int	 NSApplicationDropFiles	 = 9;
 		 */
 		if ([keyEvents count] == 0) return;
 
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([self window]);
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend([self window]);
 
 		if (backend != NIL && cursor != NIL)
 		{
-			S::GUI::Surface	*surface = cursor->GetDrawSurface();
+			Surface	*surface = cursor->GetDrawSurface();
 
-			surface->StartPaint(S::GUI::Rect(cursor->GetContainer()->GetRealPosition(), cursor->GetContainer()->GetRealSize()));
+			surface->StartPaint(GUI::Rect(cursor->GetContainer()->GetRealPosition(), cursor->GetContainer()->GetRealSize()));
 
 			[self interpretKeyEvents: keyEvents];
 
@@ -247,16 +250,16 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void) drawRect: (NSRect) rect
 	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([self window]);
-		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
-								      location: NSMakePoint(0, 0)
-								 modifierFlags: 0
-								     timestamp: 0
-								  windowNumber: [[self window] windowNumber]
-								       context: nil
-								       subtype: NSApplicationPaint
-									 data1: (NSInteger) &rect
-									 data2: nil];
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend([self window]);
+		NSEvent		*event	 = [NSEvent otherEventWithType: NSApplicationDefined
+							      location: NSMakePoint(0, 0)
+							 modifierFlags: 0
+							     timestamp: 0
+							  windowNumber: [[self window] windowNumber]
+							       context: nil
+							       subtype: NSApplicationPaint
+								 data1: (NSInteger) &rect
+								 data2: nil];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 
@@ -266,8 +269,8 @@ const int	 NSApplicationDropFiles	 = 9;
 
 			[NSGraphicsContext saveGraphicsState];
 
-			S::GUI::Point	 realPos  = cursor->GetRealPosition();
-			S::GUI::Size	 realSize = cursor->GetRealSize();
+			GUI::Point	 realPos  = cursor->GetRealPosition();
+			GUI::Size	 realSize = cursor->GetRealSize();
 
 			NSRectClip(NSMakeRect(realPos.x, realPos.y, realSize.cx, realSize.cy));
 
@@ -283,16 +286,16 @@ const int	 NSApplicationDropFiles	 = 9;
 	{
 		[super setFrameSize: newSize];
 
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([self window]);
-		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
-								      location: NSMakePoint(0, 0)
-								 modifierFlags: 0
-								     timestamp: 0
-								  windowNumber: [[self window] windowNumber]
-								       context: nil
-								       subtype: NSApplicationResize
-									 data1: nil
-									 data2: nil];
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend([self window]);
+		NSEvent		*event	 = [NSEvent otherEventWithType: NSApplicationDefined
+							      location: NSMakePoint(0, 0)
+							 modifierFlags: 0
+							     timestamp: 0
+							  windowNumber: [[self window] windowNumber]
+							       context: nil
+							       subtype: NSApplicationResize
+								 data1: nil
+								 data2: nil];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
@@ -306,16 +309,16 @@ const int	 NSApplicationDropFiles	 = 9;
 	 */
 	- (void) insertText: (id) string
 	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([self window]);
-		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
-								      location: NSMakePoint(0, 0)
-								 modifierFlags: 0
-								     timestamp: 0
-								  windowNumber: [[self window] windowNumber]
-								       context: nil
-								       subtype: NSApplicationInsertText
-									 data1: (NSInteger) string
-									 data2: nil];
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend([self window]);
+		NSEvent		*event	 = [NSEvent otherEventWithType: NSApplicationDefined
+							      location: NSMakePoint(0, 0)
+							 modifierFlags: 0
+							     timestamp: 0
+							  windowNumber: [[self window] windowNumber]
+							       context: nil
+							       subtype: NSApplicationInsertText
+								 data1: (NSInteger) string
+								 data2: nil];
 
 		if (backend != NIL && cursor != NIL) backend->ProcessSystemMessages(event);
 
@@ -425,18 +428,18 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	/* Helper methods.
 	 */
-	- (void) setCursor: (S::GUI::Cursor *) aCursor position: (const S::GUI::Point &) aPoint
+	- (void) setCursor: (GUI::Cursor *) aCursor position: (const GUI::Point &) aPoint
 	{
-		const S::GUI::Font	&font	 = aCursor->GetFont();
-		const S::GUI::Color	 color	 = font.GetColor();
+		const Font	&font	 = aCursor->GetFont();
+		const Color	 color	 = font.GetColor();
 
-		const NSColor		*nsColor = [NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
-									     green: color.GetGreen() / 255.0
-									      blue: color.GetBlue()  / 255.0
-									     alpha: 1.0];
+		const NSColor	*nsColor = [NSColor colorWithCalibratedRed: color.GetRed()   / 255.0
+								     green: color.GetGreen() / 255.0
+								      blue: color.GetBlue()  / 255.0
+								     alpha: 1.0];
 
-		[markedAttributes setObject: S::GUI::FontCocoa::GetNativeFont(font) forKey: NSFontAttributeName];
-		[markedAttributes setObject: nsColor				    forKey: NSForegroundColorAttributeName];
+		[markedAttributes setObject: FontCocoa::GetNativeFont(font) forKey: NSFontAttributeName];
+		[markedAttributes setObject: nsColor			    forKey: NSForegroundColorAttributeName];
 
 		[self unmarkText];
 		[self setNeedsDisplay: YES];
@@ -445,7 +448,7 @@ const int	 NSApplicationDropFiles	 = 9;
 		cursorPosition = aPoint;
 	}
 
-	- (void) removeCursor: (S::GUI::Cursor *) aCursor
+	- (void) removeCursor: (GUI::Cursor *) aCursor
 	{
 		if (cursor != aCursor) return;
 
@@ -519,7 +522,7 @@ const int	 NSApplicationDropFiles	 = 9;
 		/* If we shall wait for the call to complete,
 		 * we need to suspend our application lock.
 		 */
-		int	 suspendCount = (wait ? S::GUI::Application::Lock::SuspendLock() : 0);
+		int	 suspendCount = (wait ? Application::Lock::SuspendLock() : 0);
 
 		[super performSelectorOnMainThread: selector
 					withObject: arg
@@ -527,7 +530,7 @@ const int	 NSApplicationDropFiles	 = 9;
 
 		/* Resume the application lock.
 		 */
-		S::GUI::Application::Lock::ResumeLock(suspendCount);
+		Application::Lock::ResumeLock(suspendCount);
 	}
 
 	/* NSWindow methods.
@@ -595,16 +598,16 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void) processEvent: (int) type withData: (NSInteger) data
 	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend(self);
-		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
-								      location: NSMakePoint(0, 0)
-								 modifierFlags: 0
-								     timestamp: 0
-								  windowNumber: [self windowNumber]
-								       context: nil
-								       subtype: type
-									 data1: data
-									 data2: nil];
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend(self);
+		NSEvent		*event	 = [NSEvent otherEventWithType: NSApplicationDefined
+							      location: NSMakePoint(0, 0)
+							 modifierFlags: 0
+							     timestamp: 0
+							  windowNumber: [self windowNumber]
+							       context: nil
+							       subtype: type
+								 data1: data
+								 data2: nil];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
@@ -671,7 +674,7 @@ const int	 NSApplicationDropFiles	 = 9;
 @implementation CocoaWindowDelegate
 	- (BOOL) windowShouldClose: (id) sender
 	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend(sender);
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend(sender);
 
 		if (backend != NIL)
 		{
@@ -688,16 +691,16 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void) handleNotification: (NSNotification *) note as: (int) type
 	{
-		S::GUI::WindowCocoa	*backend = S::GUI::WindowCocoa::GetWindowBackend([note object]);
-		NSEvent			*event	 = [NSEvent otherEventWithType: NSApplicationDefined
-								      location: NSMakePoint(0, 0)
-								 modifierFlags: 0
-								     timestamp: 0
-								  windowNumber: [[note object] windowNumber]
-								       context: nil
-								       subtype: type
-									 data1: nil
-									 data2: nil];
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend([note object]);
+		NSEvent		*event	 = [NSEvent otherEventWithType: NSApplicationDefined
+							      location: NSMakePoint(0, 0)
+							 modifierFlags: 0
+							     timestamp: 0
+							  windowNumber: [[note object] windowNumber]
+							       context: nil
+							       subtype: type
+								 data1: nil
+								 data2: nil];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
@@ -1303,7 +1306,7 @@ S::Int S::GUI::WindowCocoa::Open(const String &title, const Point &pos, const Si
 		[wnd setDelegate: [[[CocoaWindowDelegate alloc] init] autorelease]];
 
 		/* Create drawing surface.
-		*/
+		 */
 		if ((flags & WF_THINBORDER) || (flags & WF_NORESIZE)) drawSurface = new Surface((Void *) wnd, size * fontSize + sizeModifier);
 		else						      drawSurface = new Surface((Void *) wnd);
 

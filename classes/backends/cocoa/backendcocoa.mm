@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,9 @@
 #include <smooth/backends/cocoa/backendcocoa.h>
 
 #include <smooth/gui/window/window.h>
+
+using namespace smooth;
+using namespace smooth::GUI;
 
 S::Backends::Backend *CreateBackendCocoa()
 {
@@ -32,17 +35,17 @@ S::Int	 backendCocoaTmp = S::Backends::Backend::AddBackend(&CreateBackendCocoa);
 	{
 		/* Ask open windows to close.
 		 */
-		for (S::Int n = S::GUI::Window::GetNOfWindows() - 1; n >= 0; n--)
+		for (Int n = Window::GetNOfWindows() - 1; n >= 0; n--)
 		{
-			S::GUI::Window	*window	= S::GUI::Window::GetNthWindow(n);
+			Window	*window	= Window::GetNthWindow(n);
 
 			if (window->IsVisible()) window->Close();
 		}
 
 		/* Terminate application if all windows did close.
 		 */
-		if (S::GUI::Window::nOfActiveWindows == 0) return NSTerminateNow;
-		else					   return NSTerminateCancel;
+		if (Window::nOfActiveWindows == 0) return NSTerminateNow;
+		else				   return NSTerminateCancel;
 	}
 @end
 

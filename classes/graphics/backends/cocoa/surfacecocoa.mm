@@ -172,7 +172,7 @@ S::Int S::GUI::SurfaceCocoa::PaintRect(const Rect &pRect)
 {
 	if (painting) return Error();
 
-	if (window == NIL || ![window isVisible]) return Success();
+	if (window == NIL) return Success();
 
 	NSView	*contentView = [window contentView];
 	NSRect	 rect	     = NSMakeRect(pRect.left, pRect.top, pRect.right - pRect.left, pRect.bottom - pRect.top);
@@ -235,7 +235,7 @@ S::Int S::GUI::SurfaceCocoa::PaintRect(const Rect &pRect)
 
 S::Int S::GUI::SurfaceCocoa::StartPaint(const Rect &iPRect)
 {
-	if (window == NIL || ![window isVisible]) return Success();
+	if (window == NIL) return Success();
 
 	Rect	 pRect = Rect::OverlapRect(rightToLeft.TranslateRect(iPRect), paintRects.GetLast());
 
@@ -294,7 +294,7 @@ S::Float S::GUI::SurfaceCocoa::GetScaleFactor() const
 	static SEL	 scaleFactorSelector = @selector(backingScaleFactor);
 	static Bool	 canQueryScaleFactor = [[NSScreen mainScreen] respondsToSelector: scaleFactorSelector];
 
-	if (!canQueryScaleFactor || window == NIL || ![window isVisible]) return 1.0;
+	if (!canQueryScaleFactor || window == NIL || [window screen] == nil) return 1.0;
 
 	NSScreen	*screen = [window screen];
 
@@ -303,7 +303,7 @@ S::Float S::GUI::SurfaceCocoa::GetScaleFactor() const
 
 S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 {
-	if (window == NIL || ![window isVisible]) return Success();
+	if (window == NIL) return Success();
 
 	Point	 point	  = rightToLeft.TranslatePoint(iPoint);
 	Bool	 endPaint = painting ? False : StartPaint(Rect(point, Size(1, 1))) == Success();
@@ -321,7 +321,7 @@ S::Int S::GUI::SurfaceCocoa::SetPixel(const Point &iPoint, const Color &color)
 
 S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const Color &color)
 {
-	if (window == NIL || ![window isVisible]) return Success();
+	if (window == NIL) return Success();
 
 	/* Convert coordinates.
 	 */
@@ -378,7 +378,7 @@ S::Int S::GUI::SurfaceCocoa::Line(const Point &iPos1, const Point &iPos2, const 
 
 S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int style, const Size &ellipse)
 {
-	if (window == NIL || ![window isVisible]) return Success();
+	if (window == NIL) return Success();
 
 	Rect	 rect = rightToLeft.TranslateRect(iRect);
 
@@ -449,10 +449,10 @@ S::Int S::GUI::SurfaceCocoa::Box(const Rect &iRect, const Color &color, Int styl
 
 S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, const Font &font, Bool shadow)
 {
-	if (window == NIL || ![window isVisible]) return Success();
+	if (window == NIL) return Success();
 
-	if (string == NIL)			  return Error();
-	if (shadow)				  return SurfaceBackend::SetText(string, iRect, font, shadow);
+	if (string == NIL) return Error();
+	if (shadow)	   return SurfaceBackend::SetText(string, iRect, font, shadow);
 
 	NSMutableDictionary	*attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys: FontCocoa::GetNativeFont(font),   NSFontAttributeName,
 												   NSColorForColor(font.GetColor()), NSForegroundColorAttributeName, nil];
@@ -506,7 +506,7 @@ S::Int S::GUI::SurfaceCocoa::SetText(const String &string, const Rect &iRect, co
 
 S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, const Color &color2, Int style)
 {
-	if (window == NIL || ![window isVisible]) return Success();
+	if (window == NIL) return Success();
 
 	Rect	 rect	  = rightToLeft.TranslateRect(iRect);
 	Bool	 endPaint = painting ? False : StartPaint(rect) == Success();
@@ -528,8 +528,8 @@ S::Int S::GUI::SurfaceCocoa::Gradient(const Rect &iRect, const Color &color1, co
 
 S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcRect, const Rect &iDestRect)
 {
-	if (window == NIL || ![window isVisible]) return Success();
-	if (bitmap == NIL)			  return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
 	Rect	 destRect = rightToLeft.TranslateRect(iDestRect);
 
@@ -553,8 +553,8 @@ S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 S::Int S::GUI::SurfaceCocoa::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, const Rect &destRect)
 {
-	if (window == NIL || ![window isVisible]) return Success();
-	if (bitmap == NIL)			  return Error();
+	if (window == NIL) return Success();
+	if (bitmap == NIL) return Error();
 
 	Rect	 srcRect = rightToLeft.TranslateRect(iSrcRect);
 

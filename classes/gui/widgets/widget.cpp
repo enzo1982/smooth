@@ -433,6 +433,15 @@ S::Int S::GUI::Widget::Hide()
 		DeactivateTooltip();
 	}
 
+	/* Reset mouse status.
+	 */
+	mouseOver	= False;
+
+	leftButtonDown	= False;
+	rightButtonDown	= False;
+
+	mouseDragging	= False;
+
 	/* Notify listeners.
 	 */
 	onHide.Emit();

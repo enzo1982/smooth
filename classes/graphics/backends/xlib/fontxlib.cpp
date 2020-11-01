@@ -16,7 +16,6 @@
 
 #include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <fribidi/fribidi.h>
 

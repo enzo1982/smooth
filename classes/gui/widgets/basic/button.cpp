@@ -167,7 +167,6 @@ S::Int S::GUI::Button::SetBitmap(const Bitmap &nBitmap)
 	if (IsRegistered() && prevVisible) Hide();
 
 	bitmap = nBitmap;
-	bitmap.SetBackgroundColor(GetBackgroundColor());
 
 	if (IsRegistered() && prevVisible) Show();
 

@@ -156,6 +156,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			}
 			else if (text == NIL && bitmap != NIL)
 			{
+				surface->Box(bmpRect, Setup::BackgroundColor, Rect::Filled);
+
 				if (flags & MB_COLOR)	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 				else			surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmpRect);
 
@@ -186,6 +188,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			if (bitmap != NIL)
 			{
 				surface->StartPaint(Rect(realPos, realSize));
+
+				surface->Box(bmpRect, Setup::BackgroundColor, Rect::Filled);
 				surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 
 				if (onAction.GetNOfConnectedSlots() > 0 && popup != NIL)
@@ -206,6 +210,8 @@ S::Int S::GUI::MenubarEntry::Paint(Int message)
 			if (bitmap != NIL)
 			{
 				surface->StartPaint(Rect(realPos, realSize));
+
+				surface->Box(bmpRect, Setup::BackgroundColor, Rect::Filled);
 
 				if (flags & MB_COLOR) surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
 				else		      surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmpRect);

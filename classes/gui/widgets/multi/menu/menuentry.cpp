@@ -73,10 +73,7 @@ S::Int S::GUI::MenuEntry::SetBitmap(const Bitmap &newBitmap)
 
 	if (bitmap == NIL) return Success();
 
-	bitmap.SetBackgroundColor(GetBackgroundColor());
-
 	graymap.GrayscaleBitmap();
-	graymap.SetBackgroundColor(GetBackgroundColor());
 
 	return Success();
 }

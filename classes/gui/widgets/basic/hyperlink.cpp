@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -144,8 +144,6 @@ S::Int S::GUI::Hyperlink::SetFont(const Font &nFont)
 S::Int S::GUI::Hyperlink::SetBitmap(const Bitmap &newBitmap)
 {
 	linkBitmap = newBitmap;
-
-	linkBitmap.SetBackgroundColor(GetBackgroundColor());
 
 	Paint(SP_PAINT);
 

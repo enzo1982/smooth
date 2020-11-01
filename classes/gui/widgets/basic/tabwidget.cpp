@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -216,7 +216,7 @@ S::Int S::GUI::TabWidget::Add(Widget *widget)
 	return Add(widget, NIL);
 }
 
-S::Int S::GUI::TabWidget::Add(Widget *widget, const Bitmap &nBitmap)
+S::Int S::GUI::TabWidget::Add(Widget *widget, const Bitmap &bitmap)
 {
 	if (widget == NIL) return Error();
 
@@ -226,10 +226,6 @@ S::Int S::GUI::TabWidget::Add(Widget *widget, const Bitmap &nBitmap)
 
 		if (Widget::Add(widget) == Success())
 		{
-			Bitmap	 bitmap = nBitmap;
-
-			bitmap.SetBackgroundColor(GetBackgroundColor());
-
 			bitmaps.Add(bitmap, widget->GetHandle());
 
 			widget->SetMetrics(Point(2, 21), GetSize() - Size(3, 22));

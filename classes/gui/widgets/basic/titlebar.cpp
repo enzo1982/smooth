@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -115,7 +115,6 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 	Rect		 button;
 	Point		 start;
 	Point		 end;
-	Bitmap		 icon		    = window->GetIcon();
 
 	text = window->GetText();
 
@@ -133,17 +132,13 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			if (flatStyle)
 			{
-				icon.SetBackgroundColor(titlebarStartColor);
-
 				surface->Gradient(titleFrame - Point(1, 1) + Size(2, 1), titlebarStartColor, titlebarEndColor, OR_HORZ);
 			}
 
-			if (icon != NIL) titleFrame.left += titleFrame.GetHeight() - 1;
+			if (window->GetIcon() != NIL) titleFrame.left += titleFrame.GetHeight() - 1;
 
 			if (!flatStyle)
 			{
-				icon.SetBackgroundColor(GetBackgroundColor());
-
 				surface->Frame(titleFrame, FRAME_UP);
 				surface->Gradient(titleFrame + Point(1, 1) - Size(2, 2), titlebarStartColor, titlebarEndColor, OR_HORZ);
 			}
@@ -152,7 +147,7 @@ S::Int S::GUI::Titlebar::Paint(Int message)
 
 			surface->SetText(text, titleFrame + Point(4, Math::Ceil(Float(titleFrame.GetHeight() - font.GetScaledTextSizeY()) / 2) - 1 - (flatStyle ? 1 : 0)) - Size(9, 6), font);
 
-			if (icon != NIL) surface->BlitFromBitmap(icon, Rect(Point(0, 0), icon.GetSize()), Rect(Point(titleFrame.left - 16 * surface->GetSurfaceDPI() / 96.0 - (flatStyle ? 0 : 2), titleFrame.top + (flatStyle ? 1 : 2)), Size(16, 16) * surface->GetSurfaceDPI() / 96.0));
+			if (window->GetIcon() != NIL) surface->BlitFromBitmap(window->GetIcon(), Rect(Point(0, 0), window->GetIcon().GetSize()), Rect(Point(titleFrame.left - 16 * surface->GetSurfaceDPI() / 96.0 - (flatStyle ? 0 : 2), titleFrame.top + (flatStyle ? 1 : 2)), Size(16, 16) * surface->GetSurfaceDPI() / 96.0));
 
 			if (!flatStyle)
 			{

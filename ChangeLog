@@ -7,6 +7,8 @@ dd.mm.20 hh:mm - smooth alpha 0.9.7
 - surfacecocoa.mm	- fixed popup windows appearing black on older versions of macOS
 - window.cpp		- fixed drawing issues on KDE systems
 
+- implemented alpha-blending for drawing bitmaps with alpha channel
+
 10.10.20 18:20 - smooth alpha 0.9.6
 
 - surfacegdi.cpp	- fixed too high DPI values being reported

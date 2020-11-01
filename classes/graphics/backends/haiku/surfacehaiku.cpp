@@ -161,6 +161,7 @@ S::Int S::GUI::SurfaceHaiku::PaintRect(const Rect &pRect)
 	{
 		bitmapView->Sync();
 
+		view->SetDrawingMode(B_OP_COPY);
 		view->DrawBitmapAsync(bitmap, BRect(pRect.left, pRect.top, pRect.right, pRect.bottom), BRect(pRect.left, pRect.top, pRect.right, pRect.bottom));
 	}
 
@@ -425,6 +426,12 @@ S::Int S::GUI::SurfaceHaiku::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	/* Copy the image.
 	 */
+	drawing_mode	 drawingMode = bitmap.GetDepth() == 32 ? B_OP_ALPHA : B_OP_COPY;
+
+	if (!painting) view->SetDrawingMode(drawingMode);
+
+	bitmapView->SetDrawingMode(drawingMode);
+
 	if (destRect.GetSize() == srcRect.GetSize())
 	{
 		if (!painting) view->DrawBitmap((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);

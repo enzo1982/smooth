@@ -38,6 +38,35 @@ using namespace X11;
 #	define CAIRO_OPERATOR_DIFFERENCE CAIRO_OPERATOR_XOR
 #endif
 
+namespace smooth
+{
+	namespace GUI
+	{
+		static Int PremultiplyAlpha(Bitmap &bitmap)
+		{
+			if (bitmap.GetDepth() != 32) return Success();
+
+			Point	 point;
+			Size	 size = bitmap.GetSize();
+
+			for (point.y = 0; point.y < size.cy; point.y++)
+			{
+				for (point.x = 0; point.x < size.cx; point.x++)
+				{
+					Color	 pixel = bitmap.GetPixel(point);
+
+					if (pixel.GetAlpha() != 255) bitmap.SetPixel(point, Color( pixel.GetRed()   * pixel.GetAlpha() / 255	    |
+												  (pixel.GetGreen() * pixel.GetAlpha() / 255) <<  8 |
+												  (pixel.GetBlue()  * pixel.GetAlpha() / 255) << 16 |
+														      pixel.GetAlpha()	      << 24, Color::RGBA));
+				}
+			}
+
+			return Success();
+		}
+	}
+}
+
 S::GUI::SurfaceBackend *CreateSurfaceCairo(S::Void *iSurface, const S::GUI::Size &maxSize)
 {
 	return new S::GUI::SurfaceCairo(iSurface, maxSize);
@@ -602,7 +631,13 @@ S::Int S::GUI::SurfaceCairo::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	/* Copy the image.
 	 */
-	cairo_surface_t	*srcSurface = cairo_image_surface_create_for_data(bitmap.GetBytes(), CAIRO_FORMAT_RGB24, bitmap.GetSize().cx, bitmap.GetSize().cy, bitmap.GetSize().cx * 4);
+	Bitmap	 premultipliedBitmap = bitmap;
+
+	PremultiplyAlpha(premultipliedBitmap);
+
+	Size		 srcSize    = premultipliedBitmap.GetSize();
+	cairo_format_t	 srcFormat  = premultipliedBitmap.GetDepth() == 32 ? CAIRO_FORMAT_ARGB32 : CAIRO_FORMAT_RGB24;
+	cairo_surface_t	*srcSurface = cairo_image_surface_create_for_data(premultipliedBitmap.GetBytes(), srcFormat, srcSize.cx, srcSize.cy, srcSize.cx * 4);
 
 	if (!painting)
 	{

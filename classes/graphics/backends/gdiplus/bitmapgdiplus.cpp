@@ -88,29 +88,8 @@ S::Bool S::GUI::BitmapGDIPlus::CreateBitmap(const Size &nSize, Int nDepth)
 	if (nDepth == -1) nDepth = 32;
 	if (nDepth != 32) nDepth = 32;
 
-	UnsignedByte	*buffer = new UnsignedByte [sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)];
-	BITMAPINFO	*bmpInfo = (BITMAPINFO *) buffer;
-
-	bmpInfo->bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-	bmpInfo->bmiHeader.biWidth		= nSize.cx;
-	bmpInfo->bmiHeader.biHeight		= nSize.cy;
-	bmpInfo->bmiHeader.biPlanes		= 1;
-	bmpInfo->bmiHeader.biBitCount		= nDepth;
-	bmpInfo->bmiHeader.biCompression	= BI_RGB;
-	bmpInfo->bmiHeader.biSizeImage		= 0;
-	bmpInfo->bmiHeader.biXPelsPerMeter	= 0;
-	bmpInfo->bmiHeader.biYPelsPerMeter	= 0;
-	bmpInfo->bmiHeader.biClrUsed		= 0;
-	bmpInfo->bmiHeader.biClrImportant	= 0;
-	bmpInfo->bmiColors[0].rgbBlue		= 0;
-	bmpInfo->bmiColors[0].rgbGreen		= 0;
-	bmpInfo->bmiColors[0].rgbRed		= 0;
-	bmpInfo->bmiColors[0].rgbReserved	= 0;
-
 	bytes	= new UnsignedByte [(nDepth / 8) * nSize.cx * nSize.cy];
-	bitmap	= new Gdiplus::Bitmap(bmpInfo, bytes);
-
-	delete [] buffer;
+	bitmap	= new Gdiplus::Bitmap(nSize.cx, nSize.cy, nSize.cx * (nDepth / 8), PixelFormat32bppARGB, (BYTE *) bytes);
 
 	if (bitmap == NIL) return False;
 
@@ -148,27 +127,21 @@ S::Bool S::GUI::BitmapGDIPlus::DeleteBitmap()
 
 S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 {
+	if (nBitmap == GetSystemBitmap()) return True;
+
 	if (nBitmap == NIL)
 	{
 		DeleteBitmap();
 	}
 	else
 	{
-		BITMAP	 bmp;
+		Gdiplus::Bitmap		*gdipBitmap = (Gdiplus::Bitmap *) nBitmap;
 
-		GetObject(nBitmap, sizeof(bmp), &bmp);
-
-		HBITMAP	 oBitmap = hBitmap;
-			 hBitmap = NIL;
-
-		CreateBitmap(Size(bmp.bmWidth, bmp.bmHeight), bmp.bmBitsPixel);
+		CreateBitmap(Size(gdipBitmap->GetWidth(), gdipBitmap->GetHeight()), 32);
 
 		Gdiplus::Graphics	 graphics(bitmap);
-		Gdiplus::Bitmap		 nBitmapB((HBITMAP) nBitmap, NIL);
 
-		graphics.DrawImage(&nBitmapB, 0, 0, bmp.bmWidth, bmp.bmHeight);
-
-		if (oBitmap != NIL) ::DeleteObject(oBitmap);
+		graphics.DrawImage(gdipBitmap, 0, 0, gdipBitmap->GetWidth(), gdipBitmap->GetHeight());
 	}
 
 	return True;
@@ -176,13 +149,7 @@ S::Bool S::GUI::BitmapGDIPlus::SetSystemBitmap(Void *nBitmap)
 
 S::Void *S::GUI::BitmapGDIPlus::GetSystemBitmap() const
 {
-	if (bitmap == NIL) return NIL;
-
-	if (hBitmap != NIL) ::DeleteObject(hBitmap);
-
-	bitmap->GetHBITMAP(Gdiplus::Color(255, 255, 255), &hBitmap);
-
-	return (Void *) hBitmap;
+	return (Void *) bitmap;
 }
 
 S::Bool S::GUI::BitmapGDIPlus::SetPixel(const Point &point, const Color &iColor)
@@ -198,7 +165,7 @@ S::Bool S::GUI::BitmapGDIPlus::SetPixel(const Point &point, const Color &iColor)
 	switch (depth)
 	{
 		case 24:
-			offset = (size.cy - point.y - 1) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+			offset = point.y * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
 
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >>  8) & 255;
@@ -206,7 +173,7 @@ S::Bool S::GUI::BitmapGDIPlus::SetPixel(const Point &point, const Color &iColor)
 
 			return True;
 		case 32:
-			offset = (size.cy - point.y - 1) * (				      size.cx * 4) + point.x * 4;
+			offset = point.y * (				      size.cx * 4) + point.x * 4;
 
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >>  8) & 255;
@@ -230,11 +197,11 @@ S::GUI::Color S::GUI::BitmapGDIPlus::GetPixel(const Point &point) const
 	switch (depth)
 	{
 		case 24:
-			offset = (size.cy - point.y - 1) * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
+			offset = point.y * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
 
 			return Color(			      data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2], Color::RGB);
 		case 32:
-			offset = (size.cy - point.y - 1) * (				      size.cx * 4) + point.x * 4;
+			offset = point.y * (				      size.cx * 4) + point.x * 4;
 
 			return Color(data[offset + 3] << 24 | data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2], Color::RGBA);
 	}

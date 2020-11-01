@@ -19,6 +19,35 @@
 
 #include <fribidi/fribidi.h>
 
+namespace smooth
+{
+	namespace GUI
+	{
+		static Int PremultiplyAlpha(Bitmap &bitmap)
+		{
+			if (bitmap.GetDepth() != 32) return Success();
+
+			Point	 point;
+			Size	 size = bitmap.GetSize();
+
+			for (point.y = 0; point.y < size.cy; point.y++)
+			{
+				for (point.x = 0; point.x < size.cx; point.x++)
+				{
+					Color	 pixel = bitmap.GetPixel(point);
+
+					if (pixel.GetAlpha() != 255) bitmap.SetPixel(point, Color( pixel.GetRed()   * pixel.GetAlpha() / 255	    |
+												  (pixel.GetGreen() * pixel.GetAlpha() / 255) <<  8 |
+												  (pixel.GetBlue()  * pixel.GetAlpha() / 255) << 16 |
+														      pixel.GetAlpha()	      << 24, Color::RGBA));
+				}
+			}
+
+			return Success();
+		}
+	}
+}
+
 S::GUI::SurfaceBackend *CreateSurfaceGDI(S::Void *iSurface, const S::GUI::Size &maxSize)
 {
 	return new S::GUI::SurfaceGDI(iSurface, maxSize);
@@ -505,16 +534,26 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 
 	/* Copy the image.
 	 */
-	HDC	 gdi_dc = painting ? NIL : GetWindowDC(window);
-	HDC	 cdc	= CreateCompatibleDC(paintContext);
+	HDC		 gdi_dc = painting ? NIL : GetWindowDC(window);
+	HDC		 cdc	= CreateCompatibleDC(paintContext);
+	BLENDFUNCTION	 blend	= { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+
+	Bitmap	 premultipliedBitmap = bitmap;
+
+	PremultiplyAlpha(premultipliedBitmap);
 
 	if (destRect.GetSize() == srcRect.GetSize())
 	{
-		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, bitmap.GetSystemBitmap());
+		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, premultipliedBitmap.GetSystemBitmap());
 
-		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
+		if (!painting)
+		{
+			if (bitmap.GetDepth() == 32) AlphaBlend(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), blend);
+			else			     BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
+		}
 
-		BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
+		if (bitmap.GetDepth() == 32) AlphaBlend(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), blend);
+		else			     BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
 
 		SelectObject(cdc, backup);
 	}
@@ -523,14 +562,19 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 		Float	 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
 		Float	 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
 
-		Size		 srcSize   = bitmap.GetSize();
-		const Bitmap	&srcBitmap = bitmap.Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
+		Size		 srcSize   = premultipliedBitmap.GetSize();
+		const Bitmap	&srcBitmap = premultipliedBitmap.Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
 
 		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, srcBitmap.GetSystemBitmap());
 
-		if (!painting) BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
+		if (!painting)
+		{
+			if (bitmap.GetDepth() == 32) AlphaBlend(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.GetWidth()) / scaleFactorX, Float(srcRect.GetHeight()) / scaleFactorY, blend);
+			else			     BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
+		}
 
-		BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
+		if (bitmap.GetDepth() == 32) AlphaBlend(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.GetWidth()) / scaleFactorX, Float(srcRect.GetHeight()) / scaleFactorY, blend);
+		else			     BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
 
 		SelectObject(cdc, backup);
 	}

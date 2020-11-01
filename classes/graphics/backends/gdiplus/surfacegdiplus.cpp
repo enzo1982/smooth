@@ -469,20 +469,23 @@ S::Int S::GUI::SurfaceGDIPlus::BlitFromBitmap(const Bitmap &bitmap, const Rect &
 
 	/* Copy the image.
 	 */
-	HDC			 gdi_dc = GetWindowDC(window);
-	Gdiplus::Graphics	*screen = new Gdiplus::Graphics(gdi_dc);
-	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
+	Gdiplus::Bitmap	*gdip_bitmap = (Gdiplus::Bitmap *) bitmap.GetSystemBitmap();
 
 	if (!painting)
 	{
-		screen->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
+		HDC			 gdi_dc = GetWindowDC(window);
+		Gdiplus::Graphics	*screen = new Gdiplus::Graphics(gdi_dc);
+
+		screen->SetCompositingMode(Gdiplus::CompositingModeSourceOver);
+		screen->DrawImage(gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
+
+		delete screen;
+
+		ReleaseDC(window, gdi_dc);
 	}
 
-	paintContext->DrawImage(&gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
-
-	delete screen;
-
-	ReleaseDC(window, gdi_dc);
+	paintContext->SetCompositingMode(Gdiplus::CompositingModeSourceOver);
+	paintContext->DrawImage(gdip_bitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
 
 	return Success();
 }
@@ -499,18 +502,10 @@ S::Int S::GUI::SurfaceGDIPlus::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap
 
 	/* Copy the image.
 	 */
-	Gdiplus::Bitmap		 gdip_bitmap((HBITMAP) bitmap.GetSystemBitmap(), NIL);
-	Gdiplus::Graphics	 gdip_graphics(&gdip_bitmap);
+	Gdiplus::Bitmap		*gdip_bitmap = (Gdiplus::Bitmap *) bitmap.GetSystemBitmap();
+	Gdiplus::Graphics	 gdip_graphics(gdip_bitmap);
 
 	gdip_graphics.DrawImage(paintBitmap, Gdiplus::Rect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight()), srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), Gdiplus::UnitPixel, NIL, NIL, NIL);
-
-	HBITMAP			 hBitmap = NIL;
-
-	gdip_bitmap.GetHBITMAP(Gdiplus::Color(), &hBitmap);
-
-	bitmap.SetSystemBitmap(hBitmap);
-
-	::DeleteObject(hBitmap);
 
 	return Success();
 }

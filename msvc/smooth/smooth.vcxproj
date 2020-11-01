@@ -137,7 +137,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -154,7 +154,7 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -171,7 +171,7 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -191,7 +191,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -206,7 +206,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -223,7 +223,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -240,7 +240,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -260,7 +260,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <DataExecutionPrevention>

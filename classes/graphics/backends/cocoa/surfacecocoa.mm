@@ -543,7 +543,7 @@ S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight())
 		 fromRect: NSMakeRect(srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight())
-		operation: NSCompositeCopy
+		operation: NSCompositeSourceOver
 		 fraction: 1.0];
 
 	if (endPaint) EndPaint();

@@ -207,7 +207,7 @@ S::Bool S::GUI::BitmapCocoa::SetPixel(const Point &point, const Color &iColor)
 	Color		 color	= iColor.ConvertTo(Color::RGBA);
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
-	Int		 offset = point.y * (size.cx * 4) + point.x * 4;;
+	Int		 offset = point.y * (size.cx * 4) + point.x * 4;
 
 	switch (depth)
 	{
@@ -235,7 +235,7 @@ S::GUI::Color S::GUI::BitmapCocoa::GetPixel(const Point &point) const
 	if (point.y >= size.cy || point.x >= size.cx) return 0;
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
-	Int		 offset = point.y * (size.cx * 4) + point.x * 4;;
+	Int		 offset = point.y * (size.cx * 4) + point.x * 4;
 
 	switch (depth)
 	{

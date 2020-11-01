@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,10 @@
 #include <smooth/graphics/imageloader/icon.h>
 #include <smooth/backends/win32/backendwin32.h>
 #include <smooth/init.win32.h>
+
+#ifdef HAVE_GDIPLUS
+#	include <gdiplus.h>
+#endif
 
 S::GUI::ImageLoaderIcon::ImageLoaderIcon(const String &iFileName) : ImageLoader(iFileName)
 {
@@ -40,8 +44,17 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderIcon::Load()
 
 	bitmap.CreateBitmap(size, 32);
 
+#ifdef HAVE_GDIPLUS
+	Gdiplus::Bitmap		*gdipBitmap = (Gdiplus::Bitmap *) bitmap.GetSystemBitmap();
+	Gdiplus::Graphics	 graphics(gdipBitmap);
+
+	graphics.Clear(Gdiplus::Color::Transparent);
+
+	HDC	 dc = graphics.GetHDC();
+#else
 	HDC	 dc = CreateCompatibleDC(NIL);
 	HBITMAP	 backup = (HBITMAP) SelectObject(dc, bitmap.GetSystemBitmap());
+#endif
 
 	DrawIconEx(dc, 0, 0, icon, 0, 0, 0, NIL, DI_DEFAULTSIZE | DI_IMAGE | DI_MASK);
 
@@ -58,8 +71,12 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderIcon::Load()
 
 	/* Clean up.
 	 */
+#ifdef HAVE_GDIPLUS
+	graphics.ReleaseHDC(dc);
+#else
 	SelectObject(dc, backup);
 	DeleteDC(dc);
+#endif
 
 	return bitmap;
 }

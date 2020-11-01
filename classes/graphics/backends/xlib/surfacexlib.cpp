@@ -166,10 +166,10 @@ S::Int S::GUI::SurfaceXLib::EndPaint()
 		const Rect	&paintRect = paintRects.GetNth(paintRects.Length() - 2);
 		XRectangle	 clipRect;
 
-		clipRect.x	= paintRect->left;
-		clipRect.y	= paintRect->top;
-		clipRect.width	= paintRect->GetWidth();
-		clipRect.height	= paintRect->GetHeight();
+		clipRect.x	= paintRect.left;
+		clipRect.y	= paintRect.top;
+		clipRect.width	= paintRect.GetWidth();
+		clipRect.height	= paintRect.GetHeight();
 
 		XSetClipRectangles(display, gc, 0, 0, &clipRect, 1, Unsorted);
 	}
@@ -428,24 +428,42 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 
 	XGetWindowAttributes(display, window, &windowAttributes);
 
-	const Bitmap	*srcBitmap = &bitmap;
-	Size		 srcSize   =  bitmap.GetSize();
+	Float		 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
+	Float		 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
 
-	if (bitmap.GetDepth() != windowAttributes.depth)
+	const Bitmap	*srcBitmap    = &bitmap;
+	Size		 srcSize      =  bitmap.GetSize();
+	Size		 destSize     = Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY);
+
+	if (bitmap.GetDepth() == 32 || bitmap.GetDepth() != windowAttributes.depth)
 	{
-		Bitmap	*copy  = new Bitmap(size, windowAttributes.depth);
-		XImage	*image = (XImage *) bitmap.GetSystemBitmap();
+		const Bitmap	&bitmap = srcBitmap->Scale(destSize);
+
+		Bitmap	*copy = new Bitmap(destSize, windowAttributes.depth);
+		XImage	*bkgr = XGetImage(display, this->bitmap, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), AllPlanes, ZPixmap);
 		Point	 point;
 
-		for (point.y = 0; point.y < srcSize.cy; point.y++)
+		for (point.y = 0; point.y < destSize.cy; point.y++)
 		{
-			for (point.x = 0; point.x < srcSize.cx; point.x++)
+			for (point.x = 0; point.x < destSize.cx; point.x++)
 			{
-				Long	 value = XGetPixel(image, point.x, point.y);
+				Color	 color = bitmap.GetPixel(point);
+				Int	 alpha = color.GetAlpha();
+				
+				if (alpha != 255)
+				{
+					Long	 background = XGetPixel(bkgr, point.x, point.y);
 
-				copy->SetPixel(point, Color(((value >> 24) & 255) << 24 | (value & 255) << 16 | ((value >> 8) & 255) << 8 | ((value >> 16) & 255)));
+					color = ((color.GetRed()   * alpha + ((background >> 16) & 255) * (255 - alpha)) / 255)	      |
+						((color.GetGreen() * alpha + ((background >>  8) & 255) * (255 - alpha)) / 255) <<  8 |
+						((color.GetBlue()  * alpha + ( background	 & 255) * (255 - alpha)) / 255) << 16;
+				}
+
+				copy->SetPixel(point, color);
 			}
 		}
+
+		XDestroyImage(bkgr);
 
 		srcBitmap = copy;
 	}
@@ -460,10 +478,7 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 	}
 	else
 	{
-		Float	 scaleFactorX = Float(srcRect.GetWidth()) / Float(destRect.GetWidth());
-		Float	 scaleFactorY = Float(srcRect.GetHeight()) / Float(destRect.GetHeight());
-
-		const Bitmap	&bitmap = srcBitmap->Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
+		const Bitmap	&bitmap = srcBitmap->Scale(destSize);
 
 		if (!painting) XPutImage(display, window, gc, (XImage *) bitmap.GetSystemBitmap(), Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 

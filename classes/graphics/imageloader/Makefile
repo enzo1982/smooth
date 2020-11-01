@@ -20,6 +20,10 @@ else
 	MYCCOPTS += $(shell pkg-config --cflags libpng)
 endif
 
+ifeq ($(BUILD_GDIPLUS),True)
+	MYCCOPTS += -D HAVE_GDIPLUS=1
+endif
+
 # Enter object files here:
 OBJECTS	  = imageloader.o jpeg.o pci.o png.o
 

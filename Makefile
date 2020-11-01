@@ -202,7 +202,9 @@ endif
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += resources/resources.o
 
-	ifeq ($(BUILD_GDIPLUS),True)
+	ifneq ($(BUILD_GDIPLUS),True)
+		LIBS += -lmsimg32
+	else
 		LIBS += -lgdiplus
 	endif
 

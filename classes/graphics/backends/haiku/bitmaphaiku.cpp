@@ -78,10 +78,10 @@ S::Bool S::GUI::BitmapHaiku::CreateBitmap(const Size &nSize, Int nDepth)
 {
 	DeleteBitmap();
 
-	if (nDepth == -1) nDepth = 32;
-	if (nDepth != 32) nDepth = 32;
+	if (nDepth == -1)		  nDepth = 24;
+	if (nDepth != 24 && nDepth != 32) nDepth = 24;
 
-	bitmap	= new BBitmap(BRect(0, 0, nSize.cx - 1, nSize.cy - 1), B_RGB32, true);
+	bitmap	= new BBitmap(BRect(0, 0, nSize.cx - 1, nSize.cy - 1), nDepth == 32 ? B_RGBA32 : B_RGB32, true);
 
 	if (bitmap == NIL) return False;
 
@@ -89,7 +89,7 @@ S::Bool S::GUI::BitmapHaiku::CreateBitmap(const Size &nSize, Int nDepth)
 
 	size	= nSize;
 	depth	= nDepth;
-	bpp	= depth;
+	bpp	= 32;
 	align	= 4;
 
 	return True;
@@ -157,21 +157,17 @@ S::Bool S::GUI::BitmapHaiku::SetPixel(const Point &point, const Color &iColor)
 	Color		 color	= iColor.ConvertTo(Color::RGBA);
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
-	Int		 offset = 0;
+	Int		 offset = point.y * (size.cx * 4) + point.x * 4;
 
 	switch (depth)
 	{
 		case 24:
-			offset = point.y * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >>  8) & 255;
 			data[offset + 2] =  color	 & 255;
 
 			return True;
 		case 32:
-			offset = point.y * (				      size.cx * 4) + point.x * 4;
-
 			data[offset + 0] = (color >> 16) & 255;
 			data[offset + 1] = (color >>  8) & 255;
 			data[offset + 2] =  color	 & 255;
@@ -189,17 +185,13 @@ S::GUI::Color S::GUI::BitmapHaiku::GetPixel(const Point &point) const
 	if (point.y >= size.cy || point.x >= size.cx) return 0;
 
 	UnsignedByte	*data	= ((UnsignedByte *) bytes);
-	Int		 offset = 0;
+	Int		 offset = point.y * (size.cx * 4) + point.x * 4;
 
 	switch (depth)
 	{
 		case 24:
-			offset = point.y * (((4 - ((size.cx * 3) & 3)) & 3) + size.cx * 3) + point.x * 3;
-
 			return Color(			      data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2], Color::RGB);
 		case 32:
-			offset = point.y * (				      size.cx * 4) + point.x * 4;
-
 			return Color(data[offset + 3] << 24 | data[offset + 0] << 16 | data[offset + 1] << 8 | data[offset + 2], Color::RGBA);
 	}
 

@@ -6,6 +6,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.7
 - screenxlib.cpp	- improved multi-monitor support for X11 based systems
 - surfacecocoa.mm	- fixed popup windows appearing black on older versions of macOS
 - window.cpp		- fixed drawing issues on KDE systems
+- arrows.cpp		- fixed unintentional wrap-around when going below zero value
 
 - implemented alpha-blending for drawing bitmaps with alpha channel
 

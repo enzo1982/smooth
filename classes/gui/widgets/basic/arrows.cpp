@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -211,7 +211,7 @@ S::Void S::GUI::Arrows::OnTimer()
 		if (timerCount >= 8 * n) difference = timerDirection * (Int) Math::Pow(2, n);
 	}
 
-	*variable = Math::Min(Math::Max(*variable + difference * stepSize, startValue), endValue);
+	*variable = Math::Min(Math::Max(*variable + difference * Int(stepSize), startValue), endValue);
 
 	if (*variable != prevValue) onValueChange.Emit(*variable);
 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -284,6 +284,8 @@ S::Bool S::GUI::Application::Lock::Release()
 
 S::Int S::GUI::Application::Lock::SuspendLock()
 {
+	if (GetOwnerThreadID() != Threads::Thread::GetCurrentThreadID()) return 0;
+
 	/* Release currently held lock.
 	 */
 	Int	 suspendCount = lockCount;
@@ -295,6 +297,8 @@ S::Int S::GUI::Application::Lock::SuspendLock()
 
 S::Bool S::GUI::Application::Lock::ResumeLock(Int resumeCount)
 {
+	if (resumeCount == 0) return False;
+
 	/* Acquire lock.
 	 */
 	for (Int i = 0; i < resumeCount; i++) Acquire();

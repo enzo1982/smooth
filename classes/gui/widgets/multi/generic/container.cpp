@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,6 +22,8 @@ S::GUI::Container::Container() : Widget(Point(), Size())
 
 S::GUI::Container::~Container()
 {
+	onChangeEntryOrder.DisconnectAll();
+
 	RemoveAllEntries();
 }
 

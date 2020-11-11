@@ -155,7 +155,7 @@ S::Bool S::GUI::BitmapXLib::SetSystemBitmap(Void *nBitmap)
 
 		CreateBitmap(Size(image->width, image->height), image->depth);
 
-		memcpy(bitmap->data, image->data, image->height * image->bytes_per_line);
+		memcpy(bitmap->data, image->data, size_t(image->height) * size_t(image->bytes_per_line));
 	}
 
 	return True;

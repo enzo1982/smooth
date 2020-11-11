@@ -872,32 +872,27 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 	 */
 	if (strcmp(inEncoding, outEncoding) == 0)
 	{
-		Int	 size = inBytes;
+		if (outBuffer == NIL)	 return inBytes;
+		if (inBytes >= outBytes) return 0;
 
-		if (outBuffer != NIL)
-		{
-			if (size < outBytes && size > 0) wcsncpy((wchar_t *) outBuffer, (wchar_t *) inBuffer, size / sizeof(wchar_t));
+		if (inBytes < outBytes && inBytes > 0) memcpy(outBuffer, inBuffer, inBytes);
 
-			if (size >= outBytes) size = 0;
-		}
-
-		return size;
+		return inBytes;
 	}
 
 	/* Switch bytes for conversion between little and big endian.
 	 */
 	if ((strcmp(inEncoding, "UTF-16LE") == 0 && strcmp(outEncoding, "UTF-16BE") == 0) || (strcmp(inEncoding, "UTF-16BE") == 0 && strcmp(outEncoding, "UTF-16LE") == 0))
 	{
-		Int	 size = inBytes;
+		if (outBuffer == NIL)	 return inBytes;
+		if (inBytes >= outBytes) return 0;
 
-		if (outBuffer != NIL)
+		if (inBytes < outBytes && inBytes > 0)
 		{
-			if (size < outBytes && size > 0) for (UnsignedInt i = 0; i < size / sizeof(wchar_t); i++) ((wchar_t *) outBuffer)[i] = ((((wchar_t *) inBuffer)[i] & 255) << 8) | (((wchar_t *) inBuffer)[i] >> 8);
-
-			if (size >= outBytes) size = 0;
+			for (Int i = 0; i < inBytes / 2; i++) ((UnsignedInt16 *) outBuffer)[i] = ((((UnsignedInt16 *) inBuffer)[i] & 255) << 8) | (((UnsignedInt16 *) inBuffer)[i] >> 8);
 		}
 
-		return size;
+		return inBytes;
 	}
 
 	/* Convert using iconv/libiconv.

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -66,6 +66,15 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 
 		numCores       = cpuid_get_total_cpus();
 		numLogicalCPUs = numCores;
+
+#if defined __APPLE__ && defined __aarch64__
+		/* Apple uses an HMP architecture with power efficient cores
+		 * showing performance characteristics similar to threads in
+		 * an SMT system. We assume there are 4 power efficient cores
+		 * and treat them the same way as SMT threads.
+		 */
+		if (numCores >= 6) numCores -= 4;
+#endif
 
 		return Success();
 	}

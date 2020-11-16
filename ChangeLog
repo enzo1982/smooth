@@ -8,6 +8,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.7
 - window.cpp		- fixed drawing issues on KDE systems
 - arrows.cpp		- fixed unintentional wrap-around when going below zero value
 
+- added support for building for Apple Silicon Macs
 - implemented alpha-blending for drawing bitmaps with alpha channel
 
 10.10.20 18:20 - smooth alpha 0.9.6

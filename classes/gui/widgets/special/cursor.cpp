@@ -24,6 +24,8 @@
 
 #include <fribidi/fribidi.h>
 
+static const S::Int	 CF_NOINPUT = 1 << 30;
+
 const S::Short	 S::GUI::Cursor::classID = S::Object::RequestClassID();
 
 S::Signal2<S::Void, S::GUI::Cursor *, const S::GUI::Point &>	 S::GUI::Cursor::internalSetCursor;
@@ -267,7 +269,11 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 			{
 				Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
 
+				flags |= CF_NOINPUT;
+
 				DeleteSelectedText();
+
+				flags ^= CF_NOINPUT;
 
 				String	 insertText = Clipboard(container->GetContainerWindow()).GetSelectionText();
 
@@ -279,6 +285,8 @@ S::Int S::GUI::Cursor::Process(Int message, Int wParam, Int lParam)
 
 					InsertText(insertText);
 				}
+
+				onInput.Emit(text);
 			}
 
 			break;
@@ -649,8 +657,6 @@ S::Void S::GUI::Cursor::InsertText(const String &insertText)
 	SetCursorPos(promptPos + insertLength);
 
 	AddHistoryEntry();
-
-	onInput.Emit(newText);
 }
 
 S::Void S::GUI::Cursor::CopyToClipboard()
@@ -665,7 +671,11 @@ S::Void S::GUI::Cursor::InsertFromClipboard()
 {
 	Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
 
+	flags |= CF_NOINPUT;
+
 	DeleteSelectedText();
+
+	flags ^= CF_NOINPUT;
 
 	String	 insertText = Clipboard(container->GetContainerWindow()).GetClipboardText();
 
@@ -677,6 +687,8 @@ S::Void S::GUI::Cursor::InsertFromClipboard()
 
 		InsertText(insertText);
 	}
+
+	onInput.Emit(text);
 }
 
 S::Void S::GUI::Cursor::DeleteSelectedText()
@@ -717,7 +729,7 @@ S::Void S::GUI::Cursor::DeleteSelectedText()
 
 	AddHistoryEntry();
 
-	onInput.Emit(newText);
+	if(!Binary::IsFlagSet(GetFlags(), CF_NOINPUT)) onInput.Emit(newText);
 }
 
 S::Int S::GUI::Cursor::Scroll(Int nScrollPos)
@@ -956,7 +968,11 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 			{
 				Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
 
+				flags |= CF_NOINPUT;
+
 				DeleteSelectedText();
+
+				flags ^= CF_NOINPUT;
 
 				if (selected) RemoveHistoryEntry();
 
@@ -965,6 +981,8 @@ S::Bool S::GUI::Cursor::OnSpecialKey(Int keyCode)
 				insertText[0] = '\n';
 
 				InsertText(insertText);
+
+				onInput.Emit(text);
 			}
 			else
 			{
@@ -1068,17 +1086,24 @@ S::Void S::GUI::Cursor::OnInput(Int character, Int flags)
 	{
 		Bool	 selected = (markStart != markEnd && markStart >= 0 && markEnd >= 0);
 
+		this->flags |= CF_NOINPUT;
+
 		DeleteSelectedText();
 
-		if (Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) && (character < '0' || character > '9') && character != '-' && character != '.') return;
+		this->flags ^= CF_NOINPUT;
 
-		String	 insertText;
+		if (!Binary::IsFlagSet(container->GetFlags(), EDB_NUMERIC) || (character >= '0' && character <= '9') || character == '-' || character == '.')
+		{
+			String	 insertText;
 
-		insertText[0] = character;
+			insertText[0] = character;
 
-		if (selected) RemoveHistoryEntry();
+			if (selected) RemoveHistoryEntry();
 
-		InsertText(insertText);
+			InsertText(insertText);
+		}
+
+		onInput.Emit(text);
 	}
 }
 

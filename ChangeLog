@@ -5,6 +5,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.7
 - backendcocoa.mm	- added support for opening registered file types on macOS
 - screenxlib.cpp	- improved multi-monitor support for X11 based systems
 - surfacecocoa.mm	- fixed popup windows appearing black on older versions of macOS
+- backendxlib.cpp	- fixed issues querying GTK theme colors
 - window.cpp		- fixed drawing issues on KDE systems
 - arrows.cpp		- fixed unintentional wrap-around when going below zero value
 

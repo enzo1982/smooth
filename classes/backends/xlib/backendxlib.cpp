@@ -24,23 +24,23 @@ using namespace X11;
 
 static GdkRGBA get_gtk_color(GType type, const gchar *className, GtkStateFlags stateFlags, bool background)
 {
-	/* Create GtkStyleContext to query color.
+	/* Create dummy widget of requested type.
 	 */
-	GtkStyleContext	*style = gtk_style_context_new();
+	GtkWidget	*widget = NIL;
 
-	gtk_style_context_set_screen(style, gdk_screen_get_default());
+	if	(type == GTK_TYPE_WINDOW)      widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	else if	(type == GTK_TYPE_TOOLTIP)     widget = gtk_window_new(GTK_WINDOW_POPUP);
+	else if	(type == GTK_TYPE_BUTTON)      widget = gtk_button_new();
+	else if	(type == GTK_TYPE_TEXT_VIEW)   widget = gtk_text_view_new();
+	else if	(type == GTK_TYPE_LINK_BUTTON) widget = gtk_link_button_new("");
 
-	/* Create widget path and add to style context.
+	if (widget == NIL) return { 0, 0, 0, 0 };
+
+	/* Get GtkStyleContext to query color.
 	 */
-	GtkWidgetPath	*path = gtk_widget_path_new();
-	int		 pos  = gtk_widget_path_append_type(path, type);
+	GtkStyleContext *style = gtk_widget_get_style_context(widget);
 
-	gtk_widget_path_iter_add_class(path, pos, className);
-
-	gtk_style_context_set_path(style, path);
 	gtk_style_context_add_class(style, className);
-
-	gtk_widget_path_unref(path);
 
 	/* Query color from style context.
 	 */
@@ -49,7 +49,8 @@ static GdkRGBA get_gtk_color(GType type, const gchar *className, GtkStateFlags s
 	if (background) gtk_style_context_get_background_color(style, stateFlags, &color);
 	else		gtk_style_context_get_color(style, stateFlags, &color);
 
-	g_object_unref(style);
+	g_object_ref_sink(widget);
+	g_object_unref(widget);
 
 	return color;
 }
@@ -126,13 +127,13 @@ S::Void S::Backends::BackendXLib::UpdateColors()
 	 */
 	GdkRGBA	 backgroundColor    = get_gtk_color(GTK_TYPE_WINDOW, GTK_STYLE_CLASS_BACKGROUND, GTK_STATE_FLAG_NORMAL, true);
 
-	GdkRGBA	 textColor	    = get_gtk_color(GTK_TYPE_LABEL, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, false);
+	GdkRGBA	 textColor	    = get_gtk_color(GTK_TYPE_BUTTON, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, false);
 
 	GdkRGBA	 clientColor	    = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, true);
 	GdkRGBA	 clientTextColor    = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, false);
 
-	GdkRGBA	 highlightColor	    = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_SELECTED, true);
-	GdkRGBA	 highlightTextColor = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_SELECTED, false);
+	GdkRGBA	 highlightColor	    = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GtkStateFlags(GTK_STATE_FLAG_SELECTED | GTK_STATE_FLAG_FOCUSED), true);
+	GdkRGBA	 highlightTextColor = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GtkStateFlags(GTK_STATE_FLAG_SELECTED | GTK_STATE_FLAG_FOCUSED), false);
 
 	GdkRGBA	 tooltipColor	    = get_gtk_color(GTK_TYPE_TOOLTIP, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, true);
 	GdkRGBA	 tooltipTextColor   = get_gtk_color(GTK_TYPE_TOOLTIP, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, false);

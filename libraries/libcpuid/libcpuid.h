@@ -29,7 +29,7 @@
  * \file     libcpuid.h
  * \author   Veselin Georgiev
  * \date     Oct 2008
- * \version  0.4.1
+ * \version  0.5.0
  *
  * Version history:
  *
@@ -58,10 +58,13 @@
  *                       (a backwards-incompatible change since the sizeof
  *                        cpu_raw_data_t and cpu_id_t is now different).
  * * 0.4.1 (2019-02-05): A lot of DB updates, and better RDMSR
+ * * 0.5.0 (2020-05-23): A lot of DB updates, detection of new CPU features,
+ *                       (a backwards-incompatible change since the sizeof
+ *                        cpu_raw_data_t and cpu_id_t is now different).
  */
 
 /** @mainpage A simple libcpuid introduction
- * 
+ *
  * LibCPUID provides CPU identification and access to the CPUID and RDTSC
  * instructions on the x86.
  * <p>
@@ -74,7 +77,7 @@
  * \ref cpu_tsc_mark + \ref cpu_tsc_unmark + \ref cpu_clock_by_mark,
  * \ref cpu_clock_measure or \ref cpu_clock_by_ic.
  * Read carefully for pros/cons of each method. <br>
- * 
+ *
  * To read MSRs, use \ref cpu_msr_driver_open to get a handle, and then
  * \ref cpu_rdmsr for querying abilities. Some MSR decoding is available on recent
  * CPUs, and can be queried through \ref cpu_msrinfo; the various types of queries
@@ -110,7 +113,8 @@ typedef enum {
 	VENDOR_RISE,       /*!< x86 CPU by Rise Technology */
 	VENDOR_SIS,        /*!< x86 CPU by SiS */
 	VENDOR_NSC,        /*!< x86 CPU by National Semiconductor */
-	
+	VENDOR_HYGON,	   /*!< Hygon CPU */
+
 	NUM_CPU_VENDORS,   /*!< Valid CPU vendor ids: 0..NUM_CPU_VENDORS - 1 */
 	VENDOR_UNKNOWN = -1,
 } cpu_vendor_t;
@@ -125,31 +129,37 @@ typedef enum {
  */
 struct cpu_raw_data_t {
 	/** contains results of CPUID for eax = 0, 1, ...*/
-	uint32_t basic_cpuid[MAX_CPUID_LEVEL][4];
+	uint32_t basic_cpuid[MAX_CPUID_LEVEL][NUM_REGS];
 
 	/** contains results of CPUID for eax = 0x80000000, 0x80000001, ...*/
-	uint32_t ext_cpuid[MAX_EXT_CPUID_LEVEL][4];
-	
+	uint32_t ext_cpuid[MAX_EXT_CPUID_LEVEL][NUM_REGS];
+
 	/** when the CPU is intel and it supports deterministic cache
 	    information: this contains the results of CPUID for eax = 4
 	    and ecx = 0, 1, ... */
-	uint32_t intel_fn4[MAX_INTELFN4_LEVEL][4];
-	
+	uint32_t intel_fn4[MAX_INTELFN4_LEVEL][NUM_REGS];
+
 	/** when the CPU is intel and it supports leaf 0Bh (Extended Topology
-	    enumeration leaf), this stores the result of CPUID with 
+	    enumeration leaf), this stores the result of CPUID with
 	    eax = 11 and ecx = 0, 1, 2... */
-	uint32_t intel_fn11[MAX_INTELFN11_LEVEL][4];
-	
+	uint32_t intel_fn11[MAX_INTELFN11_LEVEL][NUM_REGS];
+
 	/** when the CPU is intel and supports leaf 12h (SGX enumeration leaf),
 	 *  this stores the result of CPUID with eax = 0x12 and
 	 *  ecx = 0, 1, 2... */
-	uint32_t intel_fn12h[MAX_INTELFN12H_LEVEL][4];
+	uint32_t intel_fn12h[MAX_INTELFN12H_LEVEL][NUM_REGS];
 
 	/** when the CPU is intel and supports leaf 14h (Intel Processor Trace
 	 *  capabilities leaf).
 	 *  this stores the result of CPUID with eax = 0x12 and
 	 *  ecx = 0, 1, 2... */
-	uint32_t intel_fn14h[MAX_INTELFN14H_LEVEL][4];
+	uint32_t intel_fn14h[MAX_INTELFN14H_LEVEL][NUM_REGS];
+
+	/** when the CPU is AMD and supports leaf 8000001Dh
+	 * (topology information for the DC)
+	 * this stores the result of CPUID with eax = 8000001Dh and
+	 *  ecx = 0, 1, 2... */
+	uint32_t amd_fn8000001dh[MAX_AMDFN8000001DH_LEVEL][NUM_REGS];
 };
 
 /**
@@ -159,7 +169,7 @@ struct cpu_raw_data_t {
  * ...
  * struct cpu_raw_data_t raw;
  * struct cpu_id_t id;
- * 
+ *
  * if (cpuid_get_raw_data(&raw) == 0 && cpu_identify(&raw, &id) == 0 && id.sgx.present) {
  *   printf("SGX is present.\n");
  *   printf("SGX1 instructions: %s.\n", id.sgx.flags[INTEL_SGX1] ? "present" : "absent");
@@ -174,42 +184,42 @@ struct cpu_raw_data_t {
  *   printf("SGX is not present.\n");
  * }
  * @endcode
- */ 
+ */
 struct cpu_sgx_t {
 	/** Whether SGX is present (boolean) */
 	uint32_t present;
-	
+
 	/** Max enclave size in 32-bit mode. This is a power-of-two value:
 	 *  if it is "31", then the max enclave size is 2^31 bytes (2 GiB).
 	 */
 	uint8_t max_enclave_32bit;
-	
+
 	/** Max enclave size in 64-bit mode. This is a power-of-two value:
 	 *  if it is "36", then the max enclave size is 2^36 bytes (64 GiB).
 	 */
 	uint8_t max_enclave_64bit;
-	
+
 	/**
 	 * contains SGX feature flags. See the \ref cpu_sgx_feature_t
 	 * "INTEL_SGX*" macros below.
 	 */
 	uint8_t flags[SGX_FLAGS_MAX];
-	
+
 	/** number of Enclave Page Cache (EPC) sections. Info for each
 	 *  section is available through the \ref cpuid_get_epc() function
 	 */
 	int num_epc_sections;
-	
+
 	/** bit vector of the supported extended  features that can be written
 	 *  to the MISC region of the SSA (Save State Area)
-	 */ 
+	 */
 	uint32_t misc_select;
-	
+
 	/** a bit vector of the attributes that can be set to SECS.ATTRIBUTES
 	 *  via ECREATE. Corresponds to bits 0-63 (incl.) of SECS.ATTRIBUTES.
-	 */ 
+	 */
 	uint64_t secs_attributes;
-	
+
 	/** a bit vector of the bits that can be set in the XSAVE feature
 	 *  request mask; Corresponds to bits 64-127 of SECS.ATTRIBUTES.
 	 */
@@ -222,48 +232,48 @@ struct cpu_sgx_t {
 struct cpu_id_t {
 	/** contains the CPU vendor string, e.g. "GenuineIntel" */
 	char vendor_str[VENDOR_STR_MAX];
-	
+
 	/** contains the brand string, e.g. "Intel(R) Xeon(TM) CPU 2.40GHz" */
 	char brand_str[BRAND_STR_MAX];
-	
+
 	/** contains the recognized CPU vendor */
 	cpu_vendor_t vendor;
-	
+
 	/**
 	 * contain CPU flags. Used to test for features. See
 	 * the \ref cpu_feature_t "CPU_FEATURE_*" macros below.
 	 * @see Features
 	 */
 	uint8_t flags[CPU_FLAGS_MAX];
-	
+
 	/** CPU family */
 	int32_t family;
-	
+
 	/** CPU model */
 	int32_t model;
-	
+
 	/** CPU stepping */
 	int32_t stepping;
-	
+
 	/** CPU extended family */
 	int32_t ext_family;
-	
+
 	/** CPU extended model */
 	int32_t ext_model;
-	
+
 	/** Number of CPU cores on the current processor */
 	int32_t num_cores;
-	
+
 	/**
 	 * Number of logical processors on the current processor.
 	 * Could be more than the number of physical cores,
 	 * e.g. when the processor has HyperThreading.
 	 */
 	int32_t num_logical_cpus;
-	
+
 	/**
 	 * The total number of logical processors.
-	 * The same value is availabe through \ref cpuid_get_total_cpus.
+	 * The same value is available through \ref cpuid_get_total_cpus.
 	 *
 	 * This is num_logical_cpus * {total physical processors in the system}
 	 * (but only on a real system, under a VM this number may be lower).
@@ -276,13 +286,13 @@ struct cpu_id_t {
 	 *
 	 */
 	int32_t total_logical_cpus;
-	
+
 	/**
 	 * L1 data cache size in KB. Could be zero, if the CPU lacks cache.
 	 * If the size cannot be determined, it will be -1.
 	 */
 	int32_t l1_data_cache;
-	
+
 	/**
 	 * L1 instruction cache size in KB. Could be zero, if the CPU lacks
 	 * cache. If the size cannot be determined, it will be -1.
@@ -290,40 +300,56 @@ struct cpu_id_t {
 	 * a trace cache, the size will be expressed in K uOps.
 	 */
 	int32_t l1_instruction_cache;
-	
+
 	/**
 	 * L2 cache size in KB. Could be zero, if the CPU lacks L2 cache.
 	 * If the size of the cache could not be determined, it will be -1
 	 */
 	int32_t l2_cache;
-	
+
 	/** L3 cache size in KB. Zero on most systems */
 	int32_t l3_cache;
 
 	/** L4 cache size in KB. Zero on most systems */
 	int32_t l4_cache;
-	
-	/** Cache associativity for the L1 data cache. -1 if undetermined */
+
+	/** Cache associativity for the L1 data cache. -1 if undetermined
+	 * @deprecated replaced by \ref cpu_id_t::l1_data_assoc
+	 */
 	int32_t l1_assoc;
-	
+
+	/** Cache associativity for the L1 data cache. -1 if undetermined */
+	int32_t l1_data_assoc;
+
+	/** Cache associativity for the L1 intruction cache. -1 if undetermined */
+	int32_t l1_instruction_assoc;
+
 	/** Cache associativity for the L2 cache. -1 if undetermined */
 	int32_t l2_assoc;
-	
+
 	/** Cache associativity for the L3 cache. -1 if undetermined */
 	int32_t l3_assoc;
 
 	/** Cache associativity for the L4 cache. -1 if undetermined */
 	int32_t l4_assoc;
-	
-	/** Cache-line size for L1 data cache. -1 if undetermined */
+
+	/** Cache-line size for L1 data cache. -1 if undetermined
+	 * @deprecated replaced by \ref cpu_id_t::l1_data_cacheline
+	 */
 	int32_t l1_cacheline;
-	
+
+	/** Cache-line size for L1 data cache. -1 if undetermined */
+	int32_t l1_data_cacheline;
+
+	/** Cache-line size for L1 intruction cache. -1 if undetermined */
+	int32_t l1_instruction_cacheline;
+
 	/** Cache-line size for L2 cache. -1 if undetermined */
 	int32_t l2_cacheline;
-	
+
 	/** Cache-line size for L3 cache. -1 if undetermined */
 	int32_t l3_cacheline;
-	
+
 	/** Cache-line size for L4 cache. -1 if undetermined */
 	int32_t l4_cacheline;
 
@@ -342,17 +368,17 @@ struct cpu_id_t {
 	 * @endcode
 	 */
 	char cpu_codename[64];
-	
+
 	/** SSE execution unit size (64 or 128; -1 if N/A) */
 	int32_t sse_size;
-	
+
 	/**
 	 * contain miscellaneous detection information. Used to test about specifics of
 	 * certain detected features. See \ref cpu_hint_t "CPU_HINT_*" macros below.
 	 * @see Hints
 	 */
 	uint8_t detection_hints[CPU_HINTS_MAX];
-	
+
 	/** contains information about SGX features if the processor, if present */
 	struct cpu_sgx_t sgx;
 };
@@ -488,6 +514,9 @@ typedef enum {
 	CPU_FEATURE_SGX,	/*!< SGX extensions. Non-autoritative, check cpu_id_t::sgx::present to verify presence */
 	CPU_FEATURE_RDSEED,	/*!< RDSEED instruction */
 	CPU_FEATURE_ADX,	/*!< ADX extensions (arbitrary precision) */
+	CPU_FEATURE_AVX512VNNI, /*!< AVX-512 Vector Neural Network Instructions */
+	CPU_FEATURE_AVX512VBMI, /*!< AVX-512 Vector Bit ManipulationInstructions (version 1) */
+	CPU_FEATURE_AVX512VBMI2, /*!< AVX-512 Vector Bit ManipulationInstructions (version 2) */
 	/* termination: */
 	NUM_CPU_FEATURES,
 } cpu_feature_t;
@@ -524,11 +553,11 @@ typedef enum {
  * }
  * @endcode
  */
- 
+
 typedef enum {
 	INTEL_SGX1,		/*!< SGX1 instructions support */
 	INTEL_SGX2,		/*!< SGX2 instructions support */
-	
+
 	/* termination: */
 	NUM_SGX_FEATURES,
 } cpu_sgx_feature_t;
@@ -732,7 +761,7 @@ void cpu_tsc_mark(struct cpu_mark_t* mark);
 /**
  * @brief Calculate TSC and timing difference
  *
- * @param mark - input/output: a pointer to a cpu_mark_t sturcture, which has
+ * @param mark - input/output: a pointer to a cpu_mark_t structure, which has
  *               already been initialized by cpu_tsc_mark. The difference in
  *               TSC and time will be written here.
  *
@@ -857,7 +886,7 @@ int cpu_clock_measure(int millis, int quad_check);
  *
  * Recommended values - millis = 50, runs = 4. For more robustness,
  * increase the number of runs.
- * 
+ *
  * NOTE: on Bulldozer and later CPUs, the busy-wait cycle runs at 1.4 IPC, thus
  * the results are skewed. This is corrected internally by dividing the resulting
  * value by 1.4.
@@ -892,7 +921,7 @@ int cpu_clock(void);
  * Describes an EPC (Enclave Page Cache) layout (physical address and size).
  * A CPU may have one or more EPC areas, and information about each is
  * fetched via \ref cpuid_get_epc.
- */ 
+ */
 struct cpu_epc_t {
 	uint64_t start_addr;
 	uint64_t length;

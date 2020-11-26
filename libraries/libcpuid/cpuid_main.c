@@ -38,7 +38,13 @@
 
 /* Implementation: */
 
-static int _libcpiud_errno = ERR_OK;
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ == 201112L
+	_Thread_local int _libcpiud_errno = ERR_OK;
+#elif defined(__GNUC__) // Also works for clang
+	__thread int _libcpiud_errno = ERR_OK;
+#else
+	static int _libcpiud_errno = ERR_OK;
+#endif
 
 int set_error(cpu_error_t err)
 {
@@ -55,8 +61,8 @@ static void cpu_id_t_constructor(struct cpu_id_t* id)
 {
 	memset(id, 0, sizeof(struct cpu_id_t));
 	id->l1_data_cache = id->l1_instruction_cache = id->l2_cache = id->l3_cache = id->l4_cache = -1;
-	id->l1_assoc = id->l2_assoc = id->l3_assoc = id->l4_assoc = -1;
-	id->l1_cacheline = id->l2_cacheline = id->l3_cacheline = id->l4_cacheline = -1;
+	id->l1_assoc = id->l1_data_assoc = id->l1_instruction_assoc = id->l2_assoc = id->l3_assoc = id->l4_assoc = -1;
+	id->l1_cacheline = id->l1_data_cacheline = id->l1_instruction_cacheline = id->l2_cacheline = id->l3_cacheline = id->l4_cacheline = -1;
 	id->sse_size = -1;
 }
 
@@ -128,7 +134,7 @@ static int get_total_cpus(void)
 #if defined linux || defined __linux__ || defined __sun
 #include <sys/sysinfo.h>
 #include <unistd.h>
- 
+
 static int get_total_cpus(void)
 {
 	return sysconf(_SC_NPROCESSORS_ONLN);
@@ -215,6 +221,9 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 		{  3, CPU_FEATURE_BMI1 },
 		{  5, CPU_FEATURE_AVX2 },
 		{  8, CPU_FEATURE_BMI2 },
+		{ 18, CPU_FEATURE_RDSEED },
+		{ 19, CPU_FEATURE_ADX },
+		{ 29, CPU_FEATURE_SHA_NI },
 	};
 	const struct feature_map_t matchtable_edx81[] = {
 		{ 11, CPU_FEATURE_SYSCALL },
@@ -223,23 +232,24 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 	};
 	const struct feature_map_t matchtable_ecx81[] = {
 		{  0, CPU_FEATURE_LAHF_LM },
+		{  5, CPU_FEATURE_ABM },
 	};
 	const struct feature_map_t matchtable_edx87[] = {
 		{  8, CPU_FEATURE_CONSTANT_TSC },
 	};
-	if (raw->basic_cpuid[0][0] >= 1) {
-		match_features(matchtable_edx1, COUNT_OF(matchtable_edx1), raw->basic_cpuid[1][3], data);
-		match_features(matchtable_ecx1, COUNT_OF(matchtable_ecx1), raw->basic_cpuid[1][2], data);
+	if (raw->basic_cpuid[0][EAX] >= 1) {
+		match_features(matchtable_edx1, COUNT_OF(matchtable_edx1), raw->basic_cpuid[1][EDX], data);
+		match_features(matchtable_ecx1, COUNT_OF(matchtable_ecx1), raw->basic_cpuid[1][ECX], data);
 	}
-	if (raw->basic_cpuid[0][0] >= 7) {
-		match_features(matchtable_ebx7, COUNT_OF(matchtable_ebx7), raw->basic_cpuid[7][1], data);
+	if (raw->basic_cpuid[0][EAX] >= 7) {
+		match_features(matchtable_ebx7, COUNT_OF(matchtable_ebx7), raw->basic_cpuid[7][EBX], data);
 	}
-	if (raw->ext_cpuid[0][0] >= 0x80000001) {
-		match_features(matchtable_edx81, COUNT_OF(matchtable_edx81), raw->ext_cpuid[1][3], data);
-		match_features(matchtable_ecx81, COUNT_OF(matchtable_ecx81), raw->ext_cpuid[1][2], data);
+	if (raw->ext_cpuid[0][EAX] >= 0x80000001) {
+		match_features(matchtable_edx81, COUNT_OF(matchtable_edx81), raw->ext_cpuid[1][EDX], data);
+		match_features(matchtable_ecx81, COUNT_OF(matchtable_ecx81), raw->ext_cpuid[1][ECX], data);
 	}
-	if (raw->ext_cpuid[0][0] >= 0x80000007) {
-		match_features(matchtable_edx87, COUNT_OF(matchtable_edx87), raw->ext_cpuid[7][3], data);
+	if (raw->ext_cpuid[0][EAX] >= 0x80000007) {
+		match_features(matchtable_edx87, COUNT_OF(matchtable_edx87), raw->ext_cpuid[7][EDX], data);
 	}
 	if (data->flags[CPU_FEATURE_SSE]) {
 		/* apply guesswork to check if the SSE unit width is 128 bit */
@@ -275,6 +285,7 @@ static cpu_vendor_t cpuid_vendor_identify(const uint32_t *raw_vendor, char *vend
 		{ VENDOR_RISE		, "RiseRiseRise" },
 		{ VENDOR_SIS		, "SiS SiS SiS " },
 		{ VENDOR_NSC		, "Geode by NSC" },
+		{ VENDOR_HYGON		, "HygonGenuine" },
 	};
 
 	memcpy(vendor_str + 0, &raw_vendor[1], 4);
@@ -299,21 +310,21 @@ static int cpuid_basic_identify(struct cpu_raw_data_t* raw, struct cpu_id_t* dat
 
 	if (data->vendor == VENDOR_UNKNOWN)
 		return set_error(ERR_CPU_UNKN);
-	basic = raw->basic_cpuid[0][0];
+	basic = raw->basic_cpuid[0][EAX];
 	if (basic >= 1) {
-		data->family = (raw->basic_cpuid[1][0] >> 8) & 0xf;
-		data->model = (raw->basic_cpuid[1][0] >> 4) & 0xf;
-		data->stepping = raw->basic_cpuid[1][0] & 0xf;
-		xmodel = (raw->basic_cpuid[1][0] >> 16) & 0xf;
-		xfamily = (raw->basic_cpuid[1][0] >> 20) & 0xff;
+		data->family = (raw->basic_cpuid[1][EAX] >> 8) & 0xf;
+		data->model = (raw->basic_cpuid[1][EAX] >> 4) & 0xf;
+		data->stepping = raw->basic_cpuid[1][EAX] & 0xf;
+		xmodel = (raw->basic_cpuid[1][EAX] >> 16) & 0xf;
+		xfamily = (raw->basic_cpuid[1][EAX] >> 20) & 0xff;
 		if (data->vendor == VENDOR_AMD && data->family < 0xf)
 			data->ext_family = data->family;
 		else
 			data->ext_family = data->family + xfamily;
 		data->ext_model = data->model + (xmodel << 4);
 	}
-	ext = raw->ext_cpuid[0][0] - 0x8000000;
-	
+	ext = raw->ext_cpuid[0][EAX] - 0x8000000;
+
 	/* obtain the brand string, if present: */
 	if (ext >= 4) {
 		for (i = 0; i < 3; i++)
@@ -387,27 +398,33 @@ int cpuid_get_raw_data(struct cpu_raw_data_t* data)
 		cpu_exec_cpuid(0x80000000 + i, data->ext_cpuid[i]);
 	for (i = 0; i < MAX_INTELFN4_LEVEL; i++) {
 		memset(data->intel_fn4[i], 0, sizeof(data->intel_fn4[i]));
-		data->intel_fn4[i][0] = 4;
-		data->intel_fn4[i][2] = i;
+		data->intel_fn4[i][EAX] = 4;
+		data->intel_fn4[i][ECX] = i;
 		cpu_exec_cpuid_ext(data->intel_fn4[i]);
 	}
 	for (i = 0; i < MAX_INTELFN11_LEVEL; i++) {
 		memset(data->intel_fn11[i], 0, sizeof(data->intel_fn11[i]));
-		data->intel_fn11[i][0] = 11;
-		data->intel_fn11[i][2] = i;
+		data->intel_fn11[i][EAX] = 11;
+		data->intel_fn11[i][ECX] = i;
 		cpu_exec_cpuid_ext(data->intel_fn11[i]);
 	}
 	for (i = 0; i < MAX_INTELFN12H_LEVEL; i++) {
 		memset(data->intel_fn12h[i], 0, sizeof(data->intel_fn12h[i]));
-		data->intel_fn12h[i][0] = 0x12;
-		data->intel_fn12h[i][2] = i;
+		data->intel_fn12h[i][EAX] = 0x12;
+		data->intel_fn12h[i][ECX] = i;
 		cpu_exec_cpuid_ext(data->intel_fn12h[i]);
 	}
 	for (i = 0; i < MAX_INTELFN14H_LEVEL; i++) {
 		memset(data->intel_fn14h[i], 0, sizeof(data->intel_fn14h[i]));
-		data->intel_fn14h[i][0] = 0x14;
-		data->intel_fn14h[i][2] = i;
+		data->intel_fn14h[i][EAX] = 0x14;
+		data->intel_fn14h[i][ECX] = i;
 		cpu_exec_cpuid_ext(data->intel_fn14h[i]);
+	}
+	for (i = 0; i < MAX_AMDFN8000001DH_LEVEL; i++) {
+		memset(data->amd_fn8000001dh[i], 0, sizeof(data->amd_fn8000001dh[i]));
+		data->amd_fn8000001dh[i][EAX] = 0x8000001d;
+		data->amd_fn8000001dh[i][ECX] = i;
+		cpu_exec_cpuid_ext(data->amd_fn8000001dh[i]);
 	}
 	return set_error(ERR_OK);
 }
@@ -416,39 +433,43 @@ int cpuid_serialize_raw_data(struct cpu_raw_data_t* data, const char* filename)
 {
 	int i;
 	FILE *f;
-	
+
 	if (!strcmp(filename, ""))
 		f = stdout;
 	else
 		f = fopen(filename, "wt");
 	if (!f) return set_error(ERR_OPEN);
-	
+
 	fprintf(f, "version=%s\n", VERSION);
 	for (i = 0; i < MAX_CPUID_LEVEL; i++)
 		fprintf(f, "basic_cpuid[%d]=%08x %08x %08x %08x\n", i,
-			data->basic_cpuid[i][0], data->basic_cpuid[i][1],
-			data->basic_cpuid[i][2], data->basic_cpuid[i][3]);
+			data->basic_cpuid[i][EAX], data->basic_cpuid[i][EBX],
+			data->basic_cpuid[i][ECX], data->basic_cpuid[i][EDX]);
 	for (i = 0; i < MAX_EXT_CPUID_LEVEL; i++)
 		fprintf(f, "ext_cpuid[%d]=%08x %08x %08x %08x\n", i,
-			data->ext_cpuid[i][0], data->ext_cpuid[i][1],
-			data->ext_cpuid[i][2], data->ext_cpuid[i][3]);
+			data->ext_cpuid[i][EAX], data->ext_cpuid[i][EBX],
+			data->ext_cpuid[i][ECX], data->ext_cpuid[i][EDX]);
 	for (i = 0; i < MAX_INTELFN4_LEVEL; i++)
 		fprintf(f, "intel_fn4[%d]=%08x %08x %08x %08x\n", i,
-			data->intel_fn4[i][0], data->intel_fn4[i][1],
-			data->intel_fn4[i][2], data->intel_fn4[i][3]);
+			data->intel_fn4[i][EAX], data->intel_fn4[i][EBX],
+			data->intel_fn4[i][ECX], data->intel_fn4[i][EDX]);
 	for (i = 0; i < MAX_INTELFN11_LEVEL; i++)
 		fprintf(f, "intel_fn11[%d]=%08x %08x %08x %08x\n", i,
-			data->intel_fn11[i][0], data->intel_fn11[i][1],
-			data->intel_fn11[i][2], data->intel_fn11[i][3]);
+			data->intel_fn11[i][EAX], data->intel_fn11[i][EBX],
+			data->intel_fn11[i][ECX], data->intel_fn11[i][EDX]);
 	for (i = 0; i < MAX_INTELFN12H_LEVEL; i++)
 		fprintf(f, "intel_fn12h[%d]=%08x %08x %08x %08x\n", i,
-			data->intel_fn12h[i][0], data->intel_fn12h[i][1],
-			data->intel_fn12h[i][2], data->intel_fn12h[i][3]);
+			data->intel_fn12h[i][EAX], data->intel_fn12h[i][EBX],
+			data->intel_fn12h[i][ECX], data->intel_fn12h[i][EDX]);
 	for (i = 0; i < MAX_INTELFN14H_LEVEL; i++)
 		fprintf(f, "intel_fn14h[%d]=%08x %08x %08x %08x\n", i,
-			data->intel_fn14h[i][0], data->intel_fn14h[i][1],
-			data->intel_fn14h[i][2], data->intel_fn14h[i][3]);
-	
+			data->intel_fn14h[i][EAX], data->intel_fn14h[i][EBX],
+			data->intel_fn14h[i][ECX], data->intel_fn14h[i][EDX]);
+	for (i = 0; i < MAX_AMDFN8000001DH_LEVEL; i++)
+		fprintf(f, "amd_fn8000001dh[%d]=%08x %08x %08x %08x\n", i,
+			data->amd_fn8000001dh[i][EAX], data->amd_fn8000001dh[i][EBX],
+			data->amd_fn8000001dh[i][ECX], data->amd_fn8000001dh[i][EDX]);
+
 	if (strcmp(filename, ""))
 		fclose(f);
 	return set_error(ERR_OK);
@@ -464,9 +485,9 @@ int cpuid_deserialize_raw_data(struct cpu_raw_data_t* data, const char* filename
 	int cur_line = 0;
 	int recognized;
 	FILE *f;
-	
+
 	raw_data_t_constructor(data);
-	
+
 	if (!strcmp(filename, ""))
 		f = stdin;
 	else
@@ -498,6 +519,7 @@ int cpuid_deserialize_raw_data(struct cpu_raw_data_t* data, const char* filename
 		syntax = syntax && parse_token("intel_fn11", token, value, data->intel_fn11,     MAX_INTELFN11_LEVEL, &recognized);
 		syntax = syntax && parse_token("intel_fn12h", token, value, data->intel_fn12h,   MAX_INTELFN12H_LEVEL, &recognized);
 		syntax = syntax && parse_token("intel_fn14h", token, value, data->intel_fn14h,   MAX_INTELFN14H_LEVEL, &recognized);
+		syntax = syntax && parse_token("amd_fn8000001dh", token, value, data->amd_fn8000001dh, MAX_AMDFN8000001DH_LEVEL, &recognized);
 		if (!syntax) {
 			warnf("Error: %s:%d: Syntax error\n", filename, cur_line);
 			fclose(f);
@@ -507,7 +529,7 @@ int cpuid_deserialize_raw_data(struct cpu_raw_data_t* data, const char* filename
 			warnf("Warning: %s:%d not understood!\n", filename, cur_line);
 		}
 	}
-	
+
 	if (strcmp(filename, ""))
 		fclose(f);
 	return set_error(ERR_OK);
@@ -530,11 +552,16 @@ int cpu_ident_internal(struct cpu_raw_data_t* raw, struct cpu_id_t* data, struct
 			r = cpuid_identify_intel(raw, data, internal);
 			break;
 		case VENDOR_AMD:
+		case VENDOR_HYGON:
 			r = cpuid_identify_amd(raw, data, internal);
 			break;
 		default:
 			break;
 	}
+	/* Backward compatibility */
+	/* - Deprecated since v0.5.0 */
+	data->l1_assoc     = data->l1_data_assoc;
+	data->l1_cacheline = data->l1_data_cacheline;
 	return set_error(r);
 }
 
@@ -658,6 +685,9 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_SGX, "sgx" },
 		{ CPU_FEATURE_RDSEED, "rdseed" },
 		{ CPU_FEATURE_ADX, "adx" },
+		{ CPU_FEATURE_AVX512VNNI, "avx512vnni" },
+		{ CPU_FEATURE_AVX512VBMI, "avx512vbmi" },
+		{ CPU_FEATURE_AVX512VBMI2, "avx512vbmi2" },
 	};
 	unsigned i, n = COUNT_OF(matchtable);
 	if (n != NUM_CPU_FEATURES) {
@@ -740,6 +770,7 @@ void cpuid_get_cpu_list(cpu_vendor_t vendor, struct cpu_list_t* list)
 			cpuid_get_list_intel(list);
 			break;
 		case VENDOR_AMD:
+		case VENDOR_HYGON:
 			cpuid_get_list_amd(list);
 			break;
 		case VENDOR_CYRIX:

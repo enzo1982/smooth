@@ -41,7 +41,17 @@
 #define MAX_INTELFN11_LEVEL	4
 #define MAX_INTELFN12H_LEVEL	4
 #define MAX_INTELFN14H_LEVEL	4
+#define MAX_AMDFN8000001DH_LEVEL 4
 #define CPU_HINTS_MAX		16
 #define SGX_FLAGS_MAX		14
+
+typedef enum {
+	EAX,
+	EBX,
+	ECX,
+	EDX,
+	/* termination: */
+	NUM_REGS,
+} cpu_registers_t;
 
 #endif /* __LIBCPUID_CONSTANTS_H__ */

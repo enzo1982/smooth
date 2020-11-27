@@ -31,6 +31,12 @@
     <Filter Include="Quelldateien\vssh">
       <UniqueIdentifier>{f6490e49-c2d6-480e-bac6-77d6b9faedb7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\vquic">
+      <UniqueIdentifier>{fe127adf-a097-4a86-8cbf-93ec72fa04eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\vssh">
+      <UniqueIdentifier>{9aa20b23-178a-449c-8e66-84a21bcc6da0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\gskit.c">
@@ -46,12 +52,6 @@
       <Filter>Quelldateien\vtls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\openssl.c">
-      <Filter>Quelldateien\vtls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vtls\polarssl.c">
-      <Filter>Quelldateien\vtls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vtls\polarssl_threadlock.c">
       <Filter>Quelldateien\vtls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\schannel.c">
@@ -315,9 +315,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\rtsp.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\security.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\select.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -458,6 +455,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\urlapi.c">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\dynbuf.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\easygetopt.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\easyoptions.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\mqtt.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\rename.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vssh\wolfssh.c">
+      <Filter>Quelldateien\vssh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic.c">
+      <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\version_win32.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\keylog.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\mbedtls_threadlock.c">
+      <Filter>Quelldateien\vtls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -797,12 +824,6 @@
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\openssl.h">
       <Filter>Headerdateien\vtls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vtls\polarssl.h">
-      <Filter>Headerdateien\vtls</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vtls\polarssl_threadlock.h">
-      <Filter>Headerdateien\vtls</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\schannel.h">
       <Filter>Headerdateien\vtls</Filter>
     </ClInclude>
@@ -810,6 +831,45 @@
       <Filter>Headerdateien\vtls</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\mime.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\ngtcp2.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\quiche.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vssh\ssh.h">
+      <Filter>Headerdateien\vssh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\dynbuf.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\easyoptions.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\mqtt.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\rename.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\setup-win32.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\version_win32.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\keylog.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\mbedtls_threadlock.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\curl_krb5.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

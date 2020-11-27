@@ -34,6 +34,9 @@
 /* to disable FTP */
 /* #undef CURL_DISABLE_FTP */
 
+/* to disable curl_easy_options */
+/* #undef CURL_DISABLE_GETOPTIONS */
+
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
 
@@ -57,6 +60,9 @@
 
 /* disable mime API */
 /* #undef CURL_DISABLE_MIME */
+
+/* to disable MQTT */
+/* #undef CURL_DISABLE_MQTT */
 
 /* disable netrc parsing */
 /* #undef CURL_DISABLE_NETRC */
@@ -87,6 +93,9 @@
 
 /* to disable SMTP */
 /* #undef CURL_DISABLE_SMTP */
+
+/* to disable socketpair support */
+/* #undef CURL_DISABLE_SOCKETPAIR */
 
 /* to disable TELNET */
 /* #undef CURL_DISABLE_TELNET */
@@ -299,16 +308,6 @@
 /* Define to 1 if you have a working gmtime_r function. */
 #define HAVE_GMTIME_R 1
 
-/* Define to 1 if you have the `gnutls_alpn_set_protocols' function. */
-/* #undef HAVE_GNUTLS_ALPN_SET_PROTOCOLS */
-
-/* Define to 1 if you have the `gnutls_certificate_set_x509_key_file2'
-   function. */
-/* #undef HAVE_GNUTLS_CERTIFICATE_SET_X509_KEY_FILE2 */
-
-/* Define to 1 if you have the `gnutls_ocsp_req_init' function. */
-/* #undef HAVE_GNUTLS_OCSP_REQ_INIT */
-
 /* if you have the function gnutls_srp_verifier */
 /* #undef HAVE_GNUTLS_SRP */
 
@@ -436,8 +435,14 @@
 /* Define to 1 if you have the `ssl' library (-lssl). */
 /* #undef HAVE_LIBSSL */
 
+/* Define to 1 if you have the `wolfssh' library (-lwolfssh). */
+/* #undef HAVE_LIBWOLFSSH */
+
 /* if zlib is available */
 #define HAVE_LIBZ 1
+
+/* Define to 1 if you have the `zstd' library (-lzstd). */
+/* #undef HAVE_LIBZSTD */
 
 /* Define to 1 if you have the <linux/tcp.h> header file. */
 /* #undef HAVE_LINUX_TCP_H */
@@ -500,6 +505,9 @@
    */
 /* #undef HAVE_OLD_GSSMIT */
 
+/* Define to 1 if using OpenSSL 3 or later. */
+/* #undef HAVE_OPENSSL3 */
+
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
 /* #undef HAVE_OPENSSL_CRYPTO_H */
 
@@ -553,6 +561,9 @@
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
+
+/* Define to 1 if you have the `quiche_conn_set_qlog_fd' function. */
+/* #undef HAVE_QUICHE_CONN_SET_QLOG_FD */
 
 /* Define to 1 if you have the <quiche.h> header file. */
 /* #undef HAVE_QUICHE_H */
@@ -629,8 +640,8 @@
 /* Define to 1 if you have the `SSLv2_client_method' function. */
 /* #undef HAVE_SSLV2_CLIENT_METHOD */
 
-/* Define to 1 if you have the `SSL_get_esni_status' function. */
-/* #undef HAVE_SSL_GET_ESNI_STATUS */
+/* Define to 1 if you have the `SSL_get_ech_status' function. */
+/* #undef HAVE_SSL_GET_ECH_STATUS */
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -691,6 +702,9 @@
 
 /* Define to 1 if you have the timeval struct. */
 #define HAVE_STRUCT_TIMEVAL 1
+
+/* Define to 1 if suseconds_t is an available type. */
+/* #undef HAVE_SUSECONDS_T */
 
 /* Define to 1 if you have the <sys/filio.h> header file. */
 #define HAVE_SYS_FILIO_H 1
@@ -788,8 +802,14 @@
 /* Define to 1 if you have the winsock.h header file. */
 /* #undef HAVE_WINSOCK_H */
 
+/* Define to 1 if you have the <wolfssh/ssh.h> header file. */
+/* #undef HAVE_WOLFSSH_SSH_H */
+
 /* Define to 1 if you have the `wolfSSLv3_client_method' function. */
 /* #undef HAVE_WOLFSSLV3_CLIENT_METHOD */
+
+/* if you have wolfSSL_DES_ecb_encrypt */
+/* #undef HAVE_WOLFSSL_DES_ECB_ENCRYPT */
 
 /* Define to 1 if you have the `wolfSSL_get_peer_certificate' function. */
 /* #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE */
@@ -811,6 +831,12 @@
 
 /* if you have the zlib.h header file */
 #define HAVE_ZLIB_H 1
+
+/* if libzstd is in use */
+/* #undef HAVE_ZSTD */
+
+/* Define to 1 if you have the <zstd.h> header file. */
+/* #undef HAVE_ZSTD_H */
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
@@ -959,8 +985,8 @@
 /* if BearSSL is enabled */
 /* #undef USE_BEARSSL */
 
-/* if ESNI support is available */
-/* #undef USE_ESNI */
+/* if ECH support is available */
+/* #undef USE_ECH */
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
@@ -1000,6 +1026,9 @@
 
 /* if ngtcp2 is in use */
 /* #undef USE_NGTCP2 */
+
+/* if ngtcp2_crypto_gnutls is in use */
+/* #undef USE_NGTCP2_CRYPTO_GNUTLS */
 
 /* if ngtcp2_crypto_openssl is in use */
 /* #undef USE_NGTCP2_CRYPTO_OPENSSL */
@@ -1050,6 +1079,9 @@
 
 /* to enable SSPI support */
 /* #undef USE_WINDOWS_SSPI */
+
+/* if wolfSSH is in use */
+/* #undef USE_WOLFSSH */
 
 /* if wolfSSL is enabled */
 /* #undef USE_WOLFSSL */

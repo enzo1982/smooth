@@ -12,6 +12,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.7
 
 - added support for building for Apple Silicon Macs
 - implemented alpha-blending for drawing bitmaps with alpha channel
+- upgraded libcurl to version 7.73.0
 - upgraded libcpuid to version 0.5.0
 
 10.10.20 18:20 - smooth alpha 0.9.6

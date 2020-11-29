@@ -9,6 +9,7 @@ dd.mm.20 hh:mm - smooth alpha 0.9.7
 - window.cpp		- fixed drawing issues on KDE systems
 - arrows.cpp		- fixed unintentional wrap-around when going below zero value
 - cursor.cpp		- avoid sending two onInput signals when replacing selected text
+- semaphoreposix.cpp	- use custom semaphore implementation based on condition variable
 
 - added support for building for Apple Silicon Macs
 - implemented alpha-blending for drawing bitmaps with alpha channel

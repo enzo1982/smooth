@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,7 +21,7 @@ namespace smooth
 
 #include "../semaphorebackend.h"
 
-#include <semaphore.h>
+#include <pthread.h>
 
 namespace smooth
 {
@@ -32,18 +32,23 @@ namespace smooth
 		class SemaphorePOSIX : public SemaphoreBackend
 		{
 			protected:
-				sem_t	*semaphore;
-				Bool	 mySemaphore;
+				pthread_mutex_t	*mutex;
+				pthread_cond_t	*condition;
+
+				Int		 count;
+				Int		 max;
+
+				Bool		 mySemaphore;
 			public:
-					 SemaphorePOSIX(Int, Void * = NIL);
-					~SemaphorePOSIX();
+						 SemaphorePOSIX(Int, Void * = NIL);
+						~SemaphorePOSIX();
 
-				Void	*GetSystemSemaphore() const;
+				Void		*GetSystemSemaphore() const;
 
-				Bool	 Wait();
-				Bool	 TryWait();
+				Bool		 Wait();
+				Bool		 TryWait();
 
-				Bool	 Release();
+				Bool		 Release();
 		};
 	};
 };

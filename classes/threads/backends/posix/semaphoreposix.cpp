@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -23,55 +23,116 @@ S::Threads::SemaphorePOSIX::SemaphorePOSIX(Int iValue, Void *iSemaphore) : Semap
 
 	if (iSemaphore != NIL)
 	{
-		semaphore   = (sem_t *) iSemaphore;
+		SemaphorePOSIX	*oSemaphore = (SemaphorePOSIX *) iSemaphore;
+
+		mutex	    = oSemaphore->mutex;
+		condition   = oSemaphore->condition;
+
+		count	    = oSemaphore->count;
+		max	    = oSemaphore->max;
+
 		mySemaphore = False;
 	}
 	else
 	{
-		semaphore   = new sem_t;
+		mutex	    = new pthread_mutex_t;
+		condition   = new pthread_cond_t;
+
+		count	    = iValue;
+		max	    = iValue;
+
 		mySemaphore = True;
 
-		if (sem_init(semaphore, 0, iValue) == -1)
+		if (pthread_mutex_init(mutex, NIL) != 0)
 		{
-			delete semaphore;
+			delete mutex;
+			delete condition;
 
-			semaphore = NIL;
+			mutex	  = NIL;
+			condition = NIL;
+		}
+		else if (pthread_cond_init(condition, NIL) != 0)
+		{
+			pthread_mutex_destroy(mutex);
+
+			delete mutex;
+			delete condition;
+
+			mutex	  = NIL;
+			condition = NIL;
 		}
 	}
 }
 
 S::Threads::SemaphorePOSIX::~SemaphorePOSIX()
 {
-	if (mySemaphore && semaphore != NIL)
+	if (mySemaphore && mutex != NIL)
 	{
-		sem_destroy(semaphore);
+		pthread_mutex_destroy(mutex);
+		pthread_cond_destroy(condition);
 
-		delete semaphore;
+		delete mutex;
+		delete condition;
 	}
 }
 
 S::Void *S::Threads::SemaphorePOSIX::GetSystemSemaphore() const
 {
-	return (Void *) semaphore;
+	return (Void *) this;
 }
 
 S::Bool S::Threads::SemaphorePOSIX::Wait()
 {
-	if (semaphore != NIL && sem_wait(semaphore) == 0) return True;
+	if (mutex == NIL) return False;
 
-	return False;
+	pthread_mutex_lock(mutex);
+
+	while (count <= 0) pthread_cond_wait(condition, mutex);
+
+	count -= 1;
+
+	pthread_mutex_unlock(mutex);
+
+	return True;
 }
 
 S::Bool S::Threads::SemaphorePOSIX::TryWait()
 {
-	if (semaphore != NIL && sem_trywait(semaphore) == 0) return True;
+	if (mutex == NIL) return False;
+
+	pthread_mutex_lock(mutex);
+
+	if (count > 0)
+	{
+		count -= 1;
+
+		pthread_mutex_unlock(mutex);
+
+		return True;
+	}
+
+	pthread_mutex_unlock(mutex);
 
 	return False;
 }
 
 S::Bool S::Threads::SemaphorePOSIX::Release()
 {
-	if (semaphore != NIL && sem_post(semaphore) == 0) return True;
+	if (mutex == NIL) return False;
+
+	pthread_mutex_lock(mutex);
+
+	if (count < max)
+	{
+		count += 1;
+
+		pthread_cond_signal(condition);
+		pthread_mutex_unlock(mutex);
+
+		return True;
+	}
+
+	pthread_mutex_unlock(mutex);
 
 	return False;
 }

@@ -29,6 +29,10 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Install dependencies
         if: ${{ runner.os == 'Linux' }}
@@ -53,4 +57,4 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
         run: |
-          make
+          make -j$(nproc)

@@ -40,7 +40,7 @@
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ == 201112L
 	_Thread_local int _libcpiud_errno = ERR_OK;
-#elif defined(__GNUC__) // Also works for clang
+#elif defined(__GNUC__) && !defined(__APPLE__) // Also works for clang
 	__thread int _libcpiud_errno = ERR_OK;
 #else
 	static int _libcpiud_errno = ERR_OK;

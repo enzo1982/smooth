@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+dd.mm.21 hh:mm - smooth alpha 0.9.8
+
+- popupmenuentry.cpp	- fixed occasional crashes when opening third level popup menus
+
 14.02.21 14:56 - smooth alpha 0.9.7
 
 - backendcocoa.mm	- added support for opening registered file types on macOS

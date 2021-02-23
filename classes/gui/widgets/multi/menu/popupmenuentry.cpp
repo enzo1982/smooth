@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -300,6 +300,11 @@ S::Void S::GUI::PopupMenuEntry::OpenPopupMenu()
 	owner->SetFlags(owner->GetFlags() | MB_POPUPOPEN);
 
 	Add(popup);
+
+	/* Set the MB_POPUPOPEN flag again as it may have been unset by a
+	 * closing sibling popup during PopupMenu::Show in the above Add call.
+	 */
+	owner->SetFlags(owner->GetFlags() | MB_POPUPOPEN);
 }
 
 S::Void S::GUI::PopupMenuEntry::ClosePopupMenu()

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -538,7 +538,11 @@ S::Int S::GUI::SurfaceCocoa::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 
 	/* Copy the image.
 	 */
-	NSImage	*image	  = (NSImage *) bitmap.GetSystemBitmap();
+	Bitmap	 premultipliedBitmap = bitmap;
+
+	PremultiplyAlpha(premultipliedBitmap);
+
+	NSImage	*image	  = (NSImage *) premultipliedBitmap.GetSystemBitmap();
 	Bool	 endPaint = painting ? False : StartPaint(destRect) == Success();
 
 	[image drawInRect: NSMakeRect(destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight())

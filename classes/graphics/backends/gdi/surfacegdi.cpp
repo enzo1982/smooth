@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -18,35 +18,6 @@
 #include <smooth/foreach.h>
 
 #include <fribidi/fribidi.h>
-
-namespace smooth
-{
-	namespace GUI
-	{
-		static Int PremultiplyAlpha(Bitmap &bitmap)
-		{
-			if (bitmap.GetDepth() != 32) return Success();
-
-			Point	 point;
-			Size	 size = bitmap.GetSize();
-
-			for (point.y = 0; point.y < size.cy; point.y++)
-			{
-				for (point.x = 0; point.x < size.cx; point.x++)
-				{
-					Color	 pixel = bitmap.GetPixel(point);
-
-					if (pixel.GetAlpha() != 255) bitmap.SetPixel(point, Color( pixel.GetRed()   * pixel.GetAlpha() / 255	    |
-												  (pixel.GetGreen() * pixel.GetAlpha() / 255) <<  8 |
-												  (pixel.GetBlue()  * pixel.GetAlpha() / 255) << 16 |
-														      pixel.GetAlpha()	      << 24, Color::RGBA));
-				}
-			}
-
-			return Success();
-		}
-	}
-}
 
 S::GUI::SurfaceBackend *CreateSurfaceGDI(S::Void *iSurface, const S::GUI::Size &maxSize)
 {

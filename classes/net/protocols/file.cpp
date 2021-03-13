@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -56,7 +56,7 @@ S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 
 		if (bytes > 0)
 		{
-			IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, destination);
+			IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, destination, IO::OS_REPLACE);
 			UnsignedByte	*buffer		= new UnsignedByte [1024];
 			Int		 startTicks	= clock();
 			Int		 percent	= 0;

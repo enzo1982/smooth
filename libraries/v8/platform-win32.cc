@@ -77,12 +77,14 @@ inline void MemoryBarrier() {
 #endif  // __MINGW64_VERSION_MAJOR
 
 
+#if defined(__MINGW64_VERSION_MAJOR) && (__MINGW64_VERSION_MAJOR < 5)
 int localtime_s(tm* out_tm, const time_t* time) {
   tm* posix_local_time_struct = localtime(time);
   if (posix_local_time_struct == NULL) return 1;
   *out_tm = *posix_local_time_struct;
   return 0;
 }
+#endif
 
 
 int fopen_s(FILE** pFile, const char* filename, const char* mode) {

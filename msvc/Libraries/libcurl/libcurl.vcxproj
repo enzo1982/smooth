@@ -206,6 +206,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\asyn-ares.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\asyn-thread.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\base64.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\c-hyper.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\conncache.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\connect.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\content_encoding.c" />
@@ -252,8 +253,10 @@
     <ClCompile Include="..\..\..\libraries\libcurl\hostip4.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\hostip6.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\hostsyn.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\hsts.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\http.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\http2.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\http_aws_sigv4.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\http_chunks.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\http_digest.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\http_negotiate.c" />
@@ -356,6 +359,7 @@
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\arpa_telnet.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\asyn.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\c-hyper.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\config-win32.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\conncache.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\connect.h" />
@@ -403,8 +407,10 @@
     <ClInclude Include="..\..\..\libraries\libcurl\hash.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\hostcheck.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\hostip.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\hsts.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\http.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\http2.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\http_aws_sigv4.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\http_chunks.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\http_digest.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\http_negotiate.h" />

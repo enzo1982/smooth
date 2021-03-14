@@ -486,6 +486,15 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\mbedtls_threadlock.c">
       <Filter>Quelldateien\vtls</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\c-hyper.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\hsts.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\http_aws_sigv4.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h">
@@ -870,6 +879,15 @@
       <Filter>Headerdateien\vtls</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\curl_krb5.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\c-hyper.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\hsts.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\http_aws_sigv4.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

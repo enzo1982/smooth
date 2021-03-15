@@ -12,8 +12,10 @@
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
 #include <smooth/misc/math.h>
+#include <smooth/system/system.h>
+#include <smooth/templates/buffer.h>
 
-#include <time.h>
+using namespace smooth::IO;
 
 S::Net::Protocols::Protocol *CreateProtocolFile(const S::String &iURL)
 {
@@ -32,51 +34,42 @@ S::Net::Protocols::File::~File()
 
 S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 {
-	Bool	 error = True;
-	String	 fileName;
+	Bool	 error	  = True;
+	String	 fileName = url.Tail(url.Length() - 7);
 
-	Int	 j;
+	if (url[7] == '/' && url[9] == ':' && url[10] == '/') fileName = url.Tail(url.Length() - 8);
 
-	if (url[7] == '/' && url[9] == ':' && url[10] == '/')	j = 8;
-	else							j = 7;
-
-	for (Int i = j; i < url.Length(); i++)
-	{
-		fileName[i - j] = url[i];
-	}
-
-	IO::InStream	*in	= new IO::InStream(IO::STREAM_FILE, fileName, IO::IS_READ);
+	InStream	 in(STREAM_FILE, fileName, IS_READ);
 
 	downloadProgress.Emit(0);
 	downloadSpeed.Emit(NIL);
 
-	if (in->GetLastError() == IO::IO_ERROR_OK)
+	if (in.GetLastError() == IO::IO_ERROR_OK)
 	{
-		Int	 bytes = in->Size();
+		Int	 bytes = in.Size();
 
 		if (bytes > 0)
 		{
-			IO::OutStream	*fOut		= new IO::OutStream(IO::STREAM_FILE, destination, IO::OS_REPLACE);
-			UnsignedByte	*buffer		= new UnsignedByte [1024];
-			Int		 startTicks	= clock();
-			Int		 percent	= 0;
+			OutStream		 out(STREAM_FILE, destination, OS_REPLACE);
+			Buffer<UnsignedByte>	 buffer(32768);
+			Int			 startTicks = S::System::System::Clock();
+			Int			 percent    = 0;
 
-			for (Int i = 0; i < bytes; i += 1024)
+			for (Int i = 0; i < bytes; i += buffer.Size())
 			{
-				in->InputData((Void *) buffer, Math::Min(1024, bytes - i));
-				fOut->OutputData((Void *) buffer, Math::Min(1024, bytes - i));
+				Int	 amount = Math::Min(buffer.Size(), bytes - i);
+
+				in.InputData(buffer, amount);
+				out.OutputData(buffer, amount);
 
 				if (Math::Round(1000.0 * i / bytes) != percent)
 				{
 					percent = Math::Round(1000.0 * i / bytes);
 
 					downloadProgress.Emit(percent);
-					downloadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(clock() - startTicks) / 1000))).Append(" kB/s"));
+					downloadSpeed.Emit(String::FromInt(Math::Round((i / 1024) / (Float(S::System::System::Clock() - startTicks) / 1000))).Append(" kB/s"));
 				}
 			}
-
-			delete [] buffer;
-			delete fOut;
 		}
 
 		error = False;
@@ -84,8 +77,6 @@ S::Int S::Net::Protocols::File::DownloadToFile(const String &destination)
 
 	downloadProgress.Emit(1000);
 
-	delete in;
-
-	if (!error)	return Success();
-	else		return Error();
+	if (!error) return Success();
+	else	    return Error();
 }

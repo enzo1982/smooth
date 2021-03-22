@@ -25,6 +25,7 @@ namespace smooth
 {
 	namespace GUI
 	{
+		const Short	 IMAGE_FORMAT_AUTO	= -1;
 		const Short	 IMAGE_FORMAT_PCI	= 0;
 		const Short	 IMAGE_FORMAT_PNG	= 1;
 		const Short	 IMAGE_FORMAT_JPEG	= 2;
@@ -48,7 +49,7 @@ namespace smooth
 				virtual const Bitmap	&Load() = 0;
 
 				static Bitmap		 Load(const String &);
-				static Bitmap		 Load(const Buffer<UnsignedByte> &, Short);
+				static Bitmap		 Load(const Buffer<UnsignedByte> &, Short = IMAGE_FORMAT_AUTO);
 		};
 	};
 };

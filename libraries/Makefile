@@ -32,6 +32,10 @@ ifeq ($(USE_BUNDLED_LIBPNG),True)
 	FOLDERS += libpng
 endif
 
+ifeq ($(USE_BUNDLED_LIBWEBP),True)
+	FOLDERS += libwebp
+endif
+
 ifeq ($(USE_BUNDLED_LIBXML2),True)
 	FOLDERS += libxml2
 endif

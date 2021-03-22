@@ -1125,6 +1125,9 @@
     <ClCompile Include="..\..\classes\gui\window\backends\gdi\droptarget.cpp">
       <Filter>Quelldateien\classes\gui\window\backends\gdi</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\imageloader\webp.cpp">
+      <Filter>Quelldateien\classes\graphics\imageloader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\classes\i18n\locales\smooth_ar.h">
@@ -1900,6 +1903,15 @@
     </ClInclude>
     <ClInclude Include="..\..\classes\i18n\locales\smooth_fa.h">
       <Filter>Quelldateien\classes\i18n\locales</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\jpeg.h">
+      <Filter>Headerdateien\smooth\graphics\imageloader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\png.h">
+      <Filter>Headerdateien\smooth\graphics\imageloader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\webp.h">
+      <Filter>Headerdateien\smooth\graphics\imageloader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,12 +20,18 @@ else
 	MYCCOPTS += $(shell pkg-config --cflags libpng)
 endif
 
+ifeq ($(USE_BUNDLED_LIBWEBP),True)
+	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libwebp
+else
+	MYCCOPTS += $(shell pkg-config --cflags libwebp)
+endif
+
 ifeq ($(BUILD_GDIPLUS),True)
 	MYCCOPTS += -D HAVE_GDIPLUS=1
 endif
 
 # Enter object files here:
-OBJECTS	  = imageloader.o jpeg.o pci.o png.o
+OBJECTS	  = imageloader.o jpeg.o pci.o png.o webp.o
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += icon.o

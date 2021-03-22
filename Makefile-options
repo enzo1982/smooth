@@ -326,6 +326,14 @@ else
 	endif
 endif
 
+ifeq ($(findstring bundledlibwebp,$(config)),bundledlibwebp)
+	USE_BUNDLED_LIBWEBP = True
+else ifeq ($(findstring systemlibwebp,$(config)),systemlibwebp)
+	USE_BUNDLED_LIBWEBP = False
+else
+	USE_BUNDLED_LIBWEBP = True
+endif
+
 ifeq ($(findstring bundledlibxml2,$(config)),bundledlibxml2)
 	USE_BUNDLED_LIBXML2 = True
 else ifeq ($(findstring systemlibxml2,$(config)),systemlibxml2)

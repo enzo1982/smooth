@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 dd.mm.21 hh:mm - smooth alpha 0.9.8
 
+- webp.cpp		- added support for WebP image decoding
 - popupmenuentry.cpp	- fixed occasional crashes when opening third level popup menus
 - surfacecocoa.mm	- fixed rendering of bitmaps with alpha channel
 - file.cpp		- fixed accessing files via file:// URLs

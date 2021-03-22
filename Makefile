@@ -15,7 +15,7 @@ OBJECTS += classes/files/directory.o classes/files/file.o
 OBJECTS += classes/graphics/bitmap.o classes/graphics/color.o classes/graphics/font.o classes/graphics/surface.o
 OBJECTS += classes/graphics/backends/bitmapbackend.o classes/graphics/backends/fontbackend.o classes/graphics/backends/surfacebackend.o
 OBJECTS += classes/graphics/forms/rect.o
-OBJECTS += classes/graphics/imageloader/imageloader.o classes/graphics/imageloader/jpeg.o classes/graphics/imageloader/pci.o classes/graphics/imageloader/png.o
+OBJECTS += classes/graphics/imageloader/imageloader.o classes/graphics/imageloader/jpeg.o classes/graphics/imageloader/pci.o classes/graphics/imageloader/png.o classes/graphics/imageloader/webp.o
 OBJECTS += classes/graphics/modifiers/fontsize.o classes/graphics/modifiers/righttoleft.o
 OBJECTS += classes/gui/application/application.o
 OBJECTS += classes/gui/clipboard/clipboard.o
@@ -185,6 +185,12 @@ else ifeq ($(BUILD_HAIKU),True)
 	LIBS += -lpng
 else
 	LIBS += $(shell pkg-config --libs libpng)
+endif
+
+ifeq ($(USE_BUNDLED_LIBWEBP),True)
+	LIBS += $(LIBDIR)/libwebp.a
+else
+	LIBS += $(shell pkg-config --libs libwebp)
 endif
 
 ifeq ($(USE_BUNDLED_LIBXML2),True)

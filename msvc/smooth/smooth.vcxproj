@@ -131,13 +131,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -149,12 +149,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -166,12 +166,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -186,12 +186,12 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -202,11 +202,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -219,11 +219,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -236,11 +236,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -256,11 +256,11 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../include;../../include/support;../../include/support/libxml2;../../include/support/libiconv;../../include/support/libpng;../../include/support/libjpeg;../../include/support/libwebp;../../include/support/libbz2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <DataExecutionPrevention>
@@ -337,6 +337,7 @@
     <ClCompile Include="..\..\classes\graphics\bitmap.cpp" />
     <ClCompile Include="..\..\classes\graphics\color.cpp" />
     <ClCompile Include="..\..\classes\graphics\font.cpp" />
+    <ClCompile Include="..\..\classes\graphics\imageloader\webp.cpp" />
     <ClCompile Include="..\..\classes\graphics\surface.cpp" />
     <ClCompile Include="..\..\classes\graphics\forms\rect.cpp" />
     <ClCompile Include="..\..\classes\graphics\imageloader\icon.cpp" />
@@ -1017,6 +1018,9 @@
     <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\bitmaphaiku.h" />
     <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\fonthaiku.h" />
     <ClInclude Include="..\..\include\smooth\graphics\backends\haiku\surfacehaiku.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\jpeg.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\png.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\imageloader\webp.h" />
     <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\cocoa\clipboardcocoa.h" />
     <ClInclude Include="..\..\include\smooth\gui\clipboard\backends\haiku\clipboardhaiku.h" />
     <ClInclude Include="..\..\include\smooth\gui\dialogs\dirdlg.h" />

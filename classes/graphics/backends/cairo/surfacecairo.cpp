@@ -281,32 +281,54 @@ S::Int S::GUI::SurfaceCairo::Line(const Point &iPos1, const Point &iPos2, const 
 	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
 	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
 
-	/* Adjust to Windows GDI behavior for diagonal lines.
+	/* Draw non-straight lines manually to work around bugs in XWayland.
 	 */
-	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
+	if (pos1.x != pos2.x && pos1.y != pos2.y)
 	{
-		if (pos1.x > pos2.x) { pos1.x++; pos2.x++; }
-		if (pos1.y > pos2.y) { pos1.y++; pos2.y++; }
-	}
+		Int	 steps	  = Math::Max(Math::Abs(pos2.x - pos1.x), Math::Abs(pos2.y - pos1.y));
+		Float	 xAdvance = steps ? Float(pos2.x - pos1.x) / steps : 0;
+		Float	 yAdvance = steps ? Float(pos2.y - pos1.y) / steps : 0;
 
-	if (!painting)
+		if (!painting)
+		{
+			CreateCairoContext();
+
+			cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+
+			for (Int i = 0; i < steps; i++) cairo_rectangle(context, pos1.x + i * xAdvance, pos1.y + i * yAdvance, 1.0, 1.0);
+		
+			cairo_fill(context);
+
+			DestroyCairoContext();
+		}
+
+		cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+
+		for (Int i = 0; i < steps; i++) cairo_rectangle(paintContextCairo, pos1.x + i * xAdvance, pos1.y + i * yAdvance, 1.0, 1.0);
+		
+		cairo_fill(paintContextCairo);
+	}
+	else
 	{
-		CreateCairoContext();
+		if (!painting)
+		{
+			CreateCairoContext();
 
-		cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-		cairo_set_line_width(context, 1.0);
-		cairo_move_to(context, pos1.x + 0.01, pos1.y + 0.01);
-		cairo_line_to(context, pos2.x + 0.01, pos2.y + 0.01);
-		cairo_stroke(context);
+			cairo_set_source_rgb(context, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+			cairo_set_line_width(context, 1.0);
+			cairo_move_to(context, pos1.x + 0.01, pos1.y + 0.01);
+			cairo_line_to(context, pos2.x + 0.01, pos2.y + 0.01);
+			cairo_stroke(context);
 
-		DestroyCairoContext();
+			DestroyCairoContext();
+		}
+
+		cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
+		cairo_set_line_width(paintContextCairo, 1.0);
+		cairo_move_to(paintContextCairo, pos1.x + 0.01, pos1.y + 0.01);
+		cairo_line_to(paintContextCairo, pos2.x + 0.01, pos2.y + 0.01);
+		cairo_stroke(paintContextCairo);
 	}
-
-	cairo_set_source_rgb(paintContextCairo, color.GetRed() / 255.0, color.GetGreen() / 255.0, color.GetBlue() / 255.0);
-	cairo_set_line_width(paintContextCairo, 1.0);
-	cairo_move_to(paintContextCairo, pos1.x + 0.01, pos1.y + 0.01);
-	cairo_line_to(paintContextCairo, pos2.x + 0.01, pos2.y + 0.01);
-	cairo_stroke(paintContextCairo);
 
 	return Success();
 }

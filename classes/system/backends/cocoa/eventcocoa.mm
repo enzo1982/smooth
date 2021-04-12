@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,8 @@ S::System::EventBackend *CreateEventCocoa()
 }
 
 S::Int	 eventCocoaTmp = S::System::EventBackend::SetBackend(&CreateEventCocoa);
+
+S::Bool	 S::System::EventCocoa::quitRequested = False;
 
 S::System::EventCocoa::EventCocoa()
 {
@@ -87,5 +89,24 @@ S::Bool S::System::EventCocoa::ProcessNextEvent()
 		[NSApp run];
 	}
 
+	/* Ask windows to close if quit has been requested.
+	 */
+	if (quitRequested)
+	{
+		quitRequested = False;
+
+		for (Int n = GUI::Window::GetNOfWindows() - 1; n >= 0; n--)
+		{
+			GUI::Window	*window	= GUI::Window::GetNthWindow(n);
+
+			if (window->IsVisible()) window->Close();
+		}
+	}
+
 	return True;
+}
+
+S::Void S::System::EventCocoa::RequestApplicationQuit()
+{
+	quitRequested = True;
 }

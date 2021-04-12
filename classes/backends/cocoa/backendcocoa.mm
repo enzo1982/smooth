@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/cocoa/backendcocoa.h>
+#include <smooth/system/backends/cocoa/eventcocoa.h>
 
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/droparea.h>
@@ -38,19 +39,29 @@ S::Int	 backendCocoaTmp = S::Backends::Backend::AddBackend(&CreateBackendCocoa);
 @implementation CocoaApplicationDelegate
 	- (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender
 	{
-		/* Ask open windows to close.
+		/* Send a dummy event to allow NSApp::run to exit.
 		 */
-		for (Int n = Window::GetNOfWindows() - 1; n >= 0; n--)
-		{
-			Window	*window	= Window::GetNthWindow(n);
+		NSEvent	*event = [NSEvent otherEventWithType: NSApplicationDefined
+						    location: NSMakePoint(0, 0)
+					       modifierFlags: 0
+						   timestamp: 0
+						windowNumber: 0
+						     context: nil
+						     subtype: 0
+						       data1: nil
+						       data2: nil];
+		[NSApp postEvent: event
+			 atStart: YES];
 
-			if (window->IsVisible()) window->Close();
-		}
+		[NSApp stop: self];
 
-		/* Terminate application if all windows did close.
+		/* Request application to quit.
 		 */
-		if (Window::nOfActiveWindows == 0) return NSTerminateNow;
-		else				   return NSTerminateCancel;
+		System::EventCocoa::RequestApplicationQuit();
+
+		/* Application will terminate after all windows are closed.
+		 */
+		return NSTerminateCancel;
 	}
 
 	- (void) application: (NSApplication *) sender openFiles: (NSArray *) fileNames

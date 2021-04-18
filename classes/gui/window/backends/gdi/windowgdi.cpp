@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -777,21 +777,25 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 {
 	if (destroyIcon) DestroyIcon(sysIcon);
 
+	/* Scale to standard icon size.
+	 */
+	Size	 iconSize	  = Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
+	Bitmap	 iconScaled	  = newIcon.Scale(iconSize);
+
 	/* Set up alpha mask.
 	 */
-	Bitmap	 mask		  = newIcon;
-	Size	 size		  = newIcon.GetSize();
-	Int	 depth		  = newIcon.GetDepth();
+	Bitmap	 iconMask	  = iconScaled;
+	Int	 depth		  = iconScaled.GetDepth();
 	Int	 transparentPixel = 16777215;
 
-	for (Int y = 0; y < size.cy; y++)
+	for (Int y = 0; y < iconSize.cy; y++)
 	{
-		for (Int x = 0; x < size.cx; x++)
+		for (Int x = 0; x < iconSize.cx; x++)
 		{
-			Color	 pixel = newIcon.GetPixel(Point(x, y));
+			Color	 pixel = iconScaled.GetPixel(Point(x, y));
 
-			if (depth == 32) mask.SetPixel(Point(x, y), pixel.GetAlpha() >=	     128  ? transparentPixel : 0);
-			else		 mask.SetPixel(Point(x, y), pixel == Color(192, 192, 192) ? transparentPixel : 0);
+			if (depth == 32) iconMask.SetPixel(Point(x, y), pixel.GetAlpha() >=	 128  ? transparentPixel : 0);
+			else		 iconMask.SetPixel(Point(x, y), pixel == Color(192, 192, 192) ? transparentPixel : 0);
 		}
 	}
 
@@ -802,10 +806,10 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 	icon.fIcon	= true;
 	icon.xHotspot	= 0;
 	icon.yHotspot	= 0;
-	icon.hbmMask	= (HBITMAP) mask.GetSystemBitmap();
-	icon.hbmColor	= (HBITMAP) newIcon.GetSystemBitmap();
+	icon.hbmMask	= (HBITMAP) iconMask.GetSystemBitmap();
+	icon.hbmColor	= (HBITMAP) iconScaled.GetSystemBitmap();
 
-	sysIcon = CreateIconIndirect(&icon);
+	sysIcon	    = CreateIconIndirect(&icon);
 	destroyIcon = True;
 
 	return Success();
@@ -815,7 +819,7 @@ S::Int S::GUI::WindowGDI::SetIconDirect(Void *newIcon)
 {
 	if (destroyIcon) DestroyIcon(sysIcon);
 
-	sysIcon = (HICON) newIcon;
+	sysIcon	    = (HICON) newIcon;
 	destroyIcon = False;
 
 	return Success();

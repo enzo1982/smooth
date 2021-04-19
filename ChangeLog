@@ -5,6 +5,8 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 - imageloader.cpp	- added support for auto-detecting image formats
 - webp.cpp		- added support for WebP image decoding
 - windowgdi.cpp		- improved scaling when setting icons via SetIcon()
+- combobox.cpp		- fixed dropdown staying open when parent window moves or resizes
+- popupmenu.cpp		- fixed popup staying open when parent window moves or resizes
 - popupmenuentry.cpp	- fixed occasional crashes when opening third level popup menus
 - backendcocoa.mm	- fixed possible crash when quitting applications through a dock command
 - surfacecocoa.mm	- fixed rendering of bitmaps with alpha channel

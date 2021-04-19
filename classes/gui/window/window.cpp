@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -554,21 +554,25 @@ S::Int S::GUI::Window::Process(Int message, Int wParam, Int lParam)
 				Point	 nPos((unsigned(wParam) >> 16) - 32768, (unsigned(wParam) & 65535) - 32768);
 				Size	 nSize((unsigned(lParam) >> 16) - 32768, (unsigned(lParam) & 65535) - 32768);
 
-				Bool	 resized     = (GetSize() != nSize);
-				Bool	 prevVisible = visible;
+				Bool	 moved	 = (GetPosition() != nPos);
+				Bool	 resized = (GetSize()	  != nSize);
 
-				visible = False;
-
-				Widget::SetMetrics(nPos, nSize);
-
-				if (resized)
+				if (moved || resized)
 				{
-					CalculateOffsets();
+					DeactivateTooltip();
+					InvalidateMetrics();
 
-					updateRect = Rect(Point(-1, -1), Size(0, 0));
+					if (moved)   { pos  = nPos;  onChangePosition.Emit(pos); }
+					if (resized) { size = nSize; onChangeSize.Emit(size);    }
+
+					Bool	 prevVisible = visible;
+
+					visible = False;
+
+					if (resized) { CalculateOffsets(); updateRect = Rect(Point(-1, -1), Size(0, 0)); }
+
+					visible = prevVisible;
 				}
-
-				visible = prevVisible;
 			}
 
 			rVal = MessageProcessed;

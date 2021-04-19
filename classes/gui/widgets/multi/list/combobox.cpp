@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -178,6 +178,9 @@ S::Void S::GUI::ComboBox::OpenListBox()
 	toolWindow = new ToolWindow(listBoxPos, listBoxSize);
 	toolWindow->onLoseFocus.Connect(&ComboBox::CloseListBox, this);
 
+	window->onChangePosition.Connect(&ComboBox::CloseListBox, this);
+	window->onChangeSize.Connect(&ComboBox::CloseListBox, this);
+
 	listBox->SetFlags(LF_ALLOWRESELECT | LF_HIDEHEADER);
 	listBox->AddTab(NIL, 32768);
 
@@ -208,8 +211,13 @@ S::Void S::GUI::ComboBox::CloseListBox()
 {
 	if (listBox == NIL) return;
 
+	Window	*window = container->GetContainerWindow();
+
 	toolWindow->onLoseFocus.Disconnect(&ComboBox::CloseListBox, this);
 	toolWindow->Hide();
+
+	window->onChangePosition.Disconnect(&ComboBox::CloseListBox, this);
+	window->onChangeSize.Disconnect(&ComboBox::CloseListBox, this);
 
 	listBox->RemoveAllEntries();
 

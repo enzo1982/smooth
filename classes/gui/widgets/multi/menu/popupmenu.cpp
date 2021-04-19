@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -76,11 +76,16 @@ S::Int S::GUI::PopupMenu::Show()
 
 	closedByClick = False;
 
+	Window	*window = container->GetContainerWindow();
+
 	/* Create tool window, add entries and display it.
 	 */
 	toolWindow = new ToolWindow(GetPosition(), GetSize());
 	toolWindow->onPaint.Connect(&PopupMenu::OnToolWindowPaint, this);
 	toolWindow->onLoseFocus.Connect(&internalRequestClose);
+
+	window->onChangePosition.Connect(&internalRequestClose);
+	window->onChangeSize.Connect(&internalRequestClose);
 
 	for (Int i = 0; i < Length(); i++)
 	{
@@ -114,9 +119,14 @@ S::Int S::GUI::PopupMenu::Hide()
 
 	if (!IsRegistered()) return Success();
 
+	Window	*window = container->GetContainerWindow();
+
 	/* Hide tool window, remove entries and delete it.
 	 */
 	toolWindow->Hide();
+
+	window->onChangePosition.Disconnect(&internalRequestClose);
+	window->onChangeSize.Disconnect(&internalRequestClose);
 
 	for (Int i = 0; i < Length(); i++)
 	{

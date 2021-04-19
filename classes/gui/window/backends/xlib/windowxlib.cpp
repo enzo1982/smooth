@@ -490,10 +490,9 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				X11::Window	 focusWnd = None;
 				int		 revertTo = RevertToNone;
 
-				if (XGetInputFocus(display, &focusWnd, &revertTo) == 0)
-				{
-					if (focusWnd != wnd) break;
-				}
+				XGetInputFocus(display, &focusWnd, &revertTo);
+
+				if (focusWnd != wnd) break;
 			}
 
 			/* Pass message to smooth window.
@@ -709,12 +708,11 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				X11::Window	 focusWnd = None;
 				int		 revertTo = RevertToNone;
 
-				if (XGetInputFocus(display, &focusWnd, &revertTo) == 0)
-				{
-					Window	*window = Window::GetWindow((Void *) focusWnd);
+				XGetInputFocus(display, &focusWnd, &revertTo);
 
-					onEvent.Call(SM_LOSEFOCUS, window != NIL ? window->GetHandle() : -1, 0);
-				}
+				Window	*window = Window::GetWindow((Void *) focusWnd);
+
+				onEvent.Call(SM_LOSEFOCUS, window != NIL ? window->GetHandle() : -1, 0);
 			}
 
 			break;

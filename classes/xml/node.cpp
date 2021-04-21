@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2015 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -67,14 +67,23 @@ S::XML::Node::Node(const Node &oNode)
 
 S::XML::Node::~Node()
 {
-	Int	 nOfAttributes	= GetNOfAttributes();
-	Int	 nOfNodes	= GetNOfNodes();
+	/* Delete attributes.
+	 */
+	if (attributes != NIL)
+	{
+		foreach (Attribute *attribute, *attributes) delete attribute;
 
-	for (Int i = 0; i < nOfAttributes; i++)	RemoveAttribute(GetNthAttribute(0));
-	for (Int i = 0; i < nOfNodes; i++)	RemoveNode(GetNthNode(0));
+		delete attributes;
+	}
 
-	if (attributes != NIL)	delete attributes;
-	if (subnodes != NIL)	delete subnodes;
+	/* Delete subnodes.
+	 */
+	if (subnodes != NIL)
+	{
+		foreach (Node *subnode, *subnodes) delete subnode;
+
+		delete subnodes;
+	}
 }
 
 S::Int S::XML::Node::GetNodeID() const

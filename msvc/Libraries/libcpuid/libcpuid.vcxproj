@@ -124,7 +124,6 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.5.0";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -143,7 +142,6 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.5.0";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

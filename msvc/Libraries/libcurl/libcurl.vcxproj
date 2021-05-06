@@ -321,6 +321,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\cram.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\digest.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\digest_sspi.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vauth\gsasl.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\krb5_gssapi.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\krb5_sspi.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\ntlm.c" />
@@ -346,6 +347,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\mesalink.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\nss.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\openssl.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\rustls.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\schannel.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\schannel_verify.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\sectransp.c" />
@@ -482,6 +484,7 @@
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\mbedtls_threadlock.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\nssg.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\openssl.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\rustls.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\schannel.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\vtls.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\warnless.h" />

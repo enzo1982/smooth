@@ -15,7 +15,7 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 			- fixed incorrect usage of XGetInputFocus API
 - file.cpp		- fixed accessing files via file:// URLs
 
-- upgraded libcurl to version 7.75.0
+- upgraded libcurl to version 7.76.1
 
 14.02.21 14:56 - smooth alpha 0.9.7
 

@@ -24,10 +24,10 @@ ifeq ($(BUILD_WIN32),True)
 	OBJECTS += system_win32.o version_win32.o
 endif
 
-OBJECTS += vauth/cleartext.o vauth/cram.o vauth/digest.o vauth/digest_sspi.o vauth/krb5_gssapi.o vauth/krb5_sspi.o vauth/ntlm.o vauth/ntlm_sspi.o vauth/oauth2.o vauth/spnego_gssapi.o vauth/spnego_sspi.o vauth/vauth.o
+OBJECTS += vauth/cleartext.o vauth/cram.o vauth/digest.o vauth/digest_sspi.o vauth/gsasl.o vauth/krb5_gssapi.o vauth/krb5_sspi.o vauth/ntlm.o vauth/ntlm_sspi.o vauth/oauth2.o vauth/spnego_gssapi.o vauth/spnego_sspi.o vauth/vauth.o
 OBJECTS += vquic/ngtcp2.o vquic/quiche.o vquic/vquic.o
 OBJECTS += vssh/libssh.o vssh/libssh2.o vssh/wolfssh.o
-OBJECTS += vtls/bearssl.o vtls/gskit.o vtls/gtls.o vtls/keylog.o vtls/mbedtls.o vtls/mbedtls_threadlock.o vtls/mesalink.o vtls/nss.o vtls/openssl.o vtls/vtls.o vtls/wolfssl.o
+OBJECTS += vtls/bearssl.o vtls/gskit.o vtls/gtls.o vtls/keylog.o vtls/mbedtls.o vtls/mbedtls_threadlock.o vtls/mesalink.o vtls/nss.o vtls/openssl.o vtls/rustls.o vtls/vtls.o vtls/wolfssl.o
 
 ifeq ($(BUILD_WIN32),True)
 	OBJECTS += vtls/schannel.o vtls/schannel_verify.o

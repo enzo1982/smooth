@@ -495,6 +495,12 @@
     <ClCompile Include="..\..\..\libraries\libcurl\http_aws_sigv4.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\rustls.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vauth\gsasl.c">
+      <Filter>Quelldateien\vauth</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h">
@@ -889,6 +895,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\http_aws_sigv4.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\rustls.h">
+      <Filter>Headerdateien\vtls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

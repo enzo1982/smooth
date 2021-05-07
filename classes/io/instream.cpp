@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -334,7 +334,7 @@ S::String S::IO::InStream::InputString(Int bytes)
 		 */
 		Int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
-		for (Int i = 0; i < amount; i++) stringBuffer[databufferpos + i] = (((UnsignedByte *) dataBuffer) + currentBufferPos)[i];
+		memcpy((UnsignedByte *) stringBuffer + databufferpos, (UnsignedByte *) dataBuffer + currentBufferPos, amount);
 
 		bytesleft	 -= amount;
 		databufferpos	 += amount;
@@ -418,7 +418,7 @@ S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 		 */
 		Int	 amount = ((packageSize - currentBufferPos) < (bytesleft)) ? (packageSize - currentBufferPos) : (bytesleft);
 
-		memcpy((void *) ((unsigned char *) pointer + databufferpos), (void *) (((UnsignedByte *) dataBuffer) + currentBufferPos), amount);
+		memcpy((UnsignedByte *) pointer + databufferpos, (UnsignedByte *) dataBuffer + currentBufferPos, amount);
 
 		bytesleft	 -= amount;
 		databufferpos	 += amount;

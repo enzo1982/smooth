@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -175,7 +175,9 @@ S::Int32 S::Math::Random()
 	 */
 	Int32	 value = 0;
 
-	for (Int i = 0; i < 3; i++) value = (value << 12) | (rand() & 0xFFF);
+	value  = (rand() & 0xFFF) << 20;
+	value |= (rand() & 0xFFF) <<  8;
+	value |= (rand() & 0xFF )      ;
 
 	return value;
 }

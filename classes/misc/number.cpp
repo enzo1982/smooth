@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -200,7 +200,7 @@ S::String S::Number::ToFloatString() const
 {
 	Int	 digits = 10;
 	Int64	 fract	= (Int64) (Math::Fract(Math::Abs(floatValue)) * Math::Pow(10, digits));
-	Int	 lead	= digits - Math::Floor((Math::Log10(fract) + 1.000000001));
+	Int	 lead	= digits - Math::Floor((fract > 0 ? Math::Log10(fract) : -1) + 1.000000001);
 
 	Int	 nOfNull = 0;
 

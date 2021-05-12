@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,7 +14,6 @@
 #include <smooth/misc/encoding/base64.h>
 #include <smooth/misc/hash/crc32.h>
 #include <smooth/misc/hash/crc64.h>
-#include <smooth/system/cpu.h>
 #include <smooth/templates/buffer.h>
 #include <smooth/templates/threadlocal.h>
 #include <smooth/init.h>
@@ -311,10 +310,10 @@ const char *S::String::GetInternalFormat()
 
 	if (internalFormat == NIL)
 	{
-		System::Endianness	 endianness = System::CPU().GetEndianness();
+		UnsignedInt16	 bom = 0xFEFF;
 
-		if	(sizeof(wchar_t) == 2) internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-16LE" : "UTF-16BE");
-		else if (sizeof(wchar_t) == 4) internalFormat = (char *) (endianness == System::EndianLittle ? "UTF-32LE" : "UTF-32BE");
+		if	(sizeof(wchar_t) == 2) internalFormat = (char *) (((UnsignedInt8 *) &bom)[0] == 0xFF ? "UTF-16LE" : "UTF-16BE");
+		else if (sizeof(wchar_t) == 4) internalFormat = (char *) (((UnsignedInt8 *) &bom)[0] == 0xFF ? "UTF-32LE" : "UTF-32BE");
 	}
 
 	return internalFormat;
@@ -576,6 +575,8 @@ S::Int S::String::Length() const
 
 S::Int S::String::Find(const String &str) const
 {
+	if (str == NIL) return 0;
+
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
@@ -589,6 +590,8 @@ S::Int S::String::Find(const String &str) const
 
 S::Int S::String::FindLast(const String &str) const
 {
+	if (str == NIL) return Length();
+
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
@@ -602,6 +605,8 @@ S::Int S::String::FindLast(const String &str) const
 
 S::String &S::String::Append(const String &str)
 {
+	if (str == NIL) return *this;
+
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
@@ -640,7 +645,7 @@ S::String &S::String::Replace(const String &str1, const String &str2)
 				len1 += (len3 - len2);
 			}
 
-			wcsncpy(wString + i, str2.wString, len3);
+			if (len3 > 0) wcsncpy(wString + i, str2.wString, len3);
 
 			i += len3 - 1;
 		}
@@ -665,11 +670,14 @@ S::String &S::String::CopyN(const String &str, const Int n)
 {
 	Clean();
 
-	wString.Resize(n + 1);
+	if (n > 0)
+	{
+		wString.Resize(n + 1);
 
-	wcsncpy(wString, str.wString, n);
+		wcsncpy(wString, str.wString, n);
 
-	wString[n] = 0;
+		wString[n] = 0;
+	}
 
 	return *this;
 }
@@ -685,14 +693,15 @@ S::Int S::String::Compare(const String &str) const
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
-	if	(len1 != len2)				   return len1 - len2;
-	else if (wcsncmp(wString, str.wString, len1) != 0) return 1;
+	if	(len1 != len2)					       return len1 - len2;
+	else if (len1 > 0 && wcsncmp(wString, str.wString, len1) != 0) return 1;
 
 	return 0;
 }
 
 S::Int S::String::CompareN(const String &str, Int n) const
 {
+	if (n == 0)	  return 0;
 	if (Length() < n) return 1;
 
 	if (wcsncmp(wString, str.wString, n) != 0) return 1;
@@ -702,6 +711,8 @@ S::Int S::String::CompareN(const String &str, Int n) const
 
 S::Bool S::String::StartsWith(const String &str) const
 {
+	if (str == NIL) return True;
+
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
@@ -717,6 +728,8 @@ S::Bool S::String::StartsWith(const String &str) const
 
 S::Bool S::String::EndsWith(const String &str) const
 {
+	if (str == NIL) return True;
+
 	Int	 len1 = Length();
 	Int	 len2 = str.Length();
 
@@ -788,6 +801,8 @@ S::String S::String::Trim() const
 
 S::String &S::String::Fill(const Int value)
 {
+	if (*this == NIL) return *this;
+
 	wmemset(wString, value, Length());
 
 	return *this;
@@ -797,7 +812,7 @@ S::String &S::String::FillN(const Int value, const Int count)
 {
 	Clean();
 
-	if (count >= 0)
+	if (count > 0)
 	{
 		wString.Resize(count + 1);
 

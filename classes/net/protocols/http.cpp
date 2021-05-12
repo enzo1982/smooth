@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -433,8 +433,8 @@ int S::Net::Protocols::httpProgress(void *data, double dlTotal, double dlNow, do
 {
 	HTTP	*http = (HTTP *) data;
 
-	if (ulNow > 0 && http->ulStart == 0) http->ulStart = System::System::Clock();
-	if (dlNow > 0 && http->dlStart == 0) http->dlStart = System::System::Clock();
+	if (ulNow > 0 && http->ulStart == 0) http->ulStart = System::System::Clock() - 1;
+	if (dlNow > 0 && http->dlStart == 0) http->dlStart = System::System::Clock() - 1;
 
 	if (http->dlStart == 0)
 	{

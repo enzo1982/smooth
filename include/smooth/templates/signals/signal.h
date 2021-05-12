@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -112,7 +112,7 @@ namespace smooth
 					slotsN->EnableLocking();
 				}
 
-				slotsN->Add(new SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst));
+				slotsN->Add(new SIGNALS_SLOT_CLASS_CLASS_NAME<classTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>(proc, inst));
 
 				return Success();
 			}
@@ -154,7 +154,7 @@ namespace smooth
 					slots0->EnableLocking();
 				}
 
-				slots0->Add(new SlotClass0<oClassTYPE, slotReturnTYPE>(proc, inst));
+				slots0->Add(new SlotClass0<classTYPE, slotReturnTYPE>(proc, inst));
 
 				return Success();
 			}
@@ -192,7 +192,7 @@ namespace smooth
 			{
 				if (slotsN == NIL) return Error();
 
-				SIGNALS_SLOT_CLASS_CLASS_NAME<oClassTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	 slot(proc, inst);
+				SIGNALS_SLOT_CLASS_CLASS_NAME<classTYPE, slotReturnTYPE SIGNALS_CONDITIONAL_COMMA SIGNALS_ARGUMENT_TYPES>	 slot(proc, inst);
 
 				for (Int i = slotsN->Length() - 1; i >= 0; i--)
 				{
@@ -250,7 +250,7 @@ namespace smooth
 			{
 				if (slots0 == NIL) return Error();
 
-				SlotClass0<oClassTYPE, slotReturnTYPE>	 slot(proc, inst);
+				SlotClass0<classTYPE, slotReturnTYPE>	 slot(proc, inst);
 
 				for (Int i = slots0->Length() - 1; i >= 0; i--)
 				{

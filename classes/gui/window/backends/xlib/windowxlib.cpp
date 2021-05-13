@@ -710,9 +710,12 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				XGetInputFocus(display, &focusWnd, &revertTo);
 
-				Window	*window = Window::GetWindow((Void *) focusWnd);
+				if (focusWnd != iwnd)
+				{
+					Window	*window = Window::GetWindow((Void *) focusWnd);
 
-				onEvent.Call(SM_LOSEFOCUS, window != NIL ? window->GetHandle() : -1, 0);
+					onEvent.Call(SM_LOSEFOCUS, window != NIL ? window->GetHandle() : -1, 0);
+				}
 			}
 
 			break;

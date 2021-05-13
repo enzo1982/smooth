@@ -121,9 +121,9 @@ S::Int S::GUI::PopupMenu::Hide()
 
 	Window	*window = container->GetContainerWindow();
 
-	/* Hide tool window, remove entries and delete it.
+	/* Close tool window, remove entries and delete it.
 	 */
-	toolWindow->Hide();
+	toolWindow->Close();
 
 	window->onChangePosition.Disconnect(&internalRequestClose);
 	window->onChangeSize.Disconnect(&internalRequestClose);

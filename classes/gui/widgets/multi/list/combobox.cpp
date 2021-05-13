@@ -214,7 +214,7 @@ S::Void S::GUI::ComboBox::CloseListBox()
 	Window	*window = container->GetContainerWindow();
 
 	toolWindow->onLoseFocus.Disconnect(&ComboBox::CloseListBox, this);
-	toolWindow->Hide();
+	toolWindow->Close();
 
 	window->onChangePosition.Disconnect(&ComboBox::CloseListBox, this);
 	window->onChangeSize.Disconnect(&ComboBox::CloseListBox, this);

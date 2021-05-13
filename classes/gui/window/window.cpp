@@ -470,6 +470,8 @@ S::Int S::GUI::Window::Close()
 
 S::Void S::GUI::Window::OnCreate()
 {
+	EnterProtectedRegion();
+
 	if (GetObjectType() != ToolWindow::classID) nOfActiveWindows++;
 
 	created = True;
@@ -485,6 +487,8 @@ S::Void S::GUI::Window::OnDestroy()
 	visible	  = False;
 
 	if (GetObjectType() != ToolWindow::classID) nOfActiveWindows--;
+
+	LeaveProtectedRegion();
 }
 
 S::Void S::GUI::Window::OnMinimize()

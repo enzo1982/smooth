@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,6 +11,7 @@
 #include <smooth/backends/backend.h>
 #include <smooth/templates/nonblocking.h>
 #include <smooth/i18n/translator_internal.h>
+#include <smooth/gui/dialogs/messagebox.h>
 #include <smooth/threads/thread.h>
 #include <smooth/init.h>
 #include <smooth/foreach.h>
@@ -136,6 +137,8 @@ S::Void S::Free()
 	Object::ObjectCleanup();
 
 	if (--initCount) return;
+
+	if (Object::GetNOfObjects() != 0) GUI::Dialogs::QuickMessage(String("Incomplete smooth library shutdown!\n\n").Append(String::FromInt(Object::GetNOfObjects())).Append(" objects are still alive.\n\nPlease make sure to delete any smooth objects\nyou create before exiting the program."), "Error", GUI::Dialogs::Message::Buttons::Ok, GUI::Dialogs::Message::Icon::Error);
 
 	/* Stop running threads.
 	 */

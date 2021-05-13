@@ -32,6 +32,7 @@ namespace smooth
 	typedef Array<char *, Void *>		 BufferArray;
 
 	static multithread (BufferArray *)	 allocatedBuffers = NIL;
+	static multithread (Buffer<char> *)	 iconvBuffer	  = NIL;
 
 	static multithread (char *)		 inputFormat	  = NIL;
 	static multithread (char *)		 outputFormat	  = NIL;
@@ -142,10 +143,12 @@ S::Void S::String::DeleteTemporaryBuffers(Bool all)
 		}
 	}
 
-	/* When purging all, also free I/O format strings.
+	/* When purging all, also free iconv buffer and I/O format strings.
 	 */
 	if (all)
 	{
+		if (iconvBuffer) delete iconvBuffer;
+
 		if (inputFormat	 != NIL) delete [] inputFormat;
 		if (outputFormat != NIL) delete [] outputFormat;
 
@@ -930,16 +933,14 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 			 */
 			if (outBuffer == NIL)
 			{
-				static multithread (Buffer<char> *)	 buffer = NIL;
+				if (iconvBuffer == NIL) iconvBuffer = new Buffer<char>();
 
-				if (buffer == NIL) buffer = new Buffer<char>();
+				if (iconvBuffer->Size() > 4096 && inBytes * 8 < 256) iconvBuffer->Free();
 
-				if (buffer->Size() > 4096 && inBytes * 8 < 256) buffer->Free();
+				iconvBuffer->Resize(inBytes * 8);
 
-				buffer->Resize(inBytes * 8);
-
-				outBytes  = buffer->Size();
-				outBuffer = *buffer;
+				outBytes  = iconvBuffer->Size();
+				outBuffer = *iconvBuffer;
 			}
 
 			/* Perform actual conversion.

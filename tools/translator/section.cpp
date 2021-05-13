@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,6 +21,8 @@ Section::Section()
 Section::~Section()
 {
 	foreach (StringItem *item, items) delete item;
+	foreach (Tree *tree, trees) delete tree;
+
 	foreach (Section *section, sections) delete section;
 }
 
@@ -85,6 +87,8 @@ Bool Section::Parse(XML::Node *section, List *plist, Array<ListEntry *> &entries
 				list->Add(tree);
 
 				sections.Add(section, section->GetName().ComputeCRC32());
+
+				trees.Add(tree);
 			}
 			else
 			{

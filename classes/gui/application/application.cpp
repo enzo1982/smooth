@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -149,11 +149,9 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	 */
 	FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print substr($0, index($0, $9)) }'"), "r");
 
-	fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+	if (fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer) > 0) applicationDirectory = buffer;
 
 	pclose(pstdin);
-
-	applicationDirectory = buffer;
 #elif defined __FreeBSD__
 	/* In FreeBSD, procfs is not necessarily available, so check if it's there first.
 	 */
@@ -161,7 +159,7 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	{
 		/* If procfs is available, /proc/<pid>/file links to the current binary.
 		 */
-		readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/file"), buffer, buffer.Size() - 1);
+		if (readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/file"), buffer, buffer.Size() - 1) > 0) applicationDirectory = buffer;
 	}
 	else
 	{
@@ -169,24 +167,18 @@ S::String S::GUI::Application::GetApplicationDirectory()
 		 */
 		FILE	*pstdin = popen(String("procstat -b ").Append(String::FromInt(getpid())).Append(" | awk '$1 == \"").Append(String::FromInt(getpid())).Append("\" { print $3 }'"), "r");
 
-		fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer);
+		if (fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer) > 0) applicationDirectory = buffer;
 
 		pclose(pstdin);
 	}
-
-	applicationDirectory = buffer;
 #elif defined __sun
 	/* In Solaris, /proc/<pid>/path/a.out links to the current binary.
 	 */
-	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/path/a.out"), buffer, buffer.Size() - 1);
-
-	applicationDirectory = buffer;
+	if (readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/path/a.out"), buffer, buffer.Size() - 1) > 0) applicationDirectory = buffer;
 #elif defined __linux__ || defined __NetBSD__
 	/* In Linux and NetBSD, /proc/<pid>/exe links to the current binary.
 	 */
-	readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1);
-
-	applicationDirectory = buffer;
+	if (readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1) > 0) applicationDirectory = buffer;
 #elif defined __HAIKU__
 	/* In Haiku, get the path from application info.
 	 */

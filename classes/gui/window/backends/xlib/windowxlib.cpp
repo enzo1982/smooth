@@ -492,7 +492,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				XGetInputFocus(display, &focusWnd, &revertTo);
 
-				if (focusWnd != wnd) break;
+				if (focusWnd == None || (focusWnd != wnd && focusWnd != iwnd)) break;
 			}
 
 			/* Pass message to smooth window.

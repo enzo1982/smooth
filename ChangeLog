@@ -9,6 +9,7 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 - combobox.cpp		- fixed dropdown staying open when parent window moves or resizes
 - popupmenu.cpp		- fixed popup staying open when parent window moves or resizes
 - popupmenuentry.cpp	- fixed occasional crashes when opening third level popup menus
+- backendxlib.cpp	- fixed timers being invoked in GTK threads despite denyTimerInterrupts state
 - backendcocoa.mm	- fixed possible crash when quitting applications through a dock command
 - surfacecocoa.mm	- fixed rendering of bitmaps with alpha channel
 - surfacecairo.cpp	- fixed drawing of diagonal lines when running in a Wayland session

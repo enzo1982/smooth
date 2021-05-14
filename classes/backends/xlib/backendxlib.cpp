@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,6 +21,16 @@ using namespace X11;
 #ifndef GTK_STATE_FLAG_LINK
 #	define GTK_STATE_FLAG_LINK GtkStateFlags(1 << 9)
 #endif
+
+static void toggleTimerInterrupts(bool allowed)
+{
+	sigset_t	 ss;
+
+	sigemptyset(&ss);
+	sigaddset(&ss, SIGALRM);
+
+	pthread_sigmask(allowed ? SIG_UNBLOCK : SIG_BLOCK, &ss, NIL);
+}
 
 static GdkRGBA get_gtk_color(GType type, const gchar *className, GtkStateFlags stateFlags, bool background)
 {
@@ -93,9 +103,14 @@ S::Int S::Backends::BackendXLib::Init()
 			return Error();
 		}
 
-		/* Init the GTK.
+		/* Init the GTK with SIGALRM signals disabled to make
+		 * threads created by gtk_init inherit this SIGMASK.
 		 */
+		toggleTimerInterrupts(false);
+
 		gtk_init(NULL, NULL);
+
+		toggleTimerInterrupts(true);
 
 		/* Get default colors.
 		 */

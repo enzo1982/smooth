@@ -103,11 +103,11 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 		exit(EXIT_FAILURE);
 	}
 
-	wnd		= NIL;
-	oldwnd		= NIL;
+	wnd		= None;
+	oldwnd		= None;
 
 	ic		= NIL;
-	iwnd		= NIL;
+	iwnd		= None;
 
 	id		= windowBackends.Add(this);
 
@@ -142,7 +142,7 @@ S::GUI::WindowXLib::~WindowXLib()
 
 S::Void S::GUI::WindowXLib::UpdateWMNormalHints()
 {
-	if (wnd == NIL) return;
+	if (wnd == None) return;
 
 	XSizeHints	 normal;
 
@@ -172,7 +172,7 @@ S::Void *S::GUI::WindowXLib::GetSystemWindow() const
 
 S::GUI::WindowXLib *S::GUI::WindowXLib::GetWindowBackend(X11::Window wnd)
 {
-	if (wnd == 0) return NIL;
+	if (wnd == None) return NIL;
 
 	foreach (WindowXLib *window, windowBackends)
 	{
@@ -300,7 +300,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 		case DestroyNotify:
 			onDestroy.Emit();
 
-			oldwnd = NIL;
+			oldwnd = None;
 
 			break;
 
@@ -537,7 +537,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 			/* Grab the keyboard focus if we don't have it already.
 			 */
-			if (wnd != NIL && focusWndID != id && e->xbutton.button <= 3)
+			if (wnd != None && focusWndID != id && e->xbutton.button <= 3)
 			{
 				WindowXLib	*focusWnd = windowBackends.Get(focusWndID);
 
@@ -654,7 +654,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				/* Get screen coordinates for window.
 				 */
-				if (wnd != NIL && !e->xconfigure.send_event)
+				if (wnd != None && !e->xconfigure.send_event)
 				{
 					X11::Window	 child = 0;
 
@@ -882,7 +882,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 	wnd = XCreateWindow(display, RootWindow(display, 0), pos.x, pos.y, Math::Round(size.cx * fontSize) + sizeModifier.cx, Math::Round(size.cy * fontSize) + sizeModifier.cy, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel | CWBitGravity | CWSaveUnder | CWOverrideRedirect, &attributes);
 
-	if (wnd != NIL)
+	if (wnd != None)
 	{
 		/* Create input window.
 		 */
@@ -1008,7 +1008,7 @@ S::Int S::GUI::WindowXLib::Open(const String &title, const Point &pos, const Siz
 
 S::Int S::GUI::WindowXLib::Close()
 {
-	if (wnd == NIL) return Success();
+	if (wnd == None) return Success();
 
 	/* Delete surface.
 	 */
@@ -1022,11 +1022,11 @@ S::Int S::GUI::WindowXLib::Close()
 
 	/* Destroy input window.
 	 */
-	if (iwnd != NIL)
+	if (iwnd != None)
 	{
 		XDestroyWindow(display, iwnd);
 
-		iwnd = NIL;
+		iwnd = None;
 	}
 
 	/* Destroy window.
@@ -1034,7 +1034,7 @@ S::Int S::GUI::WindowXLib::Close()
 	XDestroyWindow(display, wnd);
 
 	oldwnd	= wnd;
-	wnd	= NIL;
+	wnd	= None;
 
 	return Success();
 }
@@ -1052,8 +1052,8 @@ S::GUI::WindowXLib *S::GUI::WindowXLib::FindLeaderWindow()
 	 */
 	foreachreverse (WindowXLib *backend, windowBackends)
 	{
-		if (  backend->id    <	id  &&
-		      backend->wnd   != NIL &&
+		if (  backend->id    <	id   &&
+		      backend->wnd   != None &&
 		    !(backend->flags &	WF_TOPMOST)) return backend;
 	}
 
@@ -1070,8 +1070,8 @@ S::Bool S::GUI::WindowXLib::IsModalWindowActive()
 	 */
 	foreachreverse (WindowXLib *backend, windowBackends)
 	{
-		if	(backend == this)				   return False;
-		else if (backend->wnd != NIL && backend->flags & WF_MODAL) return True;
+		if	(backend == this)				    return False;
+		else if (backend->wnd != None && backend->flags & WF_MODAL) return True;
 	}
 
 	return False;
@@ -1079,7 +1079,7 @@ S::Bool S::GUI::WindowXLib::IsModalWindowActive()
 
 S::Int S::GUI::WindowXLib::SetTitle(const String &nTitle)
 {
-	if (wnd == NIL) return Error();
+	if (wnd == None) return Error();
 
 	static Atom	 wmNameAtom	= XInternAtom(display, "_NET_WM_NAME", False);
 	static Atom	 wmIconNameAtom = XInternAtom(display, "_NET_WM_ICON_NAME", False);
@@ -1157,7 +1157,7 @@ S::Int S::GUI::WindowXLib::EnableDropFiles(Bool nEnableDropFiles)
 {
 	enableDropFiles = nEnableDropFiles;
 
-	if (wnd == NIL) return Success();
+	if (wnd == None) return Success();
 
 	static Atom	 xdndAwareAtom = XInternAtom(display, "XdndAware", False);
 
@@ -1247,7 +1247,7 @@ S::Int S::GUI::WindowXLib::SetMinimumSize(const Size &nMinSize)
 
 	UpdateWMNormalHints();
 
-	if (wnd != NIL)
+	if (wnd != None)
 	{
 		XResizeWindow(display, wnd, Math::Round(Math::Max(size.cx, minSize.cx) * fontSize) + sizeModifier.cx,
 					    Math::Round(Math::Max(size.cy, minSize.cy) * fontSize) + sizeModifier.cy);
@@ -1263,7 +1263,7 @@ S::Int S::GUI::WindowXLib::SetMaximumSize(const Size &nMaxSize)
 
 	UpdateWMNormalHints();
 
-	if (wnd != NIL)
+	if (wnd != None)
 	{
 		XResizeWindow(display, wnd, Math::Round(Math::Min(size.cx, maxSize.cx) * fontSize) + sizeModifier.cx,
 					    Math::Round(Math::Min(size.cy, maxSize.cy) * fontSize) + sizeModifier.cy);
@@ -1275,7 +1275,7 @@ S::Int S::GUI::WindowXLib::SetMaximumSize(const Size &nMaxSize)
 
 S::Int S::GUI::WindowXLib::Show()
 {
-	if (wnd == NIL) return Success();
+	if (wnd == None) return Success();
 
 	XMapRaised(display, wnd);
 	XFlush(display);
@@ -1285,7 +1285,7 @@ S::Int S::GUI::WindowXLib::Show()
 
 S::Int S::GUI::WindowXLib::Hide()
 {
-	if (wnd == NIL) return Success();
+	if (wnd == None) return Success();
 
 	XUnmapWindow(display, wnd);
 	XFlush(display);
@@ -1295,7 +1295,7 @@ S::Int S::GUI::WindowXLib::Hide()
 
 S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 {
-	if (wnd == NIL) return Success();
+	if (wnd == None) return Success();
 
 	XMoveResizeWindow(display, wnd, nPos.x, nPos.y, Math::Round(nSize.cx * fontSize) + sizeModifier.cx, Math::Round(nSize.cy * fontSize) + sizeModifier.cy);
 	XFlush(display);
@@ -1305,7 +1305,7 @@ S::Int S::GUI::WindowXLib::SetMetrics(const Point &nPos, const Size &nSize)
 
 S::Int S::GUI::WindowXLib::Maximize()
 {
-	if (wnd == NIL) return Success();
+	if (wnd == None) return Success();
 
 	static Atom	 wmStateAtom		  = XInternAtom(display, "_NET_WM_STATE", False);
 	static Atom	 wmStateMaximizedHorzAtom = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
@@ -1324,7 +1324,7 @@ S::Int S::GUI::WindowXLib::Maximize()
 
 S::Int S::GUI::WindowXLib::Raise()
 {
-	if (wnd == NIL) return Success();
+	if (wnd == None) return Success();
 
 	/* FixMe: Are there cases where we need to do anything here?
 	 */

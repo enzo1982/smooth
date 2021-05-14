@@ -79,7 +79,7 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	splitter->onDrag.Connect(&Translator::OnDragSplitter, this);
 
 	layer_edit	= new Layer();
-	layer_edit->SetMetrics(Point(8, 202), Size(500, 200));
+	layer_edit->SetMetrics(Point(0, 202), Size(500, 200));
 	layer_edit->onChangeSize.Connect(&Translator::OnChangeEditLayerSize, this);
 
 	button_new	= new Button("New", Point(7, 7), Size());
@@ -190,14 +190,8 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	wnd->Add(edit_filter);
 	wnd->Add(button_clear);
 
-	wnd->Add(list_entries);
-	wnd->Add(list_filtered);
-
 	wnd->GetMainLayer()->Add(droparea);
-
-	wnd->Add(splitter);
-
-	wnd->Add(layer_edit);
+	wnd->GetMainLayer()->Add(layer_edit);
 
 	layer_edit->Add(text_id);
 	layer_edit->Add(edit_id);
@@ -209,6 +203,11 @@ Translator::Translator(const String &openFile) : Application("smooth Translator"
 	layer_edit->Add(button_remove);
 	layer_edit->Add(button_new);
 	layer_edit->Add(button_copy);
+
+	wnd->Add(splitter);
+
+	wnd->Add(list_entries);
+	wnd->Add(list_filtered);
 
 	wnd->Add(title);
 	wnd->Add(menubar);
@@ -355,7 +354,7 @@ Void Translator::OnDragSplitter(Int splitterPos)
 
 	droparea->SetSize(list_entries->GetSize());
 
-	layer_edit->SetY(clientRect.top + splitterPos + 2);
+	layer_edit->SetY(splitterPos + 2);
 	layer_edit->SetSize(clientSize - Size(0, splitterPos + 2));
 
 	updateSplitter = False;

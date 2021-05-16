@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -62,6 +62,8 @@ S::Bool S::IndexArray::Move(Int index1, Int index2)
 	if (index1 > greatestIndex ||
 	    index2 > greatestIndex) return False;
 
+	WriteLock	 lock(*this);
+
 	return MoveNth(GetEntryNumberByIndex(index1), GetEntryNumberByIndex(index2));
 }
 
@@ -87,6 +89,8 @@ S::Bool S::IndexArray::MoveNth(Int n, Int m)
 S::Bool S::IndexArray::Remove(Int index)
 {
 	if (index > greatestIndex) return False;
+
+	WriteLock	 lock(*this);
 
 	return RemoveNth(GetEntryNumberByIndex(index));
 }

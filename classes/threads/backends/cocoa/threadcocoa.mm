@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,6 +21,8 @@ S::Int	 threadCocoaTmp = S::Threads::ThreadBackend::SetBackend(&CreateThreadCoco
 
 S::Threads::ThreadCocoa::ThreadCocoa(Void *iThread)
 {
+	pthread_mutex_init(&mutex, NIL);
+
 	type		 = THREAD_COCOA;
 
 	thread		 = NIL;
@@ -35,6 +37,8 @@ S::Threads::ThreadCocoa::ThreadCocoa(Void *iThread)
 S::Threads::ThreadCocoa::~ThreadCocoa()
 {
 	if (myThread) Stop();
+
+	pthread_mutex_destroy(&mutex);
 }
 
 S::Int S::Threads::ThreadCocoa::Start(Void (*threadProc)(Void *), Void *threadParam)
@@ -73,12 +77,21 @@ S::Int S::Threads::ThreadCocoa::Start(Void (*threadProc)(Void *), Void *threadPa
 
 S::Int S::Threads::ThreadCocoa::Stop()
 {
-	if (thread == NIL) return Error();
+	pthread_mutex_lock(&mutex);
+
+	if (thread == NIL)
+	{
+		pthread_mutex_unlock(&mutex);
+
+		return Error();
+	}
 
 	pthread_t	*thread	  = this->thread;
 	Bool		 myThread = this->myThread;
 
 	this->thread = NIL;
+
+	pthread_mutex_unlock(&mutex);
 
 	pthread_cancel(*thread);
 	pthread_detach(*thread);
@@ -90,12 +103,21 @@ S::Int S::Threads::ThreadCocoa::Stop()
 
 S::Int S::Threads::ThreadCocoa::Wait()
 {
-	if (thread == NIL) return Error();
+	pthread_mutex_lock(&mutex);
+
+	if (thread == NIL)
+	{
+		pthread_mutex_unlock(&mutex);
+
+		return Error();
+	}
 
 	pthread_t	*thread	  = this->thread;
 	Bool		 myThread = this->myThread;
 
 	this->thread = NIL;
+
+	pthread_mutex_unlock(&mutex);
 
 	pthread_join(*thread, NIL);
 
@@ -106,12 +128,21 @@ S::Int S::Threads::ThreadCocoa::Wait()
 
 S::Void S::Threads::ThreadCocoa::Exit()
 {
-	if (!this->thread || !pthread_equal(pthread_self(), *this->thread)) return;
+	pthread_mutex_lock(&mutex);
+
+	if (thread == NIL || !pthread_equal(pthread_self(), *thread))
+	{
+		pthread_mutex_unlock(&mutex);
+
+		return;
+	}
 
 	pthread_t	*thread	  = this->thread;
 	Bool		 myThread = this->myThread;
 
 	this->thread = NIL;
+
+	pthread_mutex_unlock(&mutex);
 
 	pthread_detach(*thread);
 

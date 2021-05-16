@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -19,6 +19,8 @@ S::Int	 threadWin32Tmp = S::Threads::ThreadBackend::SetBackend(&CreateThreadWin3
 
 S::Threads::ThreadWin32::ThreadWin32(Void *iThread)
 {
+	InitializeCriticalSection(&mutex);
+
 	type		 = THREAD_WIN32;
 
 	thread		 = NIL;
@@ -34,6 +36,8 @@ S::Threads::ThreadWin32::ThreadWin32(Void *iThread)
 S::Threads::ThreadWin32::~ThreadWin32()
 {
 	if (myThread) Stop();
+
+	DeleteCriticalSection(&mutex);
 }
 
 S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadParam)
@@ -51,7 +55,14 @@ S::Int S::Threads::ThreadWin32::Start(Void (*threadProc)(Void *), Void *threadPa
 
 S::Int S::Threads::ThreadWin32::Stop()
 {
-	if (thread == NIL) return Error();
+	EnterCriticalSection(&mutex);
+
+	if (thread == NIL)
+	{
+		LeaveCriticalSection(&mutex);
+
+		return Error();
+	}
 
 	Bool	 running  = IsRunning();
 
@@ -59,6 +70,8 @@ S::Int S::Threads::ThreadWin32::Stop()
 	Bool	 myThread = this->myThread;
 
 	this->thread = NIL;
+
+	LeaveCriticalSection(&mutex);
 
 	if (running)  TerminateThread(thread, 0);
 	if (myThread) CloseHandle(thread);
@@ -68,7 +81,14 @@ S::Int S::Threads::ThreadWin32::Stop()
 
 S::Int S::Threads::ThreadWin32::Wait()
 {
-	if (thread == NIL) return Error();
+	EnterCriticalSection(&mutex);
+
+	if (thread == NIL)
+	{
+		LeaveCriticalSection(&mutex);
+
+		return Error();
+	}
 
 	Bool	 running  = IsRunning();
 
@@ -76,6 +96,8 @@ S::Int S::Threads::ThreadWin32::Wait()
 	Bool	 myThread = this->myThread;
 
 	this->thread = NIL;
+
+	LeaveCriticalSection(&mutex);
 
 	if (running)  WaitForSingleObject(thread, INFINITE);
 	if (myThread) CloseHandle(thread);
@@ -94,12 +116,21 @@ S::Bool S::Threads::ThreadWin32::IsRunning() const
 
 S::Void S::Threads::ThreadWin32::Exit()
 {
-	if (threadID != (Int) GetCurrentThreadId()) return;
+	EnterCriticalSection(&mutex);
+
+	if (thread == NIL || threadID != (Int) GetCurrentThreadId())
+	{
+		LeaveCriticalSection(&mutex);
+
+		return;
+	}
 
 	HANDLE	 thread	  = this->thread;
 	Bool	 myThread = this->myThread;
 
 	this->thread = NIL;
+
+	LeaveCriticalSection(&mutex);
 
 	if (myThread) CloseHandle(thread);
 }

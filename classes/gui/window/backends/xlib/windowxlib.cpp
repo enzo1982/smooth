@@ -779,6 +779,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			 */
 			if (e->xclient.message_type == xdndPositionAtom)
 			{
+				Window	*window = Window::GetWindow((Void *) wnd);
+
+				Input::Pointer::UpdatePosition(window, e->xclient.data.l[2] >> 16, e->xclient.data.l[2] & 0xFFFF);
+
 				/* Send XdndStatus message.
 				 */
 				XEvent		 status;

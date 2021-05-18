@@ -6,6 +6,7 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 - webp.cpp		- added support for WebP image decoding
 - windowgdi.cpp		- improved scaling when setting icons via SetIcon()
 - init.cpp		- warn about incomplete application shutdown
+- array.cpp		- fixed thread synchronization issues when accessing arrays
 - combobox.cpp		- fixed dropdown staying open when parent window moves or resizes
 - popupmenu.cpp		- fixed popup staying open when parent window moves or resizes
 - popupmenuentry.cpp	- fixed occasional crashes when opening third level popup menus

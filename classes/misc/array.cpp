@@ -59,10 +59,10 @@ S::Bool S::IndexArray::InsertAtPos(Int position, Int index)
 
 S::Bool S::IndexArray::Move(Int index1, Int index2)
 {
+	WriteLock	 lock(*this);
+
 	if (index1 > greatestIndex ||
 	    index2 > greatestIndex) return False;
-
-	WriteLock	 lock(*this);
 
 	return MoveNth(GetEntryNumberByIndex(index1), GetEntryNumberByIndex(index2));
 }
@@ -88,9 +88,9 @@ S::Bool S::IndexArray::MoveNth(Int n, Int m)
 
 S::Bool S::IndexArray::Remove(Int index)
 {
-	if (index > greatestIndex) return False;
-
 	WriteLock	 lock(*this);
+
+	if (index > greatestIndex) return False;
 
 	return RemoveNth(GetEntryNumberByIndex(index));
 }
@@ -112,9 +112,9 @@ S::Bool S::IndexArray::RemoveNth(Int n)
 
 S::Bool S::IndexArray::RemoveAll()
 {
-	if (nOfEntries == 0) return True;
-
 	WriteLock	 lock(*this);
+
+	if (nOfEntries == 0) return True;
 
 	indices.Free();
 
@@ -155,6 +155,8 @@ S::Bool S::IndexArray::DisableLocking() const
 
 S::Bool S::IndexArray::IndexAvailable(Int index) const
 {
+	ReadLock	 lock(*this);
+
 	if (index > greatestIndex) return True;
 
 	if (GetEntryNumberByIndex(index) == -1) return True;
@@ -163,9 +165,9 @@ S::Bool S::IndexArray::IndexAvailable(Int index) const
 
 S::Int S::IndexArray::GetEntryNumberByIndex(Int index) const
 {
-	if (nOfEntries == 0) return -1;
-
 	ReadLock	 lock(*this);
+
+	if (nOfEntries == 0) return -1;
 
 	Int	 entryNumber  = -1;
 	Int	 lastAccessed = lastAccessedEntry;

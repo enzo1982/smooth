@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -97,6 +97,8 @@ namespace smooth
 
 			Bool InsertAfter(Int prevIndex, const s &value, Int index)
 			{
+				WriteLock	 lock(*this);
+
 				return InsertAtPos(GetEntryNumberByIndex(prevIndex) + 1, value, index);
 			}
 
@@ -162,9 +164,9 @@ namespace smooth
 
 			Bool RemoveAll()
 			{
-				if (nOfEntries == 0) return True;
-
 				WriteLock	 lock(*this);
+
+				if (nOfEntries == 0) return True;
 
 				for (Int i = 0; i < nOfEntries; i++) delete entries[i];
 
@@ -175,21 +177,29 @@ namespace smooth
 
 			const s &Get(Int index) const
 			{
+				ReadLock	 lock(*this);
+
 				return GetNth(GetEntryNumberByIndex(index));
 			}
 
 			s &GetReference(Int index)
 			{
+				ReadLock	 lock(*this);
+
 				return GetNthReference(GetEntryNumberByIndex(index));
 			}
 
 			const s &GetReference(Int index) const
 			{
+				ReadLock	 lock(*this);
+
 				return GetNthReference(GetEntryNumberByIndex(index));
 			}
 
 			Bool Set(Int index, const s &value)
 			{
+				WriteLock	 lock(*this);
+
 				return SetNth(GetEntryNumberByIndex(index), value);
 			}
 

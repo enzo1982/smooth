@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -73,18 +73,24 @@ S::Bool S::Threads::RWLock::LockForWrite()
 
 	/* Wait for read operations to finish.
 	 */
+	sharedAccessMutex->Lock();
+
 	while (readLocked)
 	{
+		sharedAccessMutex->Release();
 		exclusiveAccessMutex->Release();
 
 		S::System::System::Sleep(0);
 
 		exclusiveAccessMutex->Lock();
+		sharedAccessMutex->Lock();
 	}
 
 	/* Increase write lock counter.
 	 */
 	writeLocked++;
+
+	sharedAccessMutex->Release();
 
 	return True;
 }
@@ -93,11 +99,15 @@ S::Bool S::Threads::RWLock::Release()
 {
 	/* Check if we are locked for write.
 	 */
+	sharedAccessMutex->Lock();
+
 	if (writeLocked && !readLocked)
 	{
 		/* Decrease write lock counter.
 		 */
 		writeLocked--;
+
+		sharedAccessMutex->Release();
 
 		/* Allow new read and write locks again.
 		 */
@@ -108,8 +118,6 @@ S::Bool S::Threads::RWLock::Release()
 
 	/* Decrease read lock counter by one.
 	 */
-	sharedAccessMutex->Lock();
-
 	readLocked--;
 
 	sharedAccessMutex->Release();

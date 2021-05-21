@@ -58,7 +58,7 @@ S::Int S::Threads::ThreadPOSIX::Stop()
 {
 	pthread_mutex_lock(&mutex);
 
-	if (thread == NIL)
+	if (thread == NIL || pthread_equal(pthread_self(), *thread))
 	{
 		pthread_mutex_unlock(&mutex);
 

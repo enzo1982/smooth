@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -39,7 +39,7 @@ S::Threads::Thread::Thread(const Thread &oThread)
 
 S::Threads::Thread::~Thread()
 {
-	if (status == THREAD_CREATED || status == THREAD_STARTME || status == THREAD_STOPPED_SELF)
+	if (status == THREAD_CREATED || status == THREAD_STARTME)
 	{
 		status = THREAD_STOPPED;
 	}
@@ -116,24 +116,11 @@ S::Int S::Threads::Thread::Start()
 
 S::Int S::Threads::Thread::Stop()
 {
-	if (status == THREAD_RUNNING)
+	if (backend->Stop() == Success())
 	{
-		if (IsCurrentThread())
-		{
-			status = THREAD_STOPPED_SELF;
-
-			Access::Decrement(nOfRunningThreads);
-
-			backend->Exit();
-
-			return Success();
-		}
-
 		status = THREAD_STOPPED;
 
 		Access::Decrement(nOfRunningThreads);
-
-		backend->Stop();
 
 		return Success();
 	}

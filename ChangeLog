@@ -6,6 +6,7 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 - webp.cpp		- added support for WebP image decoding
 - windowgdi.cpp		- improved scaling when setting icons via SetIcon()
 - init.cpp		- warn about incomplete application shutdown
+- thread.cpp		- made it illegal to call Stop on the current thread
 - array.cpp		- fixed thread synchronization issues when accessing arrays
 - rwlock.cpp		- fixed thread synchronization issues
 - combobox.cpp		- fixed dropdown staying open when parent window moves or resizes

@@ -83,7 +83,7 @@ S::Int S::Threads::ThreadWin32::Wait()
 {
 	EnterCriticalSection(&mutex);
 
-	if (thread == NIL)
+	if (thread == NIL || threadID == (Int) GetCurrentThreadId())
 	{
 		LeaveCriticalSection(&mutex);
 

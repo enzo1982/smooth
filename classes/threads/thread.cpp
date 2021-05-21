@@ -130,17 +130,7 @@ S::Int S::Threads::Thread::Stop()
 
 S::Int S::Threads::Thread::Wait()
 {
-	if (status == THREAD_RUNNING)
-	{
-		if (IsCurrentThread())
-		{
-			return Error();
-		}
-
-		return backend->Wait();
-	}
-
-	return Error();
+	return backend->Wait();
 }
 
 S::Void S::Threads::Thread::MainCaller(Thread *thread)

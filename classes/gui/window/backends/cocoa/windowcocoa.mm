@@ -137,7 +137,7 @@ const int	 NSApplicationDropFiles	 = 9;
 		trackingArea	 = [[[NSTrackingArea alloc] initWithRect: [self visibleRect]
 								 options: NSTrackingMouseMoved | NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways
 								   owner: self
-							        userInfo: nil] autorelease];
+								userInfo: nil] autorelease];
 
 		[self addTrackingArea: trackingArea];
 
@@ -487,6 +487,8 @@ const int	 NSApplicationDropFiles	 = 9;
 
 	- (void)	    zoom:			 (id) sender;
 
+	- (void)	    close;
+
 	/* Helper Methods.
 	 */
 	- (id)		    initWithContentRect:	 (NSRect) rect styleMask: (NSUInteger) style;
@@ -546,6 +548,15 @@ const int	 NSApplicationDropFiles	 = 9;
 		if (![self isZoomed]) zooming = YES;
 
 		[super zoom: sender];
+	}
+
+	- (void) close
+	{
+		WindowCocoa	*backend = WindowCocoa::GetWindowBackend(self);
+
+		if (backend != NIL) backend->Close();
+
+		[super close];
 	}
 
 	/* Helper Methods.
@@ -659,7 +670,7 @@ const int	 NSApplicationDropFiles	 = 9;
 #endif
 	- (void) handleNotification:	    (NSNotification *) note as: (int) type;
 
-	- (BOOL) windowShouldClose:	    (id) sender;
+	- (BOOL) windowShouldClose:	    (NSWindow *) sender;
 
 	- (void) windowDidMove:		    (NSNotification *) note;
 	- (void) windowDidResize:	    (NSNotification *) note;
@@ -672,19 +683,11 @@ const int	 NSApplicationDropFiles	 = 9;
 @end
 
 @implementation CocoaWindowDelegate
-	- (BOOL) windowShouldClose: (id) sender
+	- (BOOL) windowShouldClose: (NSWindow *) sender
 	{
 		WindowCocoa	*backend = WindowCocoa::GetWindowBackend(sender);
 
-		if (backend != NIL)
-		{
-			if (backend->doClose.Call()) backend->Close();
-
-			/* Return no in any case. Either the user decided not to
-			 * close the window or we closed it on our own above.
-			 */
-			return NO;
-		}
+		if (backend != NIL && !backend->doClose.Call()) return NO;
 
 		return YES;
 	}
@@ -1370,8 +1373,16 @@ S::Int S::GUI::WindowCocoa::RequestClose()
 {
 	if (wnd == nil) return Success();
 
-	if ([NSThread isMainThread]) [wnd performClose: nil];
-	else			     [wnd performSelectorOnMainThread: @selector(performClose:) withObject: nil waitUntilDone: YES];
+	if ([wnd hasCloseBox])
+	{
+		if ([NSThread isMainThread]) [wnd performClose: nil];
+		else			     [wnd performSelectorOnMainThread: @selector(performClose:) withObject: nil waitUntilDone: YES];
+	}
+	else
+	{
+		if ([NSThread isMainThread]) [wnd close];
+		else			     [wnd performSelectorOnMainThread: @selector(close) withObject: nil waitUntilDone: YES];
+	}
 
 	return Success();
 }

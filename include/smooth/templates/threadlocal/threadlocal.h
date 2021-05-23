@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,7 +13,7 @@
 
 #include "../../definitions.h"
 
-#if !defined __WIN32__ && !defined __APPLE__ && !defined __OpenBSD__ && !defined __HAIKU__
+#if !defined __WIN32__ && !defined __APPLE__ && !defined __OpenBSD__
 #	define multithread(t) __thread t
 #else
 #	if defined __WIN32__

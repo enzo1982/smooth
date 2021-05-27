@@ -5,7 +5,7 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 - imageloader.cpp	- added support for auto-detecting image formats
 - webp.cpp		- added support for WebP image decoding
 - windowgdi.cpp		- improved scaling when setting icons via SetIcon()
-- init.cpp		- warn about incomplete application shutdown
+- init.cpp		- warn about incomplete application shutdown in debug builds
 - thread.cpp		- made it illegal to call Stop on the current thread
 			- fixed thread synchronization issues in wait and exit functions
 - array.cpp		- fixed thread synchronization issues when accessing arrays

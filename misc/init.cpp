@@ -138,7 +138,9 @@ S::Void S::Free()
 
 	if (--initCount) return;
 
+#ifdef DEBUG
 	if (Object::GetNOfObjects() != 0) GUI::Dialogs::QuickMessage(String("Incomplete smooth library shutdown!\n\n").Append(String::FromInt(Object::GetNOfObjects())).Append(" objects are still alive.\n\nPlease make sure to delete any smooth objects\nyou create before exiting the program."), "Error", GUI::Dialogs::Message::Buttons::Ok, GUI::Dialogs::Message::Icon::Error);
+#endif
 
 	/* Stop running threads.
 	 */

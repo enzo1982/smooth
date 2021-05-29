@@ -37,6 +37,8 @@ namespace smooth
 	static multithread (char *)		 inputFormat	  = NIL;
 	static multithread (char *)		 outputFormat	  = NIL;
 
+	static Bool				 initialized	  = False;
+
 	Int					 ConvertString(const char *, Int, const char *, char *, Int, const char *);
 };
 
@@ -68,6 +70,8 @@ S::String::~String()
 
 S::Int S::String::Initialize()
 {
+	initialized = True;
+
 	return Success();
 }
 
@@ -931,16 +935,35 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 
 			/* Assign output buffer if not provided.
 			 */
+			Buffer<char>	*outBufferObject = NIL;
+
 			if (outBuffer == NIL)
 			{
-				if (iconvBuffer == NIL) iconvBuffer = new Buffer<char>();
+				outBytes = inBytes * 8;
 
-				if (iconvBuffer->Size() > 4096 && inBytes * 8 < 256) iconvBuffer->Free();
+#if defined(__APPLE__) || defined(__OpenBSD__)
+				/* Work around C++ static object initialization order issues.
+				 *
+				 * This can be removed once we enable __thread or thread_local
+				 * for macOS and OpenBSD builds. On macOS this can be done when
+				 * the target version is raised to 10.7 or later.
+				 */
+				if (!initialized)
+				{
+					outBufferObject = new Buffer<char>(outBytes);
+					outBuffer	= *outBufferObject;
+				}
+				else
+#endif
+				{
+					if (iconvBuffer == NIL) iconvBuffer = new Buffer<char>();
 
-				iconvBuffer->Resize(inBytes * 8);
+					if (iconvBuffer->Size() > 4096 && outBytes < 256) iconvBuffer->Free();
 
-				outBytes  = iconvBuffer->Size();
-				outBuffer = *iconvBuffer;
+					iconvBuffer->Resize(outBytes);
+
+					outBuffer = *iconvBuffer;
+				}
 			}
 
 			/* Perform actual conversion.
@@ -956,6 +979,8 @@ S::Int S::ConvertString(const char *inBuffer, Int inBytes, const char *inEncodin
 			}
 
 			iconv_close(cd);
+
+			if (outBufferObject) delete outBufferObject;
 
 			Int	 size = !outBytesLeft ? 0 : outBytes - outBytesLeft;
 

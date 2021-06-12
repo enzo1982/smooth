@@ -20,6 +20,7 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 - windowxlib.cpp	- fixed possible crash on exit when running in a Wayland session
 			- fixed drag & drop working unreliably
 			- fixed incorrect usage of XGetInputFocus API
+- application.cpp	- fixed determination of binary path on FreeBSD
 - file.cpp		- fixed accessing files via file:// URLs
 
 - fixed several instances of undefined behavior found with -fsanitize=undefined

@@ -34,6 +34,12 @@
 #	include <stdlib.h>
 #	include <limits.h>
 
+#	if defined __APPLE__
+#		include <libproc.h>
+#	elif defined __FreeBSD__
+#		include <sys/sysctl.h>
+#	endif
+
 #	ifndef PATH_MAX
 #		define PATH_MAX 32768
 #	endif
@@ -139,48 +145,32 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	buffer.Zero();
 
 #if defined __WIN32__
-	/* In Windows, use GetModuleFileName to get the exe file name.
+	/* On Windows, use GetModuleFileName to get the exe file name.
 	 */
 	GetModuleFileName(NIL, buffer, buffer.Size() - 1);
 
 	applicationDirectory = buffer;
 #elif defined __APPLE__
-	/* In macOS, lsof -p <pid> always returns the path to the current binary in the first txt section.
+	/* On macOS, get the path using the proc_pidpath call.
 	 */
-	FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print substr($0, index($0, $9)) }'"), "r");
-
-	if (fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer) > 0) applicationDirectory = buffer;
-
-	pclose(pstdin);
+	if (proc_pidpath(getpid(), buffer, buffer.Size()) > 0) applicationDirectory = buffer;
 #elif defined __FreeBSD__
-	/* In FreeBSD, procfs is not necessarily available, so check if it's there first.
+	/* On FreeBSD, the KERN_PROC_PATHNAME sysctl with pid -1 provides the path to the current binary.
 	 */
-	if (File(String("/proc/").Append(String::FromInt(getpid())).Append("/file")).Exists())
-	{
-		/* If procfs is available, /proc/<pid>/file links to the current binary.
-		 */
-		if (readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/file"), buffer, buffer.Size() - 1) > 0) applicationDirectory = buffer;
-	}
-	else
-	{
-		/* Otherwise, procstat -b <pid> will provide the path to the current binary.
-		 */
-		FILE	*pstdin = popen(String("procstat -b ").Append(String::FromInt(getpid())).Append(" | awk '$1 == \"").Append(String::FromInt(getpid())).Append("\" { print $3 }'"), "r");
+	int	 mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+	size_t	 len	= buffer.Size();
 
-		if (fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer) > 0) applicationDirectory = buffer;
-
-		pclose(pstdin);
-	}
+	if (sysctl(mib, 4, buffer, &len, NULL, 0) == 0) applicationDirectory = buffer;
 #elif defined __sun
-	/* In Solaris, /proc/<pid>/path/a.out links to the current binary.
+	/* On Solaris, /proc/<pid>/path/a.out links to the current binary.
 	 */
 	if (readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/path/a.out"), buffer, buffer.Size() - 1) > 0) applicationDirectory = buffer;
 #elif defined __linux__ || defined __NetBSD__
-	/* In Linux and NetBSD, /proc/<pid>/exe links to the current binary.
+	/* On Linux and NetBSD, /proc/<pid>/exe links to the current binary.
 	 */
 	if (readlink(String("/proc/").Append(String::FromInt(getpid())).Append("/exe"), buffer, buffer.Size() - 1) > 0) applicationDirectory = buffer;
 #elif defined __HAIKU__
-	/* In Haiku, get the path from application info.
+	/* On Haiku, get the path from application info.
 	 */
 	BApplication	*app = Backends::BackendHaiku::GetApplication();
 	app_info	 ai;

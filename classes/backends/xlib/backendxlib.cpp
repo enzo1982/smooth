@@ -245,3 +245,30 @@ S::String S::Backends::BackendXLib::QueryGSettings(const String &schema, const S
 
 	return NIL;
 }
+
+S::String S::Backends::BackendXLib::QueryXfConf(const String &channel, const String &property)
+{
+	static String	 xfconfquery = FindExecutable("xfconf-query");
+
+	if (xfconfquery == NIL) return NIL;
+
+	/* Execute xfconf-query to query value.
+	 */
+	FILE	*pstdin = popen(String(xfconfquery).Append(" -c ").Append(channel).Append(" -p ").Append(property), "r");
+
+	if (pstdin != NIL)
+	{
+		char	 value[256];
+
+		if (fgets(value, 256, pstdin) != NIL)
+		{
+			pclose(pstdin);
+
+			return value;
+		}
+
+		pclose(pstdin);
+	}
+
+	return NIL;
+}

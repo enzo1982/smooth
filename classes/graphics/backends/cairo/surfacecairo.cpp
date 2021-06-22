@@ -221,6 +221,12 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 		if (ex_gdk_screen_get_monitor_scale_factor != NIL) scale = ex_gdk_screen_get_monitor_scale_factor(gdk_screen_get_default(), 0);
 		else						   scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
 
+		/* Alternatively, query custom DPI setting via XfConf.
+		 */
+		if (scale <= 1.0) scale = Backends::BackendXLib::QueryXfConf("xsettings", "/Xft/DPI").ToInt() / dpi;
+
+		/* Update DPI value if a scale factor has been determined.
+		 */
 		if (scale > 0) dpi *= scale;
 	}
 

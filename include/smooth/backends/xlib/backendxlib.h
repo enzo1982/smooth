@@ -67,6 +67,7 @@ namespace smooth
 				static X11::XIM		 GetIM();
 
 				static String		 QueryGSettings(const String &, const String &);
+				static String		 QueryXfConf(const String &, const String &);
 		};
 	};
 };

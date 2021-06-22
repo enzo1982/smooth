@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,10 +15,6 @@
 #include <smooth/init.h>
 
 using namespace X11;
-
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include <cairo/cairo-xlib.h>
 #include <pango/pangocairo.h>
@@ -38,39 +34,13 @@ S::Int S::GUI::FontCairo::Initialize()
 {
 	Font::Default = "Helvetica";
 
-	/* Search the path for gsettings.
-	 */
-	String			 path  = getenv("PATH");
-	const Array<String>	&paths = path.Explode(":");
+	String	 font = Backends::BackendXLib::QueryGSettings("org.gnome.desktop.interface", "font-name");
 
-	foreach (const String &path, paths)
+	if (font != NIL)
 	{
-		/* Check for gsettings in this path.
-		 */
-		if (File(String(path).Append("/").Append("gsettings")).Exists())
-		{
-			/* If gsettings exists, use it to get the default font.
-			 */
-			FILE	*pstdin = popen("gsettings get org.gnome.desktop.interface font-name", "r");
+		Font::Default = font.SubString(1, font.FindLast(" ") - 1);
 
-			if (pstdin != NIL)
-			{
-				char	 fontName[256];
-
-				if (fgets(fontName, 256, pstdin) != NIL)
-				{
-					String	 font = fontName;
-
-					Font::Default = font.SubString(1, font.FindLast(" ") - 1);
-
-					Setup::FontSize = font.SubString(font.FindLast(" ") + 1, font.Length() - font.FindLast(" ") - 2).ToFloat() / Font::DefaultSize;
-				}
-
-				pclose(pstdin);
-			}
-
-			break;
-		}
+		Setup::FontSize = font.SubString(font.FindLast(" ") + 1, font.Length() - font.FindLast(" ") - 2).ToFloat() / Font::DefaultSize;
 	}
 
 	return Success();

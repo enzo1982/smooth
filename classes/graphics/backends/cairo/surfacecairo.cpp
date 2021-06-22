@@ -214,9 +214,9 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 		System::DynamicLoader	 gdk("gdk-3");
 		gint			 (*ex_gdk_screen_get_monitor_scale_factor)(GdkScreen *, gint) = (gint (*)(GdkScreen *, gint)) gdk.GetFunctionAddress("gdk_screen_get_monitor_scale_factor");
 
-		/* Get scale factor.
+		/* Get GDK scale factor.
 		 */
-		Int	 scale = 1.0;
+		Float	 scale = 1.0;
 
 		if (ex_gdk_screen_get_monitor_scale_factor != NIL) scale = ex_gdk_screen_get_monitor_scale_factor(gdk_screen_get_default(), 0);
 		else						   scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));

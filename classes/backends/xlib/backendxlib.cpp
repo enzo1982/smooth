@@ -11,7 +11,10 @@
 #include <gtk/gtk.h>
 
 #include <smooth/backends/xlib/backendxlib.h>
+#include <smooth/files/file.h>
+#include <smooth/foreach.h>
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -195,4 +198,50 @@ Display *S::Backends::BackendXLib::GetDisplay()
 XIM S::Backends::BackendXLib::GetIM()
 {
 	return im;
+}
+
+S::String S::Backends::BackendXLib::FindExecutable(const String &executable)
+{
+	/* Search the path for executable.
+	 */
+	String			 path  = getenv("PATH");
+	const Array<String>	&paths = path.Explode(":");
+
+	foreach (const String &path, paths)
+	{
+		/* Check for executable in this path.
+		 */
+		File	 file(String(path).Append("/").Append(executable));
+
+		if (file.Exists()) return file;
+	}
+
+	return NIL;
+}
+
+S::String S::Backends::BackendXLib::QueryGSettings(const String &schema, const String &key)
+{
+	static String	 gsettings = FindExecutable("gsettings");
+
+	if (gsettings == NIL) return NIL;
+
+	/* Execute gsettings to query value.
+	 */
+	FILE	*pstdin = popen(String(gsettings).Append(" get ").Append(schema).Append(" ").Append(key), "r");
+
+	if (pstdin != NIL)
+	{
+		char	 value[256];
+
+		if (fgets(value, 256, pstdin) != NIL)
+		{
+			pclose(pstdin);
+
+			return value;
+		}
+
+		pclose(pstdin);
+	}
+
+	return NIL;
 }

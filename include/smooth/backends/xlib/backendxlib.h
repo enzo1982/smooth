@@ -52,6 +52,8 @@ namespace smooth
 			private:
 				static X11::Display	*display;
 				static X11::XIM		 im;
+
+				static String		 FindExecutable(const String &);
 			public:
 							 BackendXLib();
 				virtual			~BackendXLib();
@@ -63,6 +65,8 @@ namespace smooth
 
 				static X11::Display	*GetDisplay();
 				static X11::XIM		 GetIM();
+
+				static String		 QueryGSettings(const String &, const String &);
 		};
 	};
 };

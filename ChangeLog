@@ -26,7 +26,7 @@ dd.mm.21 hh:mm - smooth alpha 0.9.8
 
 - fixed several instances of undefined behavior found with -fsanitize=undefined
 - fixed translation field not being focused after selecting entries in Translator utility
-- upgraded libcurl to version 7.76.1
+- upgraded libcurl to version 7.77.0
 
 14.02.21 14:56 - smooth alpha 0.9.7
 

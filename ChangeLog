@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-dd.mm.21 hh:mm - smooth alpha 0.9.8
+27.06.21 13:24 - smooth alpha 0.9.8
 
 - imageloader.cpp	- added support for auto-detecting image formats
 - webp.cpp		- added support for WebP image decoding

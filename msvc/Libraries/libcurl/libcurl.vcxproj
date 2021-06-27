@@ -206,6 +206,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\asyn-ares.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\asyn-thread.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\base64.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\bufref.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\c-hyper.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\conncache.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\connect.c" />
@@ -361,6 +362,7 @@
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\arpa_telnet.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\asyn.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\bufref.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\c-hyper.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\config-win32.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\conncache.h" />

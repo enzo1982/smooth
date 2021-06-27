@@ -501,6 +501,9 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\gsasl.c">
       <Filter>Quelldateien\vauth</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\bufref.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h">
@@ -898,6 +901,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\rustls.h">
       <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\bufref.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

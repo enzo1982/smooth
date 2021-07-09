@@ -7,7 +7,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 # Change these variables to fit your project:
 ifeq ($(USE_BUNDLED_LIBXML2),True)
-	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libxml2
+	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libxml2 -DLIBXML_STATIC
 else ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I$(shell xcodebuild -sdk macosx -version | grep "^Path: " | head -n 1 | tail -c +7)/usr/include/libxml2
 else

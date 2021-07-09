@@ -3,6 +3,7 @@ ChangeLog for smooth
 dd.mm.21 hh:mm - smooth alpha 0.9.9
 
 - upgraded libcpuid to version 0.5.1
+- upgraded libxml2 to version 2.9.12
 
 27.06.21 13:24 - smooth alpha 0.9.8
 

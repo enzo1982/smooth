@@ -2,6 +2,8 @@ ChangeLog for smooth
 
 dd.mm.21 hh:mm - smooth alpha 0.9.9
 
+- dirdlg_win32.cpp	- prepend a newline to caption for improved layout
+
 - upgraded libcpuid to version 0.5.1
 - upgraded libxml2 to version 2.9.12
 

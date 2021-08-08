@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -29,7 +29,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 	info.pidlRoot	    = NIL;
 	info.pszDisplayName = buffer;
-	info.lpszTitle	    = caption;
+	info.lpszTitle	    = String("\n").Append(caption);
 	info.ulFlags	    = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
 	info.lpfn	    = &BrowseCallbackProc;
 	info.lParam	    = (LPARAM) this;

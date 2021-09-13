@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -21,15 +21,19 @@
 
 static tm localtime_p(time_t *time)
 {
-#ifdef __WIN32__
-	return *_localtime64(time);
-#else
 	tm	 lt;
 
+	memset(&lt, 0, sizeof(tm));
+
+#ifdef __WIN32__
+	tm	*ltp = _localtime64(time);
+
+	if (ltp != NULL) lt = *ltp;
+#else
 	localtime_r(time, &lt);
+#endif
 
 	return lt;
-#endif
 }
 
 S::DateTime::DateTime(Void *iTime)

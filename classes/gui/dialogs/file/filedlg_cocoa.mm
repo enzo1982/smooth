@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -142,7 +142,7 @@ using namespace smooth::GUI::Dialogs;
 
 		/* Run the panel.
 		 */
-		if (Backends::BackendCocoa::IsOSXVersionAtLeast(10, 15, 0))
+		if (Backends::BackendCocoa::IsOSXVersionAtLeast(10, 15, 0) && !Backends::BackendCocoa::IsOSXVersionAtLeast(12, 0, 0))
 		{
 			[panel beginSheetForDirectory: defaultPath != NIL ? [NSString stringWithUTF8String: defaultPath.ConvertTo("UTF-8")] : nil
 						 file: defaultFile != NIL ? [NSString stringWithUTF8String: defaultFile.ConvertTo("UTF-8")] : nil

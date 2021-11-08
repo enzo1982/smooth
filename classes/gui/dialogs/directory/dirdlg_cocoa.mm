@@ -102,6 +102,14 @@ using namespace smooth::GUI;
 		else
 		{
 			response = [panel runModal];
+
+			/* On macOS 12 the response can be NSModalResponseStop in some cases regardless of the button clicked.
+			 */
+			if (response == -1000)
+			{
+				if ([panel URL] != nil) response = NSOKButton;
+				else			response = NSCancelButton;
+			}
 		}
 
 		/* Get selected URL.

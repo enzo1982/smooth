@@ -157,6 +157,14 @@ using namespace smooth::GUI::Dialogs;
 		{
 			response = [panel runModalForDirectory: defaultPath != NIL ? [NSString stringWithUTF8String: defaultPath.ConvertTo("UTF-8")] : nil
 							  file: defaultFile != NIL ? [NSString stringWithUTF8String: defaultFile.ConvertTo("UTF-8")] : nil];
+
+			/* On macOS 12 the response can be NSModalResponseStop in some cases regardless of the button clicked.
+			 */
+			if (response == -1000)
+			{
+				if ([panel URL] != nil) response = NSFileHandlingPanelOKButton;
+				else			response = NSFileHandlingPanelCancelButton;
+			}
 		}
 
 		/* Get selected URLs.

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -42,10 +42,16 @@ static const char *smooth_sv =
 	     <entry string=\"Return\">Retur</entry>				\
 	     <entry string=\"Esc\">Esc</entry>					\
 	     <entry string=\"Space\">Mellanslag</entry>				\
-	     <entry string=\"Left\">Vänster</entry>				\
-	     <entry string=\"Up\">Upp</entry>					\
-	     <entry string=\"Right\">Höger</entry>				\
-	     <entry string=\"Down\">Ner</entry>					\
+	     <entry string=\"PgUp\">PgUp</entry>				\
+	     <entry string=\"PgDown\">PgDn</entry>				\
+	     <entry string=\"End\">End</entry>					\
+	     <entry string=\"Home\">Home</entry>				\
+	     <entry string=\"Left\">Vänsterpil</entry>				\
+	     <entry string=\"Up\">Uppåtpil</entry>				\
+	     <entry string=\"Right\">Högerpil</entry>				\
+	     <entry string=\"Down\">Nedåtpil</entry>				\
+	     <entry string=\"Ins\">Ins</entry>					\
+	     <entry string=\"Del\">Del</entry>					\
 	     <entry string=\"Ctrl\">Ctrl</entry>				\
 	     <entry string=\"Alt\">Alt</entry>					\
 	     <entry string=\"Shift\">Skift</entry>				\
@@ -58,11 +64,14 @@ static const char *smooth_sv =
 										\
 	     <entry string=\"Color selection\">Välj färg</entry>		\
 	     <entry string=\"HTML code\">HTML-kod</entry>			\
+	     <entry string=\"H\">F</entry>					\
+	     <entry string=\"S\">S</entry>					\
+	     <entry string=\"V\">H</entry>					\
 										\
 	     <entry string=\"Tip of the day\">Dagens tips</entry>		\
 	     <entry string=\"Did you know...\">Visste du ...</entry>		\
 	     <entry string=\"Show tips on startup\">Visa tips vid start</entry>	\
-	     <entry string=\"Next tip\">Nästa</entry>				\
+	     <entry string=\"Next tip\">Nästa tips</entry>			\
 	   </data>								\
 	 </LangFile>";
 

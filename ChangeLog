@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 dd.mm.21 hh:mm - smooth alpha 0.9.9
 
+- instream.cpp		- prevent opening folders with file IO classes
 - datetime.cpp		- fixed potential crash upon failed time conversion
 - filedlg_cocoa.mm	- fixed incompatibility with macOS 12.0 Monterey
 - dirdlg_win32.cpp	- prepend a newline to caption for improved layout

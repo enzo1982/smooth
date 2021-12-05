@@ -15,6 +15,7 @@
 #include <smooth/io/drivers/driver_ansi.h>
 #include <smooth/io/drivers/driver_memory.h>
 
+#include <smooth/files/directory.h>
 #include <smooth/files/file.h>
 
 #include <stdio.h>
@@ -49,6 +50,7 @@ S::IO::InStream::InStream(Int type, const String &fileName, Int mode)
 	outStream	 = NIL;
 
 	if (type != STREAM_FILE)		   { lastError = IO_ERROR_BADPARAM;			return; }
+	if (Directory(fileName).Exists())	   { lastError = IO_ERROR_BADPARAM;			return; }
 
 	driver		 = new DriverANSI(File(fileName), mode);
 

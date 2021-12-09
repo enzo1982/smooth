@@ -141,7 +141,7 @@ S::Void S::GUI::Tooltip::OnToolWindowEvent(Int message, Int wParam, Int lParam)
 
 	if (forwarding) return;
 
-	Window	*window	= container->GetContainerWindow();
+	Window	*window	= container ? container->GetContainerWindow() : NIL;
 
 	if (window == NIL) return;
 

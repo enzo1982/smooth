@@ -366,7 +366,7 @@ S::String S::IO::InStream::InputLine()
 		{
 			inpval = InputNumber(1);
 
-			if (inpval == -1)
+			if (inpval == 0 || inpval == -1)
 			{
 				stringBuffer[bytes] = 0;
 

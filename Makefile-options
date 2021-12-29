@@ -454,17 +454,6 @@ ifeq ($(findstring release,$(config)),release)
 		LDFLAGS_TOOLS += -Wl,-rpath,.
 	endif
 	endif
-
-	# Enable V8 when building on a supported platform
-	ifeq ($(BUILD_X86),True)
-		BUILD_V8 = True
-	else ifeq ($(BUILD_X86_64),True)
-		BUILD_V8 = True
-	else ifeq ($(BUILD_ARM),True)
-		BUILD_V8 = True
-	else ifeq ($(BUILD_MIPS),True)
-		BUILD_V8 = True
-	endif
 endif
 
 # Set debug specific options
@@ -495,17 +484,6 @@ ifeq ($(findstring debug,$(config)),debug)
 	ifneq ($(BUILD_OSX),True)
 		override LDFLAGS_TOOLS += -Wl,-rpath,.
 	endif
-	endif
-
-	# Enable V8 when building on a supported platform
-	ifeq ($(BUILD_X86),True)
-		BUILD_V8 = True
-	else ifeq ($(BUILD_X86_64),True)
-		BUILD_V8 = True
-	else ifeq ($(BUILD_ARM),True)
-		BUILD_V8 = True
-	else ifeq ($(BUILD_MIPS),True)
-		BUILD_V8 = True
 	endif
 endif
 

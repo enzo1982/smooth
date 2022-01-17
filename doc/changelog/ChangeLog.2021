@@ -1,0 +1,45 @@
+ChangeLog for smooth
+
+27.06.21 13:24 - smooth alpha 0.9.8
+
+- imageloader.cpp	- added support for auto-detecting image formats
+- webp.cpp		- added support for WebP image decoding
+- windowgdi.cpp		- improved scaling when setting icons via SetIcon()
+- init.cpp		- warn about incomplete application shutdown in debug builds
+- thread.cpp		- made it illegal to call Stop on the current thread
+			- fixed thread synchronization issues in wait and exit functions
+- array.cpp		- fixed thread synchronization issues when accessing arrays
+- rwlock.cpp		- fixed thread synchronization issues
+- combobox.cpp		- fixed dropdown staying open when parent window moves or resizes
+- popupmenu.cpp		- fixed popup staying open when parent window moves or resizes
+- popupmenuentry.cpp	- fixed occasional crashes when opening third level popup menus
+- backendxlib.cpp	- fixed timers being invoked in GTK threads despite denyTimerInterrupts state
+- backendcocoa.mm	- fixed possible crash when quitting applications through a dock command
+- surfacecocoa.mm	- fixed rendering of bitmaps with alpha channel
+- surfacecairo.cpp	- fixed drawing of diagonal lines when running in a Wayland session
+			- respect custom DPI settings on Xfce desktop
+- windowxlib.cpp	- fixed possible crash on exit when running in a Wayland session
+			- fixed drag & drop working unreliably
+			- fixed incorrect usage of XGetInputFocus API
+- application.cpp	- fixed determination of binary path on FreeBSD
+- file.cpp		- fixed accessing files via file:// URLs
+
+- fixed several instances of undefined behavior found with -fsanitize=undefined
+- fixed translation field not being focused after selecting entries in Translator utility
+- upgraded libcurl to version 7.77.0
+
+14.02.21 14:56 - smooth alpha 0.9.7
+
+- backendcocoa.mm	- added support for opening registered file types on macOS
+- screenxlib.cpp	- improved multi-monitor support for X11 based systems
+- surfacecocoa.mm	- fixed popup windows appearing black on older versions of macOS
+- backendxlib.cpp	- fixed issues querying GTK theme colors
+- window.cpp		- fixed drawing issues on KDE systems
+- arrows.cpp		- fixed unintentional wrap-around when going below zero value
+- cursor.cpp		- avoid sending two onInput signals when replacing selected text
+- semaphoreposix.cpp	- use custom semaphore implementation based on condition variable
+
+- added support for building for Apple Silicon Macs
+- implemented alpha-blending for drawing bitmaps with alpha channel
+- upgraded libcurl to version 7.73.0
+- upgraded libcpuid to version 0.5.0

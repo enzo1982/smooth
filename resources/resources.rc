@@ -22,7 +22,7 @@ BEGIN
             VALUE	"OriginalFilename",	"smooth.dll"
             VALUE	"ProductName",		"smooth Class Library"
             VALUE	"ProductVersion",	SMOOTH_PRODUCT
-            VALUE	"LegalCopyright",	"Copyright © 1998-2021 Robert Kausch"
+            VALUE	"LegalCopyright",	"Copyright © 1998-2022 Robert Kausch"
             VALUE	"Official website",	"http://www.smooth-project.org/"
             VALUE	"eMail contact",	"info@smooth-project.org"
         END

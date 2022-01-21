@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -15,10 +15,10 @@
 #define SMOOTH_APIVERSION "0.9.0"
 
 #ifdef SMOOTH_DLL
-# define SMOOTH_RESVERS	   0,9,9,5595
-# define SMOOTH_RESPROD	   0,9,9,5595
+# define SMOOTH_RESVERS	   0,9,9,5605
+# define SMOOTH_RESPROD	   0,9,9,5605
 # define SMOOTH_PRODUCT	  "0.9\0"
-# define SMOOTH_FILEVER	  "0.9.9.5595\0"
+# define SMOOTH_FILEVER	  "0.9.9.5605\0"
 #endif
 
 #endif

@@ -1,5 +1,9 @@
 ChangeLog for smooth
 
+dd.mm.yy hh:mm - smooth alpha 0.9.10
+
+- http.cpp		- fixed libcurl proxy feature detection
+
 21.01.22 19:17 - smooth alpha 0.9.9
 
 - instream.cpp		- prevent opening folders with file IO classes

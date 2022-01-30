@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -298,17 +298,17 @@ S::Int S::Net::Protocols::HTTP::DownloadToFile(const String &fileName)
 
 		if	(proxyMode == HTTP_PROXY_HTTP)	 curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
 
-#if defined CURLPROXY_HTTPS
+#if LIBCURL_VERSION_NUM >= 0x073400
 		else if (proxyMode == HTTP_PROXY_HTTPS)	 curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTPS);
 #endif
 
-#if defined CURLPROXY_SOCKS4A
+#if LIBCURL_VERSION_NUM >= 0x071200
 		else if (proxyMode == HTTP_PROXY_SOCKS4) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4A);
 #else
 		else if (proxyMode == HTTP_PROXY_SOCKS4) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4);
 #endif
 
-#if defined CURLPROXY_SOCKS5_HOSTNAME
+#if LIBCURL_VERSION_NUM >= 0x071200
 		else if (proxyMode == HTTP_PROXY_SOCKS5) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5_HOSTNAME);
 #else
 		else if (proxyMode == HTTP_PROXY_SOCKS5) curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);

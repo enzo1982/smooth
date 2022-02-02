@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,8 @@
 
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
+
+#include <smooth/files/directory.h>
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -53,7 +55,7 @@ S::IO::DriverPOSIX::DriverPOSIX(const String &file, Int mode) : Driver()
 	/* Add O_NOINHERIT and O_BINARY options and Unicode prefix on Windows.
 	 */
 	Int	 options  = O_NOINHERIT | O_BINARY;
-	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
+	String	 fileName = Directory::MakeExtendedPath(file);
 #else
 	/* Use O_CLOEXEC option on other systems.
 	 */

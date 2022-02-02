@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,7 @@
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
 
+#include <smooth/files/directory.h>
 #include <smooth/backends/win32/backendwin32.h>
 
 S::IO::DriverWin32::DriverWin32(const String &file, Int mode) : Driver()
@@ -22,7 +23,7 @@ S::IO::DriverWin32::DriverWin32(const String &file, Int mode) : Driver()
 
 	/* Build real filename to pass to CreateFile.
 	 */
-	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
+	String	 fileName = Directory::MakeExtendedPath(file);
 
 	switch (mode)
 	{

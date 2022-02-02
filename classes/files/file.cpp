@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -73,7 +73,7 @@ namespace smooth
 	{
 		if (!file.Exists()) return False;
 
-		HANDLE	 handle = CreateFile(String(Directory::GetUnicodePathPrefix(file)).Append(file), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		HANDLE	 handle = CreateFile(Directory::MakeExtendedPath(file), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 		::GetFileTime(handle, cTime, aTime, wTime);
 
@@ -86,7 +86,7 @@ namespace smooth
 	{
 		if (!file.Exists()) return False;
 
-		HANDLE	 handle = CreateFile(String(Directory::GetUnicodePathPrefix(file)).Append(file), GENERIC_WRITE, 0, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+		HANDLE	 handle = CreateFile(Directory::MakeExtendedPath(file), GENERIC_WRITE, 0, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 		::SetFileTime(handle, cTime, aTime, wTime);
 
@@ -266,7 +266,7 @@ S::Int64 S::File::GetFileSize() const
 	if (!Exists()) return -1;
 
 #ifdef __WIN32__
-	HANDLE	 handle	  = CreateFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
+	HANDLE	 handle	  = CreateFile(Directory::MakeExtendedPath(*this), GENERIC_READ, FILE_SHARE_READ, NIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NIL);
 
 	DWORD	 sizeLow  = 0;
 	DWORD	 sizeHigh = 0;
@@ -330,7 +330,7 @@ S::Bool S::File::Exists() const
 {
 #ifdef __WIN32__
 	WIN32_FIND_DATA	 findData;
-	HANDLE		 handle = FindFirstFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), &findData);
+	HANDLE		 handle = FindFirstFile(Directory::MakeExtendedPath(*this), &findData);
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
@@ -353,7 +353,7 @@ S::Int S::File::Create()
 	if (Exists()) return Error();
 
 #ifdef __WIN32__
-	HANDLE	 handle = CreateFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
+	HANDLE	 handle = CreateFile(Directory::MakeExtendedPath(*this), GENERIC_READ, FILE_SHARE_READ, NIL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NIL);
 
 	if (handle == INVALID_HANDLE_VALUE) return Error();
 
@@ -368,7 +368,7 @@ S::Int S::File::Copy(const File &destination)
 	if (!Exists()) return Error();
 
 #ifdef __WIN32__
-	Bool	 result = CopyFile(String(Directory::GetUnicodePathPrefix(*this)).Append(*this), String(Directory::GetUnicodePathPrefix(destination)).Append(destination), True);
+	Bool	 result = CopyFile(Directory::MakeExtendedPath(*this), Directory::MakeExtendedPath(destination), True);
 #else
 	Bool	 result = False;
 
@@ -410,12 +410,12 @@ S::Int S::File::Move(const File &destination)
 	if (!Exists()) return Error();
 
 #ifdef __WIN32__
-	String		 fileName	= String(Directory::GetUnicodePathPrefix(*this)).Append(*this);
+	String		 fileName	= Directory::MakeExtendedPath(*this);
 	UnsignedInt	 fileAttributes	= GetFileAttributes(fileName);
 
 	SetFileAttributes(fileName, fileAttributes & ~FILE_ATTRIBUTE_READONLY);
 
-	Bool	 result = MoveFile(fileName, String(Directory::GetUnicodePathPrefix(destination)).Append(destination));
+	Bool	 result = MoveFile(fileName, Directory::MakeExtendedPath(destination));
 
 	SetFileAttributes(fileName, fileAttributes);
 #else
@@ -431,7 +431,7 @@ S::Int S::File::Delete()
 	if (!Exists()) return Error();
 
 #ifdef __WIN32__
-	String	 fileName = String(Directory::GetUnicodePathPrefix(*this)).Append(*this);
+	String	 fileName = Directory::MakeExtendedPath(*this);
 
 	SetFileAttributes(fileName, GetFileAttributes(fileName) & ~FILE_ATTRIBUTE_READONLY);
 

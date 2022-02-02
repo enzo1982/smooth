@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,7 +37,6 @@
 #endif
 
 char	*S::Directory::directoryDelimiter = NIL;
-char	*S::Directory::unicodePathPrefix  = NIL;
 
 S::Directory::Directory()
 {
@@ -162,7 +161,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 
 #ifdef __WIN32__
 	WIN32_FIND_DATA	 findData;
-	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\").Append(pattern), &findData);
+	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this).Append("\\").Append(pattern), &findData);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
 
@@ -201,7 +200,7 @@ const S::Array<S::Directory> &S::Directory::GetDirectoriesByPattern(const String
 
 #ifdef __WIN32__
 	WIN32_FIND_DATA	 findData;
-	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\").Append(pattern), &findData);
+	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this).Append("\\").Append(pattern), &findData);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
 
@@ -241,8 +240,8 @@ S::DateTime S::Directory::GetCreateTime() const
 	if (!Exists()) return dateTime;
 
 #ifdef __WIN32__
-	WIN32_FIND_DATA findData;
-	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this), &findData);
+	WIN32_FIND_DATA	 findData;
+	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this), &findData);
 
 	FindClose(handle);
 
@@ -270,8 +269,8 @@ S::Bool S::Directory::Exists() const
 		else						  return False;
 	}
 
-	WIN32_FIND_DATAW	 findData;
-	HANDLE			 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this), &findData);
+	WIN32_FIND_DATA	 findData;
+	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this), &findData);
 
 	if (handle == INVALID_HANDLE_VALUE) return False;
 
@@ -303,7 +302,7 @@ S::Int S::Directory::Create()
 			String	 path = directory.Head(i);
 
 #ifdef __WIN32__
-			result = CreateDirectory(String(GetUnicodePathPrefix(path)).Append(path), NIL);
+			result = CreateDirectory(MakeExtendedPath(path), NIL);
 #else
 			if (mkdir(path.ConvertTo("UTF-8"), 0777) == 0) result = True;
 			else					       result = False;
@@ -325,7 +324,7 @@ S::Int S::Directory::Move(const Directory &destination)
 	if (!Exists()) return Error();
 
 #ifdef __WIN32__
-	Bool	 result = MoveFile(String(GetUnicodePathPrefix(*this)).Append(*this), String(GetUnicodePathPrefix(destination)).Append(destination));
+	Bool	 result = MoveFile(MakeExtendedPath(*this), MakeExtendedPath(destination));
 #else
 	Bool	 result = (rename(String(*this).ConvertTo("UTF-8"), String(destination).ConvertTo("UTF-8")) == 0);
 #endif
@@ -337,7 +336,7 @@ S::Int S::Directory::Move(const Directory &destination)
 S::Int S::Directory::Delete()
 {
 #ifdef __WIN32__
-	Bool	 result = RemoveDirectory(String(GetUnicodePathPrefix(*this)).Append(*this));
+	Bool	 result = RemoveDirectory(MakeExtendedPath(*this));
 #else
 	Bool	 result = (rmdir(String(*this).ConvertTo("UTF-8")) == 0);
 #endif
@@ -350,7 +349,7 @@ S::Int S::Directory::Empty()
 {
 #ifdef __WIN32__
 	WIN32_FIND_DATA	 findData;
-	HANDLE		 handle = FindFirstFile(String(GetUnicodePathPrefix(*this)).Append(*this).Append("\\*"), &findData);
+	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this).Append("\\*"), &findData);
 
 	if (handle == INVALID_HANDLE_VALUE) return Error();
 
@@ -395,19 +394,48 @@ const char *S::Directory::GetDirectoryDelimiter()
 const char *S::Directory::GetUnicodePathPrefix(const String &path)
 {
 #ifdef __WIN32__
-	if (path.StartsWith("\\\\")) return "";
-#endif
+	static const char	*unicodePathPrefix = "\\\\?\\";
 
-	if (unicodePathPrefix == NIL)
-	{
-#ifdef __WIN32__
-		unicodePathPrefix = (char *) "\\\\?\\";
-#else
-		unicodePathPrefix = (char *) "";
-#endif
-	}
+	if (path.StartsWith("\\\\")) return "";
 
 	return unicodePathPrefix;
+#endif
+
+	return "";
+}
+
+S::String S::Directory::MakeExtendedPath(const String &path)
+{
+#ifdef __WIN32__
+	static const String	 extendedPathPrefix = "\\\\?\\";
+	static const String	 uncPathPrefix	    = "\\\\?\\UNC\\";
+
+	if (!path.StartsWith(extendedPathPrefix))
+	{
+		if (path.StartsWith("\\\\")) return String(uncPathPrefix).Append(path.Tail(path.Length() - 2));
+
+		return String(extendedPathPrefix).Append(path);
+	}
+#endif
+
+	return path;
+}
+
+S::String S::Directory::StripExtendedPathPrefix(const String &path)
+{
+#ifdef __WIN32__
+	static const String	 extendedPathPrefix = "\\\\?\\";
+	static const String	 uncPathPrefix	    = "\\\\?\\UNC\\";
+
+	if (path.StartsWith(extendedPathPrefix))
+	{
+		if (path.StartsWith(uncPathPrefix)) return String("\\\\").Append(path.Tail(path.Length() - uncPathPrefix.Length()));
+
+		return path.Tail(path.Length() - extendedPathPrefix.Length());
+	}
+#endif
+
+	return path;
 }
 
 S::Directory S::Directory::GetActiveDirectory()
@@ -431,7 +459,7 @@ S::Directory S::Directory::GetActiveDirectory()
 S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 {
 #ifdef __WIN32__
-	Bool	 result = SetCurrentDirectory(String(GetUnicodePathPrefix(directory)).Append(directory).Append("\\"));
+	Bool	 result = SetCurrentDirectory(MakeExtendedPath(directory).Append("\\"));
 #else
 	Bool	 result = (chdir(String(directory).ConvertTo("UTF-8")) == 0);
 #endif

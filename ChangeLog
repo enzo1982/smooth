@@ -4,6 +4,9 @@ dd.mm.yy hh:mm - smooth alpha 0.9.10
 
 - http.cpp		- fixed libcurl proxy feature detection
 
+- fixed long paths being converted to 8.3 format on recent versions of Windows
+- fixed handling of long UNC paths on Windows
+
 21.01.22 19:17 - smooth alpha 0.9.9
 
 - instream.cpp		- prevent opening folders with file IO classes

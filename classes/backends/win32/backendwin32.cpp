@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,10 +9,13 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/win32/backendwin32.h>
+#include <smooth/files/directory.h>
 #include <smooth/gui/application/application.h>
 
 #include <shlobj.h>
 #include <iconv.h>
+
+#define MAX_EXT_PATH 32768
 
 size_t	 (*iconv)(iconv_t, char **, size_t *, char **, size_t *) = NIL;
 iconv_t	 (*iconv_open)(const char *, const char *)		 = NIL;
@@ -318,4 +321,17 @@ S::Bool S::Backends::BackendWin32::IsWindowsVersionAtLeast(UnsignedInt platformI
 						       (versionInfo.dwMajorVersion == majorVersion && versionInfo.dwMinorVersion >= minorVersion))) return True;
 
 	return False;
+}
+
+S::String S::Backends::BackendWin32::GetFullPathName(const String &shortPath)
+{
+	static const String	 extendedPathPrefix = "\\\\?\\";
+
+	if (shortPath.StartsWith(extendedPathPrefix)) return shortPath;
+
+	wchar_t	 buffer[MAX_EXT_PATH] = { 0 };
+
+	if (GetLongPathName(Directory::MakeExtendedPath(shortPath), buffer, MAX_EXT_PATH) == 0) return shortPath;
+
+	return Directory::StripExtendedPathPrefix(buffer);
 }

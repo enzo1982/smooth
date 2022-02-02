@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,7 @@
 
 #include <smooth/gui/window/backends/gdi/droptarget.h>
 #include <smooth/gui/window/backends/gdi/windowgdi.h>
+#include <smooth/backends/win32/backendwin32.h>
 
 const CLIPFORMAT	 smooth::GUI::DropTarget::CF_SHELLIDLIST = RegisterClipboardFormat(CFSTR_SHELLIDLIST);
 
@@ -42,7 +43,7 @@ smooth::Array<smooth::String> smooth::GUI::DropTarget::GetFilesFromHDROP(HDROP h
 	{
 		DragQueryFile(hDrop, i, buffer, buffer.Size());
 
-		fileNames.Add(String(buffer));
+		fileNames.Add(Backends::BackendWin32::GetFullPathName(String(buffer)));
 	}
 
 	return fileNames;
@@ -70,7 +71,7 @@ smooth::Array<smooth::String> smooth::GUI::DropTarget::GetFilesFromCIDA(CIDA *ci
 
 		if (shellItem->GetDisplayName(SIGDN_FILESYSPATH, &path) == S_OK)
 		{
-			fileNames.Add(path);
+			fileNames.Add(Backends::BackendWin32::GetFullPathName(path));
 
 			CoTaskMemFree(path);
 		}

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,9 +11,13 @@
 #include <smooth/gui/dialogs/filedlg.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/files/directory.h>
+#include <smooth/backends/win32/backendwin32.h>
+#include <smooth/foreach.h>
 
 #include <windows.h>
 #include <commdlg.h>
+
+#define MAX_EXT_PATH 32768
 
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
@@ -25,48 +29,44 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 	if (defExt != NIL)
 	{
-		for (Int k = 0; k < filters.Length(); k++)
+		foreach (const String &filter, filters)
 		{
-			if (filters.GetNth(k).ToLower().Contains(String("*.").Append(defExt).ToLower()))
-			{
-				filterIndex = k + 1;
+			if (!filter.ToLower().Contains(String("*.").Append(defExt).ToLower())) continue;
 
-				break;
-			}
+			filterIndex = foreachindex + 1;
+
+			break;
 		}
 	}
 
 	/* Configure and display dialog.
 	 */
-	Int	 bpos = 0;
+	OPENFILENAME	 ofn		      = { 0 };
+	wchar_t		 filter[MAX_EXT_PATH] = { 0 };
+	wchar_t		 buffer[MAX_EXT_PATH] = { 0 };
 
-	static OPENFILENAME	 ofn;
-	wchar_t			*filter = new wchar_t [32768];
-	wchar_t			*buffer = new wchar_t [32768];
-
-	for (Int i = 0; i < 32768; i++)		   buffer[i] = 0;
-	for (Int n = 0; n < defFile.Length(); n++) buffer[n] = defFile[n];
+	wcsncpy(buffer, defFile, defFile.Length());
 
 	if (parentWindow != NIL) ofn.hwndOwner = (HWND) parentWindow->GetSystemWindow();
-	else			 ofn.hwndOwner = NIL;
 
-	ofn.lStructSize	    = sizeof(OPENFILENAMEW);
+	ofn.lStructSize	    = sizeof(OPENFILENAME);
 	ofn.nFilterIndex    = filterIndex;
 	ofn.lpstrFile	    = buffer;
-	ofn.nMaxFile	    = 32768;
-	ofn.lpstrFileTitle  = NIL;
+	ofn.nMaxFile	    = MAX_EXT_PATH;
 	ofn.lpstrInitialDir = defPath;
 	ofn.lpstrTitle	    = caption;
 	ofn.Flags	    = OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER | flags;
 	ofn.lpstrDefExt	    = defExt;
 
-	for (Int k = 0; k < filters.Length(); k++)
+	Int	 bpos = 0;
+
+	for (Int i = 0; i < filters.Length(); i++)
 	{
-		for (Int l = 0; l < filterNames.GetNth(k).Length(); l++) filter[bpos++] = filterNames.GetNth(k)[l];
+		for (Int n = 0; n < filterNames.GetNth(i).Length(); n++) filter[bpos++] = filterNames.GetNth(i)[n];
 
 		filter[bpos++] = 0;
 
-		for (Int m = 0; m < filters.GetNth(k).Length(); m++) filter[bpos++] = filters.GetNth(k)[m];
+		for (Int n = 0; n < filters.GetNth(i).Length(); n++) filter[bpos++] = filters.GetNth(i)[n];
 
 		filter[bpos++] = 0;
 	}
@@ -78,63 +78,59 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 	if	(mode == SFM_OPEN) { ofn.Flags |= OFN_FILEMUSTEXIST; result = GetOpenFileName(&ofn); }
 	else if (mode == SFM_SAVE) {				     result = GetSaveFileName(&ofn); }
 
-	if (result)
+	if (!result)
 	{
-		Int	 n;
-		Int	 pos = 0;
-		String	 dir;
-		String	 file;
-		wchar_t	*buffer2 = new wchar_t [32768];
+		error = Error();
 
-		for (n = 0; n < 32768; n++)
+		return error;
+	}
+
+	/* Extract file names from result buffer.
+	 */
+	Int	 n;
+	Int	 pos = 0;
+	String	 folder;
+	wchar_t	 name[MAX_EXT_PATH];
+
+	for (n = 0; n < MAX_EXT_PATH; n++)
+	{
+		name[pos++] = buffer[n];
+
+		if (buffer[n] == 0)
 		{
-			buffer2[pos++] = buffer[n];
+			folder = name;
+
+			break;
+		}
+	}
+
+	if (flags & SFD_ALLOWMULTISELECT)
+	{
+		n++;
+		pos = 0;
+
+		for (; n < MAX_EXT_PATH; n++)
+		{
+			name[pos++] = buffer[n];
 
 			if (buffer[n] == 0)
 			{
-				dir.Copy(buffer2);
+				String	 file = String(folder).Append(Directory::GetDirectoryDelimiter()).Append(name);
 
-				break;
+				if (file.EndsWith(Directory::GetDirectoryDelimiter())) file[file.Length() - 1] = 0;
+
+				files.Add(Backends::BackendWin32::GetFullPathName(file));
+
+				pos = 0;
+
+				if (buffer[n + 1] == 0) break;
 			}
 		}
-
-		if (flags & SFD_ALLOWMULTISELECT)
-		{
-			n++;
-			pos = 0;
-
-			for (; n < 32768; n++)
-			{
-				buffer2[pos++] = buffer[n];
-
-				if (buffer[n] == 0)
-				{
-					file = file.Copy(dir).Append(Directory::GetDirectoryDelimiter()).Append(buffer2);
-
-					if (file.EndsWith(Directory::GetDirectoryDelimiter())) file[file.Length() - 1] = 0;
-
-					files.Add(file);
-
-					pos = 0;
-
-					if (buffer[n + 1] == 0) break;
-				}
-			}
-		}
-		else
-		{
-			files.Add(dir);
-		}
-
-		delete [] buffer2;
 	}
 	else
 	{
-		error = Error();
+		files.Add(Backends::BackendWin32::GetFullPathName(folder));
 	}
-
-	delete [] buffer;
-	delete [] filter;
 
 	return error;
 }

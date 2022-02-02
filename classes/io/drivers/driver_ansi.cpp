@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,8 @@
 
 #include <smooth/io/instream.h>
 #include <smooth/io/outstream.h>
+
+#include <smooth/files/directory.h>
 
 #include <stdio.h>
 #include <errno.h>
@@ -44,7 +46,7 @@ S::IO::DriverANSI::DriverANSI(const String &file, Int mode) : Driver()
 	/* Add N mode option and Unicode prefix on Windows.
 	 */
 	String	 options  = "N";
-	String	 fileName = String(file.StartsWith("\\\\") ? "" : "\\\\?\\").Append(file);
+	String	 fileName = Directory::MakeExtendedPath(file);
 #else
 	/* Use e mode option on other systems.
 	 */

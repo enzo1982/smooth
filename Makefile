@@ -167,6 +167,8 @@ ifeq ($(USE_BUNDLED_LIBICONV),True)
 	LIBS += $(LIBDIR)/libiconv.a
 else ifeq ($(BUILD_OSX),True)
 	LIBS += -liconv
+else ifeq ($(BUILD_HAIKU),True)
+	LIBS += -liconv
 endif
 
 ifeq ($(USE_BUNDLED_LIBJPEG),True)

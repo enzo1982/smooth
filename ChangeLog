@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 dd.mm.yy hh:mm - smooth alpha 0.9.10
 
+- fontcairo.cpp		- respect text scaling factor in addition to font size setting
 - http.cpp		- fixed libcurl proxy feature detection
 
 - fixed long paths being converted to 8.3 format on recent versions of Windows

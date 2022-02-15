@@ -34,16 +34,19 @@ S::Int	 addFontCairoInitTmp = S::AddInitFunction(&S::GUI::FontCairo::Initialize)
 
 S::Int S::GUI::FontCairo::Initialize()
 {
-	Font::Default = "Helvetica";
+	Font::Default	= "Helvetica";
+	Setup::FontSize = 1.0;
 
-	String	 font = Backends::BackendXLib::QueryGSettings("org.gnome.desktop.interface", "font-name");
+	String	 font	     = Backends::BackendXLib::QueryGSettings("org.gnome.desktop.interface", "font-name");
+	Float	 scaleFactor = Backends::BackendXLib::QueryGSettings("org.gnome.desktop.interface", "text-scaling-factor").ToFloat();
 
 	if (font != NIL)
 	{
-		Font::Default = font.SubString(1, font.FindLast(" ") - 1);
-
+		Font::Default	= font.SubString(1, font.FindLast(" ") - 1);
 		Setup::FontSize = font.SubString(font.FindLast(" ") + 1, font.Length() - font.FindLast(" ") - 2).ToFloat() / Font::DefaultSize;
 	}
+
+	if (scaleFactor != 0) Setup::FontSize *= scaleFactor;
 
 	return Success();
 }

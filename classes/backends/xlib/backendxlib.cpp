@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -12,6 +12,8 @@
 
 #include <smooth/backends/xlib/backendxlib.h>
 #include <smooth/files/file.h>
+#include <smooth/io/instream.h>
+#include <smooth/system/system.h>
 #include <smooth/foreach.h>
 
 #include <unistd.h>
@@ -241,6 +243,38 @@ S::String S::Backends::BackendXLib::QueryGSettings(const String &schema, const S
 		}
 
 		pclose(pstdin);
+	}
+
+	return NIL;
+}
+
+S::String S::Backends::BackendXLib::QueryKDESettings(const String &category, const String &key)
+{
+	File		 kdeConfig("kdeglobals", System::System::GetApplicationDataDirectory());
+
+	if (!kdeConfig.Exists()) return NIL;
+
+	IO::InStream	 in(IO::STREAM_FILE, kdeConfig, IO::IS_READ);
+
+	/* Find category header.
+	 */
+	while (in.GetPos() < in.Size())
+	{
+		String	 line = in.InputLine();
+
+		if (line == String("[").Append(category).Append("]")) break;
+	}
+
+	/* Find key.
+	 */
+	while (in.GetPos() < in.Size())
+	{
+		String	 line = in.InputLine();
+
+		if ( line.StartsWith("["))	       break;
+		if (!line.StartsWith(key.Append("="))) continue;
+
+		return line.Tail(line.Length() - line.Find("=") - 1);
 	}
 
 	return NIL;

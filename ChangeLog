@@ -2,6 +2,7 @@ ChangeLog for smooth
 
 dd.mm.yy hh:mm - smooth alpha 0.9.10
 
+- backendxlib.cpp	- added support for KDE color schemes (including dark mode)
 - fontcairo.cpp		- respect text scaling factor in addition to font size setting
 - surfacecairo.cpp	- attempt to read desktop scale factor from KDE settings if GDK query fails
 - http.cpp		- fixed libcurl proxy feature detection

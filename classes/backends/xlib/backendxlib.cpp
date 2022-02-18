@@ -70,6 +70,16 @@ static GdkRGBA get_gtk_color(GType type, const gchar *className, GtkStateFlags s
 	return color;
 }
 
+static S::GUI::Color get_kde_color(const S::String &category, const S::String &color)
+{
+	S::String			 spec	= S::Backends::BackendXLib::QueryKDESettings(S::String("Colors:").Append(category), color);
+	const S::Array<S::String>	&values = spec.Explode(",");
+
+	if (values.Length() != 3) return S::GUI::Color();
+
+	return S::GUI::Color(values.GetNth(0).ToInt(), values.GetNth(1).ToInt(), values.GetNth(2).ToInt());
+}
+
 S::Backends::Backend *CreateBackendXLib()
 {
 	return new S::Backends::BackendXLib();
@@ -143,11 +153,28 @@ S::Int S::Backends::BackendXLib::Deinit()
 
 S::Void S::Backends::BackendXLib::UpdateColors()
 {
+	/* Check desktop environment.
+	 */
+	String			 desktop = getenv("XDG_CURRENT_DESKTOP");
+	const Array<String>	&IDs	 = desktop.Explode(":");
+
+	foreach (const String &ID, IDs)
+	{
+		if (ID == "KDE" && UpdateColorsKDE()) return;
+	}
+
+	UpdateColorsGnome();
+}
+
+S::Bool S::Backends::BackendXLib::UpdateColorsGnome()
+{
 	/* Query UI colors defined in GTK theme.
 	 */
 	GdkRGBA	 backgroundColor    = get_gtk_color(GTK_TYPE_WINDOW, GTK_STYLE_CLASS_BACKGROUND, GTK_STATE_FLAG_NORMAL, true);
 
 	GdkRGBA	 textColor	    = get_gtk_color(GTK_TYPE_BUTTON, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, false);
+
+	if (gdk_rgba_equal(&backgroundColor, &textColor)) return False;
 
 	GdkRGBA	 clientColor	    = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, true);
 	GdkRGBA	 clientTextColor    = get_gtk_color(GTK_TYPE_TEXT_VIEW, GTK_STYLE_CLASS_VIEW, GTK_STATE_FLAG_NORMAL, false);
@@ -190,6 +217,50 @@ S::Void S::Backends::BackendXLib::UpdateColors()
 		Setup::LinkColor	  = GUI::Color(255 * linkColor.red, 255 * linkColor.green, 255 * linkColor.blue);
 		Setup::LinkHighlightColor = GUI::Color(255 * linkHighlightColor.red, 255 * linkHighlightColor.green, 255 * linkHighlightColor.blue);
 	}
+
+	return True;
+}
+
+S::Bool S::Backends::BackendXLib::UpdateColorsKDE()
+{
+	GUI::Color	 backgroundColor = get_kde_color("Window", "BackgroundNormal");
+	GUI::Color	 textColor	 = get_kde_color("Window", "ForegroundNormal");
+
+	if (backgroundColor == textColor) return False;
+
+	Setup::BackgroundColor	  = backgroundColor;
+	Setup::TextColor	  = textColor;
+	Setup::InactiveTextColor  = get_kde_color("Window", "ForegroundInactive");
+
+	if (Setup::BackgroundColor.Grayscale() < Setup::TextColor.Grayscale())
+	{
+		GUI::Color	 backgroundAlternate = get_kde_color("Window", "BackgroundAlternate");
+
+		if (backgroundAlternate.Grayscale() > Setup::BackgroundColor.Grayscale()) Setup::BackgroundColor = backgroundAlternate;
+	}
+
+	Setup::LightGrayColor	  = GUI::Color(Setup::BackgroundColor.GetRed() + (255 - Setup::BackgroundColor.GetRed()) * 0.6, Setup::BackgroundColor.GetGreen() + (255 - Setup::BackgroundColor.GetGreen()) * 0.6, Setup::BackgroundColor.GetBlue() + (255 - Setup::BackgroundColor.GetBlue()) * 0.6);
+
+	Setup::ClientColor	  = get_kde_color("View", "BackgroundNormal");
+	Setup::ClientTextColor	  = get_kde_color("View", "ForegroundNormal");
+
+	Setup::DividerLightColor  = Setup::LightGrayColor;
+	Setup::DividerDarkColor	  = GUI::Color(Setup::BackgroundColor.GetRed() * 0.7, Setup::BackgroundColor.GetGreen() * 0.7, Setup::BackgroundColor.GetBlue() * 0.7);
+
+	Setup::HighlightColor	  = get_kde_color("Selection", "BackgroundNormal");
+	Setup::HighlightTextColor = get_kde_color("Selection", "ForegroundNormal");
+
+	Setup::GradientStartColor = GUI::Color(Setup::HighlightColor.GetRed() * 0.75, Setup::HighlightColor.GetGreen() * 0.75, Setup::HighlightColor.GetBlue() * 0.75);
+	Setup::GradientEndColor	  = GUI::Color(Setup::HighlightColor.GetRed() + (255 - Setup::HighlightColor.GetRed()) * 0.15, Setup::HighlightColor.GetGreen() + (255 - Setup::HighlightColor.GetGreen()) * 0.15, Setup::HighlightColor.GetBlue() + (255 - Setup::HighlightColor.GetBlue()) * 0.15);
+	Setup::GradientTextColor  = Setup::HighlightTextColor;
+
+	Setup::TooltipColor	  = get_kde_color("Tooltip", "BackgroundNormal");
+	Setup::TooltipTextColor	  = get_kde_color("Tooltip", "ForegroundNormal");
+
+	Setup::LinkColor	  = get_kde_color("Window", "ForegroundLink");
+	Setup::LinkHighlightColor = get_kde_color("Window", "ForegroundActive");
+
+	return True;
 }
 
 Display *S::Backends::BackendXLib::GetDisplay()

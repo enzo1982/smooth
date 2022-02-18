@@ -54,6 +54,9 @@ namespace smooth
 				static X11::XIM		 im;
 
 				static String		 FindExecutable(const String &);
+
+				static Bool		 UpdateColorsGnome();
+				static Bool		 UpdateColorsKDE();
 			public:
 							 BackendXLib();
 				virtual			~BackendXLib();

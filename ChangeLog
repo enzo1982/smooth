@@ -9,6 +9,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.10
 
 - fixed long paths being converted to 8.3 format on recent versions of Windows
 - fixed handling of long UNC paths on Windows
+- upgraded libxml2 to version 2.9.13
 
 21.01.22 19:17 - smooth alpha 0.9.9
 

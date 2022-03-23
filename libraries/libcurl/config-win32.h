@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -36,14 +36,8 @@
 /* Define if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
 
-/* Define if you have the <crypto.h> header file. */
-/* #define HAVE_CRYPTO_H 1 */
-
 /* Define if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
-
-/* Define if you have the <err.h> header file. */
-/* #define HAVE_ERR_H 1 */
 
 /* Define if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
@@ -82,9 +76,6 @@
 
 /* Define if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
-
-/* Define if you have the <sgtty.h> header file. */
-/* #define HAVE_SGTTY_H 1 */
 
 /* Define if you have the <ssl.h> header file. */
 /* #define HAVE_SSL_H 1 */
@@ -133,16 +124,12 @@
 #define HAVE_TIME_H 1
 
 /* Define if you have the <unistd.h> header file. */
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(__LCC__) || \
-    defined(__POCC__)
+#if defined(__MINGW32__) || defined(__LCC__) || defined(__POCC__)
 #define HAVE_UNISTD_H 1
 #endif
 
 /* Define if you have the <windows.h> header file. */
 #define HAVE_WINDOWS_H 1
-
-/* Define if you have the <winsock.h> header file. */
-#define HAVE_WINSOCK_H 1
 
 /* Define if you have the <winsock2.h> header file. */
 #ifndef __SALFORDC__
@@ -157,9 +144,6 @@
 /* ---------------------------------------------------------------- */
 /*                        OTHER HEADER INFO                         */
 /* ---------------------------------------------------------------- */
-
-/* Define if sig_atomic_t is an available typedef. */
-#define HAVE_SIG_ATOMIC_T 1
 
 /* Define if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -191,9 +175,6 @@
 /* Define to 1 if you have the getsockname function. */
 #define HAVE_GETSOCKNAME 1
 
-/* Define if you have the gethostbyaddr function. */
-#define HAVE_GETHOSTBYADDR 1
-
 /* Define if you have the gethostname function. */
 #define HAVE_GETHOSTNAME 1
 
@@ -217,9 +198,6 @@
 
 /* Define if you have a working ioctlsocket FIONBIO function. */
 #define HAVE_IOCTLSOCKET_FIONBIO 1
-
-/* Define if you have the perror function. */
-#define HAVE_PERROR 1
 
 /* Define if you have the RAND_screen function when using SSL. */
 #define HAVE_RAND_SCREEN 1
@@ -267,7 +245,7 @@
 #define HAVE_STRSTR 1
 
 /* Define if you have the strtoll function. */
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(__POCC__) || \
+#if defined(__MINGW32__) || defined(__POCC__) || \
     (defined(_MSC_VER) && (_MSC_VER >= 1800))
 #define HAVE_STRTOLL 1
 #endif
@@ -349,9 +327,7 @@
 
 /* Define if ssize_t is not an available 'typedefed' type. */
 #ifndef _SSIZE_T_DEFINED
-#  if (defined(__WATCOMC__) && (__WATCOMC__ >= 1240)) || \
-      defined(__POCC__) || \
-      defined(__MINGW32__)
+#  if defined(__POCC__) || defined(__MINGW32__)
 #  elif defined(_WIN64)
 #    define _SSIZE_T_DEFINED
 #    define ssize_t __int64
@@ -399,7 +375,6 @@
 
 #ifdef USE_LWIPSOCK
 #  undef USE_WINSOCK
-#  undef HAVE_WINSOCK_H
 #  undef HAVE_WINSOCK2_H
 #  undef HAVE_WS2TCPIP_H
 #  undef HAVE_ERRNO_H
@@ -430,7 +405,6 @@
   #undef byte
   #undef word
   #undef USE_WINSOCK
-  #undef HAVE_WINSOCK_H
   #undef HAVE_WINSOCK2_H
   #undef HAVE_WS2TCPIP_H
   #define HAVE_GETADDRINFO
@@ -463,7 +437,7 @@
 #endif
 
 /* Define if the compiler supports the 'long long' data type. */
-#if defined(__MINGW32__) || defined(__WATCOMC__)      || \
+#if defined(__MINGW32__) || \
     (defined(_MSC_VER)     && (_MSC_VER     >= 1310)) || \
     (defined(__BORLANDC__) && (__BORLANDC__ >= 0x561))
 #define HAVE_LONGLONG 1
@@ -627,10 +601,6 @@ Vista
 #  define USE_WIN32_LARGE_FILES
 #endif
 
-#if defined(__WATCOMC__) && !defined(USE_WIN32_LARGE_FILES)
-#  define USE_WIN32_LARGE_FILES
-#endif
-
 #if defined(__POCC__)
 #  undef USE_WIN32_LARGE_FILES
 #endif
@@ -677,13 +647,6 @@ Vista
 #define USE_WIN32_LDAP 1
 #endif
 
-#if defined(__WATCOMC__) && defined(USE_WIN32_LDAP)
-#if __WATCOMC__ < 1280
-#define WINBERAPI  __declspec(cdecl)
-#define WINLDAPAPI __declspec(cdecl)
-#endif
-#endif
-
 #if defined(__POCC__) && defined(USE_WIN32_LDAP)
 #  define CURL_DISABLE_LDAP 1
 #endif
@@ -693,22 +656,8 @@ Vista
 #define USE_WIN32_CRYPTO
 #endif
 
-/* On MinGW the ADDRESS_FAMILY typedef was committed alongside LUP_SECURE,
-   so we use it to check for the presence of the typedef. */
-#include <ws2tcpip.h>
-#if !defined(__MINGW32__) || defined(LUP_SECURE)
 /* Define to use Unix sockets. */
 #define USE_UNIX_SOCKETS
-#if !defined(UNIX_PATH_MAX)
-  /* Replicating logic present in afunix.h of newer Windows 10 SDK versions */
-# define UNIX_PATH_MAX 108
-  /* !checksrc! disable TYPEDEFSTRUCT 1 */
-  typedef struct sockaddr_un {
-    ADDRESS_FAMILY sun_family;
-    char sun_path[UNIX_PATH_MAX];
-  } SOCKADDR_UN, *PSOCKADDR_UN;
-#endif
-#endif
 
 /* ---------------------------------------------------------------- */
 /*                       ADDITIONAL DEFINITIONS                     */

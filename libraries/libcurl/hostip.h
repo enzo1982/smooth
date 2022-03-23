@@ -71,6 +71,8 @@ struct Curl_dns_entry {
   long inuse;
 };
 
+bool Curl_host_is_ipnum(const char *hostname);
+
 /*
  * Curl_resolv() returns an entry with the info for the specified host
  * and port.
@@ -95,7 +97,7 @@ enum resolve_t Curl_resolv_timeout(struct Curl_easy *data,
                                    struct Curl_dns_entry **dnsentry,
                                    timediff_t timeoutms);
 
-#ifdef CURLRES_IPV6
+#ifdef ENABLE_IPV6
 /*
  * Curl_ipv6works() returns TRUE if IPv6 seems to work.
  */
@@ -127,8 +129,8 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 void Curl_resolv_unlock(struct Curl_easy *data,
                         struct Curl_dns_entry *dns);
 
-/* init a new dns cache and return success */
-int Curl_mk_dnscache(struct Curl_hash *hash);
+/* init a new dns cache */
+void Curl_init_dnscache(struct Curl_hash *hash);
 
 /* prune old entries from the DNS cache */
 void Curl_hostcache_prune(struct Curl_easy *data);

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -46,10 +46,6 @@
 #include <libpsl.h>
 #endif
 
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-#include <iconv.h>
-#endif
-
 #ifdef USE_LIBRTMP
 #include <librtmp/rtmp.h>
 #endif
@@ -75,28 +71,26 @@
 #endif
 
 #ifdef HAVE_BROTLI
-static size_t brotli_version(char *buf, size_t bufsz)
+static void brotli_version(char *buf, size_t bufsz)
 {
   uint32_t brotli_version = BrotliDecoderVersion();
   unsigned int major = brotli_version >> 24;
   unsigned int minor = (brotli_version & 0x00FFFFFF) >> 12;
   unsigned int patch = brotli_version & 0x00000FFF;
-
-  return msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
+  (void)msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
 }
 #endif
 
 #ifdef HAVE_ZSTD
-static size_t zstd_version(char *buf, size_t bufsz)
+static void zstd_version(char *buf, size_t bufsz)
 {
   unsigned long zstd_version = (unsigned long)ZSTD_versionNumber();
   unsigned int major = (unsigned int)(zstd_version / (100 * 100));
   unsigned int minor = (unsigned int)((zstd_version -
-                         (major * 100 * 100)) / 100);
+                                       (major * 100 * 100)) / 100);
   unsigned int patch = (unsigned int)(zstd_version -
-                         (major * 100 * 100) - (minor * 100));
-
-  return msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
+                                      (major * 100 * 100) - (minor * 100));
+  (void)msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
 }
 #endif
 
@@ -108,7 +102,7 @@ static size_t zstd_version(char *buf, size_t bufsz)
  * zeros in the data.
  */
 
-#define VERSION_PARTS 17 /* number of substrings we can concatenate */
+#define VERSION_PARTS 16 /* number of substrings we can concatenate */
 
 char *curl_version(void)
 {
@@ -136,9 +130,6 @@ char *curl_version(void)
 #endif
 #ifdef USE_LIBPSL
   char psl_version[40];
-#endif
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-  char iconv_version[40]="iconv";
 #endif
 #ifdef USE_SSH
   char ssh_version[40];
@@ -208,15 +199,7 @@ char *curl_version(void)
   msnprintf(psl_version, sizeof(psl_version), "libpsl/%s", psl_get_version());
   src[i++] = psl_version;
 #endif
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-#ifdef _LIBICONV_VERSION
-  msnprintf(iconv_version, sizeof(iconv_version), "iconv/%d.%d",
-            _LIBICONV_VERSION >> 8, _LIBICONV_VERSION & 255);
-#else
-  /* version unknown, let the default stand */
-#endif /* _LIBICONV_VERSION */
-  src[i++] = iconv_version;
-#endif
+
 #ifdef USE_SSH
   Curl_ssh_version(ssh_version, sizeof(ssh_version));
   src[i++] = ssh_version;
@@ -435,9 +418,6 @@ static curl_version_info_data version_info = {
 #if defined(WIN32) && defined(UNICODE) && defined(_UNICODE)
   | CURL_VERSION_UNICODE
 #endif
-#if defined(CURL_DOES_CONVERSIONS)
-  | CURL_VERSION_CONV
-#endif
 #if defined(USE_TLS_SRP)
   | CURL_VERSION_TLSAUTH_SRP
 #endif
@@ -551,15 +531,6 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
     version_info.features |= CURL_VERSION_IDN;
 #elif defined(USE_WIN32_IDN)
   version_info.features |= CURL_VERSION_IDN;
-#endif
-
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-#ifdef _LIBICONV_VERSION
-  version_info.iconv_ver_num = _LIBICONV_VERSION;
-#else
-  /* version unknown */
-  version_info.iconv_ver_num = -1;
-#endif /* _LIBICONV_VERSION */
 #endif
 
 #if defined(USE_SSH)

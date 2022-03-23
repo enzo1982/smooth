@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -68,7 +68,6 @@
 #include "slist.h"
 #include "mime.h"
 #include "amigaos.h"
-#include "non-ascii.h"
 #include "warnless.h"
 #include "multiif.h"
 #include "sigpipe.h"
@@ -117,7 +116,7 @@ curl_realloc_callback Curl_crealloc = (curl_realloc_callback)realloc;
 curl_strdup_callback Curl_cstrdup = (curl_strdup_callback)system_strdup;
 curl_calloc_callback Curl_ccalloc = (curl_calloc_callback)calloc;
 #if defined(WIN32) && defined(UNICODE)
-curl_wcsdup_callback Curl_cwcsdup = (curl_wcsdup_callback)_wcsdup;
+curl_wcsdup_callback Curl_cwcsdup = Curl_wcsdup;
 #endif
 
 #if defined(_MSC_VER) && defined(_DLL) && !defined(__POCC__)
@@ -165,12 +164,6 @@ static CURLcode global_init(long flags, bool memoryfuncs)
   if(!Curl_amiga_init()) {
     DEBUGF(fprintf(stderr, "Error: Curl_amiga_init failed\n"));
     goto fail;
-  }
-#endif
-
-#ifdef NETWARE
-  if(netware_init()) {
-    DEBUGF(fprintf(stderr, "Warning: LONG namespace not available\n"));
   }
 #endif
 
@@ -417,13 +410,13 @@ static int events_socket(struct Curl_easy *easy,      /* easy handle */
           ev->list = nxt;
         free(m);
         m = nxt;
-        infof(easy, "socket cb: socket %d REMOVED\n", s);
+        infof(easy, "socket cb: socket %d REMOVED", s);
       }
       else {
         /* The socket 's' is already being monitored, update the activity
            mask. Convert from libcurl bitmask to the poll one. */
         m->socket.events = socketcb2poll(what);
-        infof(easy, "socket cb: socket %d UPDATED as %s%s\n", s,
+        infof(easy, "socket cb: socket %d UPDATED as %s%s", s,
               (what&CURL_POLL_IN)?"IN":"",
               (what&CURL_POLL_OUT)?"OUT":"");
       }
@@ -447,7 +440,7 @@ static int events_socket(struct Curl_easy *easy,      /* easy handle */
         m->socket.events = socketcb2poll(what);
         m->socket.revents = 0;
         ev->list = m;
-        infof(easy, "socket cb: socket %d ADDED as %s%s\n", s,
+        infof(easy, "socket cb: socket %d ADDED as %s%s", s,
               (what&CURL_POLL_IN)?"IN":"",
               (what&CURL_POLL_OUT)?"OUT":"");
       }
@@ -532,7 +525,7 @@ static CURLcode wait_or_timeout(struct Curl_multi *multi, struct events *ev)
         if(fds[i].revents) {
           /* socket activity, tell libcurl */
           int act = poll2cselect(fds[i].revents); /* convert */
-          infof(multi->easyp, "call curl_multi_socket_action(socket %d)\n",
+          infof(multi->easyp, "call curl_multi_socket_action(socket %d)",
                 fds[i].fd);
           mcode = curl_multi_socket_action(multi, fds[i].fd, act,
                                            &ev->running_handles);
@@ -822,7 +815,7 @@ static CURLcode dupset(struct Curl_easy *dst, struct Curl_easy *src)
 struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
 {
   struct Curl_easy *outcurl = calloc(1, sizeof(struct Curl_easy));
-  if(NULL == outcurl)
+  if(!outcurl)
     goto fail;
 
   /*
@@ -933,8 +926,6 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
   }
 #endif /* USE_ARES */
 
-  Curl_convert_setup(outcurl);
-
   Curl_initinfo(outcurl);
 
   outcurl->magic = CURLEASY_MAGIC_NUMBER;
@@ -1027,7 +1018,7 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
 
   if((newstate & (KEEP_RECV_PAUSE| KEEP_SEND_PAUSE)) == oldstate) {
     /* Not changing any pause state, return */
-    DEBUGF(infof(data, "pause: no change, early return\n"));
+    DEBUGF(infof(data, "pause: no change, early return"));
     return CURLE_OK;
   }
 
@@ -1087,14 +1078,16 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
       /* if not pausing again, force a recv/send check of this connection as
          the data might've been read off the socket already */
       data->conn->cselect_bits = CURL_CSELECT_IN | CURL_CSELECT_OUT;
-    if(data->multi)
-      Curl_update_timer(data->multi);
+    if(data->multi) {
+      if(Curl_update_timer(data->multi))
+        return CURLE_ABORTED_BY_CALLBACK;
+    }
   }
 
   if(!data->state.done)
     /* This transfer may have been moved in or out of the bundle, update the
        corresponding socket callback, if used */
-    Curl_updatesocket(data);
+    result = Curl_updatesocket(data);
 
   return result;
 }
@@ -1213,9 +1206,16 @@ static int conn_upkeep(struct Curl_easy *data,
   /* Param is unused. */
   (void)param;
 
-  if(conn->handler->connection_check)
+  if(conn->handler->connection_check) {
+    /* briefly attach the connection to this transfer for the purpose of
+       checking it */
+    Curl_attach_connnection(data, conn);
+
     /* Do a protocol-specific keepalive check on the connection. */
     conn->handler->connection_check(data, conn, CONNCHECK_KEEPALIVE);
+    /* detach the connection again */
+    Curl_detach_connnection(data);
+  }
 
   return 0; /* continue iteration */
 }

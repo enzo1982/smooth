@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -101,14 +101,6 @@
 #  include "config-os400.h"
 #endif
 
-#ifdef TPF
-#  include "config-tpf.h"
-#endif
-
-#ifdef __VXWORKS__
-#  include "config-vxworks.h"
-#endif
-
 #ifdef __PLAN9__
 #  include "config-plan9.h"
 #endif
@@ -166,41 +158,47 @@
  */
 
 #ifdef HTTP_ONLY
-#  ifndef CURL_DISABLE_TFTP
-#    define CURL_DISABLE_TFTP
-#  endif
-#  ifndef CURL_DISABLE_FTP
-#    define CURL_DISABLE_FTP
-#  endif
-#  ifndef CURL_DISABLE_LDAP
-#    define CURL_DISABLE_LDAP
-#  endif
-#  ifndef CURL_DISABLE_TELNET
-#    define CURL_DISABLE_TELNET
-#  endif
 #  ifndef CURL_DISABLE_DICT
 #    define CURL_DISABLE_DICT
 #  endif
 #  ifndef CURL_DISABLE_FILE
 #    define CURL_DISABLE_FILE
 #  endif
-#  ifndef CURL_DISABLE_RTSP
-#    define CURL_DISABLE_RTSP
-#  endif
-#  ifndef CURL_DISABLE_POP3
-#    define CURL_DISABLE_POP3
-#  endif
-#  ifndef CURL_DISABLE_IMAP
-#    define CURL_DISABLE_IMAP
-#  endif
-#  ifndef CURL_DISABLE_SMTP
-#    define CURL_DISABLE_SMTP
+#  ifndef CURL_DISABLE_FTP
+#    define CURL_DISABLE_FTP
 #  endif
 #  ifndef CURL_DISABLE_GOPHER
 #    define CURL_DISABLE_GOPHER
 #  endif
+#  ifndef CURL_DISABLE_IMAP
+#    define CURL_DISABLE_IMAP
+#  endif
+#  ifndef CURL_DISABLE_LDAP
+#    define CURL_DISABLE_LDAP
+#  endif
+#  ifndef CURL_DISABLE_LDAPS
+#    define CURL_DISABLE_LDAPS
+#  endif
+#  ifndef CURL_DISABLE_MQTT
+#    define CURL_DISABLE_MQTT
+#  endif
+#  ifndef CURL_DISABLE_POP3
+#    define CURL_DISABLE_POP3
+#  endif
+#  ifndef CURL_DISABLE_RTSP
+#    define CURL_DISABLE_RTSP
+#  endif
 #  ifndef CURL_DISABLE_SMB
 #    define CURL_DISABLE_SMB
+#  endif
+#  ifndef CURL_DISABLE_SMTP
+#    define CURL_DISABLE_SMTP
+#  endif
+#  ifndef CURL_DISABLE_TELNET
+#    define CURL_DISABLE_TELNET
+#  endif
+#  ifndef CURL_DISABLE_TFTP
+#    define CURL_DISABLE_TFTP
 #  endif
 #endif
 
@@ -266,22 +264,6 @@
 
 #ifdef HAVE_EXTRA_STRDUP_H
 #  include <extra/strdup.h>
-#endif
-
-#ifdef TPF
-#  include <strings.h>    /* for bzero, strcasecmp, and strncasecmp */
-#  include <string.h>     /* for strcpy and strlen */
-#  include <stdlib.h>     /* for rand and srand */
-#  include <sys/socket.h> /* for select and ioctl*/
-#  include <netdb.h>      /* for in_addr_t definition */
-#  include <tpf/sysapi.h> /* for tpf_process_signals */
-   /* change which select is used for libcurl */
-#  define select(a,b,c,d,e) tpf_select_libcurl(a,b,c,d,e)
-#endif
-
-#ifdef __VXWORKS__
-#  include <sockLib.h>    /* for generic BSD socket functions */
-#  include <ioLib.h>      /* for basic I/O interface functions */
 #endif
 
 #ifdef __AMIGA__
@@ -456,6 +438,15 @@
 #endif
 #endif
 
+#ifndef SSIZE_T_MAX
+/* some limits.h headers have this defined, some don't */
+#if defined(SIZEOF_SIZE_T) && (SIZEOF_SIZE_T > 4)
+#define SSIZE_T_MAX 9223372036854775807
+#else
+#define SSIZE_T_MAX 2147483647
+#endif
+#endif
+
 /*
  * Arg 2 type for gethostname in case it hasn't been defined in config file.
  */
@@ -604,14 +595,6 @@
 #  endif
 #endif
 
-#ifdef NETWARE
-int netware_init(void);
-#ifndef __NOVELL_LIBC__
-#include <sys/bsdskt.h>
-#include <sys/timeval.h>
-#endif
-#endif
-
 #if defined(HAVE_LIBIDN2) && defined(HAVE_IDN2_H) && !defined(USE_WIN32_IDN)
 /* The lib and header are present */
 #define USE_LIBIDN2
@@ -626,7 +609,7 @@ int netware_init(void);
 #if defined(USE_GNUTLS) || defined(USE_OPENSSL) || defined(USE_NSS) || \
     defined(USE_MBEDTLS) || \
     defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || \
-    defined(USE_SECTRANSP) || defined(USE_GSKIT) || defined(USE_MESALINK) || \
+    defined(USE_SECTRANSP) || defined(USE_GSKIT) || \
     defined(USE_BEARSSL) || defined(USE_RUSTLS)
 #define USE_SSL    /* SSL support has been enabled */
 #endif
@@ -644,24 +627,16 @@ int netware_init(void);
 #endif
 
 /* Single point where USE_NTLM definition might be defined */
-#ifndef CURL_DISABLE_CRYPTO_AUTH
-#if defined(USE_OPENSSL) || defined(USE_MBEDTLS) ||                     \
-  defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_SECTRANSP) ||  \
-  defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO) ||              \
-  (defined(USE_WOLFSSL) && defined(HAVE_WOLFSSL_DES_ECB_ENCRYPT))
-
-#define USE_CURL_NTLM_CORE
-
-#  if defined(USE_MBEDTLS)
-/* Get definition of MBEDTLS_MD4_C */
-#  include <mbedtls/md4.h>
+#if !defined(CURL_DISABLE_CRYPTO_AUTH) && !defined(CURL_DISABLE_NTLM)
+#  if defined(USE_OPENSSL) || defined(USE_MBEDTLS) ||                       \
+      defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_SECTRANSP) ||  \
+      defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO) ||              \
+      (defined(USE_WOLFSSL) && defined(HAVE_WOLFSSL_DES_ECB_ENCRYPT))
+#    define USE_CURL_NTLM_CORE
 #  endif
-
-#endif
-
-#if defined(USE_CURL_NTLM_CORE) || defined(USE_WINDOWS_SSPI)
-#define USE_NTLM
-#endif
+#  if defined(USE_CURL_NTLM_CORE) || defined(USE_WINDOWS_SSPI)
+#    define USE_NTLM
+#  endif
 #endif
 
 #ifdef CURL_WANTS_CA_BUNDLE_ENV
@@ -710,7 +685,6 @@ int netware_init(void);
 #if defined(__LWIP_OPT_H__) || defined(LWIP_HDR_OPT_H)
 #  if defined(SOCKET) || \
      defined(USE_WINSOCK) || \
-     defined(HAVE_WINSOCK_H) || \
      defined(HAVE_WINSOCK2_H) || \
      defined(HAVE_WS2TCPIP_H)
 #    error "WinSock and lwIP TCP/IP stack definitions shall not coexist!"
@@ -798,6 +772,11 @@ endings either CRLF or LF so 't' is appropriate.
 #define CURLMAX(x,y) ((x)>(y)?(x):(y))
 #define CURLMIN(x,y) ((x)<(y)?(x):(y))
 
+/* A convenience macro to provide both the string literal and the length of
+   the string literal in one go, useful for functions that take "string,len"
+   as their argument */
+#define STRCONST(x) x,sizeof(x)-1
+
 /* Some versions of the Android SDK is missing the declaration */
 #if defined(HAVE_GETPWUID_R) && defined(HAVE_DECL_GETPWUID_R_MISSING)
 struct passwd;
@@ -817,6 +796,23 @@ int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
 
 #if defined(USE_NGTCP2) || defined(USE_QUICHE)
 #define ENABLE_QUIC
+#endif
+
+#if defined(USE_UNIX_SOCKETS) && defined(WIN32)
+#  if defined(__MINGW32__) && !defined(LUP_SECURE)
+     typedef u_short ADDRESS_FAMILY; /* Classic mingw, 11y+ old mingw-w64 */
+#  endif
+#  if !defined(UNIX_PATH_MAX)
+     /* Replicating logic present in afunix.h
+        (distributed with newer Windows 10 SDK versions only) */
+#    define UNIX_PATH_MAX 108
+     /* !checksrc! disable TYPEDEFSTRUCT 1 */
+     typedef struct sockaddr_un {
+       ADDRESS_FAMILY sun_family;
+       char sun_path[UNIX_PATH_MAX];
+     } SOCKADDR_UN, *PSOCKADDR_UN;
+#    define WIN32_SOCKADDR_UN
+#  endif
 #endif
 
 #endif /* HEADER_CURL_SETUP_H */

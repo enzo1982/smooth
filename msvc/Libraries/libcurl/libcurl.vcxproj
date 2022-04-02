@@ -249,7 +249,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\hash.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\hmac.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\hostasyn.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\hostcheck.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\hostip.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\hostip4.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\hostip6.c" />
@@ -279,10 +278,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\mqtt.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\multi.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\netrc.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\non-ascii.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\nonblock.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\nwlib.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\nwos.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\openldap.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\parsedate.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\pingpong.c" />
@@ -342,10 +338,10 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\bearssl.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\gskit.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\gtls.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\hostcheck.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\keylog.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\mbedtls.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\mbedtls_threadlock.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\vtls\mesalink.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\nss.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\openssl.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\rustls.c" />
@@ -354,9 +350,9 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\sectransp.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\vtls.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\wolfssl.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\x509asn1.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\warnless.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\wildcard.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\x509asn1.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h" />

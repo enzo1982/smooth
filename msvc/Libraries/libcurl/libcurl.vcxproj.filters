@@ -204,9 +204,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\hostasyn.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\hostcheck.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\hostip.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -282,16 +279,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\netrc.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\non-ascii.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\nonblock.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\nwlib.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\nwos.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\openldap.c">
@@ -390,16 +378,10 @@
     <ClCompile Include="..\..\..\libraries\libcurl\wildcard.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\x509asn1.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\mime.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\bearssl.c">
-      <Filter>Quelldateien\vtls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vtls\mesalink.c">
       <Filter>Quelldateien\vtls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\schannel_verify.c">
@@ -503,6 +485,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\bufref.c">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\hostcheck.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\x509asn1.c">
+      <Filter>Quelldateien\vtls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

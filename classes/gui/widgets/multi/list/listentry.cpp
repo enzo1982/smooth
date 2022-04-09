@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2018 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -250,9 +250,14 @@ S::Int S::GUI::ListEntry::Deselect()
 
 S::Void S::GUI::ListEntry::InitDrag()
 {
-	if (!mouseOver && container->GetObjectType() == ListBox::classID)
+	if (container->GetObjectType() == ListBox::classID)
 	{
-		((ListBox *) container)->DragSelectedEntry(container->GetContainerWindow()->GetMousePosition().y < GetRealPosition().y ? True : False);
+		Point	 mousePos  = container->GetContainerWindow()->GetMousePosition();
+		Point	 entryPos  = GetRealPosition();
+		Size	 entrySize = GetRealSize();
+
+		if	(mousePos.y <  entryPos.y		) ((ListBox *) container)->DragSelectedEntry(True);
+		else if (mousePos.y >= entryPos.y + entrySize.cy) ((ListBox *) container)->DragSelectedEntry(False);
 	}
 }
 

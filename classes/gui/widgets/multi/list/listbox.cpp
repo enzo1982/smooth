@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -221,24 +221,64 @@ S::Int S::GUI::ListBox::DragSelectedEntry(Bool upDown)
 {
 	if (!(flags & LF_ALLOWREORDER)) return Error();
 
+	/* Get entry numbers to switch and check.
+	 */
 	Int	 selectedEntryNumber = GetSelectedEntryNumber();
 	Int	 newEntryNumber	     = selectedEntryNumber;
+	Int	 checkEntryNumber    = selectedEntryNumber;
 
-	if	( upDown && selectedEntryNumber != 0)		 newEntryNumber = selectedEntryNumber - 1;
-	else if (!upDown && selectedEntryNumber != Length() - 1) newEntryNumber = selectedEntryNumber + 1;
+	if (upDown)
+	{
+		newEntryNumber	 = Math::Max(0, selectedEntryNumber - 1);
+		checkEntryNumber = Math::Max(0, newEntryNumber	    - 1);
+	}
+	else
+	{
+		newEntryNumber	 = Math::Min(selectedEntryNumber + 1, Length() - 1);
+		checkEntryNumber = Math::Min(newEntryNumber	 + 1, Length() - 1);
+	}
 
-	Int	 oldSbPos = scrollbarPos;
-
-	if	(newEntryNumber < scrollbarPos)		    scrollbarPos--;
-	else if (!GetNthEntry(newEntryNumber)->IsVisible()) scrollbarPos++;
-
+	/* Check whether entry should be moved.
+	 */
 	if (selectedEntryNumber != newEntryNumber)
 	{
+		Int	 oldScrollbarPos = scrollbarPos;
+
+		/* Check whether to scroll the whole list.
+		 */
+		ListEntry	*checkEntry = GetNthEntry(checkEntryNumber);
+
+		if (!checkEntry->IsVisible() || checkEntry->GetVisibleArea().GetHeight() <= 2)
+		{
+			if (upDown) scrollbarPos -= scrollbar->GetStepSize();
+			else	    scrollbarPos += scrollbar->GetStepSize();
+		}
+
+		/* Move entry to new position.
+		 */
 		MoveEntry(selectedEntryNumber, newEntryNumber);
+
+		/* Redraw the list.
+		 */
+		Surface		*surface  = GetDrawSurface();
+		ListEntry	*oldEntry = GetNthEntry(selectedEntryNumber);
+
+		surface->StartPaint(Rect(GetRealPosition(), GetRealSize()));
 
 		Paint(SP_PAINT);
 
-		if (scrollbarPos != oldSbPos) System::System::Sleep(100);
+		oldEntry->Process(SM_MOUSEMOVE, 0, 0);
+
+		surface->EndPaint();
+
+		/* If list was scrolled, delay next action by 100ms.
+		 */
+		if (scrollbarPos != oldScrollbarPos) System::System::Sleep(100);
+	}
+	else
+	{
+		if (upDown) ScrollUp(ScrollToTop);
+		else	    ScrollDown(ScrollToBottom);
 	}
 
 	return Success();

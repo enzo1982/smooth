@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -10,6 +10,10 @@
 
 #include <smooth/misc/number.h>
 #include <smooth/misc/math.h>
+
+static const S::String	 kZero	= "0";
+static const S::String	 kMinus	= "-";
+static const S::String	 kPoint	= ".";
 
 S::Number::Number(const Int64 iNumber)
 {
@@ -92,88 +96,107 @@ S::Bool S::Number::operator !=(const Number &number) const
 	return !(*this == number);
 }
 
-S::Number S::Number::FromIntString(const String &iString)
+S::Number S::Number::FromIntString(const String &string)
 {
-	String	 string = iString.ToLower();
-	Int	 sign	= (string[0] == '-' ? -1 : 1);
+	Int	 first = string[0];
+	Int	 sign  = (first == '-' ? -1 : 1);
+	Int	 skip  = 0;
 
-	if (string[0] == '-' || string[0] == '+') string = string.Tail(string.Length() - 1);
+	if (first == '-' || first == '+') skip = 1;
 
-	Int	 length = 0;
+	Int	 length = string.Length();
+	Int	 digits = 0;
 
-	for (Int i = 0; i < string.Length(); i++)
+	for (Int i = skip; i < length; i++)
 	{
-		if	((string[i] >= '0' && string[i] <= '9')) length++;
-		else						 break;
+		Int	 digit = string[i];
+
+		if ((digit >= '0' && digit <= '9')) digits++;
+		else				    break;
 	}
 
 	Int64	 value = 0;
 
-	for (Int i = 0; i < length; i++)
+	for (Int i = 0; i < digits; i++)
 	{
-		value += Int64(string[i] - '0') * (Int64) Math::Pow(10, length - i - 1);
+		value += Int64(string[skip + i] - '0') * (Int64) Math::Pow(10, digits - i - 1);
 	}
 
 	return value * sign;
 }
 
-S::Number S::Number::FromFloatString(const String &iString)
+S::Number S::Number::FromFloatString(const String &string)
 {
-	String	 string = iString.ToLower();
-	Int	 sign	= (string[0] == '-' ? -1 : 1);
+	Int	 first = string[0];
+	Int	 sign  = (first == '-' ? -1 : 1);
+	Int	 skip  = 0;
 
-	if (string[0] == '-' || string[0] == '+') string = string.Tail(string.Length() - 1);
+	if (first == '-' || first == '+') skip = 1;
 
-	Int	 length = 0;
+	Int	 length = string.Length();
+	Int	 digits = 0;
 
-	for (Int i = 0; i < string.Length(); i++)
+	for (Int i = skip; i < length; i++)
 	{
-		if	((string[i] >= '0' && string[i] <= '9')) length++;
-		else						 break;
+		Int	 digit = string[i];
+
+		if ((digit >= '0' && digit <= '9')) digits++;
+		else				    break;
 	}
 
-	Int	 lengthafp = 0;
+	Int	 digitsafp = 0;
 
-	if (string[length] == '.')
+	if (string[skip + digits] == '.')
 	{
-		for (Int i = length + 1; i < string.Length(); i++)
+		for (Int i = skip + digits + 1; i < length; i++)
 		{
-			if	((string[i] >= '0' && string[i] <= '9')) lengthafp++;
-			else						 break;
+			Int	 digit = string[i];
+
+			if ((digit >= '0' && digit <= '9')) digitsafp++;
+			else				    break;
 		}
 	}
 
 	Float	 value = Number::FromIntString(string);
 
-	for (Int i = 0; i < lengthafp; i++)
+	for (Int i = 0; i < digitsafp; i++)
 	{
-		value += Float(string[i + length + 1] - '0') * Math::Pow(10, 0 - i - 1);
+		value += Float(string[skip + digits + 1 + i] - '0') * Math::Pow(10, 0 - i - 1);
 	}
 
 	return value * sign;
 }
 
-S::Number S::Number::FromHexString(const String &iString)
+S::Number S::Number::FromHexString(const String &string)
 {
-	String	 string = iString.ToLower();
+	Int	 first  = string[0];
+	Int	 second = string[1];
+	Int	 skip	= 0;
 
-	if (string.StartsWith("0x")) string = string.Tail(string.Length() - 2);
+	if (first == '0' && (second == 'x' || second == 'X')) skip = 2;
 
-	Int	 length = 0;
+	Int	 length = string.Length();
+	Int	 digits = 0;
 
-	for (Int i = 0; i < string.Length(); i++)
+	for (Int i = skip; i < length; i++)
 	{
-		if	((string[i] >= '0' && string[i] <= '9') ||
-			 (string[i] >= 'a' && string[i] <= 'f')) length++;
-		else						 break;
+		Int	 digit = string[i];
+
+		if ((digit >= '0' && digit <= '9') ||
+		    (digit >= 'A' && digit <= 'F') ||
+		    (digit >= 'a' && digit <= 'f')) digits++;
+		else				    break;
 	}
 
 	Int64	 value = 0;
 
-	for (Int i = 0; i < length; i++)
+	for (Int i = 0; i < digits; i++)
 	{
-		if	(string[i] >= '0' && string[i] <= '9') value += (Int64(string[i] - '0')	     << ((length - i - 1) * 4));
-		else if (string[i] >= 'a' && string[i] <= 'f') value += (Int64(string[i] - 'a' + 10) << ((length - i - 1) * 4));
+		Int	 digit = string[skip + i];
+
+		if	(digit >= '0' && digit <= '9') value += (Int64(digit - '0')	 << ((digits - i - 1) * 4));
+		else if (digit >= 'A' && digit <= 'F') value += (Int64(digit - 'A' + 10) << ((digits - i - 1) * 4));
+		else if (digit >= 'a' && digit <= 'f') value += (Int64(digit - 'a' + 10) << ((digits - i - 1) * 4));
 	}
 
 	return value;
@@ -181,17 +204,17 @@ S::Number S::Number::FromHexString(const String &iString)
 
 S::String S::Number::ToIntString() const
 {
-	if (intValue == 0) return "0";
+	if (intValue == 0) return kZero;
 
 	String	 string;
 	Int	 length = (Int) Math::Log10(Math::Abs(intValue)) + 1;
 
 	for (Int i = 0; i < length; i++)
 	{
-		string[string.Length()] = '0' + Int64(Math::Abs(intValue) / Math::Pow(10, length - i - 1)) % 10;
+		string[i] = '0' + Int64(Math::Abs(intValue) / Math::Pow(10, length - i - 1)) % 10;
 	}
 
-	if (intValue < 0) string = String("-").Append(string);
+	if (intValue < 0) string = String(kMinus).Append(string);
 
 	return string;
 }
@@ -229,14 +252,14 @@ S::String S::Number::ToFloatString() const
 	}
 	else if (fract > 0)
 	{
-		string.Append(".");
+		string.Append(kPoint);
 
-		for (Int i = 0; i < lead; i++) string.Append("0");
+		for (Int i = 0; i < lead; i++) string.Append(kZero);
 
 		string.Append(Number(fract).ToIntString());
 	}
 
-	if (floatValue < 0) string = String("-").Append(string);
+	if (floatValue < 0) string = String(kMinus).Append(string);
 
 	return string;
 }
@@ -244,12 +267,13 @@ S::String S::Number::ToFloatString() const
 S::String S::Number::ToHexString(Int length) const
 {
 	String	 string;
+	Int	 stringPos = 0;
 
 	for (Int i = 0; i < 16; i++)
 	{
-		if	(((intValue >> (4 * (15 - i))) & 15) >= 10) string[string.Length()] = 'a' + ((intValue >> (4 * (15 - i))) & 15) - 10;
-		else if (((intValue >> (4 * (15 - i))) & 15) >=  1) string[string.Length()] = '0' + ((intValue >> (4 * (15 - i))) & 15);
-		else if (string.Length()		     >   0) string[string.Length()] = '0';
+		if	(((intValue >> (4 * (15 - i))) & 15) >= 10) string[stringPos++] = 'a' + ((intValue >> (4 * (15 - i))) & 15) - 10;
+		else if (((intValue >> (4 * (15 - i))) & 15) >=  1) string[stringPos++] = '0' + ((intValue >> (4 * (15 - i))) & 15);
+		else if (stringPos			     >   0) string[stringPos++] = '0';
 	}
 
 	if (length != -1)

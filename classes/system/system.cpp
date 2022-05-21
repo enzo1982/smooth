@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -255,7 +255,9 @@ S::Bool S::System::System::OpenURL(const String &url)
 
 S::String S::System::System::GetWindowsRootDirectory()
 {
-	String	 windowsDir;
+	static String	 windowsDir;
+
+	if (windowsDir != NIL) return windowsDir;
 
 #ifdef __WIN32__
 	Buffer<wchar_t>	 buffer(32768 + 1);
@@ -273,7 +275,9 @@ S::String S::System::System::GetWindowsRootDirectory()
 
 S::String S::System::System::GetProgramFilesDirectory()
 {
-	String	 programsDir;
+	static String	 programsDir;
+
+	if (programsDir != NIL) return programsDir;
 
 #ifdef __WIN32__
 	HKEY	 currentVersion;
@@ -311,8 +315,11 @@ S::String S::System::System::GetProgramFilesDirectory()
 
 S::String S::System::System::GetApplicationDataDirectory()
 {
+	static String	 configDir;
+
+	if (configDir != NIL) return configDir;
+
 	String::InputFormat	 inputFormat("UTF-8");
-	String			 configDir;
 
 #if defined __WIN32__
 	ITEMIDLIST	*idlist;
@@ -364,8 +371,11 @@ S::String S::System::System::GetApplicationDataDirectory()
 
 S::String S::System::System::GetApplicationCacheDirectory()
 {
+	static String	 cacheDir;
+
+	if (cacheDir != NIL) return cacheDir;
+
 	String::InputFormat	 inputFormat("UTF-8");
-	String			 cacheDir;
 
 #if defined __WIN32__
 	ITEMIDLIST	*idlist;
@@ -417,8 +427,11 @@ S::String S::System::System::GetApplicationCacheDirectory()
 
 S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 {
+	static String	 personalDir[NumPersonalFilesTypes];
+
+	if (personalDir[type] != NIL) return personalDir[type];
+
 	String::InputFormat	 inputFormat("UTF-8");
-	String			 personalDir;
 
 #ifdef __WIN32__
 	ITEMIDLIST	*idlist;
@@ -450,16 +463,16 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 
 	SHGetPathFromIDList(idlist, buffer);
 
-	personalDir = buffer;
+	personalDir[type] = buffer;
 
 	CoTaskMemFree(idlist);
 
-	if (personalDir == NIL) personalDir = "C:";
+	if (personalDir[type] == NIL) personalDir[type] = "C:";
 #else
 	passwd	*pw = getpwuid(getuid());
 
-	if (pw != NIL)	personalDir = pw->pw_dir;
-	else		personalDir = "~";
+	if (pw != NIL)	personalDir[type] = pw->pw_dir;
+	else		personalDir[type] = "~";
 
 #ifdef __APPLE__
 	OSErr	 error = -1;
@@ -500,7 +513,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 
 				CFStringGetCString(path, buffer, buffer.Size(), kCFStringEncodingUTF8);
 
-				personalDir = buffer;
+				personalDir[type] = buffer;
 
 				CFRelease(path);
 			}
@@ -511,7 +524,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 #else
 	String	 configHome = getenv("XDG_CONFIG_HOME");
 
-	if (configHome == NIL) configHome = String(personalDir).Append("/.config");
+	if (configHome == NIL) configHome = String(personalDir[type]).Append("/.config");
 
 	if (File(String(configHome).Append("/user-dirs.dirs")).Exists())
 	{
@@ -527,7 +540,7 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 			    (type == PersonalFilesMovies    && entry.StartsWith("XDG_VIDEOS_DIR"   )) ||
 			    (type == PersonalFilesDownloads && entry.StartsWith("XDG_DOWNLOAD_DIR" )))
 			{
-				personalDir = entry.SubString(entry.Find("\"") + 1, entry.FindLast("\"") - entry.Find("\"") - 1).Replace("$HOME", personalDir);
+				personalDir[type] = entry.SubString(entry.Find("\"") + 1, entry.FindLast("\"") - entry.Find("\"") - 1).Replace("$HOME", personalDir[type]);
 
 				break;
 			}
@@ -536,15 +549,19 @@ S::String S::System::System::GetPersonalFilesDirectory(PersonalFilesType type)
 #endif
 #endif
 
-	if (!personalDir.EndsWith(Directory::GetDirectoryDelimiter())) personalDir.Append(Directory::GetDirectoryDelimiter());
-	if ( personalDir == Directory::GetDirectoryDelimiter())	       personalDir = NIL;
+	if (!personalDir[type].EndsWith(Directory::GetDirectoryDelimiter())) personalDir[type].Append(Directory::GetDirectoryDelimiter());
+	if ( personalDir[type] == Directory::GetDirectoryDelimiter())	     personalDir[type] = NIL;
 
-	return personalDir;
+	return personalDir[type];
 }
 
 S::String S::System::System::GetResourcesDirectory()
 {
-	String	 resourcesDir = GUI::Application::GetApplicationDirectory();
+	static String	 resourcesDir;
+
+	if (resourcesDir != NIL) return resourcesDir;
+
+	resourcesDir = GUI::Application::GetApplicationDirectory();
 
 #if !defined __WIN32__
 	resourcesDir[resourcesDir.Length() - 1]					    = 0;
@@ -567,8 +584,11 @@ S::String S::System::System::GetResourcesDirectory()
 
 S::String S::System::System::GetTempDirectory()
 {
+	static String	 tempDir;
+
+	if (tempDir != NIL) return tempDir;
+
 	String::InputFormat	 inputFormat("UTF-8");
-	String			 tempDir;
 
 #if defined __WIN32__
 	Buffer<wchar_t>	 buffer(32768 + 1);

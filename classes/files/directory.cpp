@@ -36,6 +36,18 @@
 #	endif
 #endif
 
+static const S::String	&kDelimiter   = S::Directory::GetDirectoryDelimiter();
+
+static const S::String	 kSlash	      = "/";
+static const S::String	 kBackslash   = "\\";
+static const S::String	 kUncPrefix   = "\\\\";
+static const S::String	 kDot	      = ".";
+static const S::String	 kDots	      = "..";
+static const S::String	 kTilde	      = "~";
+
+static const S::String	 kDotElement  = S::String(kDelimiter).Append(kDot).Append(kDelimiter);
+static const S::String	 kDotsElement = S::String(kDelimiter).Append(kDots).Append(kDelimiter);
+
 char	*S::Directory::directoryDelimiter = NIL;
 
 S::Directory::Directory()
@@ -44,27 +56,27 @@ S::Directory::Directory()
 
 S::Directory::Directory(const String &iDirName, const String &iDirPath)
 {
-	const String	&delimiter = Directory::GetDirectoryDelimiter();
-
 	dirName = iDirName;
 	dirPath = iDirPath;
 
-	dirName.Replace("/",  delimiter);
-	dirName.Replace("\\", delimiter);
-
-	dirPath.Replace("/",  delimiter);
-	dirPath.Replace("\\", delimiter);
+#ifdef __WIN32__
+	if (dirName.Contains(kSlash)) dirName.Replace(kSlash, kDelimiter);
+	if (dirPath.Contains(kSlash)) dirPath.Replace(kSlash, kDelimiter);
+#else
+	if (dirName.Contains(kBackslash)) dirName.Replace(kBackslash, kDelimiter);
+	if (dirPath.Contains(kBackslash)) dirPath.Replace(kBackslash, kDelimiter);
+#endif
 
 	if (dirName != NIL && dirPath == NIL)
 	{
 #ifdef __WIN32__
-		if (dirName.StartsWith(delimiter) && !dirName.StartsWith("\\\\")) dirName = String(Directory::GetActiveDirectory()).Head(2).Append(dirName);
+		if (dirName.StartsWith(kDelimiter) && !dirName.StartsWith(kUncPrefix)) dirName = String(Directory::GetActiveDirectory()).Head(2).Append(dirName);
 #endif
 
 #ifdef __WIN32__
-		if (dirName[1] == ':' || dirName.StartsWith("\\\\"))
+		if (dirName[1] == ':' || dirName.StartsWith(kUncPrefix))
 #else
-		if (dirName.StartsWith(delimiter) || dirName.StartsWith("~"))
+		if (dirName.StartsWith(kDelimiter) || dirName.StartsWith(kTilde))
 #endif
 		{
 			dirPath = dirName;
@@ -72,16 +84,16 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 		}
 		else
 		{
-			dirPath = String(Directory::GetActiveDirectory()).Append(delimiter).Append(dirName);
+			dirPath = String(Directory::GetActiveDirectory()).Append(kDelimiter).Append(dirName);
 			dirName = NIL;
 		}
 	}
 
 	if (dirName == NIL)
 	{
-		if (dirPath.EndsWith(delimiter)) dirPath[dirPath.Length() - 1] = 0;
+		if (dirPath.EndsWith(kDelimiter)) dirPath[dirPath.Length() - 1] = 0;
 
-		Int	 lastBS = dirPath.FindLast(delimiter);
+		Int	 lastBS = dirPath.FindLast(kDelimiter);
 
 		if (lastBS >= 0)
 		{
@@ -92,23 +104,23 @@ S::Directory::Directory(const String &iDirName, const String &iDirPath)
 
 	/* Replace ./ elements.
 	 */
-	if (!dirPath.EndsWith(delimiter)) dirPath.Append(delimiter);
+	if (!dirPath.EndsWith(kDelimiter)) dirPath.Append(kDelimiter);
 
-	dirPath.Replace(String(delimiter).Append(".").Append(delimiter), delimiter);
+	if (dirPath.Contains(kDotElement)) dirPath.Replace(kDotElement, kDelimiter);
 
-	if (dirPath.StartsWith(String(".").Append(delimiter))) dirPath = String(Directory::GetActiveDirectory()).Append(dirPath.Tail(dirPath.Length() - 2));
+	if (dirPath.StartsWith(String(kDot).Append(kDelimiter))) dirPath = String(Directory::GetActiveDirectory()).Append(dirPath.Tail(dirPath.Length() - 2));
 
 	/* Replace ../ elements.
 	 */
-	while (dirPath.Contains(String(delimiter).Append("..").Append(delimiter)))
+	while (dirPath.Contains(kDotsElement))
 	{
-		Int	 upPos	= dirPath.Find(String(delimiter).Append("..").Append(delimiter));
-		Int	 prePos	= dirPath.Head(upPos).FindLast(delimiter);
+		Int	 upPos	= dirPath.Find(kDotsElement);
+		Int	 prePos	= dirPath.Head(upPos).FindLast(kDelimiter);
 
 		dirPath.Replace(dirPath.SubString(prePos, upPos - prePos + 3), String());
 	}
 
-	if (dirPath.EndsWith(delimiter)) dirPath[dirPath.Length() - 1] = 0;
+	if (dirPath.EndsWith(kDelimiter)) dirPath[dirPath.Length() - 1] = 0;
 }
 
 S::Directory::Directory(const Directory &iDirectory)
@@ -132,7 +144,9 @@ S::Directory &S::Directory::operator =(const Directory &nDirectory)
 
 S::Directory::operator S::String() const
 {
-	return String(dirPath).Append(dirName == NIL ? String() : String(Directory::GetDirectoryDelimiter())).Append(dirName);
+	if (dirName == NIL) return dirPath;
+
+	return String(dirPath).Append(kDelimiter).Append(dirName);
 }
 
 const S::String &S::Directory::GetDirectoryName() const
@@ -161,7 +175,7 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 
 #ifdef __WIN32__
 	WIN32_FIND_DATA	 findData;
-	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this).Append("\\").Append(pattern), &findData);
+	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this).Append(kBackslash).Append(pattern), &findData);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
 
@@ -178,13 +192,13 @@ const S::Array<S::File> &S::Directory::GetFilesByPattern(const String &pattern) 
 					  Replace("[", "\\[").Replace("]", "\\]");
 	glob_t	 fileData = { 0 };
 
-	if (glob(path.Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, &fileData) == 0)
+	if (glob(path.Append(kSlash).Append(pattern).ConvertTo("UTF-8"), GLOB_MARK, NIL, &fileData) == 0)
 	{
 		String::InputFormat	 inputFormat("UTF-8");
 
 		for (size_t i = 0; i < fileData.gl_pathc; i++)
 		{
-			if (!String(fileData.gl_pathv[i]).EndsWith("/")) files.Add(File(fileData.gl_pathv[i]));
+			if (!String(fileData.gl_pathv[i]).EndsWith(kSlash)) files.Add(File(fileData.gl_pathv[i]));
 		}
 
 		globfree(&fileData);
@@ -200,13 +214,13 @@ const S::Array<S::Directory> &S::Directory::GetDirectoriesByPattern(const String
 
 #ifdef __WIN32__
 	WIN32_FIND_DATA	 findData;
-	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this).Append("\\").Append(pattern), &findData);
+	HANDLE		 handle = FindFirstFile(MakeExtendedPath(*this).Append(kBackslash).Append(pattern), &findData);
 
 	Bool	 success = (handle != INVALID_HANDLE_VALUE);
 
 	while (success)
 	{
-		if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findData.cFileName) != "." && String(findData.cFileName) != "..") directories.Add(Directory(findData.cFileName, *this));
+		if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && String(findData.cFileName) != kDot && String(findData.cFileName) != kDots) directories.Add(Directory(findData.cFileName, *this));
 
 		success = FindNextFile(handle, &findData);
 	}
@@ -217,13 +231,13 @@ const S::Array<S::Directory> &S::Directory::GetDirectoriesByPattern(const String
 					  Replace("[", "\\[").Replace("]", "\\]");
 	glob_t	 fileData = { 0 };
 
-	if (glob(path.Append("/").Append(pattern).ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
+	if (glob(path.Append(kSlash).Append(pattern).ConvertTo("UTF-8"), GLOB_MARK | GLOB_ONLYDIR, NIL, &fileData) == 0)
 	{
 		String::InputFormat	 inputFormat("UTF-8");
 
 		for (size_t i = 0; i < fileData.gl_pathc; i++)
 		{
-			if (String(fileData.gl_pathv[i]).EndsWith("/")) directories.Add(Directory(fileData.gl_pathv[i]));
+			if (String(fileData.gl_pathv[i]).EndsWith(kSlash)) directories.Add(Directory(fileData.gl_pathv[i]));
 		}
 
 		globfree(&fileData);
@@ -355,7 +369,7 @@ S::Int S::Directory::Empty()
 
 	do
 	{
-		if (String(findData.cFileName) == "." || String(findData.cFileName) == "..") continue;
+		if (String(findData.cFileName) == kDot || String(findData.cFileName) == kDots) continue;
 
 		if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
@@ -396,7 +410,7 @@ const char *S::Directory::GetUnicodePathPrefix(const String &path)
 #ifdef __WIN32__
 	static const char	*unicodePathPrefix = "\\\\?\\";
 
-	if (path.StartsWith("\\\\")) return "";
+	if (path.StartsWith(kUncPrefix)) return "";
 
 	return unicodePathPrefix;
 #endif
@@ -412,7 +426,7 @@ S::String S::Directory::MakeExtendedPath(const String &path)
 
 	if (!path.StartsWith(extendedPathPrefix))
 	{
-		if (path.StartsWith("\\\\")) return String(uncPathPrefix).Append(path.Tail(path.Length() - 2));
+		if (path.StartsWith(kUncPrefix)) return String(uncPathPrefix).Append(path.Tail(path.Length() - 2));
 
 		return String(extendedPathPrefix).Append(path);
 	}
@@ -429,7 +443,7 @@ S::String S::Directory::StripExtendedPathPrefix(const String &path)
 
 	if (path.StartsWith(extendedPathPrefix))
 	{
-		if (path.StartsWith(uncPathPrefix)) return String("\\\\").Append(path.Tail(path.Length() - uncPathPrefix.Length()));
+		if (path.StartsWith(uncPathPrefix)) return String(kUncPrefix).Append(path.Tail(path.Length() - uncPathPrefix.Length()));
 
 		return path.Tail(path.Length() - extendedPathPrefix.Length());
 	}
@@ -459,7 +473,7 @@ S::Directory S::Directory::GetActiveDirectory()
 S::Int S::Directory::SetActiveDirectory(const Directory &directory)
 {
 #ifdef __WIN32__
-	Bool	 result = SetCurrentDirectory(MakeExtendedPath(directory).Append("\\"));
+	Bool	 result = SetCurrentDirectory(MakeExtendedPath(directory).Append(kBackslash));
 #else
 	Bool	 result = (chdir(String(directory).ConvertTo("UTF-8")) == 0);
 #endif

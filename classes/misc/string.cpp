@@ -582,15 +582,12 @@ S::Int S::String::Length() const
 
 S::Int S::String::Find(const String &str) const
 {
-	if (str == NIL) return 0;
+	if (str	  == NIL) return 0;
+	if (*this == NIL) return -1;
 
-	Int	 len1 = Length();
-	Int	 len2 = str.Length();
+	wchar_t* start = wcsstr(wString, str.wString);
 
-	for (Int i = 0; i <= len1 - len2; i++)
-	{
-		if (wcsncmp(wString + i, str.wString, len2) == 0) return i;
-	}
+	if (start != NIL) return start - wString;
 
 	return -1;
 }

@@ -168,33 +168,45 @@ namespace smooth
 #endif
 };
 
+static const S::String	&kDelimiter   = S::Directory::GetDirectoryDelimiter();
+
+static const S::String	 kSlash	      = "/";
+static const S::String	 kBackslash   = "\\";
+static const S::String	 kUncPrefix   = "\\\\";
+static const S::String	 kDot	      = ".";
+static const S::String	 kDots	      = "..";
+static const S::String	 kTilde	      = "~";
+
+static const S::String	 kDotElement  = S::String(kDelimiter).Append(kDot).Append(kDelimiter);
+static const S::String	 kDotsElement = S::String(kDelimiter).Append(kDots).Append(kDelimiter);
+
 S::File::File()
 {
 }
 
 S::File::File(const String &iFileName, const String &iFilePath)
 {
-	const String	&delimiter = Directory::GetDirectoryDelimiter();
-
 	fileName = iFileName;
 	filePath = iFilePath;
 
-	fileName.Replace("/",  delimiter);
-	fileName.Replace("\\", delimiter);
-
-	filePath.Replace("/",  delimiter);
-	filePath.Replace("\\", delimiter);
+#ifdef __WIN32__
+	if (fileName.Contains(kSlash)) fileName.Replace(kSlash, kDelimiter);
+	if (filePath.Contains(kSlash)) filePath.Replace(kSlash, kDelimiter);
+#else
+	if (fileName.Contains(kBackslash)) fileName.Replace(kBackslash, kDelimiter);
+	if (filePath.Contains(kBackslash)) filePath.Replace(kBackslash, kDelimiter);
+#endif
 
 	if (fileName != NIL && filePath == NIL)
 	{
 #ifdef __WIN32__
-		if (fileName.StartsWith(delimiter) && !fileName.StartsWith("\\\\")) fileName = String(Directory::GetActiveDirectory()).Head(2).Append(fileName);
+		if (fileName.StartsWith(kDelimiter) && !fileName.StartsWith(kUncPrefix)) fileName = String(Directory::GetActiveDirectory()).Head(2).Append(fileName);
 #endif
 
 #ifdef __WIN32__
-		if (fileName[1] == ':' || fileName.StartsWith("\\\\"))
+		if (fileName[1] == ':' || fileName.StartsWith(kUncPrefix))
 #else
-		if (fileName.StartsWith(delimiter) || fileName.StartsWith("~"))
+		if (fileName.StartsWith(kDelimiter) || fileName.StartsWith(kTilde))
 #endif
 		{
 			filePath = fileName;
@@ -202,14 +214,14 @@ S::File::File(const String &iFileName, const String &iFilePath)
 		}
 		else
 		{
-			filePath = String(Directory::GetActiveDirectory()).Append(delimiter).Append(fileName);
+			filePath = String(Directory::GetActiveDirectory()).Append(kDelimiter).Append(fileName);
 			fileName = NIL;
 		}
 	}
 
 	if (fileName == NIL)
 	{
-		Int	 lastBS = filePath.FindLast(delimiter);
+		Int	 lastBS = filePath.FindLast(kDelimiter);
 
 		fileName = filePath.Tail(filePath.Length() - lastBS - 1);
 		filePath[lastBS >= 0 ? lastBS : 0] = 0;
@@ -217,23 +229,23 @@ S::File::File(const String &iFileName, const String &iFilePath)
 
 	/* Replace ./ elements.
 	 */
-	if (!filePath.EndsWith(delimiter)) filePath.Append(delimiter);
+	if (!filePath.EndsWith(kDelimiter)) filePath.Append(kDelimiter);
 
-	filePath.Replace(String(delimiter).Append(".").Append(delimiter), delimiter);
+	if (filePath.Contains(kDotElement)) filePath.Replace(kDotElement, kDelimiter);
 
-	if (filePath.StartsWith(String(".").Append(delimiter))) filePath = String(Directory::GetActiveDirectory()).Append(filePath.Tail(filePath.Length() - 2));
+	if (filePath.StartsWith(String(kDot).Append(kDelimiter))) filePath = String(Directory::GetActiveDirectory()).Append(filePath.Tail(filePath.Length() - 2));
 
 	/* Replace ../ elements.
 	 */
-	while (filePath.Contains(String(delimiter).Append("..").Append(delimiter)))
+	while (filePath.Contains(kDotsElement))
 	{
-		Int	 upPos	= filePath.Find(String(delimiter).Append("..").Append(delimiter));
-		Int	 prePos	= filePath.Head(upPos).FindLast(delimiter);
+		Int	 upPos	= filePath.Find(kDotsElement);
+		Int	 prePos	= filePath.Head(upPos).FindLast(kDelimiter);
 
 		filePath.Replace(filePath.SubString(prePos, upPos - prePos + 3), String());
 	}
 
-	if (filePath.EndsWith(delimiter)) filePath[filePath.Length() - 1] = 0;
+	if (filePath.EndsWith(kDelimiter)) filePath[filePath.Length() - 1] = 0;
 }
 
 S::File::File(const File &iFile)
@@ -248,7 +260,7 @@ S::File::~File()
 
 S::File::operator S::String() const
 {
-	return String(filePath).Append(Directory::GetDirectoryDelimiter()).Append(fileName);
+	return String(filePath).Append(kDelimiter).Append(fileName);
 }
 
 const S::String &S::File::GetFileName() const

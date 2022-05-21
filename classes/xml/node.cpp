@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -142,11 +142,15 @@ S::XML::Attribute *S::XML::Node::GetAttributeByName(const String &attributeName)
 {
 	Int	 nOfAttributes = GetNOfAttributes();
 
+	if (nOfAttributes == 0) return NIL;
+
+	Int	 nameIndex     = attributeName.ComputeCRC32();
+
 	for (Int i = 0; i < nOfAttributes; i++)
 	{
 		Attribute	*attribute = GetNthAttribute(i);
 
-		if (attribute->GetName() == attributeName) return attribute;
+		if (attribute->nameIndex == nameIndex) return attribute;
 	}
 
 	return NIL;
@@ -204,13 +208,17 @@ S::XML::Node *S::XML::Node::GetNthNode(Int nodeNumber) const
 
 S::XML::Node *S::XML::Node::GetNodeByName(const String &nodeName) const
 {
-	Int	 nOfNodes = GetNOfNodes();
+	Int	 nOfNodes  = GetNOfNodes();
+
+	if (nOfNodes == 0) return NIL;
+
+	Int	 nameIndex = nodeName.ComputeCRC32();
 
 	for (Int i = 0; i < nOfNodes; i++)
 	{
 		Node	*node = GetNthNode(i);
 
-		if (node->GetName() == nodeName) return node;
+		if (node->nameIndex == nameIndex) return node;
 	}
 
 	return NIL;

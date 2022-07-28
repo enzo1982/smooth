@@ -14,6 +14,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.10
 - upgraded fribidi to version 1.0.12
 - upgraded libxml2 to version 2.9.13
 - upgraded libcurl to version 7.82.0
+- upgraded libiconv to version 1.17
 - upgraded zlib to version 1.2.12
 
 21.01.22 19:17 - smooth alpha 0.9.9

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -24,6 +24,12 @@
 #if !defined SM_CXPADDEDBORDER
 #	define SM_CXPADDEDBORDER 92
 #endif
+
+static HMODULE	 dwmapidll = NIL;
+
+typedef HRESULT (*DWMSETWINDOWATTRIBUTE)(HWND, DWORD, LPCVOID, DWORD);
+
+static DWMSETWINDOWATTRIBUTE	 ex_DwmSetWindowAttribute = NIL;
 
 S::GUI::WindowBackend *CreateWindowGDI()
 {
@@ -56,6 +62,12 @@ LRESULT CALLBACK S::GUI::WindowGDI::WindowProc(HWND window, UINT message, WPARAM
 
 S::Int S::GUI::WindowGDI::Initialize()
 {
+	/* Load DWM API library.
+	 */
+	dwmapidll = LoadLibrary(L"dwmapi.dll");
+
+	ex_DwmSetWindowAttribute = (DWMSETWINDOWATTRIBUTE) GetProcAddress(dwmapidll, "DwmSetWindowAttribute");
+
 	/* Register for cursor events.
 	 */
 	Cursor::internalSetCursor.Connect(&WindowGDI::SetCursor);
@@ -70,6 +82,10 @@ S::Int S::GUI::WindowGDI::Free()
 	 */
 	Cursor::internalSetCursor.Disconnect(&WindowGDI::SetCursor);
 	Cursor::internalRemoveCursor.Disconnect(&WindowGDI::RemoveCursor);
+
+	/* Free DWM API library.
+	 */
+	FreeLibrary(dwmapidll);
 
 	return Success();
 }
@@ -652,6 +668,26 @@ S::Int S::GUI::WindowGDI::Open(const String &title, const Point &pos, const Size
 		else						      drawSurface = new Surface(hwnd);
 
 		drawSurface->SetSize(size * fontSize + sizeModifier);
+
+		/* Control top edge color on Windows 10 and 11.
+		 */
+		if (ex_DwmSetWindowAttribute != NIL)
+		{
+			/* Set dark top edge if we are in dark mode.
+			 */
+			if (Setup::BackgroundColor.ConvertTo(Color::GRAY) <= 127)
+			{
+				BOOL	 darkMode = TRUE;
+
+				ex_DwmSetWindowAttribute(hwnd, /* DWMWA_USE_IMMERSIVE_DARK_MODE */ 20, &darkMode, sizeof(darkMode));
+			}
+
+			/* Set top edge to background color (Windows 11 only).
+			 */
+			COLORREF	 captionColor = Setup::BackgroundColor.GetBlue() << 16 | Setup::BackgroundColor.GetGreen() << 8 | Setup::BackgroundColor.GetRed();
+
+			ex_DwmSetWindowAttribute(hwnd, /* DWMWA_CAPTION_COLOR */ 35, &captionColor, sizeof(captionColor));
+		}
 
 		/* Disable leader window if we are modal.
 		 */

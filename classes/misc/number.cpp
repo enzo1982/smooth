@@ -157,7 +157,7 @@ S::Number S::Number::FromFloatString(const String &string)
 		}
 	}
 
-	Float	 value = Number::FromIntString(string);
+	Float	 value = Math::Abs(Int64(Number::FromIntString(string)));
 
 	for (Int i = 0; i < digitsafp; i++)
 	{

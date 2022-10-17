@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -122,7 +122,7 @@ S::GUI::WindowXLib::WindowXLib(Void *iWindow)
 	sysIcon		= NIL;
 	sysIconSize	= 0;
 
-	xdndTimeStamp	= 0;
+	xdndTimeStamp	= CurrentTime;
 	acceptDrop	= False;
 	enableDropFiles	= False;
 }
@@ -281,7 +281,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 	static Atom	 xdndLeaveAtom		  = XInternAtom(display, "XdndLeave", False);
 	static Atom	 xdndFinishedAtom	  = XInternAtom(display, "XdndFinished", False);
 
-	static Atom	 xdndActionPrivateAtom	  = XInternAtom(display, "XdndActionPrivate", False);
+	static Atom	 xdndActionCopyAtom	  = XInternAtom(display, "XdndActionCopy", False);
 
 	/* Lock application while processing messages.
 	 */
@@ -798,7 +798,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 				status.xclient.data.l[1]    = acceptDrop;
 				status.xclient.data.l[2]    = (pos.x   << 16) | pos.y;
 				status.xclient.data.l[3]    = (size.cx << 16) | size.cy;
-				status.xclient.data.l[4]    = xdndActionPrivateAtom;
+				status.xclient.data.l[4]    = xdndActionCopyAtom;
 
 				XSendEvent(display, sourceWnd, 0, 0, &status);
 				XFlush(display);
@@ -832,7 +832,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				finished.xclient.data.l[0]    = wnd;
 				finished.xclient.data.l[1]    = acceptDrop;
-				finished.xclient.data.l[2]    = xdndActionPrivateAtom;
+				finished.xclient.data.l[2]    = xdndActionCopyAtom;
 
 				XSendEvent(display, sourceWnd, 0, 0, &finished);
 				XFlush(display);
@@ -843,7 +843,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			if (e->xclient.message_type == xdndDropAtom ||
 			    e->xclient.message_type == xdndLeaveAtom)
 			{
-				xdndTimeStamp = 0;
+				xdndTimeStamp = CurrentTime;
 				acceptDrop    = False;
 			}
 
@@ -1175,8 +1175,6 @@ S::Int S::GUI::WindowXLib::EnableDropFiles(Bool nEnableDropFiles)
 
 const S::Array<S::String> &S::GUI::WindowXLib::GetDroppedFiles() const
 {
-	if (xdndTimeStamp == 0) return WindowBackend::GetDroppedFiles();
-
 	static Atom	 mimeURIListAtom   = XInternAtom(display, "text/uri-list", False);
 
 	static Atom	 xdndSelectionAtom = XInternAtom(display, "XdndSelection", False);

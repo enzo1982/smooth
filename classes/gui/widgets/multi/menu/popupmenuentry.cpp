@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -99,7 +99,8 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 
 				if (bitmap != NIL && bVar == NIL && iVar == NIL)
 				{
-					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+					if (IsActive())	surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
+					else		surface->BlitFromBitmap(graymap, Rect(Point(0, 0), graymap.GetSize()), bmpRect);
 				}
 
 				if (shortcut != NIL)

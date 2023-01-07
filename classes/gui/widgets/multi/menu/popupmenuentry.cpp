@@ -136,8 +136,6 @@ S::Int S::GUI::PopupMenuEntry::Paint(Int message)
 				if (bitmap != NIL && bVar == NIL && iVar == NIL)
 				{
 					surface->BlitFromBitmap(bitmap, Rect(Point(0, 0), bitmap.GetSize()), bmpRect);
-
-					surface->Frame(bmpRect, FRAME_DOWN);
 				}
 
 				if (shortcut != NIL)

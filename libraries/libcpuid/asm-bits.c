@@ -137,7 +137,8 @@ void exec_cpuid(uint32_t *regs)
 	);
 #	endif /* COMPILER_GCC */
 #else
-#  if defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86)
+#  ifdef COMPILER_MICROSOFT
+#	ifdef PLATFORM_X86
 	__asm {
 		push	ebx
 		push	ecx
@@ -162,6 +163,7 @@ void exec_cpuid(uint32_t *regs)
 		pop	ecx
 		pop	ebx
 	}
+#	endif /* PLATFORM_X86 */
 #  endif /* COMPILER_MICROSOFT */
 #endif
 }
@@ -181,12 +183,14 @@ void cpu_rdtsc(uint64_t* result)
 	);
 #  endif
 #else
-#  if defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86)
+#  ifdef COMPILER_MICROSOFT
+#	ifdef PLATFORM_X86
 	__asm {
 		rdtsc
 		mov	low_part,	eax
 		mov	hi_part,	edx
 	};
+#	endif /* PLATFORM_X86 */
 #  endif /* COMPILER_MICROSOFT */
 #endif /* COMPILER_GCC */
 	*result = (uint64_t)low_part + (((uint64_t) hi_part) << 32);
@@ -511,7 +515,8 @@ void busy_sse_loop(int cycles)
 	);
 #endif
 #else
-#  if defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86)
+#  ifdef COMPILER_MICROSOFT
+#	ifdef PLATFORM_X86
 	__asm {
 		mov	eax,	cycles
 		xorps	xmm0,	xmm0
@@ -817,6 +822,7 @@ bsLoop:
 		dec		eax
 		jnz		bsLoop
 	}
+#	endif /* PLATFORM_X86 */
 #  endif /* COMPILER_MICROSOFT */
 #endif /* COMPILER_GCC */
 }

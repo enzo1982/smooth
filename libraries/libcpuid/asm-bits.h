@@ -51,19 +51,19 @@
 #if !defined(PLATFORM_X86)
 #	define PLATFORM_X86
 #endif
-#elif defined(__ARMEL__)
+#elif defined(__ARMEL__) || defined(_M_ARM)
 #if !defined(PLATFORM_ARM)
 #	define PLATFORM_ARM
 #endif
-#elif defined(__aarch64__)
-#if !defined(PLATFORM_ARM)
+#elif defined(__aarch64__) || defined(_M_ARM64)
+#if !defined(PLATFORM_AARCH64)
 #	define PLATFORM_AARCH64
 #endif
 #endif
 
 /* Under Windows/AMD64 with MSVC, inline assembly isn't supported */
 #if (defined(COMPILER_GCC) || defined(COMPILER_CLANG)) || \
-	(defined(COMPILER_MICROSOFT) && defined(PLATFORM_X86))
+	(defined(COMPILER_MICROSOFT) && !defined(PLATFORM_X64))
 #	define INLINE_ASM_SUPPORTED
 #endif
 

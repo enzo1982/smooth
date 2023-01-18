@@ -5,6 +5,8 @@
  * Copyright (c) 2004 - 2022 Daniel Stenberg
  * All rights reserved.
  *
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -38,6 +40,9 @@
 
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
 #endif
 
 #include "urldata.h"
@@ -140,11 +145,8 @@ krb5_decode(void *app_data, void *buf, int len,
   enc.value = buf;
   enc.length = len;
   maj = gss_unwrap(&min, *context, &enc, &dec, NULL, NULL);
-  if(maj != GSS_S_COMPLETE) {
-    if(len >= 4)
-      strcpy(buf, "599 ");
+  if(maj != GSS_S_COMPLETE)
     return -1;
-  }
 
   memcpy(buf, dec.value, dec.length);
   len = curlx_uztosi(dec.length);
@@ -452,14 +454,14 @@ static int ftp_send_command(struct Curl_easy *data, const char *message, ...)
 /* Read |len| from the socket |fd| and store it in |to|. Return a CURLcode
    saying whether an error occurred or CURLE_OK if |len| was read. */
 static CURLcode
-socket_read(curl_socket_t fd, void *to, size_t len)
+socket_read(struct Curl_easy *data, curl_socket_t fd, void *to, size_t len)
 {
   char *to_p = to;
   CURLcode result;
   ssize_t nread = 0;
 
   while(len > 0) {
-    result = Curl_read_plain(fd, to_p, len, &nread);
+    result = Curl_read_plain(data, fd, to_p, len, &nread);
     if(!result) {
       len -= nread;
       to_p += nread;
@@ -500,30 +502,37 @@ socket_write(struct Curl_easy *data, curl_socket_t fd, const void *to,
   return CURLE_OK;
 }
 
-static CURLcode read_data(struct connectdata *conn,
-                          curl_socket_t fd,
+static CURLcode read_data(struct Curl_easy *data, curl_socket_t fd,
                           struct krb5buffer *buf)
 {
+  struct connectdata *conn = data->conn;
   int len;
   CURLcode result;
+  int nread;
 
-  result = socket_read(fd, &len, sizeof(len));
+  result = socket_read(data, fd, &len, sizeof(len));
   if(result)
     return result;
 
   if(len) {
     /* only realloc if there was a length */
     len = ntohl(len);
-    buf->data = Curl_saferealloc(buf->data, len);
+    if(len > CURL_MAX_INPUT_LENGTH)
+      len = 0;
+    else
+      buf->data = Curl_saferealloc(buf->data, len);
   }
   if(!len || !buf->data)
     return CURLE_OUT_OF_MEMORY;
 
-  result = socket_read(fd, buf->data, len);
+  result = socket_read(data, fd, buf->data, len);
   if(result)
     return result;
-  buf->size = conn->mech->decode(conn->app_data, buf->data, len,
-                                 conn->data_prot, conn);
+  nread = conn->mech->decode(conn->app_data, buf->data, len,
+                             conn->data_prot, conn);
+  if(nread < 0)
+    return CURLE_RECV_ERROR;
+  buf->size = (size_t)nread;
   buf->index = 0;
   return CURLE_OK;
 }
@@ -551,7 +560,7 @@ static ssize_t sec_recv(struct Curl_easy *data, int sockindex,
 
   /* Handle clear text response. */
   if(conn->sec_complete == 0 || conn->data_prot == PROT_CLEAR)
-    return sread(fd, buffer, len);
+    return Curl_recv_plain(data, sockindex, buffer, len, err);
 
   if(conn->in_buffer.eof_flag) {
     conn->in_buffer.eof_flag = 0;
@@ -564,7 +573,7 @@ static ssize_t sec_recv(struct Curl_easy *data, int sockindex,
   buffer += bytes_read;
 
   while(len > 0) {
-    if(read_data(conn, fd, &conn->in_buffer))
+    if(read_data(data, fd, &conn->in_buffer))
       return -1;
     if(conn->in_buffer.size == 0) {
       if(bytes_read > 0)

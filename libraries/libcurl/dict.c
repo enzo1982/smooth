@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -317,4 +319,4 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
 
   return CURLE_OK;
 }
-#endif /*CURL_DISABLE_DICT*/
+#endif /* CURL_DISABLE_DICT */

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -71,7 +73,7 @@ bool Curl_h2_http_1_1_error(struct Curl_easy *data);
 #define Curl_http2_init_state(x)
 #define Curl_http2_init_userset(x)
 #define Curl_http2_done(x,y)
-#define Curl_http2_done_sending(x,y)
+#define Curl_http2_done_sending(x,y) (void)y
 #define Curl_http2_add_child(x, y, z)
 #define Curl_http2_remove_child(x, y)
 #define Curl_http2_cleanup_dependencies(x)

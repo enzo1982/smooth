@@ -19,6 +19,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -45,6 +47,7 @@
 #include "transfer.h"
 #include "curl_ldap.h"
 #include "curl_base64.h"
+#include "cfilters.h"
 #include "connect.h"
 #include "curl_sasl.h"
 #include "strcase.h"
@@ -498,8 +501,7 @@ static CURLcode oldap_ssl_connect(struct Curl_easy *data, ldapstate newstate)
   struct ldapconninfo *li = conn->proto.ldapc;
   bool ssldone = 0;
 
-  result = Curl_ssl_connect_nonblocking(data, conn, FALSE,
-                                        FIRSTSOCKET, &ssldone);
+  result = Curl_conn_connect(data, FIRSTSOCKET, FALSE, &ssldone);
   if(!result) {
     state(data, newstate);
 
@@ -1066,8 +1068,8 @@ static ssize_t oldap_recv(struct Curl_easy *data, int sockindex, char *buf,
 
         if(!binary) {
           /* check for leading or trailing whitespace */
-          if(ISSPACE(bvals[i].bv_val[0]) ||
-             ISSPACE(bvals[i].bv_val[bvals[i].bv_len - 1]))
+          if(ISBLANK(bvals[i].bv_val[0]) ||
+             ISBLANK(bvals[i].bv_val[bvals[i].bv_len - 1]))
             binval = 1;
           else {
             /* check for unprintable characters */
@@ -1151,7 +1153,7 @@ ldapsb_tls_ctrl(Sockbuf_IO_Desc *sbiod, int opt, void *arg)
   (void)arg;
   if(opt == LBER_SB_OPT_DATA_READY) {
     struct Curl_easy *data = sbiod->sbiod_pvt;
-    return Curl_ssl_data_pending(data->conn, FIRSTSOCKET);
+    return Curl_conn_data_pending(data, FIRSTSOCKET);
   }
   return 0;
 }

@@ -162,9 +162,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\dict.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\dotdot.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\easy.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -235,9 +232,6 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\http2.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\idn_win32.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\if2ip.c">
@@ -408,9 +402,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\altsvc.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\curl_ctype.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\curl_get_line.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -491,6 +482,30 @@
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\x509asn1.c">
       <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\cfilters.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\fopen.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\idn.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\timediff.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\ws.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\headers.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\noproxy.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\msh3.c">
+      <Filter>Quelldateien\vquic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -575,9 +590,6 @@
     <ClInclude Include="..\..\..\libraries\libcurl\curl_sasl.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\curl_sec.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\curl_setup.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -594,9 +606,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\dict.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\dotdot.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\easyif.h">
@@ -627,9 +636,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\hash.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\hostcheck.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\hostip.h">
@@ -683,9 +689,6 @@
     <ClInclude Include="..\..\..\libraries\libcurl\netrc.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\non-ascii.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\nonblock.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -693,9 +696,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\pingpong.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\pipeline.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\pop3.h">
@@ -749,9 +749,6 @@
     <ClInclude Include="..\..\..\libraries\libcurl\splay.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\ssh.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\strcase.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -794,9 +791,6 @@
     <ClInclude Include="..\..\..\libraries\libcurl\wildcard.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\x509asn1.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vauth\digest.h">
       <Filter>Headerdateien\vauth</Filter>
     </ClInclude>
@@ -805,15 +799,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vauth\vauth.h">
       <Filter>Headerdateien\vauth</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vtls\axtls.h">
-      <Filter>Headerdateien\vtls</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vtls\cyassl.h">
-      <Filter>Headerdateien\vtls</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vtls\darwinssl.h">
-      <Filter>Headerdateien\vtls</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\gskit.h">
       <Filter>Headerdateien\vtls</Filter>
@@ -892,6 +877,39 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\bufref.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\cfilters.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\easy_lock.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\fopen.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\idn.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\timediff.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\ws.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\functypes.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\headers.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\noproxy.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\msh3.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\vtls_int.h">
+      <Filter>Headerdateien\vtls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

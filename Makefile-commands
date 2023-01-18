@@ -18,7 +18,7 @@ endif
 endif
 
 ifeq ($(BUILD_WIN32),True)
-	CCOPTS += -DUNICODE
+	CCOPTS += -DUNICODE -D_UNICODE
 	LDOPTS += -mwindows -Wl,--dynamicbase,--nxcompat
 
 	ifdef IMPORTLIB

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,17 +20,14 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "curl_setup.h"
 
 #include "nonblock.h" /* for curlx_nonblock(), formerly Curl_nonblock() */
 #include "sockaddr.h"
 #include "timeval.h"
-
-CURLcode Curl_is_connected(struct Curl_easy *data,
-                           struct connectdata *conn,
-                           int sockindex,
-                           bool *connected);
 
 CURLcode Curl_connecthost(struct Curl_easy *data,
                           struct connectdata *conn,
@@ -59,7 +56,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
 /*
  * Check if a connection seems to be alive.
  */
-bool Curl_connalive(struct connectdata *conn);
+bool Curl_connalive(struct Curl_easy *data, struct connectdata *conn);
 
 #ifdef USE_WINSOCK
 /* When you run a program that uses the Windows Sockets API, you may
@@ -151,6 +148,13 @@ void Curl_conncontrol(struct connectdata *conn,
 #define connkeep(x,y) Curl_conncontrol(x, CONNCTRL_KEEP)
 #endif
 
-bool Curl_conn_data_pending(struct connectdata *conn, int sockindex);
+CURLcode Curl_conn_socket_set(struct Curl_easy *data,
+                              struct connectdata *conn,
+                              int sockindex);
+
+CURLcode Curl_conn_socket_accepted_set(struct Curl_easy *data,
+                                       struct connectdata *conn,
+                                       int sockindex,
+                                       curl_socket_t *s);
 
 #endif /* HEADER_CURL_CONNECT_H */

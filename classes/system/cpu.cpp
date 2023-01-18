@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -81,13 +81,13 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 
 	/* Get actual CPUID data.
 	 */
-	cpu_raw_data_t	 raw;
-	cpu_id_t	 data;
+	cpu_raw_data_array_t	 raw;
+	system_id_t		 system;
 
 	failed	       = True;
 
-	if (cpuid_get_raw_data(&raw)  < 0) return Error();
-	if (cpu_identify(&raw, &data) < 0) return Error();
+	if (cpuid_get_all_raw_data(&raw)    < 0) return Error();
+	if (cpu_identify_all(&raw, &system) < 0) return Error();
 
 	/* OK, set to initialized.
 	 */
@@ -96,15 +96,23 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 
 	/* Set vendor and brand strings.
 	 */
+	cpu_id_t& data = system.cpu_types[0];
+
 	vendorString   = data.vendor_str;
 	brandString    = data.brand_str;
 
 	if (brandString == NIL) brandString = data.cpu_codename;
 
-	/* Set number of cores and log CPUs.
+	/* Set number of cores and logical CPUs.
 	 */
-	numCores       = data.num_cores;
-	numLogicalCPUs = data.num_logical_cpus;
+	numCores       = 0;
+	numLogicalCPUs = 0;
+
+	for (Int i = 0; i < system.num_cpu_types; i++)
+	{
+		numCores       += system.cpu_types[i].num_cores;
+		numLogicalCPUs += system.cpu_types[i].num_logical_cpus;
+	}
 
 	/* Set feature flags.
 	 */
@@ -130,6 +138,11 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 
 	hasVMX	       = data.flags[CPU_FEATURE_VMX];
 	hasSVM	       = data.flags[CPU_FEATURE_SVM];
+
+	/* Free CPUID data.
+	 */
+	cpuid_free_system_id(&system);
+	cpuid_free_raw_data_array(&raw);
 
 	return Success();
 }

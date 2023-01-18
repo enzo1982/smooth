@@ -9,6 +9,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.10
 - windowgdi.cpp		- apply dark mode to top window edge too on Windows 10 and 11
 - listbox.cpp		- fixed and improved list entry dragging behavior
 - http.cpp		- fixed libcurl proxy feature detection
+- cpu.cpp		- fixed number of cores reported for CPUs with different core types (performance/efficiency)
 
 - various minor performance optimizations
 - fixed long paths being converted to 8.3 format on recent versions of Windows

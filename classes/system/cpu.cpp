@@ -103,7 +103,7 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 
 	if (brandString == NIL) brandString = data.cpu_codename;
 
-	/* Set number of cores and logical CPUs.
+	/* Find number of cores and logical CPUs per processor.
 	 */
 	numCores       = 0;
 	numLogicalCPUs = 0;
@@ -113,6 +113,14 @@ S::Errors::Error S::System::CPU::GetCPUID() const
 		numCores       += system.cpu_types[i].num_cores;
 		numLogicalCPUs += system.cpu_types[i].num_logical_cpus;
 	}
+
+	/* Find number of processors and mutiply core numbers.
+	 */
+	Int	 numTotalCPUs  = cpuid_get_total_cpus();
+	Int	 numProcessors = numTotalCPUs / numLogicalCPUs;
+
+	numCores       *= numProcessors;
+	numLogicalCPUs *= numProcessors;
 
 	/* Set feature flags.
 	 */

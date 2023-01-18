@@ -35,6 +35,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_cpu.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_csp.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_dsp.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_gamma.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_neon.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_sse2.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dec\alpha_dec.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dec\buffer_dec.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dec\frame_dec.c" />
@@ -74,6 +81,7 @@
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_enc_sse41.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_neon.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_sse2.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_sse41.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\rescaler.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\rescaler_neon.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\rescaler_sse2.c" />
@@ -124,6 +132,11 @@
     <ClCompile Include="..\..\..\libraries\libwebp\src\utils\utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv.h" />
+    <ClInclude Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_cpu.h" />
+    <ClInclude Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_csp.h" />
+    <ClInclude Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_dsp.h" />
+    <ClInclude Include="..\..\..\libraries\libwebp\sharpyuv\sharpyuv_gamma.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dec\alphai_dec.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dec\common_dec.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dec\vp8i_dec.h" />
@@ -132,9 +145,11 @@
     <ClInclude Include="..\..\..\libraries\libwebp\src\dec\webpi_dec.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\common_sse2.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\common_sse41.h" />
+    <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\cpu.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\dsp.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\lossless.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\lossless_common.h" />
+    <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\neon.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\quant.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\yuv.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\enc\backward_references_enc.h" />

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -78,6 +78,12 @@ extern "C"
 
 #endif
 
+static HMODULE	 user32dll = NIL;
+
+typedef BOOL (WINAPI* SETPROCESSDPIAWARE)();
+
+static SETPROCESSDPIAWARE	 ex_SetProcessDPIAware = NIL;
+
 S::Backends::Backend *CreateBackendWin32()
 {
 	return new S::Backends::BackendWin32();
@@ -109,12 +115,11 @@ S::Int S::Backends::BackendWin32::Init()
 
 	/* Declare the process DPI aware.
 	 */
-	HMODULE	 user32dll = LoadLibrary(L"user32.dll");
-	BOOL	 (*ex_SetProcessDPIAware)() = (BOOL (*)()) GetProcAddress(user32dll, "SetProcessDPIAware");
+	user32dll = LoadLibrary(L"user32.dll");
+
+	ex_SetProcessDPIAware = (SETPROCESSDPIAWARE) GetProcAddress(user32dll, "SetProcessDPIAware");
 
 	if (ex_SetProcessDPIAware != NIL) ex_SetProcessDPIAware();
-
-//	FreeLibrary(user32dll);
 
 	/* Get default colors.
 	 */
@@ -131,6 +136,10 @@ S::Int S::Backends::BackendWin32::Init()
 
 S::Int S::Backends::BackendWin32::Deinit()
 {
+	/* Free dynamically loaded user32 library.
+	 */
+	FreeLibrary(user32dll);
+
 	/* Cleanup Windows sockets.
 	 */
 	WSACleanup();

@@ -39,8 +39,8 @@ static const char *smooth_co =
 												\
 	     <entry string=\"Backspace\">Currezzione</entry>					\
 	     <entry string=\"Tab\">Tab</entry>							\
-	     <entry string=\"Return\">Inviu</entry>						\
-	     <entry string=\"Esc\">Scap.</entry>						\
+	     <entry string=\"Return\">Entrata</entry>						\
+	     <entry string=\"Esc\">Scap</entry>							\
 	     <entry string=\"Space\">Spaziu</entry>						\
 	     <entry string=\"PgUp\">Pag. sù</entry>						\
 	     <entry string=\"PgDown\">Pag. ghjò</entry>						\
@@ -50,11 +50,11 @@ static const char *smooth_co =
 	     <entry string=\"Up\">Insù</entry>							\
 	     <entry string=\"Right\">Diritta</entry>						\
 	     <entry string=\"Down\">Inghjò</entry>						\
-	     <entry string=\"Ins\">Fram.</entry>						\
-	     <entry string=\"Del\">Squas.</entry>						\
+	     <entry string=\"Ins\">Fram</entry>							\
+	     <entry string=\"Del\">Squas</entry>						\
 	     <entry string=\"Ctrl\">Ctrl</entry>						\
 	     <entry string=\"Alt\">Alt</entry>							\
-	     <entry string=\"Shift\">Maius.</entry>						\
+	     <entry string=\"Shift\">Maius</entry>						\
 												\
 	     <entry string=\"Open file\">Apre u schedariu</entry>				\
 	     <entry string=\"Save file\">Arregistrà u schedariu</entry>				\
@@ -71,10 +71,10 @@ static const char *smooth_co =
 	     <entry string=\"S\">S</entry>							\
 	     <entry string=\"V\">V</entry>							\
 												\
-	     <entry string=\"Tip of the day\">Minichichja oghjinca</entry>			\
+	     <entry string=\"Tip of the day\">Astuzia oghjinca</entry>				\
 	     <entry string=\"Did you know...\">A sapete chì…</entry>				\
-	     <entry string=\"Show tips on startup\">Affissà e minichichje à u lanciu</entry>	\
-	     <entry string=\"Next tip\">Minichichja seguente</entry>				\
+	     <entry string=\"Show tips on startup\">Affissà l’astuzie à u lanciu</entry>	\
+	     <entry string=\"Next tip\">Astuzia seguente</entry>				\
 	   </data>										\
 	 </LangFile>";
 

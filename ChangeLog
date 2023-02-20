@@ -11,6 +11,8 @@ dd.mm.yy hh:mm - smooth alpha 0.9.10
 - http.cpp		- fixed libcurl proxy feature detection
 - cpu.cpp		- fixed number of cores reported for CPUs with different core types (performance/efficiency)
 			- fixed number of cores reported for SMP systems (now reporting total number of cores)
+- instream.cpp		- allow data pointer to be NULL in InputData if number of bytes is 0
+- outstream.cpp		- allow data pointer to be NULL in OutputData if number of bytes is 0
 
 - various minor performance optimizations
 - fixed long paths being converted to 8.3 format on recent versions of Windows

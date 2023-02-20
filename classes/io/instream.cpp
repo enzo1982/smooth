@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -395,9 +395,9 @@ S::String S::IO::InStream::InputLine()
 
 S::Int S::IO::InStream::InputData(Void *pointer, Int bytes)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return 0; }
-	if (pointer == NIL)		{ lastError = IO_ERROR_BADPARAM; return 0; }
-	if (bytes < 0)			{ lastError = IO_ERROR_BADPARAM; return 0; }
+	if (streamType == STREAM_NONE)	 { lastError = IO_ERROR_NOTOPEN; return 0; }
+	if (bytes > 0 && pointer == NIL) { lastError = IO_ERROR_BADPARAM; return 0; }
+	if (bytes < 0)			 { lastError = IO_ERROR_BADPARAM; return 0; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 

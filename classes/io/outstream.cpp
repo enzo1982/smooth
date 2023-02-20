@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -369,10 +369,10 @@ S::Bool S::IO::OutStream::OutputLine(const String &string)
 
 S::Bool S::IO::OutStream::OutputData(const Void *pointer, Int bytes)
 {
-	if (streamType == STREAM_NONE)	{ lastError = IO_ERROR_NOTOPEN; return False; }
-	if (packageSize <= 0)		{ lastError = IO_ERROR_UNKNOWN; return False; }
-	if (pointer == NIL)		{ lastError = IO_ERROR_BADPARAM; return False; }
-	if (bytes < 0)			{ lastError = IO_ERROR_BADPARAM; return False; }
+	if (streamType == STREAM_NONE)	 { lastError = IO_ERROR_NOTOPEN; return False; }
+	if (packageSize <= 0)		 { lastError = IO_ERROR_UNKNOWN; return False; }
+	if (bytes > 0 && pointer == NIL) { lastError = IO_ERROR_BADPARAM; return False; }
+	if (bytes < 0)			 { lastError = IO_ERROR_BADPARAM; return False; }
 
 	if (bitstreamActive && !keepBits) CompleteBitstream();
 

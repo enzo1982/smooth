@@ -1317,7 +1317,8 @@ int cpu_identify_all(struct cpu_raw_data_array_t* raw_array, struct system_id_t*
 			};
 			const enum event_t first_event = is_new_cpu_type && (system->num_cpu_types > 1) ? EVENT_NEW_CPU_TYPE : EVENT_LAST_ITEM;
 			const enum event_t last_event  = is_last_item                                   ? EVENT_LAST_ITEM    : EVENT_NEW_CPU_TYPE;
-			for (enum event_t event = first_event; event <= last_event; event++) {
+			enum event_t event;
+			for (event = first_event; event <= last_event; event++) {
 				switch (event) {
 					case EVENT_NEW_CPU_TYPE: cpu_type_index = system->num_cpu_types - 2; break;
 					case EVENT_LAST_ITEM:    cpu_type_index = system->num_cpu_types - 1; break;

@@ -8,6 +8,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.10
 - windowxlib.cpp	- improved compatibility of drag & drop implementation with KDE running under Wayland
 - windowgdi.cpp		- apply dark mode to top window edge too on Windows 10 and 11
 - surfacecocoa.mm	- fixed crash trying to draw to windows before they are fully constructed
+- application.cpp	- fixed determination of application path when running under Rosetta
 - listbox.cpp		- fixed and improved list entry dragging behavior
 - http.cpp		- fixed libcurl proxy feature detection
 - cpu.cpp		- fixed number of cores reported for CPUs with different core types (performance/efficiency)

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -154,6 +154,18 @@ S::String S::GUI::Application::GetApplicationDirectory()
 	/* On macOS, get the path using the proc_pidpath call.
 	 */
 	if (proc_pidpath(getpid(), buffer, buffer.Size()) > 0) applicationDirectory = buffer;
+
+	/* Resort to using lsof -p <pid>, which returns the path to the current binary in the first
+	 * txt section, in case lookup failed or we got the path to the Rosetta binary translator.
+	 */
+	if (applicationDirectory == NIL || applicationDirectory == "/usr/libexec/oah/translate")
+	{
+		FILE	*pstdin = popen(String("lsof -p ").Append(String::FromInt(getpid())).Append(" | awk '$4 == \"txt\" { print substr($0, index($0, $9)) }'"), "r");
+
+		if (fscanf(pstdin, String("%[^\n]").Append(String::FromInt(buffer.Size() - 1)), (char *) buffer) > 0) applicationDirectory = buffer;
+
+		pclose(pstdin);
+	}
 #elif defined __FreeBSD__
 	/* On FreeBSD, the KERN_PROC_PATHNAME sysctl with pid -1 provides the path to the current binary.
 	 */

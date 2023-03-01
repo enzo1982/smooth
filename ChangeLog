@@ -7,6 +7,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.10
 - surfacecairo.cpp	- attempt to read desktop scale factor from KDE settings if GDK query fails
 - windowxlib.cpp	- improved compatibility of drag & drop implementation with KDE running under Wayland
 - windowgdi.cpp		- apply dark mode to top window edge too on Windows 10 and 11
+- surfacecocoa.mm	- fixed crash trying to draw to windows before they are fully constructed
 - listbox.cpp		- fixed and improved list entry dragging behavior
 - http.cpp		- fixed libcurl proxy feature detection
 - cpu.cpp		- fixed number of cores reported for CPUs with different core types (performance/efficiency)

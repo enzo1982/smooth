@@ -309,6 +309,10 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			 */
 			focusWndID = id;
 
+			/* Grab focus unless we are a tool window.
+			 */
+			if (!(flags & WF_TOPMOST && flags & WF_NOTASKBUTTON && flags & WF_THINBORDER)) XSetInputFocus(display, wnd, RevertToParent, CurrentTime);
+
 			/* Initialize window metrics here to handle X servers
 			 * that do not send a ConfigureNotify to new windows.
 			 */
@@ -480,10 +484,7 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 			 */
 			if (IsModalWindowActive()) break;
 
-			/* Reject button messages if we do not have the focus and
-			 * we are not an utility window.
-			 *
-			 * This usually means that some modal window is blocking.
+			/* Handle focus if we are not a utility window.
 			 */
 			if (!(flags & WF_TOPMOST && flags & WF_NOTASKBUTTON && flags & WF_THINBORDER))
 			{
@@ -492,6 +493,20 @@ S::Int S::GUI::WindowXLib::ProcessSystemMessages(XEvent *e)
 
 				XGetInputFocus(display, &focusWnd, &revertTo);
 
+				/* Grab focus if an ancestor of ourselves is focussed.
+				 */
+				foreach (WindowXLib *backend, windowBackends)
+				{
+					if	(backend == this)	   break;
+					else if (backend->wnd != focusWnd) continue;
+
+					XSetInputFocus(display, focusWnd = wnd, RevertToParent, CurrentTime);
+					break;
+				}
+
+				/* Reject button messages if we do not have the focus at this point,
+				 * which usually means that some modal window is blocking.
+				 */
 				if (focusWnd == None || (focusWnd != wnd && focusWnd != iwnd)) break;
 			}
 

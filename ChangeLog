@@ -1,6 +1,6 @@
 ChangeLog for smooth
 
-dd.mm.yy hh:mm - smooth alpha 0.9.10
+05.03.23 15:38 - smooth alpha 0.9.10
 
 - windowgdi.cpp		- apply dark mode to top window edge too on Windows 10 and 11
 - fontcairo.cpp		- respect text scaling factor in addition to font size setting

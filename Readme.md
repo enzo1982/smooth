@@ -1,6 +1,6 @@
 The smooth Class Library
 ====================================================================================================
-[![Build Status](https://img.shields.io/github/workflow/status/enzo1982/smooth/Verify%20build/master)](https://github.com/enzo1982/smooth/actions?query=workflow%3A%22Verify+build%22+branch%3Amaster) [![Last commit](https://img.shields.io/github/last-commit/enzo1982/smooth.svg)](https://github.com/enzo1982/smooth/commits/master) [![License](https://img.shields.io/github/license/enzo1982/smooth.svg)](https://github.com/enzo1982/smooth/blob/master/Copying)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/enzo1982/smooth/verify-build.yml?branch=master)](https://github.com/enzo1982/smooth/actions?query=workflow%3A%22Verify+build%22+branch%3Amaster) [![Last commit](https://img.shields.io/github/last-commit/enzo1982/smooth.svg)](https://github.com/enzo1982/smooth/commits/master) [![License](https://img.shields.io/github/license/enzo1982/smooth.svg)](https://github.com/enzo1982/smooth/blob/master/Copying)
 
 _smooth_ is an object oriented C++ class library for Windows, macOS, Linux and most Unix-like operating systems. It provides basic functionality and platform support for applications and libraries.
 

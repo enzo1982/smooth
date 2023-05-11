@@ -5,7 +5,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 CCOPTS	   = -I"$(SRCDIR)"/$(SMOOTH_PATH)/include $(MYCCOPTS)
 RC	   = windres
 RCOPTS	   = -DSMOOTH_DLL -O coff
-LDOPTS	   = -L"$(SRCDIR)"/$(SMOOTH_PATH)/$(LIBDIR) -lstdc++ $(LIBS)
+LDOPTS	   = -L"$(SRCDIR)"/$(SMOOTH_PATH)/$(LIBDIR) $(LIBS)
 
 ifndef GLOBALDLL
 	CCOPTS += -fvisibility=hidden

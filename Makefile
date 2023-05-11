@@ -129,7 +129,7 @@ endif
 
 ### Output options ###
 
-LIBS = -lstdc++
+LIBS =
 
 ifeq ($(USE_BUNDLED_LIBBZ2),True)
 	LIBS += $(LIBDIR)/libbz2.a

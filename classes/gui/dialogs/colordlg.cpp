@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -331,29 +331,29 @@ void S::GUI::Dialogs::ColorSelection::ColorDlgPaintProc()
 		irect.right += 5;
 		irect.bottom += 5;
 
-		register Int	 xmin = irect.left - (xoffset + 1);
-		register Int	 ymin = irect.top - (yoffset + 1);
-		register Int	 xmax = irect.right - (xoffset + 1);
-		register Int	 ymax = irect.bottom - (yoffset + 1);
+		Int	 xmin = irect.left - (xoffset + 1);
+		Int	 ymin = irect.top - (yoffset + 1);
+		Int	 xmax = irect.right - (xoffset + 1);
+		Int	 ymax = irect.bottom - (yoffset + 1);
 
-		rect.left	= xmin;
-		rect.top	= ymin;
-		rect.right	= xmax;
-		rect.bottom	= ymax;
+		rect.left   = xmin;
+		rect.top    = ymin;
+		rect.right  = xmax;
+		rect.bottom = ymax;
 
-		for (register int sat = Math::Max(0, ymin); sat < Math::Min(hssize, ymax); sat++)
+		for (int sat = Math::Max(0, ymin); sat < Math::Min(hssize, ymax); sat++)
 		{
-			register int	 normrgb = colortable[acthue][255 - Math::Round(sat * (256.0 / hssize))];
+			int	 normrgb = colortable[acthue][255 - Math::Round(sat * (256.0 / hssize))];
 
-			register double	 rbias	 = (double) Color(normrgb).GetRed() / (255.0 / (256.0 / hssize));
-			register double	 gbias	 = (double) Color(normrgb).GetGreen() / (255.0 / (256.0 / hssize));
-			register double	 bbias	 = (double) Color(normrgb).GetBlue() / (255.0 / (256.0 / hssize));
+			double	 rbias	 = (double) Color(normrgb).GetRed() / (255.0 / (256.0 / hssize));
+			double	 gbias	 = (double) Color(normrgb).GetGreen() / (255.0 / (256.0 / hssize));
+			double	 bbias	 = (double) Color(normrgb).GetBlue() / (255.0 / (256.0 / hssize));
 
-			register double  ared	 = -rbias + Math::Max(0, xmin) * rbias;
-			register double  agreen	 = -gbias + Math::Max(0, xmin) * gbias;
-			register double  ablue	 = -bbias + Math::Max(0, xmin) * bbias;
+			double	 ared	 = -rbias + Math::Max(0, xmin) * rbias;
+			double	 agreen	 = -gbias + Math::Max(0, xmin) * gbias;
+			double	 ablue	 = -bbias + Math::Max(0, xmin) * bbias;
 
-			for (register int val = Math::Max(0, xmin); val < Math::Min(hssize, xmax); val++)
+			for (int val = Math::Max(0, xmin); val < Math::Min(hssize, xmax); val++)
 			{
 				bmp.SetPixel(Point(val, sat), Color(Math::Round(ared += rbias), Math::Round(agreen += gbias), Math::Round(ablue += bbias)));
 			}

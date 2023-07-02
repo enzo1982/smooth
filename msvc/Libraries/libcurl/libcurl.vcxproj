@@ -206,8 +206,14 @@
     <ClCompile Include="..\..\..\libraries\libcurl\asyn-ares.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\asyn-thread.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\base64.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\bufq.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\bufref.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\c-hyper.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-h1-proxy.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-h2-proxy.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-haproxy.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-https-connect.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-socket.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\cfilters.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\conncache.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\connect.c" />
@@ -220,6 +226,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\curl_gethostname.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_get_line.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_gssapi.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\curl_log.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_memrchr.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_multibyte.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_ntlm_core.c" />
@@ -233,6 +240,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\dict.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\doh.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\dynbuf.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\dynhds.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\easy.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\easygetopt.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\easyoptions.c" />
@@ -332,9 +340,9 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vauth\vauth.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\version.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\version_win32.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\vquic\msh3.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\vquic\ngtcp2.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\vquic\quiche.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_msh3.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_ngtcp2.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_quiche.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh2.c" />
@@ -356,15 +364,20 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\wolfssl.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vtls\x509asn1.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\warnless.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\wildcard.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\ws.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\arpa_telnet.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\asyn.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\bufq.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\bufref.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\c-hyper.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-h1-proxy.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-h2-proxy.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-haproxy.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-https-connect.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-socket.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\cfilters.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\config-win32.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\conncache.h" />
@@ -382,6 +395,7 @@
     <ClInclude Include="..\..\..\libraries\libcurl\curl_hmac.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\curl_krb5.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\curl_ldap.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\curl_log.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\curl_md4.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\curl_md5.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\curl_memory.h" />
@@ -398,6 +412,7 @@
     <ClInclude Include="..\..\..\libraries\libcurl\curl_threads.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\dict.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\dynbuf.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\dynhds.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\easyif.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\easyoptions.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\easy_lock.h" />
@@ -475,10 +490,11 @@
     <ClInclude Include="..\..\..\libraries\libcurl\vauth\ntlm.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vauth\vauth.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\version_win32.h" />
-    <ClInclude Include="..\..\..\libraries\libcurl\vquic\msh3.h" />
-    <ClInclude Include="..\..\..\libraries\libcurl\vquic\ngtcp2.h" />
-    <ClInclude Include="..\..\..\libraries\libcurl\vquic\quiche.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_msh3.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_ngtcp2.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_quiche.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic_int.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vssh\ssh.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\gskit.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\gtls.h" />
@@ -492,7 +508,6 @@
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\vtls.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\vtls_int.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\warnless.h" />
-    <ClInclude Include="..\..\..\libraries\libcurl\wildcard.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\ws.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

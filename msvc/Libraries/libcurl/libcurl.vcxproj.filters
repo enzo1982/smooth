@@ -369,9 +369,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\warnless.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\wildcard.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\mime.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -392,12 +389,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh2.c">
       <Filter>Quelldateien\vssh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vquic\ngtcp2.c">
-      <Filter>Quelldateien\vquic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vquic\quiche.c">
-      <Filter>Quelldateien\vquic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\altsvc.c">
       <Filter>Quelldateien</Filter>
@@ -504,8 +495,38 @@
     <ClCompile Include="..\..\..\libraries\libcurl\noproxy.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\vquic\msh3.c">
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_msh3.c">
       <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_ngtcp2.c">
+      <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_quiche.c">
+      <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\bufq.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-h1-proxy.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-h2-proxy.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-haproxy.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-https-connect.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\cf-socket.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\curl_log.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\dynhds.c">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -788,9 +809,6 @@
     <ClInclude Include="..\..\..\libraries\libcurl\warnless.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\wildcard.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vauth\digest.h">
       <Filter>Headerdateien\vauth</Filter>
     </ClInclude>
@@ -823,12 +841,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\mime.h">
       <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vquic\ngtcp2.h">
-      <Filter>Headerdateien\vquic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vquic\quiche.h">
-      <Filter>Headerdateien\vquic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic.h">
       <Filter>Headerdateien\vquic</Filter>
@@ -905,11 +917,44 @@
     <ClInclude Include="..\..\..\libraries\libcurl\noproxy.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\vquic\msh3.h">
-      <Filter>Headerdateien\vquic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\vtls_int.h">
       <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_msh3.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_ngtcp2.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_quiche.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic_int.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\bufq.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-h1-proxy.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-h2-proxy.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-haproxy.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-https-connect.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\cf-socket.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\curl_log.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\dynhds.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

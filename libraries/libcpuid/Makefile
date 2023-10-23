@@ -14,7 +14,7 @@ ifeq ($(BUILD_LINUX),True)
 endif
 
 # Enter object files here:
-OBJECTS	    = asm-bits.o cpuid_main.o libcpuid_util.o rdtsc.o recog_amd.o recog_intel.o
+OBJECTS	    = asm-bits.o cpuid_main.o libcpuid_util.o rdtsc.o recog_amd.o recog_centaur.o recog_intel.o
 
 ## Do not change anything below this line. ##
 

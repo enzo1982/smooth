@@ -29,7 +29,7 @@
  * \file     libcpuid.h
  * \author   Veselin Georgiev
  * \date     Oct 2008
- * \version  0.6.2
+ * \version  0.6.4
  *
  * Version history:
  *
@@ -68,7 +68,15 @@
  *                        cpu_id_t is now different).
  * * 0.6.1 (2022-10-23): A lot of DB updates, fix set_cpu_affinity() on Windows,
  *                       fix cpu_identify_all() when HT is disabled.
- * * 0.6.6 (2022-11-11): A lot of DB updates, fix cpu_identify_all() for single-core CPUs.
+ * * 0.6.2 (2022-11-11): A lot of DB updates, fix cpu_identify_all() for single-core CPUs.
+ * * 0.6.3 (2023-04-02): A lot of DB updates, fix infinite loop in set_cpu_affinity() on macOS,
+ *                       fix a misprint of extended CPUID in cpuid_basic_identify(),
+ *                       restore previous thread CPU affinity before returning from cpuid_get_all_raw_data(),
+ *                       query CPU info at least once even if set_cpu_affinity() fails,
+ *                       rename set_error() to cpuid_set_error() and get_error() to cpuid_get_error().
+ * * 0.6.4 (2023-10-08): A lot of DB updates, add support for Centaur CPUs (VIA and Zhaoxin),
+ *                       fix floating point exception in cpu_identify_all(),
+ *                       fix build for NetBSD and DragonFly BSD.
  */
 
 /** @mainpage A simple libcpuid introduction
@@ -403,7 +411,7 @@ struct cpu_id_t {
 	/** Cache associativity for the L1 data cache. -1 if undetermined */
 	int32_t l1_data_assoc;
 
-	/** Cache associativity for the L1 intruction cache. -1 if undetermined */
+	/** Cache associativity for the L1 instruction cache. -1 if undetermined */
 	int32_t l1_instruction_assoc;
 
 	/** Cache associativity for the L2 cache. -1 if undetermined */
@@ -423,7 +431,7 @@ struct cpu_id_t {
 	/** Cache-line size for L1 data cache. -1 if undetermined */
 	int32_t l1_data_cacheline;
 
-	/** Cache-line size for L1 intruction cache. -1 if undetermined */
+	/** Cache-line size for L1 instruction cache. -1 if undetermined */
 	int32_t l1_instruction_cacheline;
 
 	/** Cache-line size for L2 cache. -1 if undetermined */
@@ -438,7 +446,7 @@ struct cpu_id_t {
 	/** Number of L1 data cache instances. -1 if undetermined */
 	int32_t l1_data_instances;
 
-	/** Number of L1 intruction cache instances. -1 if undetermined */
+	/** Number of L1 instruction cache instances. -1 if undetermined */
 	int32_t l1_instruction_instances;
 
 	/** Number of L2 cache instances. -1 if undetermined */
@@ -464,7 +472,7 @@ struct cpu_id_t {
 	 * +--------+--------+-------+-------+-------+---------------------------------------+-----------------------+
 	 * @endcode
 	 */
-	char cpu_codename[64];
+	char cpu_codename[CODENAME_STR_MAX];
 
 	/** SSE execution unit size (64 or 128; -1 if N/A) */
 	int32_t sse_size;
@@ -499,7 +507,7 @@ struct system_id_t {
 	/** Number of total L1 data cache instances. -1 if undetermined */
 	int32_t l1_data_total_instances;
 
-	/** Number of total L1 intruction cache instances. -1 if undetermined */
+	/** Number of total L1 instruction cache instances. -1 if undetermined */
 	int32_t l1_instruction_total_instances;
 
 	/** Number of total L2 cache instances. -1 if undetermined */

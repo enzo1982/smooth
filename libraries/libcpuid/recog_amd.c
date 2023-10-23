@@ -347,20 +347,22 @@ const struct match_entry_t cpudb_amd[] = {
 	{ 15, -1, -1, 25,   68,  -1,    -1,    -1, NC, RYZEN_|_5           ,     0, "Ryzen 5 (Rembrandt)"           },
 	{ 15, -1, -1, 25,   68,  -1,    -1,    -1, NC, RYZEN_|_3           ,     0, "Ryzen 3 (Rembrandt)"           },
 	/* Zen 4 (2022) => https://en.wikichip.org/wiki/amd/microarchitectures/zen_4 */
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, EPYC_               ,     0, "EPYC (Genoa)"                  },
+	{ 15, -1, -1, 25,   17,  -1,    -1,    -1, NC, EPYC_               ,     0, "EPYC (Genoa)"                  },
 	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_TR_           ,     0, "Threadripper (Storm Peak)"     },
 	{ 15, -1,  2, 25,   97,  -1,    -1,    -1, NC, RYZEN_|_9           ,     0, "Ryzen 9 (Raphael)"             },
 	{ 15, -1,  2, 25,   97,  -1,    -1,    -1, NC, RYZEN_|_7           ,     0, "Ryzen 7 (Raphael)"             },
 	{ 15, -1,  2, 25,   97,  -1,    -1,    -1, NC, RYZEN_|_5           ,     0, "Ryzen 5 (Raphael)"             },
 	{ 15, -1,  2, 25,   97,  -1,    -1,    -1, NC, RYZEN_|_3           ,     0, "Ryzen 3 (Raphael)"             },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_9           ,     0, "Ryzen 9 (Dragon Range)"        },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_7           ,     0, "Ryzen 7 (Dragon Range)"        },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_5           ,     0, "Ryzen 5 (Dragon Range)"        },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_3           ,     0, "Ryzen 3 (Dragon Range)"        },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_9           ,     0, "Ryzen 9 (Phoenix Point)"       },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_7           ,     0, "Ryzen 7 (Phoenix Point)"       },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_5           ,     0, "Ryzen 5 (Phoenix Point)"       },
-	//{ 15, -1, -1, 25,   ??,  -1,    -1,    -1, NC, RYZEN_|_3           ,     0, "Ryzen 3 (Phoenix Point)"       },
+	{ 15, -1, -1, 25,   97,  -1,    -1,    -1, NC, RYZEN_|_9|_H        ,     0, "Ryzen 9 (Dragon Range)"        },
+	{ 15, -1, -1, 25,   97,  -1,    -1,    -1, NC, RYZEN_|_7|_H        ,     0, "Ryzen 7 (Dragon Range)"        },
+	{ 15, -1, -1, 25,   97,  -1,    -1,    -1, NC, RYZEN_|_5|_H        ,     0, "Ryzen 5 (Dragon Range)"        },
+	{ 15, -1, -1, 25,  116,  -1,    -1,    -1, NC, RYZEN_|_9|_H        ,     0, "Ryzen 9 (Phoenix)"             },
+	{ 15, -1, -1, 25,  116,  -1,    -1,    -1, NC, RYZEN_|_7|_H        ,     0, "Ryzen 7 (Phoenix)"             },
+	{ 15, -1, -1, 25,  116,  -1,    -1,    -1, NC, RYZEN_|_7|_U        ,     0, "Ryzen 7 (Phoenix)"             },
+	{ 15, -1, -1, 25,  116,  -1,    -1,    -1, NC, RYZEN_|_5|_H        ,     0, "Ryzen 5 (Phoenix)"             },
+	{ 15, -1, -1, 25,  116,  -1,    -1,    -1, NC, RYZEN_|_5|_U        ,     0, "Ryzen 5 (Phoenix)"             },
+	{ 15, -1, -1, 25,  116,  -1,    -1,    -1, NC, RYZEN_|_3|_U        ,     0, "Ryzen 3 (Phoenix)"             },
+	{ 15, -1, -1, 25,  116,  -1,    -1,    -1, NC, RYZEN_|_Z           ,     0, "Ryzen Z1 (Phoenix)"            },
 	/* F   M   S  EF    EM  #cores  L2$   L3$  BC  ModelBits          ModelCode  Name                           */
 };
 
@@ -520,6 +522,7 @@ static struct amd_code_and_bits_t decode_amd_codename_part1(const char *bs)
 	struct amd_code_and_bits_t result;
 	uint64_t bits = 0;
 	int i = 0;
+	const size_t n = strlen(bs);
 
 	const struct { amd_code_t c; const char *search; } code_matchtable[] = {
 		{ PHENOM2, "Phenom(tm) II" },
@@ -565,7 +568,7 @@ static struct amd_code_and_bits_t decode_amd_codename_part1(const char *bs)
 	if (amd_has_turion_modelname(bs)) {
 		bits |= TURION_;
 	}
-	if ((i = match_pattern(bs, "Ryzen [3579]")) != 0) {
+	if ((i = match_pattern(bs, "Ryzen [3579Z]")) != 0) {
 		bits |= RYZEN_;
 		i--;
 		switch (bs[i + 6]) {
@@ -573,6 +576,15 @@ static struct amd_code_and_bits_t decode_amd_codename_part1(const char *bs)
 			case '5': bits |= _5; break;
 			case '7': bits |= _7; break;
 			case '9': bits |= _9; break;
+			case 'Z': bits |= _Z; break;
+		}
+		for(i = i + 7; i < n; i++) {
+			switch (bs[i]) {
+				case 'H': bits |= _H; break;
+				case 'S': bits |= _S; break;
+				case 'U': bits |= _U; break;
+				case 'X': bits |= _X; break;
+			}
 		}
 	}
 
@@ -645,4 +657,32 @@ int cpuid_identify_amd(struct cpu_raw_data_t* raw, struct cpu_id_t* data, struct
 void cpuid_get_list_amd(struct cpu_list_t* list)
 {
 	generic_get_cpu_list(cpudb_amd, COUNT_OF(cpudb_amd), list);
+}
+
+cpu_purpose_t cpuid_identify_purpose_amd(struct cpu_raw_data_t* raw)
+{
+	//FIXME: ext_cpuid[0x26] => index 38 is past the end of the array (which contains 32 elements)
+	//TODO: leaf CPUID_Fn80000026 needs to be added in cpu_raw_data_t
+	(void)(raw);
+#if 0
+	/* Check for hybrid architecture
+	From Processor Programming Reference (PPR) for AMD Family 19h Model 70h, Revision A0 Processors
+	Available at https://www.amd.com/system/files/TechDocs/57019-A0-PUB_3.00.zip
+
+	- CPUID_Fn80000026_ECX [Extended CPU Topology][15:8] is LevelType.
+	  LevelType 01h is Core.
+
+	- CPUID_Fn80000026_EBX [Extended CPU Topology][31:28] is CoreType.
+	  Only valid while LevelType=Core.
+	*/
+	if (EXTRACTS_BITS(raw->ext_cpuid[0x26][ECX], 15, 8) == 0x1) {
+		debugf(3, "Detected AMD CPU hybrid architecture\n");
+		switch (EXTRACTS_BITS(raw->ext_cpuid[0x26][EBX], 31, 28)) {
+			case 0x0: return PURPOSE_PERFORMANCE;
+			case 0x1: return PURPOSE_EFFICIENCY;
+			default:  return PURPOSE_GENERAL;
+		}
+	}
+#endif
+	return PURPOSE_GENERAL;
 }

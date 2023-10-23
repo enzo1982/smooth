@@ -142,7 +142,7 @@ int match_cpu_codename(const struct match_entry_t* matchtable, int count,
 			bestindex = i;
 		}
 	}
-	strcpy(data->cpu_codename, matchtable[bestindex].name);
+	strncpy(data->cpu_codename, matchtable[bestindex].name, CODENAME_STR_MAX);
 	return bestscore;
 }
 
@@ -153,7 +153,7 @@ void generic_get_cpu_list(const struct match_entry_t* matchtable, int count,
 	n = 0;
 	list->names = (char**) malloc(sizeof(char*) * count);
 	if (!list->names) { /* Memory allocation failure */
-		set_error(ERR_NO_MEM);
+		cpuid_set_error(ERR_NO_MEM);
 		list->num_entries = 0;
 		return;
 	}
@@ -172,7 +172,7 @@ void generic_get_cpu_list(const struct match_entry_t* matchtable, int count,
 		list->names[n] = strdup(matchtable[i].name);
 #endif
 		if (!list->names[n]) { /* Memory allocation failure */
-			set_error(ERR_NO_MEM);
+			cpuid_set_error(ERR_NO_MEM);
 			list->num_entries = 0;
 			for (j = 0; j < n; j++) {
 				free(list->names[j]);
@@ -345,6 +345,31 @@ void assign_cache_data(uint8_t on, cache_type_t cache, int size, int assoc, int 
 			break;
 		default:
 			break;
+	}
+}
+
+void decode_number_of_cores_x86(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
+{
+	int logical_cpus = -1, num_cores = -1;
+
+	if (raw->basic_cpuid[0][EAX] >= 1) {
+		logical_cpus = (raw->basic_cpuid[1][EBX] >> 16) & 0xff;
+		if (raw->basic_cpuid[0][EAX] >= 4) {
+			num_cores = 1 + ((raw->basic_cpuid[4][EAX] >> 26) & 0x3f);
+		}
+	}
+	if (data->flags[CPU_FEATURE_HT]) {
+		if (num_cores > 1) {
+			data->num_cores = num_cores;
+			data->num_logical_cpus = logical_cpus;
+		} else {
+			data->num_cores = 1;
+			data->num_logical_cpus = (logical_cpus >= 1 ? logical_cpus : 1);
+			if (data->num_logical_cpus == 1)
+				data->flags[CPU_FEATURE_HT] = 0;
+		}
+	} else {
+		data->num_cores = data->num_logical_cpus = (logical_cpus >= 1 ? logical_cpus : 1);
 	}
 }
 

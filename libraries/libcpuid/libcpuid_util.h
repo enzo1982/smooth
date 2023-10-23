@@ -43,7 +43,7 @@ struct match_entry_t {
 	int ncores, l2cache, l3cache, brand_code;
 	uint64_t model_bits;
 	int model_code;
-	char name[32];
+	char name[CODENAME_STR_MAX];
 };
 
 // returns the match score:
@@ -92,12 +92,12 @@ void debug_print_lbits(int debuglevel, uint64_t mask);
 /*
  * Sets the current errno
  */
-int set_error(cpu_error_t err);
+int cpuid_set_error(cpu_error_t err);
 
 /*
  * Gets the current errno
  */
-int get_error(void);
+int cpuid_get_error(void);
 
 extern libcpuid_warn_fn_t _warn_fun;
 extern int _current_verboselevel;
@@ -123,6 +123,9 @@ void clear_affinity_mask_bit(logical_cpu_t logical_cpu, cpu_affinity_mask_t *aff
 
 /* assign cache values in cpu_id_t type */
 void assign_cache_data(uint8_t on, cache_type_t cache, int size, int assoc, int linesize, struct cpu_id_t* data);
+
+/* generic way to retrieve core count for x86 CPUs */
+void decode_number_of_cores_x86(struct cpu_raw_data_t* raw, struct cpu_id_t* data);
 
 /* generic way to retrieve cache topology for x86 CPUs */
 void decode_deterministic_cache_info_x86(uint32_t cache_regs[][NUM_REGS],

@@ -147,7 +147,7 @@ ifeq ($(USE_BUNDLED_LIBCURL),True)
 	LIBS += $(LIBDIR)/libcurl.a
 
 	ifeq ($(BUILD_WIN32),True)
-		LIBS += -lwldap32 -lcrypt32
+		LIBS += -lwldap32 -lcrypt32 -lbcrypt
 	else ifeq ($(BUILD_OSX),True)
 		LIBS += -framework Security -lldap
 	endif

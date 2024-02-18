@@ -11,3 +11,4 @@ dd.mm.yy hh:mm - smooth alpha 0.9.11
 - upgraded libpng to version 1.6.40
 - upgraded libwebp to version 1.3.2
 - upgraded zlib to version 1.3
+- upgraded libjpeg to version 9f

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TFTP_H
-#define HEADER_CURL_TFTP_H
+#ifndef HEADER_CURL_VQUIC_CURL_OSSLQ_H
+#define HEADER_CURL_VQUIC_CURL_OSSLQ_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -23,11 +23,29 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#ifndef CURL_DISABLE_TFTP
-extern const struct Curl_handler Curl_handler_tftp;
 
-#define TFTP_BLKSIZE_MIN 8
-#define TFTP_BLKSIZE_MAX 65464
+#include "curl_setup.h"
+
+#if defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)
+
+#ifdef HAVE_NETINET_UDP_H
+#include <netinet/udp.h>
 #endif
 
-#endif /* HEADER_CURL_TFTP_H */
+struct Curl_cfilter;
+
+#include "urldata.h"
+
+void Curl_osslq_ver(char *p, size_t len);
+
+CURLcode Curl_cf_osslq_create(struct Curl_cfilter **pcf,
+                              struct Curl_easy *data,
+                              struct connectdata *conn,
+                              const struct Curl_addrinfo *ai);
+
+bool Curl_conn_is_osslq(const struct Curl_easy *data,
+                        const struct connectdata *conn,
+                        int sockindex);
+#endif
+
+#endif /* HEADER_CURL_VQUIC_CURL_OSSLQ_H */

@@ -343,7 +343,9 @@
     <ClCompile Include="..\..\..\libraries\libcurl\version_win32.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_msh3.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_ngtcp2.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_osslq.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_quiche.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic-tls.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh2.c" />
@@ -492,7 +494,9 @@
     <ClInclude Include="..\..\..\libraries\libcurl\version_win32.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_msh3.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_ngtcp2.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_osslq.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_quiche.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic-tls.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic_int.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vssh\ssh.h" />

@@ -29,7 +29,7 @@ ifeq ($(BUILD_OSX),True)
 endif
 
 OBJECTS += vauth/cleartext.o vauth/cram.o vauth/digest.o vauth/digest_sspi.o vauth/gsasl.o vauth/krb5_gssapi.o vauth/krb5_sspi.o vauth/ntlm.o vauth/ntlm_sspi.o vauth/oauth2.o vauth/spnego_gssapi.o vauth/spnego_sspi.o vauth/vauth.o
-OBJECTS += vquic/curl_msh3.o vquic/curl_ngtcp2.o vquic/curl_quiche.o vquic/vquic.o
+OBJECTS += vquic/curl_msh3.o vquic/curl_ngtcp2.o vquic/curl_osslq.o vquic/curl_quiche.o vquic/vquic.o vquic/vquic-tls.o
 OBJECTS += vssh/libssh.o vssh/libssh2.o vssh/wolfssh.o
 OBJECTS += vtls/bearssl.o vtls/gtls.o vtls/hostcheck.o vtls/keylog.o vtls/mbedtls.o vtls/mbedtls_threadlock.o vtls/openssl.o vtls/rustls.o vtls/vtls.o vtls/wolfssl.o vtls/x509asn1.o
 

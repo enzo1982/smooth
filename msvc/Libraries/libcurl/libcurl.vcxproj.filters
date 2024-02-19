@@ -525,6 +525,12 @@
     <ClCompile Include="..\..\..\libraries\libcurl\http1.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_osslq.c">
+      <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic-tls.c">
+      <Filter>Quelldateien\vquic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h">
@@ -952,6 +958,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\http1.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\curl_osslq.h">
+      <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic-tls.h">
+      <Filter>Headerdateien\vquic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

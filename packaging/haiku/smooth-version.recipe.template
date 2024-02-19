@@ -11,7 +11,7 @@ Features provided by smooth include:
 - completely transparent Unicode and software internationalization support
 - a libxml2 based XML parser"
 HOMEPAGE="http://www.smooth-project.org/"
-COPYRIGHT="1998-2023 Robert Kausch"
+COPYRIGHT="1998-2024 Robert Kausch"
 LICENSE="Artistic v2.0"
 REVISION="1"
 SOURCE_URI="https://github.com/enzo1982/smooth/releases/download/v${portVersion/\~/-}/smooth-${portVersion/\~/-}.tar.gz"

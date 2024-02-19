@@ -421,7 +421,7 @@ xmlAttrSerializeContent(xmlOutputBufferPtr buf, xmlAttrPtr attr)
  *
  * This will dump the content of the notation table as an XML DTD definition
  */
-void
+static void
 xmlBufDumpNotationTable(xmlBufPtr buf, xmlNotationTablePtr table) {
     xmlBufferPtr buffer;
 
@@ -445,7 +445,7 @@ xmlBufDumpNotationTable(xmlBufPtr buf, xmlNotationTablePtr table) {
  * This will dump the content of the element declaration as an XML
  * DTD definition
  */
-void
+static void
 xmlBufDumpElementDecl(xmlBufPtr buf, xmlElementPtr elem) {
     xmlBufferPtr buffer;
 
@@ -469,7 +469,7 @@ xmlBufDumpElementDecl(xmlBufPtr buf, xmlElementPtr elem) {
  * This will dump the content of the attribute declaration as an XML
  * DTD definition
  */
-void
+static void
 xmlBufDumpAttributeDecl(xmlBufPtr buf, xmlAttributePtr attr) {
     xmlBufferPtr buffer;
 
@@ -492,7 +492,7 @@ xmlBufDumpAttributeDecl(xmlBufPtr buf, xmlAttributePtr attr) {
  *
  * This will dump the content of the entity table as an XML DTD definition
  */
-void
+static void
 xmlBufDumpEntityDecl(xmlBufPtr buf, xmlEntityPtr ent) {
     xmlBufferPtr buffer;
 
@@ -1847,7 +1847,7 @@ xmlSaveDoc(xmlSaveCtxtPtr ctxt, xmlDocPtr doc)
 /**
  * xmlSaveTree:
  * @ctxt:  a document saving context
- * @node:  the top node of the subtree to save
+ * @cur:  the top node of the subtree to save
  *
  * Save a subtree starting at the node parameter to a saving context
  * TODO: The function is not fully implemented yet as it does not return the
@@ -2166,17 +2166,9 @@ xmlBufNodeDump(xmlBufPtr buf, xmlDocPtr doc, xmlNodePtr cur, int level,
     xmlInitParser();
 
     if (cur == NULL) {
-#ifdef DEBUG_TREE
-        xmlGenericError(xmlGenericErrorContext,
-                        "xmlNodeDump : node == NULL\n");
-#endif
         return (-1);
     }
     if (buf == NULL) {
-#ifdef DEBUG_TREE
-        xmlGenericError(xmlGenericErrorContext,
-                        "xmlNodeDump : buf == NULL\n");
-#endif
         return (-1);
     }
     outbuf = (xmlOutputBufferPtr) xmlMalloc(sizeof(xmlOutputBuffer));
@@ -2218,18 +2210,8 @@ xmlElemDump(FILE * f, xmlDocPtr doc, xmlNodePtr cur)
     xmlInitParser();
 
     if (cur == NULL) {
-#ifdef DEBUG_TREE
-        xmlGenericError(xmlGenericErrorContext,
-                        "xmlElemDump : cur == NULL\n");
-#endif
         return;
     }
-#ifdef DEBUG_TREE
-    if (doc == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-                        "xmlElemDump : doc == NULL\n");
-    }
-#endif
 
     outbuf = xmlOutputBufferCreateFile(f, NULL);
     if (outbuf == NULL)
@@ -2273,6 +2255,8 @@ xmlNodeDumpOutput(xmlOutputBufferPtr buf, xmlDocPtr doc, xmlNodePtr cur,
     xmlDtdPtr dtd;
     int is_xhtml = 0;
 #endif
+
+    (void) doc;
 
     xmlInitParser();
 
@@ -2467,10 +2451,6 @@ xmlDocFormatDump(FILE *f, xmlDocPtr cur, int format) {
     int ret;
 
     if (cur == NULL) {
-#ifdef DEBUG_TREE
-        xmlGenericError(xmlGenericErrorContext,
-		"xmlDocDump : document == NULL\n");
-#endif
 	return(-1);
     }
     encoding = (const char *) cur->encoding;

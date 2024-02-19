@@ -1,32 +1,18 @@
-/*
- * Summary: Internal Interfaces for encoding in libxml2
- * Description: this module describes a few interfaces which were
- *              added along with the API changes in 2.9.0
- *              those are private routines at this point
- *
- * Copy: See Copyright for the status of this software.
- *
- * Author: Daniel Veillard
- */
+#ifndef XML_ENC_H_PRIVATE__
+#define XML_ENC_H_PRIVATE__
 
-#ifndef __XML_ENC_H__
-#define __XML_ENC_H__
-
+#include <libxml/encoding.h>
 #include <libxml/tree.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+XML_HIDDEN void
+xmlInitEncodingInternal(void);
 
-int xmlCharEncFirstLineInt(xmlCharEncodingHandler *handler, xmlBufferPtr out,
-                           xmlBufferPtr in, int len);
-int xmlCharEncFirstLineInput(xmlParserInputBufferPtr input, int len);
-int xmlCharEncInput(xmlParserInputBufferPtr input, int flush);
-int xmlCharEncOutput(xmlOutputBufferPtr output, int init);
+XML_HIDDEN int
+xmlEncInputChunk(xmlCharEncodingHandler *handler, unsigned char *out,
+                 int *outlen, const unsigned char *in, int *inlen);
+XML_HIDDEN int
+xmlCharEncInput(xmlParserInputBufferPtr input);
+XML_HIDDEN int
+xmlCharEncOutput(xmlOutputBufferPtr output, int init);
 
-#ifdef __cplusplus
-}
-#endif
-#endif /* __XML_ENC_H__ */
-
-
+#endif /* XML_ENC_H_PRIVATE__ */

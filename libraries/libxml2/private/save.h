@@ -1,36 +1,18 @@
-/*
- * Summary: Internal Interfaces for saving in libxml2
- * Description: this module describes a few interfaces which were
- *              added along with the API changes in 2.9.0
- *              those are private routines at this point
- *
- * Copy: See Copyright for the status of this software.
- *
- * Author: Daniel Veillard
- */
-
-#ifndef __XML_SAVE_H__
-#define __XML_SAVE_H__
+#ifndef XML_SAVE_H_PRIVATE__
+#define XML_SAVE_H_PRIVATE__
 
 #include <libxml/tree.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <libxml/xmlversion.h>
 
 #ifdef LIBXML_OUTPUT_ENABLED
-void xmlBufAttrSerializeTxtContent(xmlBufPtr buf, xmlDocPtr doc,
-                                   xmlAttrPtr attr, const xmlChar * string);
-void xmlBufDumpNotationTable(xmlBufPtr buf, xmlNotationTablePtr table);
-void xmlBufDumpElementDecl(xmlBufPtr buf, xmlElementPtr elem);
-void xmlBufDumpAttributeDecl(xmlBufPtr buf, xmlAttributePtr attr);
-void xmlBufDumpEntityDecl(xmlBufPtr buf, xmlEntityPtr ent);
-#endif
 
-xmlChar *xmlEncodeAttributeEntities(xmlDocPtr doc, const xmlChar *input);
+XML_HIDDEN void
+xmlBufAttrSerializeTxtContent(xmlBufPtr buf, xmlDocPtr doc,
+                              xmlAttrPtr attr, const xmlChar * string);
+XML_HIDDEN void
+xmlNsListDumpOutput(xmlOutputBufferPtr buf, xmlNsPtr cur);
 
-#ifdef __cplusplus
-}
-#endif
-#endif /* __XML_SAVE_H__ */
+#endif /* LIBXML_OUTPUT_ENABLED */
+
+#endif /* XML_SAVE_H_PRIVATE__ */
 

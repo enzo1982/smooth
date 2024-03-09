@@ -8,7 +8,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.11
 - upgraded libcpuid to version 0.6.4
 - upgraded libxml2 to version 2.12.5
 - upgraded libcurl to version 8.6.0
-- upgraded libpng to version 1.6.42
+- upgraded libpng to version 1.6.43
 - upgraded libwebp to version 1.3.2
 - upgraded zlib to version 1.3.1
 - upgraded libjpeg to version 9f

@@ -94,6 +94,7 @@ const struct Curl_handler Curl_handler_scp = {
   wssh_getsock,                         /* perform_getsock */
   wscp_disconnect,                      /* disconnect */
   ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_SSH,                             /* defport */
@@ -123,6 +124,7 @@ const struct Curl_handler Curl_handler_sftp = {
   wssh_getsock,                         /* perform_getsock */
   wsftp_disconnect,                     /* disconnect */
   ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_SSH,                             /* defport */
@@ -398,7 +400,7 @@ static CURLcode wssh_connect(struct Curl_easy *data, bool *done)
 
   rc = wolfSSH_SetUsername(sshc->ssh_session, conn->user);
   if(rc != WS_SUCCESS) {
-    failf(data, "wolfSSH failed to set user name");
+    failf(data, "wolfSSH failed to set username");
     goto error;
   }
 
@@ -431,7 +433,7 @@ error:
 
 /*
  * wssh_statemach_act() runs the SSH state machine as far as it can without
- * blocking and without reaching the end.  The data the pointer 'block' points
+ * blocking and without reaching the end. The data the pointer 'block' points
  * to will be set to TRUE if the wolfssh function returns EAGAIN meaning it
  * wants to be called again when the socket is ready
  */
@@ -444,7 +446,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
   struct SSHPROTO *sftp_scp = data->req.p.ssh;
   WS_SFTPNAME *name;
   int rc = 0;
-  *block = FALSE; /* we're not blocking by default */
+  *block = FALSE; /* we are not blocking by default */
 
   do {
     switch(sshc->state) {
@@ -625,10 +627,10 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       if(data->state.resume_from > 0) {
         /* Let's read off the proper amount of bytes from the input. */
         int seekerr = CURL_SEEKFUNC_OK;
-        if(conn->seek_func) {
+        if(data->set.seek_func) {
           Curl_set_in_callback(data, true);
-          seekerr = conn->seek_func(conn->seek_client, data->state.resume_from,
-                                    SEEK_SET);
+          seekerr = data->set.seek_func(data->set.seek_client,
+                                        data->state.resume_from, SEEK_SET);
           Curl_set_in_callback(data, false);
         }
 
@@ -639,7 +641,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
             failf(data, "Could not seek stream");
             return CURLE_FTP_COULDNT_USE_REST;
           }
-          /* seekerr == CURL_SEEKFUNC_CANTSEEK (can't seek to offset) */
+          /* seekerr == CURL_SEEKFUNC_CANTSEEK (cannot seek to offset) */
           do {
             char scratch[4*1024];
             size_t readthisamountnow =
@@ -678,9 +680,9 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         Curl_pgrsSetUploadSize(data, data->state.infilesize);
       }
       /* upload data */
-      Curl_setup_transfer(data, -1, -1, FALSE, FIRSTSOCKET);
+      Curl_xfer_setup1(data, CURL_XFER_SEND, -1, FALSE);
 
-      /* not set by Curl_setup_transfer to preserve keepon bits */
+      /* not set by Curl_xfer_setup to preserve keepon bits */
       conn->sockfd = conn->writesockfd;
 
       if(result) {
@@ -688,7 +690,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         sshc->actualcode = result;
       }
       else {
-        /* store this original bitmask setup to use later on if we can't
+        /* store this original bitmask setup to use later on if we cannot
            figure out a "real" bitmask */
         sshc->orig_waitfor = data->req.keepon;
 
@@ -697,7 +699,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
            with both accordingly */
         data->state.select_bits = CURL_CSELECT_OUT;
 
-        /* since we don't really wait for anything at this point, we want the
+        /* since we do not really wait for anything at this point, we want the
            state machine to move on as soon as possible so we set a very short
            timeout here */
         Curl_expire(data, 0, EXPIRE_RUN_NOW);
@@ -778,14 +780,14 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       /* Setup the actual download */
       if(data->req.size == 0) {
         /* no data to transfer */
-        Curl_setup_transfer(data, -1, -1, FALSE, -1);
+        Curl_xfer_setup_nop(data);
         infof(data, "File already completely downloaded");
         state(data, SSH_STOP);
         break;
       }
-      Curl_setup_transfer(data, FIRSTSOCKET, data->req.size, FALSE, -1);
+      Curl_xfer_setup1(data, CURL_XFER_RECV, data->req.size, FALSE);
 
-      /* not set by Curl_setup_transfer to preserve keepon bits */
+      /* not set by Curl_xfer_setup to preserve keepon bits */
       conn->writesockfd = conn->sockfd;
 
       /* we want to use the _receiving_ function even when the socket turns
@@ -906,7 +908,7 @@ static CURLcode wssh_multi_statemach(struct Curl_easy *data, bool *done)
   do {
     result = wssh_statemach_act(data, &block);
     *done = (sshc->state == SSH_STOP) ? TRUE : FALSE;
-    /* if there's no error, it isn't done and it didn't EWOULDBLOCK, then
+    /* if there is no error, it is not done and it did not EWOULDBLOCK, then
        try again */
     if(*done) {
       DEBUGF(infof(data, "wssh_statemach_act says DONE"));
@@ -1119,7 +1121,7 @@ static CURLcode wsftp_disconnect(struct Curl_easy *data,
   DEBUGF(infof(data, "SSH DISCONNECT starts now"));
 
   if(conn->proto.sshc.ssh_session) {
-    /* only if there's a session still around to use! */
+    /* only if there is a session still around to use! */
     state(data, SSH_SFTP_SHUTDOWN);
     result = wssh_block_statemach(data, TRUE);
   }

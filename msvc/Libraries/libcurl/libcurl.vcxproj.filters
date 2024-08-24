@@ -138,9 +138,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\curl_ntlm_core.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\curl_ntlm_wb.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\curl_rtmp.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -531,6 +528,18 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic-tls.c">
       <Filter>Quelldateien\vquic</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vtls\cipher_suite.c">
+      <Filter>Quelldateien\vtls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\curl_sha512_256.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\cw-out.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\request.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libcurl\amigaos.h">
@@ -600,9 +609,6 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\curl_ntlm_core.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\libraries\libcurl\curl_ntlm_wb.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\curl_printf.h">
@@ -964,6 +970,33 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic-tls.h">
       <Filter>Headerdateien\vquic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\bearssl.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\cipher_suite.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\hostcheck.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\sectransp.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\wolfssl.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vtls\x509asn1.h">
+      <Filter>Headerdateien\vtls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\curl_sha512_256.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\cw-out.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\request.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

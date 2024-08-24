@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_NTLM_WB_H
-#define HEADER_CURL_NTLM_WB_H
+#ifndef HEADER_CURL_SHA512_256_H
+#define HEADER_CURL_SHA512_256_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Evgeny Grin (Karlson2k), <k2k@narod.ru>.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -24,22 +24,21 @@
  *
  ***************************************************************************/
 
-#include "curl_setup.h"
+#if !defined(CURL_DISABLE_DIGEST_AUTH) && !defined(CURL_DISABLE_SHA512_256)
 
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_NTLM) && \
-    defined(NTLM_WB_ENABLED)
+#include <curl/curl.h>
+#include "curl_hmac.h"
 
-/* this is for ntlm header input */
-CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
-                            struct connectdata *conn, bool proxy,
-                            const char *header);
+#define CURL_HAVE_SHA512_256
 
-/* this is for creating ntlm header output */
-CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
-                             bool proxy);
+extern const struct HMAC_params Curl_HMAC_SHA512_256[1];
 
-void Curl_http_auth_cleanup_ntlm_wb(struct connectdata *conn);
+#define SHA512_256_DIGEST_LENGTH 32
 
-#endif /* !CURL_DISABLE_HTTP && USE_NTLM && NTLM_WB_ENABLED */
+CURLcode
+Curl_sha512_256it(unsigned char *output, const unsigned char *input,
+                  size_t input_size);
 
-#endif /* HEADER_CURL_NTLM_WB_H */
+#endif /* !CURL_DISABLE_DIGEST_AUTH && !CURL_DISABLE_SHA512_256 */
+
+#endif /* HEADER_CURL_SHA256_H */

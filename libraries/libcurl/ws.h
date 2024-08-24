@@ -57,7 +57,7 @@ struct ws_encoder {
   curl_off_t payload_len;  /* payload length of current frame */
   curl_off_t payload_remain;  /* remaining payload of current */
   unsigned int xori; /* xor index */
-  unsigned char mask[4]; /* 32 bit mask for this connection */
+  unsigned char mask[4]; /* 32-bit mask for this connection */
   unsigned char firstbyte; /* first byte of frame we encode */
   bool contfragment; /* set TRUE if the previous fragment sent was not final */
 };
@@ -75,7 +75,6 @@ struct websocket {
 
 CURLcode Curl_ws_request(struct Curl_easy *data, REQTYPE *req);
 CURLcode Curl_ws_accept(struct Curl_easy *data, const char *mem, size_t len);
-void Curl_ws_done(struct Curl_easy *data);
 
 extern const struct Curl_handler Curl_handler_ws;
 #ifdef USE_SSL
@@ -85,7 +84,6 @@ extern const struct Curl_handler Curl_handler_wss;
 
 #else
 #define Curl_ws_request(x,y) CURLE_OK
-#define Curl_ws_done(x) Curl_nop_stmt
 #define Curl_ws_free(x) Curl_nop_stmt
 #endif
 

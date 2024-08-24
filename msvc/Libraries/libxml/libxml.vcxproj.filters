@@ -123,6 +123,9 @@
     <ClInclude Include="..\..\..\include\support\libxml2\win32config.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\support\libxml2\libxml\xpath.h">
+      <Filter>Headerdateien\libxml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\libraries\libxml2\buf.c">

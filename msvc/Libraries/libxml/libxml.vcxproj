@@ -217,6 +217,7 @@
     <ClInclude Include="..\..\..\include\support\libxml2\libxml\xmlstring.h" />
     <ClInclude Include="..\..\..\include\support\libxml2\libxml\xmlversion.h" />
     <ClInclude Include="..\..\..\include\support\libxml2\libxml\xmlwriter.h" />
+    <ClInclude Include="..\..\..\include\support\libxml2\libxml\xpath.h" />
     <ClInclude Include="..\..\..\include\support\libxml2\win32config.h" />
   </ItemGroup>
   <ItemGroup>

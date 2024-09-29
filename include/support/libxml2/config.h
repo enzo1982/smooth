@@ -2,6 +2,7 @@
 #include "win32config.h"
 #else
 #define HAVE_STDINT_H 1
+#define HAVE_FCNTL_H 1
 
 #define HAVE_VA_COPY 1
 #endif

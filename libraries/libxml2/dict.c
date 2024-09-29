@@ -954,7 +954,7 @@ xmlInitRandom(void) {
     xmlInitMutex(&xmlRngMutex);
 
     {
-#ifdef _WIN32
+#if defined(_WIN32) && _WIN32_WINNT >= 0x0600
         NTSTATUS status;
 
         status = BCryptGenRandom(NULL, (unsigned char *) globalRngState,

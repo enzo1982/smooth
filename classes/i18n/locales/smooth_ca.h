@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2024 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -37,9 +37,9 @@ static const char *smooth_ca =
 	     <entry string=\"Clear\">Neteja</entry>					\
 	     <entry string=\"Select all\">Selecciona-ho tot</entry>			\
 											\
-	     <entry string=\"Backspace\">Espai enrere</entry>				\
+	     <entry string=\"Backspace\">Retrocés</entry>				\
 	     <entry string=\"Tab\">Tab</entry>						\
-	     <entry string=\"Return\">Intro</entry>					\
+	     <entry string=\"Return\">Retorn</entry>					\
 	     <entry string=\"Esc\">Esc</entry>						\
 	     <entry string=\"Space\">Espai</entry>					\
 	     <entry string=\"PgUp\">RePàg</entry>					\
@@ -56,19 +56,19 @@ static const char *smooth_ca =
 	     <entry string=\"Alt\">Alt</entry>						\
 	     <entry string=\"Shift\">Majús</entry>					\
 											\
-	     <entry string=\"Open file\">Obre fitxer</entry>				\
+	     <entry string=\"Open file\">Obre un fitxer</entry>				\
 	     <entry string=\"Save file\">Desa el fitxer</entry>				\
 	     <entry string=\"Save file as\">Desa el fitxer com a</entry>		\
-	     <entry string=\"Select directory\">Tria carpeta</entry>			\
-	     <entry string=\"Select font\">Trieu tipus de lletra</entry>		\
+	     <entry string=\"Select directory\">Seleccioneu un directori</entry>	\
+	     <entry string=\"Select font\">Seleccioneu el tipus de lletra</entry>	\
 											\
 	     <entry string=\"Color selection\">Selecció de color</entry>		\
 	     <entry string=\"HTML code\">Codi HTML</entry>				\
 											\
-	     <entry string=\"Tip of the day\">Pista del dia</entry>			\
+	     <entry string=\"Tip of the day\">Consell del dia</entry>			\
 	     <entry string=\"Did you know...\">Sabíeu que...</entry>			\
-	     <entry string=\"Show tips on startup\">Mostra pistes en engegar</entry>	\
-	     <entry string=\"Next tip\">Següent</entry>					\
+	     <entry string=\"Show tips on startup\">Mostra consells en iniciar</entry>	\
+	     <entry string=\"Next tip\">Següent consell</entry>				\
 	   </data>									\
 	 </LangFile>";
 

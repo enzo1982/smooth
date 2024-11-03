@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2014 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2024 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -22,7 +22,7 @@ static const char *smooth_ru =
 	     <property name=\"encoding\">UTF-8</property>				\
 	   </info>									\
 	   <data>									\
-	     <entry string=\"OK\">Да</entry>						\
+	     <entry string=\"OK\">OK</entry>						\
 	     <entry string=\"Cancel\">Отмена</entry>					\
 	     <entry string=\"Yes\">Да</entry>						\
 	     <entry string=\"No\">Нет</entry>						\

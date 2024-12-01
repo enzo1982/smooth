@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2024 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -124,16 +124,17 @@ S::Bool S::GUI::BitmapHaiku::SetSystemBitmap(Void *nBitmap)
 	}
 	else
 	{
-		BRect	 bounds = ((BBitmap *) nBitmap)->Bounds();
+		BBitmap	*haikuBitmap = (BBitmap *) nBitmap;
+		BRect	 bounds	     = haikuBitmap->Bounds();
 
-		CreateBitmap(Size(bounds.right + 1, bounds.bottom + 1), 32);
+		CreateBitmap(Size(bounds.right + 1, bounds.bottom + 1), haikuBitmap->ColorSpace() == B_RGBA32 ? 32 : 24);
 
 		BView	*view = new BView(bounds, NULL, B_FOLLOW_ALL_SIDES, 0);
 
 		bitmap->AddChild(view);
 		bitmap->Lock();
 
-		view->DrawBitmap((BBitmap *) nBitmap, BPoint(0, 0));
+		view->DrawBitmap(haikuBitmap, BPoint(0, 0));
 
 		bitmap->Unlock();
 		bitmap->RemoveChild(view);

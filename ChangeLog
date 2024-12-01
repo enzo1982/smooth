@@ -2,6 +2,8 @@ ChangeLog for smooth
 
 dd.mm.yy hh:mm - smooth alpha 0.9.11
 
+- bitmaphaiku.cpp	- fixed bitmap transparency issues
+
 - fixed crash querying CPU info on systems without affinity setting support in libcpuid
 
 - upgraded fribidi to version 1.0.16

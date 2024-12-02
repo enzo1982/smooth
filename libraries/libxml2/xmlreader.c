@@ -58,7 +58,7 @@
   #ifdef __va_copy
     #define va_copy(dest, src) __va_copy(dest, src)
   #else
-    #define va_copy(dest, src) memcpy(dest, src, sizeof(va_list))
+    #define va_copy(dest, src) memcpy(&(dest), &(src), sizeof(va_list))
   #endif
 #endif
 
@@ -1750,7 +1750,8 @@ xmlTextReaderReadString(xmlTextReaderPtr reader)
         case XML_CDATA_SECTION_NODE:
             break;
         case XML_ELEMENT_NODE:
-            if (xmlTextReaderDoExpand(reader) == -1)
+            if ((xmlTextReaderDoExpand(reader) == -1) ||
+                (node->children == NULL))
                 return(NULL);
             break;
         case XML_ATTRIBUTE_NODE:
@@ -2340,6 +2341,8 @@ xmlTextReaderGetAttributeNo(xmlTextReaderPtr reader, int no) {
     }
     /* TODO walk the DTD if present */
 
+    if (cur->children == NULL)
+        return(NULL);
     ret = xmlNodeListGetString(reader->node->doc, cur->children, 1);
     if (ret == NULL)
         xmlTextReaderErrMemory(reader);
@@ -3585,6 +3588,8 @@ xmlTextReaderValue(xmlTextReaderPtr reader) {
             xmlDocPtr doc = NULL;
             xmlChar *ret;
 
+            if (attr->children == NULL)
+                return(NULL);
 	    if (attr->parent != NULL)
                 doc = attr->parent->doc;
 	    ret = xmlNodeListGetString(doc, attr->children, 1);

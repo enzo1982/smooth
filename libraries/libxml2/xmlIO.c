@@ -536,7 +536,7 @@ xmlFdOpen(const char *filename, int write, int *out) {
             flags = _O_WRONLY | _O_CREAT | _O_TRUNC;
         else
             flags = _O_RDONLY;
-	fd = _wopen(wpath, flags | _O_BINARY, 0777);
+	fd = _wopen(wpath, flags | _O_BINARY, 0666);
         xmlFree(wpath);
     }
 #else
@@ -544,7 +544,7 @@ xmlFdOpen(const char *filename, int write, int *out) {
         flags = O_WRONLY | O_CREAT | O_TRUNC;
     else
         flags = O_RDONLY;
-    fd = open(filename, flags, 0777);
+    fd = open(filename, flags, 0666);
 #endif /* WIN32 */
 
     if (fd < 0) {
@@ -1210,7 +1210,13 @@ xmlInputDefaultOpen(xmlParserInputBufferPtr buf, const char *filename) {
         if (xzStream == NULL) {
             close(fd);
         } else {
-            if (__libxml2_xzcompressed(xzStream) > 0) {
+            /*
+             * Non-regular files like pipes can't be reopened.
+             * If a file isn't seekable, we pipe uncompressed
+             * input through xzlib.
+             */
+            if ((lseek(fd, 0, SEEK_CUR) < 0) ||
+                (__libxml2_xzcompressed(xzStream) > 0)) {
                 buf->context = xzStream;
                 buf->readcallback = xmlXzfileRead;
                 buf->closecallback = xmlXzfileClose;
@@ -1237,12 +1243,13 @@ xmlInputDefaultOpen(xmlParserInputBufferPtr buf, const char *filename) {
         if (gzStream == NULL) {
             close(fd);
         } else {
-            char buff4[4];
-
-            if ((gzread(gzStream, buff4, 4) > 0) &&
+            /*
+             * Non-regular files like pipes can't be reopened.
+             * If a file isn't seekable, we pipe uncompressed
+             * input through zlib.
+             */
+            if ((lseek(fd, 0, SEEK_CUR) < 0) ||
                 (gzdirect(gzStream) == 0)) {
-                gzrewind(gzStream);
-
                 buf->context = gzStream;
                 buf->readcallback = xmlGzfileRead;
                 buf->closecallback = xmlGzfileClose;
@@ -1572,6 +1579,8 @@ xmlParserInputBufferCreateFilenameInt(const char *URI, xmlCharEncoding enc,
     int ret;
     int i;
 
+    xmlInitParser();
+
     *out = NULL;
     if (URI == NULL)
         return(XML_ERR_ARGUMENT);
@@ -1678,6 +1687,8 @@ __xmlOutputBufferCreateFilename(const char *URI,
     xmlURIPtr puri;
     int i = 0;
     char *unescaped = NULL;
+
+    xmlInitParser();
 
     if (URI == NULL)
         return(NULL);
@@ -2978,6 +2989,8 @@ int
 xmlRegisterInputCallbacks(xmlInputMatchCallback matchFunc,
 	xmlInputOpenCallback openFunc, xmlInputReadCallback readFunc,
 	xmlInputCloseCallback closeFunc) {
+    xmlInitParser();
+
     if (xmlInputCallbackNr >= MAX_INPUT_CALLBACK) {
 	return(-1);
     }
@@ -3009,6 +3022,8 @@ xmlRegisterDefaultInputCallbacks(void) {
 int
 xmlPopInputCallbacks(void)
 {
+    xmlInitParser();
+
     if (xmlInputCallbackNr <= 0)
         return(-1);
 
@@ -3026,6 +3041,8 @@ xmlPopInputCallbacks(void)
 void
 xmlCleanupInputCallbacks(void)
 {
+    xmlInitParser();
+
     xmlInputCallbackNr = 0;
 }
 
@@ -3045,6 +3062,8 @@ int
 xmlRegisterOutputCallbacks(xmlOutputMatchCallback matchFunc,
 	xmlOutputOpenCallback openFunc, xmlOutputWriteCallback writeFunc,
 	xmlOutputCloseCallback closeFunc) {
+    xmlInitParser();
+
     if (xmlOutputCallbackNr >= MAX_OUTPUT_CALLBACK) {
 	return(-1);
     }
@@ -3076,6 +3095,8 @@ xmlRegisterDefaultOutputCallbacks (void) {
 int
 xmlPopOutputCallbacks(void)
 {
+    xmlInitParser();
+
     if (xmlOutputCallbackNr <= 0)
         return(-1);
 
@@ -3093,6 +3114,8 @@ xmlPopOutputCallbacks(void)
 void
 xmlCleanupOutputCallbacks(void)
 {
+    xmlInitParser();
+
     xmlOutputCallbackNr = 0;
 }
 

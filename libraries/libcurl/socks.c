@@ -217,7 +217,7 @@ static CURLproxycode socks_state_send(struct Curl_cfilter *cf,
   CURLcode result;
 
   nwritten = Curl_conn_cf_send(cf->next, data, (char *)sx->outp,
-                               sx->outstanding, &result);
+                               sx->outstanding, FALSE, &result);
   if(nwritten <= 0) {
     if(CURLE_AGAIN == result) {
       return CURLPX_OK;
@@ -286,7 +286,7 @@ static CURLproxycode do_SOCKS4(struct Curl_cfilter *cf,
 {
   struct connectdata *conn = cf->conn;
   const bool protocol4a =
-    (conn->socks_proxy.proxytype == CURLPROXY_SOCKS4A) ? TRUE : FALSE;
+    (conn->socks_proxy.proxytype == CURLPROXY_SOCKS4A);
   unsigned char *socksreq = sx->buffer;
   CURLcode result;
   CURLproxycode presult;
@@ -388,7 +388,7 @@ CONNECT_RESOLVED:
 
         infof(data, "SOCKS4 connect to IPv4 %s (locally resolved)", buf);
 
-        Curl_resolv_unlock(data, dns); /* not used anymore from now on */
+        Curl_resolv_unlink(data, &dns); /* not used anymore from now on */
       }
       else
         failf(data, "SOCKS4 connection to %s not supported", sx->hostname);
@@ -512,7 +512,7 @@ CONNECT_REQ_INIT:
   /* Result */
   switch(socksreq[1]) {
   case 90:
-    infof(data, "SOCKS4%s request granted.", protocol4a?"a":"");
+    infof(data, "SOCKS4%s request granted.", protocol4a ? "a" : "");
     break;
   case 91:
     failf(data,
@@ -583,7 +583,7 @@ static CURLproxycode do_SOCKS5(struct Curl_cfilter *cf,
   CURLcode result;
   CURLproxycode presult;
   bool socks5_resolve_local =
-    (conn->socks_proxy.proxytype == CURLPROXY_SOCKS5) ? TRUE : FALSE;
+    (conn->socks_proxy.proxytype == CURLPROXY_SOCKS5);
   const size_t hostname_len = strlen(sx->hostname);
   size_t len = 0;
   const unsigned char auth = data->set.socks5auth;
@@ -893,7 +893,7 @@ CONNECT_RESOLVED:
       failf(data, "SOCKS5 connection to %s not supported", dest);
     }
 
-    Curl_resolv_unlock(data, dns); /* not used anymore from now on */
+    Curl_resolv_unlink(data, &dns); /* not used anymore from now on */
     goto CONNECT_REQ_SEND;
   }
 CONNECT_RESOLVE_REMOTE:

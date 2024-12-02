@@ -24,6 +24,7 @@
 
 #include "curl_setup.h"
 
+#include "timeval.h"
 #include "splay.h"
 
 /*
@@ -33,7 +34,7 @@
  *  zero          : when i is equal   to   j
  *  positive when : when i is larger  than j
  */
-#define compare(i,j) Curl_splaycomparekeys((i),(j))
+#define compare(i,j) Curl_timediff_us(i,j)
 
 /*
  * Splay using the key i (which may or may not be in the tree.) The starting
@@ -45,12 +46,12 @@ struct Curl_tree *Curl_splay(struct curltime i,
   struct Curl_tree N, *l, *r, *y;
 
   if(!t)
-    return t;
+    return NULL;
   N.smaller = N.larger = NULL;
   l = r = &N;
 
   for(;;) {
-    long comp = compare(i, t->key);
+    timediff_t comp = compare(i, t->key);
     if(comp < 0) {
       if(!t->smaller)
         break;
@@ -106,15 +107,15 @@ struct Curl_tree *Curl_splayinsert(struct curltime i,
     ~0, -1
   }; /* will *NEVER* appear */
 
-  if(!node)
-    return t;
+  DEBUGASSERT(node);
 
   if(t) {
     t = Curl_splay(i, t);
+    DEBUGASSERT(t);
     if(compare(i, t->key) == 0) {
-      /* There already exists a node in the tree with the very same key. Build
-         a doubly-linked circular list of nodes. We add the new 'node' struct
-         to the end of this list. */
+      /* There already exists a node in the tree with the same key. Build a
+         doubly-linked circular list of nodes. We add the new 'node' struct to
+         the end of this list. */
 
       node->key = KEY_NOTUSED; /* we set the key in the sub node to NOTUSED
                                   to quickly identify this node as a subnode */
@@ -166,6 +167,7 @@ struct Curl_tree *Curl_splaygetbest(struct curltime i,
 
   /* find smallest */
   t = Curl_splay(tv_zero, t);
+  DEBUGASSERT(t);
   if(compare(i, t->key) < 0) {
     /* even the smallest is too big */
     *removed = NULL;
@@ -197,7 +199,7 @@ struct Curl_tree *Curl_splaygetbest(struct curltime i,
 }
 
 
-/* Deletes the very node we point out from the tree if it is there. Stores a
+/* Deletes the node we point out from the tree if it is there. Stores a
  * pointer to the new resulting tree in 'newroot'.
  *
  * Returns zero on success and non-zero on errors!
@@ -217,8 +219,10 @@ int Curl_splayremove(struct Curl_tree *t,
   }; /* will *NEVER* appear */
   struct Curl_tree *x;
 
-  if(!t || !removenode)
+  if(!t)
     return 1;
+
+  DEBUGASSERT(removenode);
 
   if(compare(KEY_NOTUSED, removenode->key) == 0) {
     /* Key set to NOTUSED means it is a subnode within a 'same' linked list
@@ -238,6 +242,7 @@ int Curl_splayremove(struct Curl_tree *t,
   }
 
   t = Curl_splay(removenode->key, t);
+  DEBUGASSERT(t);
 
   /* First make sure that we got the same root node as the one we want
      to remove, as otherwise we might be trying to remove a node that
@@ -268,6 +273,7 @@ int Curl_splayremove(struct Curl_tree *t,
       x = t->larger;
     else {
       x = Curl_splay(removenode->key, t->smaller);
+      DEBUGASSERT(x);
       x->larger = t->larger;
     }
   }
@@ -275,4 +281,17 @@ int Curl_splayremove(struct Curl_tree *t,
   *newroot = x; /* store new root pointer */
 
   return 0;
+}
+
+/* set and get the custom payload for this tree node */
+void Curl_splayset(struct Curl_tree *node, void *payload)
+{
+  DEBUGASSERT(node);
+  node->ptr = payload;
+}
+
+void *Curl_splayget(struct Curl_tree *node)
+{
+  DEBUGASSERT(node);
+  return node->ptr;
 }

@@ -387,9 +387,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\curl_get_line.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libraries\libcurl\curl_path.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\curl_range.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -539,6 +536,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\libraries\libcurl\request.c">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libcurl\vssh\curl_path.c">
+      <Filter>Quelldateien\vssh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -997,6 +997,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libcurl\request.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libcurl\vssh\curl_path.h">
+      <Filter>Headerdateien\vssh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -28,8 +28,6 @@
 
 #include <limits.h>
 
-#include <wolfssh/ssh.h>
-#include <wolfssh/wolfsftp.h>
 #include "urldata.h"
 #include "cfilters.h"
 #include "connect.h"
@@ -220,13 +218,15 @@ static void state(struct Curl_easy *data, sshstate nowstate)
 }
 
 static ssize_t wscp_send(struct Curl_easy *data, int sockindex,
-                         const void *mem, size_t len, CURLcode *err)
+                         const void *mem, size_t len, bool eos,
+                         CURLcode *err)
 {
   ssize_t nwrite = 0;
   (void)data;
   (void)sockindex; /* we only support SCP on the fixed known primary socket */
   (void)mem;
   (void)len;
+  (void)eos;
   (void)err;
 
   return nwrite;
@@ -247,16 +247,17 @@ static ssize_t wscp_recv(struct Curl_easy *data, int sockindex,
 
 /* return number of sent bytes */
 static ssize_t wsftp_send(struct Curl_easy *data, int sockindex,
-                          const void *mem, size_t len, CURLcode *err)
+                          const void *mem, size_t len, bool eos, CURLcode *err)
 {
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = &conn->proto.sshc;
   word32 offset[2];
   int rc;
   (void)sockindex;
+  (void)eos;
 
-  offset[0] = (word32)sshc->offset&0xFFFFFFFF;
-  offset[1] = (word32)(sshc->offset>>32)&0xFFFFFFFF;
+  offset[0] = (word32)sshc->offset & 0xFFFFFFFF;
+  offset[1] = (word32)(sshc->offset >> 32) & 0xFFFFFFFF;
 
   rc = wolfSSH_SFTP_SendWritePacket(sshc->ssh_session, sshc->handle,
                                     sshc->handleSz,
@@ -280,7 +281,7 @@ static ssize_t wsftp_send(struct Curl_easy *data, int sockindex,
     return -1;
   }
   DEBUGASSERT(rc == (int)len);
-  infof(data, "sent %zu bytes SFTP from offset %" CURL_FORMAT_CURL_OFF_T,
+  infof(data, "sent %zu bytes SFTP from offset %" FMT_OFF_T,
         len, sshc->offset);
   sshc->offset += len;
   return (ssize_t)rc;
@@ -299,8 +300,8 @@ static ssize_t wsftp_recv(struct Curl_easy *data, int sockindex,
   word32 offset[2];
   (void)sockindex;
 
-  offset[0] = (word32)sshc->offset&0xFFFFFFFF;
-  offset[1] = (word32)(sshc->offset>>32)&0xFFFFFFFF;
+  offset[0] = (word32)sshc->offset & 0xFFFFFFFF;
+  offset[1] = (word32)(sshc->offset >> 32) & 0xFFFFFFFF;
 
   rc = wolfSSH_SFTP_SendReadPacket(sshc->ssh_session, sshc->handle,
                                    sshc->handleSz,
@@ -577,7 +578,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
           else {
             curl_off_t size = ((curl_off_t)attrs.sz[1] << 32) | attrs.sz[0];
             if(size < 0) {
-              failf(data, "Bad file size (%" CURL_FORMAT_CURL_OFF_T ")", size);
+              failf(data, "Bad file size (%" FMT_OFF_T ")", size);
               return CURLE_BAD_DOWNLOAD_RESUME;
             }
             data->state.resume_from = size;
@@ -628,10 +629,10 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         /* Let's read off the proper amount of bytes from the input. */
         int seekerr = CURL_SEEKFUNC_OK;
         if(data->set.seek_func) {
-          Curl_set_in_callback(data, true);
+          Curl_set_in_callback(data, TRUE);
           seekerr = data->set.seek_func(data->set.seek_client,
                                         data->state.resume_from, SEEK_SET);
-          Curl_set_in_callback(data, false);
+          Curl_set_in_callback(data, FALSE);
         }
 
         if(seekerr != CURL_SEEKFUNC_OK) {
@@ -650,11 +651,11 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
               sizeof(scratch) : curlx_sotouz(data->state.resume_from - passed);
 
             size_t actuallyread;
-            Curl_set_in_callback(data, true);
+            Curl_set_in_callback(data, TRUE);
             actuallyread = data->state.fread_func(scratch, 1,
                                                   readthisamountnow,
                                                   data->state.in);
-            Curl_set_in_callback(data, false);
+            Curl_set_in_callback(data, FALSE);
 
             passed += actuallyread;
             if((actuallyread == 0) || (actuallyread > readthisamountnow)) {
@@ -762,13 +763,13 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         return CURLE_SSH;
       }
 
-      size = ((curl_off_t)attrs.sz[1] <<32) | attrs.sz[0];
+      size = ((curl_off_t)attrs.sz[1] << 32) | attrs.sz[0];
 
       data->req.size = size;
       data->req.maxdownload = size;
       Curl_pgrsSetDownloadSize(data, size);
 
-      infof(data, "SFTP download %" CURL_FORMAT_CURL_OFF_T " bytes", size);
+      infof(data, "SFTP download %" FMT_OFF_T " bytes", size);
 
       /* We cannot seek with wolfSSH so resuming and range requests are not
          possible */
@@ -907,7 +908,7 @@ static CURLcode wssh_multi_statemach(struct Curl_easy *data, bool *done)
                  implementation */
   do {
     result = wssh_statemach_act(data, &block);
-    *done = (sshc->state == SSH_STOP) ? TRUE : FALSE;
+    *done = (sshc->state == SSH_STOP);
     /* if there is no error, it is not done and it did not EWOULDBLOCK, then
        try again */
     if(*done) {
@@ -961,7 +962,7 @@ CURLcode wsftp_perform(struct Curl_easy *data,
 static CURLcode wssh_do(struct Curl_easy *data, bool *done)
 {
   CURLcode result;
-  bool connected = 0;
+  bool connected = FALSE;
   struct connectdata *conn = data->conn;
   struct ssh_conn *sshc = &conn->proto.sshc;
 
@@ -1027,7 +1028,7 @@ static CURLcode wssh_block_statemach(struct Curl_easy *data,
 
       /* wait for the socket to become ready */
       (void)Curl_socket_check(fd_read, CURL_SOCKET_BAD, fd_write,
-                              left>1000?1000:left); /* ignore result */
+                              left > 1000 ? 1000 : left); /* ignore result */
     }
   }
 

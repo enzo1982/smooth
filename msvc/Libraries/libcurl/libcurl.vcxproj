@@ -229,7 +229,6 @@
     <ClCompile Include="..\..\..\libraries\libcurl\curl_memrchr.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_multibyte.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_ntlm_core.c" />
-    <ClCompile Include="..\..\..\libraries\libcurl\curl_path.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_range.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_rtmp.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\curl_sasl.c" />
@@ -349,6 +348,7 @@
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\curl_quiche.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic-tls.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vquic\vquic.c" />
+    <ClCompile Include="..\..\..\libraries\libcurl\vssh\curl_path.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\libssh2.c" />
     <ClCompile Include="..\..\..\libraries\libcurl\vssh\wolfssh.c" />
@@ -504,6 +504,7 @@
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic-tls.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vquic\vquic_int.h" />
+    <ClInclude Include="..\..\..\libraries\libcurl\vssh\curl_path.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vssh\ssh.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\bearssl.h" />
     <ClInclude Include="..\..\..\libraries\libcurl\vtls\cipher_suite.h" />

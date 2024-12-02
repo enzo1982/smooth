@@ -30,14 +30,15 @@
  */
 
 #ifdef CURL_NO_OLDIES
-#define CURL_STRICTER
+#define CURL_STRICTER /* not used since 8.11.0 */
 #endif
 
 /* Compile-time deprecation macros. */
-#if (defined(__GNUC__) &&                                               \
-  ((__GNUC__ > 12) || ((__GNUC__ == 12) && (__GNUC_MINOR__ >= 1 ))) ||  \
-  defined(__IAR_SYSTEMS_ICC__)) &&                                      \
-  !defined(__INTEL_COMPILER) &&                                         \
+#if (defined(__GNUC__) &&                                              \
+  ((__GNUC__ > 12) || ((__GNUC__ == 12) && (__GNUC_MINOR__ >= 1))) ||  \
+  (defined(__clang__) && __clang_major__ >= 3) ||                      \
+  defined(__IAR_SYSTEMS_ICC__)) &&                                     \
+  !defined(__INTEL_COMPILER) &&                                        \
   !defined(CURL_DISABLE_DEPRECATION) && !defined(BUILDING_LIBCURL)
 #define CURL_DEPRECATED(version, message)                       \
   __attribute__((deprecated("since " # version ". " message)))
@@ -76,7 +77,7 @@
 #if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__CYGWIN__)
 #if !(defined(_WINSOCKAPI_) || defined(_WINSOCK_H) || \
       defined(__LWIP_OPT_H__) || defined(LWIP_HDR_OPT_H))
-/* The check above prevents the winsock2 inclusion if winsock.h already was
+/* The check above prevents the winsock2.h inclusion if winsock.h already was
    included, since they cannot co-exist without problems */
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -113,13 +114,8 @@
 extern "C" {
 #endif
 
-#if defined(BUILDING_LIBCURL) || defined(CURL_STRICTER)
-typedef struct Curl_easy CURL;
-typedef struct Curl_share CURLSH;
-#else
 typedef void CURL;
 typedef void CURLSH;
-#endif
 
 /*
  * libcurl external API function linkage decorations.
@@ -253,12 +249,12 @@ typedef int (*curl_xferinfo_callback)(void *clientp,
 #endif
 
 #ifndef CURL_MAX_WRITE_SIZE
-  /* Tests have proven that 20K is a very bad buffer size for uploads on
-     Windows, while 16K for some odd reason performed a lot better.
-     We do the ifndef check to allow this value to easier be changed at build
-     time for those who feel adventurous. The practical minimum is about
-     400 bytes since libcurl uses a buffer of this size as a scratch area
-     (unrelated to network send operations). */
+  /* Tests have proven that 20K is a bad buffer size for uploads on Windows,
+     while 16K for some odd reason performed a lot better. We do the ifndef
+     check to allow this value to easier be changed at build time for those
+     who feel adventurous. The practical minimum is about 400 bytes since
+     libcurl uses a buffer of this size as a scratch area (unrelated to
+     network send operations). */
 #define CURL_MAX_WRITE_SIZE 16384
 #endif
 
@@ -721,6 +717,8 @@ typedef enum {
    with them. */
 #define CURLOPT_WRITEINFO CURLOPT_OBSOLETE40
 #define CURLOPT_CLOSEPOLICY CURLOPT_OBSOLETE72
+#define CURLOPT_OBSOLETE72 9999
+#define CURLOPT_OBSOLETE40 9999
 
 #endif /* !CURL_NO_OLDIES */
 
@@ -939,6 +937,9 @@ typedef enum {
 /* - CURLSSLOPT_AUTO_CLIENT_CERT tells libcurl to automatically locate and use
    a client certificate for authentication. (Schannel) */
 #define CURLSSLOPT_AUTO_CLIENT_CERT (1<<5)
+
+/* If possible, send data using TLS 1.3 early data */
+#define CURLSSLOPT_EARLYDATA (1<<6)
 
 /* The default connection attempt delay in milliseconds for happy eyeballs.
    CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS.3 and happy-eyeballs-timeout-ms.d document
@@ -1250,8 +1251,7 @@ typedef enum {
   /* send linked-list of post-transfer QUOTE commands */
   CURLOPT(CURLOPT_POSTQUOTE, CURLOPTTYPE_SLISTPOINT, 39),
 
-   /* OBSOLETE, do not use! */
-  CURLOPT(CURLOPT_OBSOLETE40, CURLOPTTYPE_OBJECTPOINT, 40),
+  /* 40 is not used */
 
   /* talk a lot */
   CURLOPT(CURLOPT_VERBOSE, CURLOPTTYPE_LONG, 41),
@@ -1352,9 +1352,7 @@ typedef enum {
   /* Max amount of cached alive connections */
   CURLOPT(CURLOPT_MAXCONNECTS, CURLOPTTYPE_LONG, 71),
 
-  /* OBSOLETE, do not use! */
-  CURLOPT(CURLOPT_OBSOLETE72, CURLOPTTYPE_LONG, 72),
-
+  /* 72 = OBSOLETE */
   /* 73 = OBSOLETE */
 
   /* Set to explicitly use a new connection for the upcoming transfer.
@@ -1398,7 +1396,7 @@ typedef enum {
      operation. Set filename to "-" (dash) to make it go to stdout. */
   CURLOPT(CURLOPT_COOKIEJAR, CURLOPTTYPE_STRINGPOINT, 82),
 
-  /* Specify which SSL ciphers to use */
+  /* Specify which TLS 1.2 (1.1, 1.0) ciphers to use */
   CURLOPT(CURLOPT_SSL_CIPHER_LIST, CURLOPTTYPE_STRINGPOINT, 83),
 
   /* Specify which HTTP version to use! This must be set to one of the
@@ -2022,7 +2020,7 @@ typedef enum {
   /* password for the SSL private key for proxy */
   CURLOPT(CURLOPT_PROXY_KEYPASSWD, CURLOPTTYPE_STRINGPOINT, 258),
 
-  /* Specify which SSL ciphers to use for proxy */
+  /* Specify which TLS 1.2 (1.1, 1.0) ciphers to use for proxy */
   CURLOPT(CURLOPT_PROXY_SSL_CIPHER_LIST, CURLOPTTYPE_STRINGPOINT, 259),
 
   /* CRL file for proxy */
@@ -2203,7 +2201,7 @@ typedef enum {
   /* specify which protocols that libcurl is allowed to follow directs to */
   CURLOPT(CURLOPT_REDIR_PROTOCOLS_STR, CURLOPTTYPE_STRINGPOINT, 319),
 
-  /* websockets options */
+  /* WebSockets options */
   CURLOPT(CURLOPT_WS_OPTIONS, CURLOPTTYPE_LONG, 320),
 
   /* CA cache timeout */
@@ -2645,7 +2643,7 @@ CURL_EXTERN char *curl_getenv(const char *variable);
  *
  * DESCRIPTION
  *
- * Returns a static ascii string of the libcurl version.
+ * Returns a static ASCII string of the libcurl version.
  */
 CURL_EXTERN char *curl_version(void);
 
@@ -2953,7 +2951,9 @@ typedef enum {
   CURLINFO_CONN_ID          = CURLINFO_OFF_T + 64,
   CURLINFO_QUEUE_TIME_T     = CURLINFO_OFF_T + 65,
   CURLINFO_USED_PROXY       = CURLINFO_LONG + 66,
-  CURLINFO_LASTONE          = 66
+  CURLINFO_POSTTRANSFER_TIME_T = CURLINFO_OFF_T + 67,
+  CURLINFO_EARLYDATA_SENT_T = CURLINFO_OFF_T + 68,
+  CURLINFO_LASTONE          = 68
 } CURLINFO;
 
 /* CURLINFO_RESPONSE_CODE is the new name for the option previously known as
@@ -3236,7 +3236,9 @@ CURL_EXTERN CURLcode curl_easy_pause(CURL *handle, int bitmask);
 #include "options.h"
 #include "header.h"
 #include "websockets.h"
+#ifndef CURL_SKIP_INCLUDE_MPRINTF
 #include "mprintf.h"
+#endif
 
 /* the typechecker does not work in C++ (yet) */
 #if defined(__GNUC__) && defined(__GNUC_MINOR__) && \

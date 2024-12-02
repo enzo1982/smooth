@@ -91,7 +91,7 @@ static CURLcode ftpsend(struct Curl_easy *data, struct connectdata *conn,
 #ifdef HAVE_GSSAPI
     conn->data_prot = PROT_CMD;
 #endif
-    result = Curl_xfer_send(data, sptr, write_len, &bytes_written);
+    result = Curl_xfer_send(data, sptr, write_len, FALSE, &bytes_written);
 #ifdef HAVE_GSSAPI
     DEBUGASSERT(data_sec > PROT_NONE && data_sec < PROT_LAST);
     conn->data_prot = data_sec;
@@ -209,7 +209,7 @@ krb5_auth(void *app_data, struct Curl_easy *data, struct connectdata *conn)
   struct gss_channel_bindings_struct chan;
   size_t base64_sz = 0;
   struct sockaddr_in *remote_addr =
-    (struct sockaddr_in *)(void *)&conn->remote_addr->sa_addr;
+    (struct sockaddr_in *)(void *)&conn->remote_addr->curl_sa_addr;
   char *stringp;
 
   if(getsockname(conn->sock[FIRSTSOCKET],
@@ -336,17 +336,20 @@ krb5_auth(void *app_data, struct Curl_easy *data, struct connectdata *conn)
         }
 
         _gssresp.value = NULL; /* make sure it is initialized */
+        _gssresp.length = 0;
         p += 4; /* over '789 ' */
         p = strstr(p, "ADAT=");
         if(p) {
-          result = Curl_base64_decode(p + 5,
-                                      (unsigned char **)&_gssresp.value,
-                                      &_gssresp.length);
+          unsigned char *outptr;
+          size_t outlen;
+          result = Curl_base64_decode(p + 5, &outptr, &outlen);
           if(result) {
             failf(data, "base64-decoding: %s", curl_easy_strerror(result));
             ret = AUTH_CONTINUE;
             break;
           }
+          _gssresp.value = outptr;
+          _gssresp.length = outlen;
         }
 
         gssresp = &_gssresp;
@@ -497,7 +500,7 @@ socket_write(struct Curl_easy *data, int sockindex, const void *to,
   size_t written;
 
   while(len > 0) {
-    result = Curl_conn_send(data, sockindex, to_p, len, &written);
+    result = Curl_conn_send(data, sockindex, to_p, len, FALSE, &written);
     if(!result && written > 0) {
       len -= written;
       to_p += written;
@@ -620,7 +623,7 @@ static void do_sec_send(struct Curl_easy *data, struct connectdata *conn,
   size_t cmd_size = 0;
   CURLcode error;
   enum protection_level prot_level = conn->data_prot;
-  bool iscmd = (prot_level == PROT_CMD)?TRUE:FALSE;
+  bool iscmd = (prot_level == PROT_CMD);
 
   DEBUGASSERT(prot_level > PROT_NONE && prot_level < PROT_LAST);
 
@@ -652,7 +655,7 @@ static void do_sec_send(struct Curl_easy *data, struct connectdata *conn,
 
       socket_write(data, fd, cmd_buffer, cmd_size);
       socket_write(data, fd, "\r\n", 2);
-      infof(data, "Send: %s%s", prot_level == PROT_PRIVATE?enc:mic,
+      infof(data, "Send: %s%s", prot_level == PROT_PRIVATE ? enc : mic,
             cmd_buffer);
       free(cmd_buffer);
     }
@@ -686,10 +689,12 @@ static ssize_t sec_write(struct Curl_easy *data, struct connectdata *conn,
 
 /* Matches Curl_send signature */
 static ssize_t sec_send(struct Curl_easy *data, int sockindex,
-                        const void *buffer, size_t len, CURLcode *err)
+                        const void *buffer, size_t len, bool eos,
+                        CURLcode *err)
 {
   struct connectdata *conn = data->conn;
   curl_socket_t fd = conn->sock[sockindex];
+  (void)eos; /* unused */
   *err = CURLE_OK;
   return sec_write(data, conn, fd, buffer, len);
 }

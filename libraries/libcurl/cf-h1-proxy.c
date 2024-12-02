@@ -266,7 +266,7 @@ static CURLcode send_CONNECT(struct Curl_cfilter *cf,
   blen -= ts->nsent;
   buf += ts->nsent;
 
-  nwritten = cf->next->cft->do_send(cf->next, data, buf, blen, &result);
+  nwritten = cf->next->cft->do_send(cf->next, data, buf, blen, FALSE, &result);
   if(nwritten < 0) {
     if(result == CURLE_AGAIN) {
       result = CURLE_OK;
@@ -299,7 +299,7 @@ static CURLcode on_resp_header(struct Curl_cfilter *cf,
      (checkprefix("Proxy-authenticate:", header) &&
       (407 == k->httpcode))) {
 
-    bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
+    bool proxy = (k->httpcode == 407);
     char *auth = Curl_copy_header_value(header);
     if(!auth)
       return CURLE_OUT_OF_MEMORY;
@@ -489,8 +489,7 @@ static CURLcode recv_CONNECT_resp(struct Curl_cfilter *cf,
         ts->keepon = KEEPON_IGNORE;
 
         if(ts->cl) {
-          infof(data, "Ignore %" CURL_FORMAT_CURL_OFF_T
-                " bytes of response-body", ts->cl);
+          infof(data, "Ignore %" FMT_OFF_T " bytes of response-body", ts->cl);
         }
         else if(ts->chunked_encoding) {
           infof(data, "Ignore chunked response-body");
@@ -548,8 +547,8 @@ static CURLcode CONNECT_host(struct Curl_cfilter *cf,
   if(result)
     return result;
 
-  authority = aprintf("%s%s%s:%d", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
-                      port);
+  authority = aprintf("%s%s%s:%d", ipv6_ip ? "[":"", hostname,
+                      ipv6_ip ? "]" : "", port);
   if(!authority)
     return CURLE_OUT_OF_MEMORY;
 

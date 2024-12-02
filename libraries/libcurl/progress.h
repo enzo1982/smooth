@@ -58,10 +58,8 @@ void Curl_pgrsUpdate_nometer(struct Curl_easy *data);
 
 void Curl_pgrsResetTransferSizes(struct Curl_easy *data);
 struct curltime Curl_pgrsTime(struct Curl_easy *data, timerid timer);
-timediff_t Curl_pgrsLimitWaitTime(curl_off_t cursize,
-                                  curl_off_t startsize,
-                                  curl_off_t limit,
-                                  struct curltime start,
+timediff_t Curl_pgrsLimitWaitTime(struct pgrs_dir *d,
+                                  curl_off_t speed_limit,
                                   struct curltime now);
 /**
  * Update progress timer with the elapsed time from its start to `timestamp`.
@@ -70,6 +68,8 @@ timediff_t Curl_pgrsLimitWaitTime(curl_off_t cursize,
  */
 void Curl_pgrsTimeWas(struct Curl_easy *data, timerid timer,
                       struct curltime timestamp);
+
+void Curl_pgrsEarlyData(struct Curl_easy *data, curl_off_t sent);
 
 #define PGRS_HIDE    (1<<4)
 #define PGRS_UL_SIZE_KNOWN (1<<5)

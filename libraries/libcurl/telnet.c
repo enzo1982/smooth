@@ -154,8 +154,8 @@ struct TELNET {
   int himq[256];
   int him_preferred[256];
   int subnegotiation[256];
-  char subopt_ttype[32];             /* Set with suboption TTYPE */
-  char subopt_xdisploc[128];         /* Set with suboption XDISPLOC */
+  char *subopt_ttype;                /* Set with suboption TTYPE */
+  char *subopt_xdisploc;             /* Set with suboption XDISPLOC */
   unsigned short subopt_wsx;         /* Set with suboption NAWS */
   unsigned short subopt_wsy;         /* Set with suboption NAWS */
   TelnetReceive telrcv_state;
@@ -671,7 +671,7 @@ static void printsub(struct Curl_easy *data,
   if(data->set.verbose) {
     unsigned int i = 0;
     if(direction) {
-      infof(data, "%s IAC SB ", (direction == '<')? "RCVD":"SENT");
+      infof(data, "%s IAC SB ", (direction == '<') ? "RCVD" : "SENT");
       if(length >= 3) {
         int j;
 
@@ -721,8 +721,8 @@ static void printsub(struct Curl_easy *data,
     switch(pointer[0]) {
     case CURL_TELOPT_NAWS:
       if(length > 4)
-        infof(data, "Width: %d ; Height: %d", (pointer[1]<<8) | pointer[2],
-              (pointer[3]<<8) | pointer[4]);
+        infof(data, "Width: %d ; Height: %d", (pointer[1] << 8) | pointer[2],
+              (pointer[3] << 8) | pointer[4]);
       break;
     default:
       switch(pointer[1]) {
@@ -831,12 +831,9 @@ static CURLcode check_telnet_options(struct Curl_easy *data)
       case 5:
         /* Terminal type */
         if(strncasecompare(option, "TTYPE", 5)) {
-          size_t l = strlen(arg);
-          if(l < sizeof(tn->subopt_ttype)) {
-            strcpy(tn->subopt_ttype, arg);
-            tn->us_preferred[CURL_TELOPT_TTYPE] = CURL_YES;
-            break;
-          }
+          tn->subopt_ttype = arg;
+          tn->us_preferred[CURL_TELOPT_TTYPE] = CURL_YES;
+          break;
         }
         result = CURLE_UNKNOWN_OPTION;
         break;
@@ -844,12 +841,9 @@ static CURLcode check_telnet_options(struct Curl_easy *data)
       case 8:
         /* Display variable */
         if(strncasecompare(option, "XDISPLOC", 8)) {
-          size_t l = strlen(arg);
-          if(l < sizeof(tn->subopt_xdisploc)) {
-            strcpy(tn->subopt_xdisploc, arg);
-            tn->us_preferred[CURL_TELOPT_XDISPLOC] = CURL_YES;
-            break;
-          }
+          tn->subopt_xdisploc = arg;
+          tn->us_preferred[CURL_TELOPT_XDISPLOC] = CURL_YES;
+          break;
         }
         result = CURLE_UNKNOWN_OPTION;
         break;
@@ -1276,7 +1270,7 @@ static CURLcode send_telnet_data(struct Curl_easy *data,
       default:                    /* write! */
         bytes_written = 0;
         result = Curl_xfer_send(data, outbuf + total_written,
-                                outlen - total_written, &bytes_written);
+                                outlen - total_written, FALSE, &bytes_written);
         total_written += bytes_written;
         break;
     }
@@ -1342,7 +1336,7 @@ static CURLcode telnet_do(struct Curl_easy *data, bool *done)
 
 #ifdef USE_WINSOCK
   /* We want to wait for both stdin and the socket. Since
-  ** the select() function in winsock only works on sockets
+  ** the select() function in Winsock only works on sockets
   ** we have to use the WaitForMultipleObjects() call.
   */
 
@@ -1353,7 +1347,7 @@ static CURLcode telnet_do(struct Curl_easy *data, bool *done)
     return CURLE_FAILED_INIT;
   }
 
-  /* Tell winsock what events we want to listen to */
+  /* Tell Winsock what events we want to listen to */
   if(WSAEventSelect(sockfd, event_handle, FD_READ|FD_CLOSE) == SOCKET_ERROR) {
     WSACloseEvent(event_handle);
     return CURLE_OK;

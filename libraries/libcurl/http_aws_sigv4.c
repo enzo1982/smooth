@@ -47,7 +47,7 @@
 
 #define HMAC_SHA256(k, kl, d, dl, o)           \
   do {                                         \
-    result = Curl_hmacit(Curl_HMAC_SHA256,     \
+    result = Curl_hmacit(&Curl_HMAC_SHA256,    \
                          (unsigned char *)k,   \
                          kl,                   \
                          (unsigned char *)d,   \
@@ -60,11 +60,11 @@
 #define TIMESTAMP_SIZE 17
 
 /* hex-encoded with trailing null */
-#define SHA256_HEX_LENGTH (2 * SHA256_DIGEST_LENGTH + 1)
+#define SHA256_HEX_LENGTH (2 * CURL_SHA256_DIGEST_LENGTH + 1)
 
 static void sha256_to_hex(char *dst, unsigned char *sha)
 {
-  Curl_hexencode(sha, SHA256_DIGEST_LENGTH,
+  Curl_hexencode(sha, CURL_SHA256_DIGEST_LENGTH,
                  (unsigned char *)dst, SHA256_HEX_LENGTH);
 }
 
@@ -122,12 +122,39 @@ static void trim_headers(struct curl_slist *head)
 
 #define DATE_HDR_KEY_LEN (MAX_SIGV4_LEN + sizeof("X--Date"))
 
-#define MAX_HOST_LEN 255
-/* FQDN + host: */
-#define FULL_HOST_LEN (MAX_HOST_LEN + sizeof("host:"))
-
 /* string been x-PROVIDER-date:TIMESTAMP, I need +1 for ':' */
 #define DATE_FULL_HDR_LEN (DATE_HDR_KEY_LEN + TIMESTAMP_SIZE + 1)
+
+/* alphabetically compare two headers by their name, expecting
+   headers to use ':' at this point */
+static int compare_header_names(const char *a, const char *b)
+{
+  const char *colon_a;
+  const char *colon_b;
+  size_t len_a;
+  size_t len_b;
+  size_t min_len;
+  int cmp;
+
+  colon_a = strchr(a, ':');
+  colon_b = strchr(b, ':');
+
+  DEBUGASSERT(colon_a);
+  DEBUGASSERT(colon_b);
+
+  len_a = colon_a ? (size_t)(colon_a - a) : strlen(a);
+  len_b = colon_b ? (size_t)(colon_b - b) : strlen(b);
+
+  min_len = (len_a < len_b) ? len_a : len_b;
+
+  cmp = strncmp(a, b, min_len);
+
+  /* return the shorter of the two if one is shorter */
+  if(!cmp)
+    return (int)(len_a - len_b);
+
+  return cmp;
+}
 
 /* timestamp should point to a buffer of at last TIMESTAMP_SIZE bytes */
 static CURLcode make_headers(struct Curl_easy *data,
@@ -145,7 +172,7 @@ static CURLcode make_headers(struct Curl_easy *data,
   struct curl_slist *tmp_head = NULL;
   CURLcode ret = CURLE_OUT_OF_MEMORY;
   struct curl_slist *l;
-  int again = 1;
+  bool again = TRUE;
 
   /* provider1 mid */
   Curl_strntolower(provider1, provider1, strlen(provider1));
@@ -159,31 +186,22 @@ static CURLcode make_headers(struct Curl_easy *data,
             "x-%s-date:%s", provider1, timestamp);
 
   if(!Curl_checkheaders(data, STRCONST("Host"))) {
-    char full_host[FULL_HOST_LEN + 1];
+    char *fullhost;
 
     if(data->state.aptr.host) {
-      size_t pos;
-
-      if(strlen(data->state.aptr.host) > FULL_HOST_LEN) {
-        ret = CURLE_URL_MALFORMAT;
-        goto fail;
-      }
-      strcpy(full_host, data->state.aptr.host);
       /* remove /r/n as the separator for canonical request must be '\n' */
-      pos = strcspn(full_host, "\n\r");
-      full_host[pos] = 0;
+      size_t pos = strcspn(data->state.aptr.host, "\n\r");
+      fullhost = Curl_memdup0(data->state.aptr.host, pos);
     }
-    else {
-      if(strlen(hostname) > MAX_HOST_LEN) {
-        ret = CURLE_URL_MALFORMAT;
-        goto fail;
-      }
-      msnprintf(full_host, FULL_HOST_LEN, "host:%s", hostname);
-    }
+    else
+      fullhost = aprintf("host:%s", hostname);
 
-    head = curl_slist_append(NULL, full_host);
-    if(!head)
+    if(fullhost)
+      head = Curl_slist_append_nodup(NULL, fullhost);
+    if(!head) {
+      free(fullhost);
       goto fail;
+    }
   }
 
 
@@ -240,7 +258,7 @@ static CURLcode make_headers(struct Curl_easy *data,
     if(!tmp_head)
       goto fail;
     head = tmp_head;
-    *date_header = curl_maprintf("%s: %s\r\n", date_hdr_key, timestamp);
+    *date_header = aprintf("%s: %s\r\n", date_hdr_key, timestamp);
   }
   else {
     char *value;
@@ -267,18 +285,18 @@ static CURLcode make_headers(struct Curl_easy *data,
     *date_header = NULL;
   }
 
-  /* alpha-sort in a case sensitive manner */
+  /* alpha-sort by header name in a case sensitive manner */
   do {
-    again = 0;
+    again = FALSE;
     for(l = head; l; l = l->next) {
       struct curl_slist *next = l->next;
 
-      if(next && strcmp(l->data, next->data) > 0) {
+      if(next && compare_header_names(l->data, next->data) > 0) {
         char *tmp = l->data;
 
         l->data = next->data;
         next->data = tmp;
-        again = 1;
+        again = TRUE;
       }
     }
   } while(again);
@@ -476,12 +494,12 @@ static CURLcode canon_string(const char *q, size_t len,
           /* allowed as-is */
           if(*q == '=') {
             result = Curl_dyn_addn(dq, q, 1);
-            *found_equals = true;
+            *found_equals = TRUE;
             break;
           }
         }
         /* URL encode */
-        out[1] = hex[((unsigned char)*q)>>4];
+        out[1] = hex[((unsigned char)*q) >> 4];
         out[2] = hex[*q & 0xf];
         result = Curl_dyn_addn(dq, out, 3);
         break;
@@ -531,7 +549,7 @@ static CURLcode canon_query(struct Curl_easy *data,
   ap = &array[0];
   for(i = 0; !result && (i < entry); i++, ap++) {
     const char *q = ap->p;
-    bool found_equals = false;
+    bool found_equals = FALSE;
     if(!ap->len)
       continue;
     result = canon_string(q, ap->len, dq, &found_equals);
@@ -558,7 +576,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char provider1[MAX_SIGV4_LEN + 1]="";
   char region[MAX_SIGV4_LEN + 1]="";
   char service[MAX_SIGV4_LEN + 1]="";
-  bool sign_as_s3 = false;
+  bool sign_as_s3 = FALSE;
   const char *hostname = conn->host.name;
   time_t clock;
   struct tm tm;
@@ -573,7 +591,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   const char *method = NULL;
   char *payload_hash = NULL;
   size_t payload_hash_len = 0;
-  unsigned char sha_hash[SHA256_DIGEST_LENGTH];
+  unsigned char sha_hash[CURL_SHA256_DIGEST_LENGTH];
   char sha_hex[SHA256_HEX_LENGTH];
   char content_sha256_hdr[CONTENT_SHA256_HDR_LEN + 2] = ""; /* add \r\n */
   char *canonical_request = NULL;
@@ -582,8 +600,8 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char *str_to_sign = NULL;
   const char *user = data->state.aptr.user ? data->state.aptr.user : "";
   char *secret = NULL;
-  unsigned char sign0[SHA256_DIGEST_LENGTH] = {0};
-  unsigned char sign1[SHA256_DIGEST_LENGTH] = {0};
+  unsigned char sign0[CURL_SHA256_DIGEST_LENGTH] = {0};
+  unsigned char sign1[CURL_SHA256_DIGEST_LENGTH] = {0};
   char *auth_headers = NULL;
 
   DEBUGASSERT(!proxy);
@@ -735,19 +753,19 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   result = CURLE_OUT_OF_MEMORY;
 
   canonical_request =
-    curl_maprintf("%s\n" /* HTTPRequestMethod */
-                  "%s\n" /* CanonicalURI */
-                  "%s\n" /* CanonicalQueryString */
-                  "%s\n" /* CanonicalHeaders */
-                  "%s\n" /* SignedHeaders */
-                  "%.*s",  /* HashedRequestPayload in hex */
-                  method,
-                  Curl_dyn_ptr(&canonical_path),
-                  Curl_dyn_ptr(&canonical_query) ?
-                  Curl_dyn_ptr(&canonical_query) : "",
-                  Curl_dyn_ptr(&canonical_headers),
-                  Curl_dyn_ptr(&signed_headers),
-                  (int)payload_hash_len, payload_hash);
+    aprintf("%s\n" /* HTTPRequestMethod */
+            "%s\n" /* CanonicalURI */
+            "%s\n" /* CanonicalQueryString */
+            "%s\n" /* CanonicalHeaders */
+            "%s\n" /* SignedHeaders */
+            "%.*s",  /* HashedRequestPayload in hex */
+            method,
+            Curl_dyn_ptr(&canonical_path),
+            Curl_dyn_ptr(&canonical_query) ?
+            Curl_dyn_ptr(&canonical_query) : "",
+            Curl_dyn_ptr(&canonical_headers),
+            Curl_dyn_ptr(&signed_headers),
+            (int)payload_hash_len, payload_hash);
   if(!canonical_request)
     goto fail;
 
@@ -755,12 +773,12 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 
   /* provider 0 lowercase */
   Curl_strntolower(provider0, provider0, strlen(provider0));
-  request_type = curl_maprintf("%s4_request", provider0);
+  request_type = aprintf("%s4_request", provider0);
   if(!request_type)
     goto fail;
 
-  credential_scope = curl_maprintf("%s/%s/%s/%s",
-                                   date, region, service, request_type);
+  credential_scope = aprintf("%s/%s/%s/%s",
+                             date, region, service, request_type);
   if(!credential_scope)
     goto fail;
 
@@ -777,22 +795,22 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
    * Google allows using RSA key instead of HMAC, so this code might change
    * in the future. For now we only support HMAC.
    */
-  str_to_sign = curl_maprintf("%s4-HMAC-SHA256\n" /* Algorithm */
-                              "%s\n" /* RequestDateTime */
-                              "%s\n" /* CredentialScope */
-                              "%s",  /* HashedCanonicalRequest in hex */
-                              provider0,
-                              timestamp,
-                              credential_scope,
-                              sha_hex);
+  str_to_sign = aprintf("%s4-HMAC-SHA256\n" /* Algorithm */
+                        "%s\n" /* RequestDateTime */
+                        "%s\n" /* CredentialScope */
+                        "%s",  /* HashedCanonicalRequest in hex */
+                        provider0,
+                        timestamp,
+                        credential_scope,
+                        sha_hex);
   if(!str_to_sign) {
     goto fail;
   }
 
   /* provider 0 uppercase */
-  secret = curl_maprintf("%s4%s", provider0,
-                         data->state.aptr.passwd ?
-                         data->state.aptr.passwd : "");
+  secret = aprintf("%s4%s", provider0,
+                   data->state.aptr.passwd ?
+                   data->state.aptr.passwd : "");
   if(!secret)
     goto fail;
 
@@ -805,24 +823,24 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   sha256_to_hex(sha_hex, sign0);
 
   /* provider 0 uppercase */
-  auth_headers = curl_maprintf("Authorization: %s4-HMAC-SHA256 "
-                               "Credential=%s/%s, "
-                               "SignedHeaders=%s, "
-                               "Signature=%s\r\n"
-                               /*
-                                * date_header is added here, only if it was not
-                                * user-specified (using CURLOPT_HTTPHEADER).
-                                * date_header includes \r\n
-                                */
-                               "%s"
-                               "%s", /* optional sha256 header includes \r\n */
-                               provider0,
-                               user,
-                               credential_scope,
-                               Curl_dyn_ptr(&signed_headers),
-                               sha_hex,
-                               date_header ? date_header : "",
-                               content_sha256_hdr);
+  auth_headers = aprintf("Authorization: %s4-HMAC-SHA256 "
+                         "Credential=%s/%s, "
+                         "SignedHeaders=%s, "
+                         "Signature=%s\r\n"
+                         /*
+                          * date_header is added here, only if it was not
+                          * user-specified (using CURLOPT_HTTPHEADER).
+                          * date_header includes \r\n
+                          */
+                         "%s"
+                         "%s", /* optional sha256 header includes \r\n */
+                         provider0,
+                         user,
+                         credential_scope,
+                         Curl_dyn_ptr(&signed_headers),
+                         sha_hex,
+                         date_header ? date_header : "",
+                         content_sha256_hdr);
   if(!auth_headers) {
     goto fail;
   }

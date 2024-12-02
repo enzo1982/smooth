@@ -142,7 +142,7 @@ bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
 }
 
 #if !defined(USE_WINDOWS_SSPI)
-/* Convert md5 chunk to RFC2617 (section 3.1.3) -suitable ascii string */
+/* Convert md5 chunk to RFC2617 (section 3.1.3) -suitable ASCII string */
 static void auth_digest_md5_to_ascii(unsigned char *source, /* 16 bytes */
                                      unsigned char *dest) /* 33 bytes */
 {
@@ -151,7 +151,7 @@ static void auth_digest_md5_to_ascii(unsigned char *source, /* 16 bytes */
     msnprintf((char *) &dest[i * 2], 3, "%02x", source[i]);
 }
 
-/* Convert sha256 or SHA-512/256 chunk to RFC7616 -suitable ascii string */
+/* Convert sha256 or SHA-512/256 chunk to RFC7616 -suitable ASCII string */
 static void auth_digest_sha256_to_ascii(unsigned char *source, /* 32 bytes */
                                      unsigned char *dest) /* 65 bytes */
 {
@@ -388,7 +388,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     return result;
 
   /* So far so good, now calculate A1 and H(A1) according to RFC 2831 */
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt)
     return CURLE_OUT_OF_MEMORY;
 
@@ -402,7 +402,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                   curlx_uztoui(strlen(passwdp)));
   Curl_MD5_final(ctxt, digest);
 
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt)
     return CURLE_OUT_OF_MEMORY;
 
@@ -425,7 +425,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     return CURLE_OUT_OF_MEMORY;
 
   /* Calculate H(A2) */
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt) {
     free(spn);
 
@@ -443,7 +443,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     msnprintf(&HA2_hex[2 * i], 3, "%02x", digest[i]);
 
   /* Now calculate the response hash */
-  ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
+  ctxt = Curl_MD5_init(&Curl_DIGEST_MD5);
   if(!ctxt) {
     free(spn);
 

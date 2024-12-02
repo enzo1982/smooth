@@ -342,6 +342,9 @@
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_sse41.c">
       <Filter>Quelldateien\libwebp\dsp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\libraries\libwebp\src\utils\palette.c">
+      <Filter>Quelldateien\libwebp\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\libraries\libwebp\src\utils\bit_reader_inl_utils.h">
@@ -481,6 +484,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libraries\libwebp\src\dsp\cpu.h">
       <Filter>Headerdateien\libwebp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libraries\libwebp\src\utils\palette.h">
+      <Filter>Headerdateien\libwebp\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

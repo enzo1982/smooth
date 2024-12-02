@@ -124,6 +124,7 @@
     <ClCompile Include="..\..\..\libraries\libwebp\src\utils\filters_utils.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\utils\huffman_encode_utils.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\utils\huffman_utils.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\src\utils\palette.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\utils\quant_levels_dec_utils.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\utils\quant_levels_utils.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\utils\random_utils.c" />
@@ -165,6 +166,7 @@
     <ClInclude Include="..\..\..\libraries\libwebp\src\utils\filters_utils.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\utils\huffman_encode_utils.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\utils\huffman_utils.h" />
+    <ClInclude Include="..\..\..\libraries\libwebp\src\utils\palette.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\utils\quant_levels_dec_utils.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\utils\quant_levels_utils.h" />
     <ClInclude Include="..\..\..\libraries\libwebp\src\utils\random_utils.h" />

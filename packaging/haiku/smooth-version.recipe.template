@@ -11,7 +11,7 @@ Features provided by smooth include:
 - completely transparent Unicode and software internationalization support
 - a libxml2 based XML parser"
 HOMEPAGE="http://www.smooth-project.org/"
-COPYRIGHT="1998-2024 Robert Kausch"
+COPYRIGHT="1998-2025 Robert Kausch"
 LICENSE="Artistic v2.0"
 REVISION="1"
 SOURCE_URI="https://github.com/enzo1982/smooth/releases/download/v${portVersion/\~/-}/smooth-${portVersion/\~/-}.tar.gz"
@@ -43,11 +43,13 @@ fi
 REQUIRES="
 	haiku$secondaryArchSuffix
 	lib:libbz2$secondaryArchSuffix
+	lib:libcpuid$secondaryArchSuffix
 	lib:libcurl$secondaryArchSuffix
 	lib:libfribidi$secondaryArchSuffix
 	lib:libiconv$secondaryArchSuffix
 	lib:libjpeg$secondaryArchSuffix
 	lib:libpng16$secondaryArchSuffix
+	lib:libwebp$secondaryArchSuffix
 	lib:libxml2$secondaryArchSuffix
 	lib:libz$secondaryArchSuffix
 	"
@@ -63,11 +65,13 @@ REQUIRES_devel="
 BUILD_REQUIRES="
 	haiku${secondaryArchSuffix}_devel
 	devel:libbz2$secondaryArchSuffix
+	devel:libcpuid$secondaryArchSuffix
 	devel:libcurl$secondaryArchSuffix
 	devel:libfribidi$secondaryArchSuffix
 	devel:libiconv$secondaryArchSuffix
 	devel:libjpeg$secondaryArchSuffix
 	devel:libpng16$secondaryArchSuffix
+	devel:libwebp$secondaryArchSuffix
 	devel:libxml2$secondaryArchSuffix
 	devel:libz$secondaryArchSuffix
 	"

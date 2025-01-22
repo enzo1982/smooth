@@ -4,7 +4,7 @@
 #if !defined __WIN32__ || defined BUILDING_LIBICONV
 #	include <libiconv/iconv.h>
 #else
-#	define _LIBICONV_VERSION 0x0110
+#	define _LIBICONV_VERSION 0x0112
 
 #	undef iconv_t
 

@@ -19,23 +19,19 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
 	/* Create file chooser dialog.
 	 */
-	GtkWidget	*dialog = NULL;
+	GtkFileChooserNative	*dialog = NULL;
 
 	if (mode == SFM_OPEN)
 	{
-		dialog = gtk_file_chooser_dialog_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
-						     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-						     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-						     NULL);
+		dialog = gtk_file_chooser_native_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
+						     "_Open", "_Cancel");
 
 		if (flags & SFD_ALLOWMULTISELECT) gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dialog), True);
 	}
 	else if (mode == SFM_SAVE)
 	{
-		dialog = gtk_file_chooser_dialog_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_SAVE,
-						     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-						     GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
-						     NULL);
+		dialog = gtk_file_chooser_native_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_SAVE,
+						     "_Save", "_Cancel");
 
 		if (flags & SFD_CONFIRMOVERWRITE) gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), True);
 	}
@@ -73,7 +69,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 	/* Run dialog and check result.
 	 */
-	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	if (gtk_native_dialog_run(GTK_NATIVE_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
 		GSList	*list = gtk_file_chooser_get_uris(GTK_FILE_CHOOSER(dialog));
 		GSList	*current = list;
@@ -106,7 +102,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 		error = Error();
 	}
 
-	gtk_widget_destroy(dialog);
+	g_object_unref(dialog);
 
 	/* Wait for GTK to finish pending actions.
 	 */

@@ -19,6 +19,8 @@ else ifeq ($(BUILD_ARM64),True)
     MYCCOPTS += -DPNG_ARM_NEON_OPT=0
 else ifeq ($(BUILD_PPC64),True)
     MYCCOPTS += -DPNG_POWERPC_VSX_OPT=0
+else ifeq ($(BUILD_RISCV64),True)
+    MYCCOPTS += -DPNG_RISCV_RVV_OPT=0
 endif
 
 # Enter object files here:

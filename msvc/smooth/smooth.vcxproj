@@ -818,7 +818,16 @@
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)2.xdc</XMLDocumentationFileName>
     </ClCompile>
     <ClCompile Include="..\..\classes\system\console.cpp" />
-    <ClCompile Include="..\..\classes\system\cpu.cpp" />
+    <ClCompile Include="..\..\classes\system\cpu.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="..\..\classes\system\dynamicloader.cpp" />
     <ClCompile Include="..\..\classes\system\event.cpp" />
     <ClCompile Include="..\..\classes\system\system.cpp" />

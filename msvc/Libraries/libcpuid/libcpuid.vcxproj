@@ -122,49 +122,49 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.6.2";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VERSION="0.8.0";LIBCPUID_DISABLE_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -172,21 +172,25 @@
     <ClCompile Include="..\..\..\libraries\libcpuid\asm-bits.c" />
     <ClCompile Include="..\..\..\libraries\libcpuid\cpuid_main.c" />
     <ClCompile Include="..\..\..\libraries\libcpuid\libcpuid_util.c" />
+    <ClCompile Include="..\..\..\libraries\libcpuid\rdcpuid.c" />
     <ClCompile Include="..\..\..\libraries\libcpuid\rdtsc.c" />
     <ClCompile Include="..\..\..\libraries\libcpuid\recog_amd.c" />
+    <ClCompile Include="..\..\..\libraries\libcpuid\recog_arm.c" />
     <ClCompile Include="..\..\..\libraries\libcpuid\recog_centaur.c" />
     <ClCompile Include="..\..\..\libraries\libcpuid\recog_intel.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\libraries\libcpuid\amd_code_t.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\asm-bits.h" />
-    <ClInclude Include="..\..\..\libraries\libcpuid\centaur_code_t.h" />
-    <ClInclude Include="..\..\..\libraries\libcpuid\intel_code_t.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\libcpuid.h" />
+    <ClInclude Include="..\..\..\libraries\libcpuid\libcpuid_arm_driver.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\libcpuid_constants.h" />
+    <ClInclude Include="..\..\..\libraries\libcpuid\libcpuid_internal.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\libcpuid_types.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\libcpuid_util.h" />
+    <ClInclude Include="..\..\..\libraries\libcpuid\rdcpuid.h" />
+    <ClInclude Include="..\..\..\libraries\libcpuid\rdtsc.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\recog_amd.h" />
+    <ClInclude Include="..\..\..\libraries\libcpuid\recog_arm.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\recog_centaur.h" />
     <ClInclude Include="..\..\..\libraries\libcpuid\recog_intel.h" />
   </ItemGroup>

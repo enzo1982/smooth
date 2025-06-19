@@ -29,6 +29,7 @@
 #include "libcpuid_internal.h"
 
 #define COUNT_OF(array) (sizeof(array) / sizeof(array[0]))
+#define UNUSED(x) (void)(x)
 
 struct feature_map_t {
 	unsigned bit;
@@ -38,18 +39,21 @@ struct feature_map_t {
 void match_features(const struct feature_map_t* matchtable, int count,
                     uint32_t reg, struct cpu_id_t* data);
 
+
 struct match_entry_t {
 	int family, model, stepping, ext_family, ext_model;
-	int ncores, l2cache, l3cache, brand_code;
-	uint64_t model_bits;
-	int model_code;
+	int ncores, l2cache, l3cache;
+	struct {
+		char pattern[BRAND_STR_MAX];
+		int score;
+	} brand;
 	char name[CODENAME_STR_MAX];
+	char technology[TECHNOLOGY_STR_MAX];
 };
 
 // returns the match score:
-int match_cpu_codename(const struct match_entry_t* matchtable, int count,
-                       struct cpu_id_t* data, int brand_code, uint64_t bits,
-                       int model_code);
+
+int match_cpu_codename(const struct match_entry_t* matchtable, int count, struct cpu_id_t* data);
 
 void warnf(const char* format, ...)
 #ifdef __GNUC__
@@ -75,6 +79,16 @@ void generic_get_cpu_list(const struct match_entry_t* matchtable, int count,
  *             x + 1 where x is the index where the match is found).
  */
 int match_pattern(const char* haystack, const char* pattern);
+
+/*
+ * Remove a substring from a string
+*/
+void remove_substring(char* string, const char* substring);
+
+/*
+ * Remove useless spaces from a string
+ */
+void collapse_spaces(char* string);
 
 /*
  * Gets an initialized cpu_id_t. It is cached, so that internal libcpuid
@@ -132,5 +146,8 @@ void decode_deterministic_cache_info_x86(uint32_t cache_regs[][NUM_REGS],
                                          uint8_t subleaf_count,
                                          struct cpu_id_t* data,
                                          struct internal_id_info_t* internal);
+
+/* generic way to get microarchitecture levels for x86 CPUs */
+void decode_architecture_version_x86(struct cpu_id_t* data);
 
 #endif /* __LIBCPUID_UTIL_H__ */

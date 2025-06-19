@@ -58,6 +58,8 @@ libcpuid_warn_fn_t _warn_fun = default_warn;
 #endif
 void warnf(const char* format, ...)
 {
+	if (getenv("LIBCPUID_NO_WARN"))
+		return;
 	char buff[1024];
 	va_list va;
 	if (!_warn_fun) return;
@@ -71,70 +73,63 @@ void debugf(int verboselevel, const char* format, ...)
 {
 	char buff[1024];
 	va_list va;
-	if (verboselevel > _current_verboselevel) return;
+	if (!_warn_fun || (verboselevel > _current_verboselevel)) return;
 	va_start(va, format);
 	vsnprintf(buff, sizeof(buff), format, va);
 	va_end(va);
 	_warn_fun(buff);
 }
 
-#ifndef HAVE_POPCOUNT64
-static unsigned int popcount64(uint64_t mask)
+static int score(const struct match_entry_t* entry, const struct cpu_id_t* data)
 {
-	unsigned int num_set_bits = 0;
-
-	while (mask) {
-		mask &= mask - 1;
-		num_set_bits++;
-	}
-
-	return num_set_bits;
-}
-#endif
-
-static int score(const struct match_entry_t* entry, const struct cpu_id_t* data,
-                 int brand_code, uint64_t bits, int model_code)
-{
-	int i, tmp, res = 0;
+	int i, res = 0;
+	char brand_str[BRAND_STR_MAX];
 	const struct { const char *field; int entry; int data; int score; } array[] = {
-		{ "family",     entry->family,     data->family,     2 },
-		{ "model",      entry->model,      data->model,      2 },
-		{ "stepping",   entry->stepping,   data->stepping,   2 },
-		{ "ext_family", entry->ext_family, data->ext_family, 2 },
-		{ "ext_model",  entry->ext_model,  data->ext_model,  2 },
-		{ "ncores",     entry->ncores,     data->num_cores,  2 },
-		{ "l2cache",    entry->l2cache,    data->l2_cache,   1 },
-		{ "l3cache",    entry->l3cache,    data->l3_cache,   1 },
-		{ "brand_code", entry->brand_code, brand_code,       2 },
-		{ "model_code", entry->model_code, model_code,       2 },
+		{ "family",     entry->family,     data->x86.family,     2 },
+		{ "model",      entry->model,      data->x86.model,      2 },
+		{ "stepping",   entry->stepping,   data->x86.stepping,   2 },
+		{ "ext_family", entry->ext_family, data->x86.ext_family, 2 },
+		{ "ext_model",  entry->ext_model,  data->x86.ext_model,  2 },
+		{ "ncores",     entry->ncores,     data->num_cores,      2 },
+		{ "l2cache",    entry->l2cache,    data->l2_cache,       1 },
+		{ "l3cache",    entry->l3cache,    data->l3_cache,       1 },
 	};
 	for (i = 0; i < sizeof(array) / sizeof(array[0]); i++) {
-		if(array[i].entry == array[i].data) {
+		if ((array[i].entry >= 0) && (array[i].entry == array[i].data)) {
 			res += array[i].score;
 			debugf(4, "Score: %-12s matches, adding %2i (current score for this entry: %2i)\n", array[i].field, array[i].score, res);
 		}
 	}
 
-	tmp = popcount64(entry->model_bits & bits) * 2;
-	res += tmp;
-	debugf(4, "Score: %-12s matches, adding %2i (current score for this entry: %2i)\n", "model_bits", tmp, res);
+	if ((entry->brand.score > 0) && (strlen(entry->brand.pattern) > 0)) {
+		/* Remove useless substrings in brand_str */
+		strncpy(brand_str, data->brand_str, BRAND_STR_MAX);
+		remove_substring(brand_str, "CPU");
+		remove_substring(brand_str, "Processor");
+		collapse_spaces(brand_str);
+		/* Test pattern */
+		debugf(5, "Test if '%s' brand pattern matches '%s'...\n", entry->brand.pattern, brand_str);
+		if (match_pattern(brand_str, entry->brand.pattern)) {
+			res += entry->brand.score;
+			debugf(4, "Score: %-12s matches, adding %2i (current score for this entry: %2i)\n", "brand", entry->brand.score, res);
+		}
+	}
+
 	return res;
 }
 
-int match_cpu_codename(const struct match_entry_t* matchtable, int count,
-                       struct cpu_id_t* data, int brand_code, uint64_t bits,
-                       int model_code)
+int match_cpu_codename(const struct match_entry_t* matchtable, int count, struct cpu_id_t* data)
 {
 	int bestscore = -1;
 	int bestindex = 0;
 	int i, t;
 
-	debugf(3, "Matching cpu f:%d, m:%d, s:%d, xf:%d, xm:%d, ncore:%d, l2:%d, bcode:%d, bits:%llu, code:%d\n",
-		data->family, data->model, data->stepping, data->ext_family,
-		data->ext_model, data->num_cores, data->l2_cache, brand_code, (unsigned long long) bits, model_code);
+	debugf(3, "Matching cpu f:%d, m:%d, s:%d, xf:%d, xm:%d, ncore:%d, l2:%d, l3:%d\n",
+		data->x86.family, data->x86.model, data->x86.stepping, data->x86.ext_family,
+		data->x86.ext_model, data->num_cores, data->l2_cache, data->l3_cache);
 
 	for (i = 0; i < count; i++) {
-		t = score(&matchtable[i], data, brand_code, bits, model_code);
+		t = score(&matchtable[i], data);
 		debugf(3, "Entry %d, `%s', score %d\n", i, matchtable[i].name, t);
 		if (t > bestscore) {
 			debugf(2, "Entry `%s' selected - best score so far (%d)\n", matchtable[i].name, t);
@@ -142,7 +137,8 @@ int match_cpu_codename(const struct match_entry_t* matchtable, int count,
 			bestindex = i;
 		}
 	}
-	strncpy(data->cpu_codename, matchtable[bestindex].name, CODENAME_STR_MAX);
+	strncpy(data->cpu_codename,    matchtable[bestindex].name,       CODENAME_STR_MAX);
+	strncpy(data->technology_node, matchtable[bestindex].technology, TECHNOLOGY_STR_MAX);
 	return bestscore;
 }
 
@@ -190,7 +186,7 @@ static int xmatch_entry(char c, const char* p)
 {
 	int i, j;
 	if (c == 0) return -1;
-	if (c == p[0]) return 1;
+	if (tolower(c) == tolower(p[0])) return 1;
 	if (p[0] == '.') return 1;
 	if (p[0] == '#' && isdigit(c)) return 1;
 	if (p[0] == '[') {
@@ -198,7 +194,7 @@ static int xmatch_entry(char c, const char* p)
 		while (p[j] && p[j] != ']') j++;
 		if (!p[j]) return -1;
 		for (i = 1; i < j; i++)
-			if (p[i] == c) return j + 1;
+			if (tolower(p[i]) == tolower(c)) return j + 1;
 	}
 	return -1;
 }
@@ -220,6 +216,39 @@ int match_pattern(const char* s, const char* p)
 		}
 	}
 	return 0;
+}
+
+void remove_substring(char* string, const char* substring)
+{
+	size_t len;
+	char *pos = strstr(string, substring);
+
+	if (pos != NULL) {
+		len = strlen(substring);
+		memmove(pos, pos + len, strlen(pos + len) + 1);
+	}
+}
+
+void collapse_spaces(char* string)
+{
+	size_t i, j = 0;
+	bool in_space = false;
+	const size_t len = strlen(string);
+
+	for (i = 0; i < len; i++) {
+		if (isspace(string[i])) {
+			if (!in_space) {
+				string[j++] = ' ';
+				in_space = true;
+			}
+		}
+		else {
+			string[j++] = string[i];
+			in_space = false;
+		}
+	}
+
+	string[j] = '\0';
 }
 
 struct cpu_id_t* get_cached_cpuid(void)
@@ -412,4 +441,106 @@ void decode_deterministic_cache_info_x86(uint32_t cache_regs[][NUM_REGS],
 		internal->cache_mask[i] = ~((1 << index_msb) - 1);
 		assign_cache_data(1, type, size, ways, linesize, data);
 	}
+}
+
+void decode_architecture_version_x86(struct cpu_id_t* data)
+{
+	bool is_compliant, has_all_features;
+	int i, j;
+	cpu_feature_level_t feature_level = FEATURE_LEVEL_UNKNOWN;
+
+	const struct { const int family; const cpu_feature_level_t feature_level; }
+	architecture_matchtable_ia_32[] = {
+		{  3, FEATURE_LEVEL_I386 },
+		{  4, FEATURE_LEVEL_I486 },
+		{  5, FEATURE_LEVEL_I586 },
+		{  6, FEATURE_LEVEL_I686 },
+		{ 15, FEATURE_LEVEL_I686 }, // Intel Pentium 4, AMD K8
+	};
+
+	const cpu_feature_t architecture_x86_64_v1[] = {
+		CPU_FEATURE_CMOV,
+		CPU_FEATURE_CX8,
+		CPU_FEATURE_FPU,
+		CPU_FEATURE_FXSR,
+		CPU_FEATURE_MMX,
+		CPU_FEATURE_SSE,
+		CPU_FEATURE_SSE2,
+		-1
+	};
+
+	const cpu_feature_t architecture_x86_64_v2[] = {
+		CPU_FEATURE_CX16,
+		CPU_FEATURE_LAHF_LM,
+		CPU_FEATURE_POPCNT,
+		CPU_FEATURE_PNI,
+		CPU_FEATURE_SSE4_1,
+		CPU_FEATURE_SSE4_2,
+		CPU_FEATURE_SSSE3,
+		-1
+	};
+
+	const cpu_feature_t architecture_x86_64_v3[] = {
+		CPU_FEATURE_AVX,
+		CPU_FEATURE_AVX2,
+		CPU_FEATURE_BMI1,
+		CPU_FEATURE_BMI2,
+		CPU_FEATURE_F16C,
+		CPU_FEATURE_FMA3,
+		CPU_FEATURE_ABM,
+		CPU_FEATURE_MOVBE,
+		CPU_FEATURE_OSXSAVE,
+		-1
+	};
+
+	const cpu_feature_t architecture_x86_64_v4[] = {
+		CPU_FEATURE_AVX512F,
+		CPU_FEATURE_AVX512BW,
+		CPU_FEATURE_AVX512CD,
+		CPU_FEATURE_AVX512DQ,
+		CPU_FEATURE_AVX512VL,
+		-1
+	};
+
+	const struct { const cpu_feature_t* features_array; const cpu_feature_level_t feature_level; }
+	architecture_matchtable_x86_64[] = {
+		{ architecture_x86_64_v1, FEATURE_LEVEL_X86_64_V1 },
+		{ architecture_x86_64_v2, FEATURE_LEVEL_X86_64_V2 },
+		{ architecture_x86_64_v3, FEATURE_LEVEL_X86_64_V3 },
+		{ architecture_x86_64_v4, FEATURE_LEVEL_X86_64_V4 },
+	};
+
+	if (!data->flags[CPU_FEATURE_LM]) {
+		/* Check Intel Architecture, 32-bit */
+		for (i = 0; i < COUNT_OF(architecture_matchtable_ia_32); i++) {
+			is_compliant = (data->x86.family == architecture_matchtable_ia_32[i].family);
+			debugf(3, "Check if CPU is %s compliant: %s for family %i\n", cpu_feature_level_str(architecture_matchtable_ia_32[i].feature_level), is_compliant ? "yes" : "no", architecture_matchtable_ia_32[i].family);
+			if (is_compliant) {
+				feature_level = architecture_matchtable_ia_32[i].feature_level;
+				break;
+			}
+		}
+	}
+	else {
+		/* Check Intel Architecture, 64-bit */
+		for (i = 0; i < COUNT_OF(architecture_matchtable_x86_64); i++) {
+			debugf(3, "Check if CPU is %s compliant:\n", cpu_feature_level_str(architecture_matchtable_x86_64[i].feature_level));
+			has_all_features = true;
+			for (j = 0; architecture_matchtable_x86_64[i].features_array[j] != -1; j++) {
+				is_compliant     = data->flags[ architecture_matchtable_x86_64[i].features_array[j] ];
+				has_all_features = has_all_features && is_compliant;
+				debugf(3, " - feature %s is %s\n", cpu_feature_str(architecture_matchtable_x86_64[i].features_array[j]), is_compliant ? "present" : "absent");
+			}
+			if (is_compliant)
+				feature_level = architecture_matchtable_x86_64[i].feature_level;
+			else
+				break;
+		}
+	}
+
+	data->feature_level = feature_level;
+	if (feature_level == FEATURE_LEVEL_UNKNOWN)
+		warnf("Warning: CPU with CPUID signature %02X_%02XH has an unknown architecture version (LM=%i).\n", data->x86.ext_family, data->x86.ext_model, data->flags[CPU_FEATURE_LM]);
+	else
+		debugf(2, "x86 architecture version is %s\n", cpu_feature_level_str(feature_level));
 }

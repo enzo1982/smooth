@@ -1,5 +1,5 @@
 /*
- * Copyright 2016  Veselin Georgiev,
+ * Copyright 2024  Veselin Georgiev,
  * anrieffNOSPAM @ mgail_DOT.com (convert to gmail)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,18 +23,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef __RECOG_ARM_H__
+#define __RECOG_ARM_H__
 
-/*
- * This file contains a list of internal codes we use in detection. It is
- * of no external use and isn't a complete list of AMD products.
- */
-	CODE2(OPTERON_800, 1000),
-	CODE(PHENOM),
-	CODE(PHENOM2),
-	CODE(FUSION_C),
-	CODE(FUSION_E),
-	CODE(FUSION_EA),
-	CODE(FUSION_Z),
-	CODE(FUSION_A),
-	CODE(FUSION_RX),
-	CODE(FUSION_GX),
+int cpuid_identify_arm(struct cpu_raw_data_t* raw, struct cpu_id_t* data);
+void cpuid_get_list_arm(cpu_vendor_t vendor, struct cpu_list_t* list);
+cpu_purpose_t cpuid_identify_purpose_arm(struct cpu_raw_data_t* raw);
+
+#endif /* __RECOG_ARM_H__ */

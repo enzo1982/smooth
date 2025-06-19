@@ -1,5 +1,5 @@
 /*
- * Copyright 2016  Veselin Georgiev,
+ * Copyright 2024  Veselin Georgiev,
  * anrieffNOSPAM @ mgail_DOT.com (convert to gmail)
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,36 +23,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef __RDCPUID_H__
+#define __RDCPUID_H__
 
-/*
- * This file contains a list of internal codes we use in detection. It is
- * of no external use and isn't a complete list of intel products.
- */
-	CODE2(PENTIUM, 2000),
+struct cpuid_driver_t* cpu_cpuid_driver_open_core(unsigned core_num);
+int cpu_read_arm_register_32b(struct cpuid_driver_t* driver, reg_request_t request, uint32_t* result);
+int cpu_read_arm_register_64b(struct cpuid_driver_t* driver, reg_request_t request, uint64_t* result);
+int cpu_cpuid_driver_close(struct cpuid_driver_t* drv);
 
-	CODE(IRWIN),
-	CODE(POTOMAC),
-	CODE(GAINESTOWN),
-	CODE(WESTMERE),
-
-	CODE(PENTIUM_M),
-	CODE(NOT_CELERON),
-
-	CODE(CORE_SOLO),
-	CODE(MOBILE_CORE_SOLO),
-	CODE(CORE_DUO),
-	CODE(MOBILE_CORE_DUO),
-
-	CODE(WOLFDALE),
-	CODE(MEROM),
-	CODE(PENRYN),
-	CODE(QUAD_CORE),
-	CODE(DUAL_CORE_HT),
-	CODE(QUAD_CORE_HT),
-	CODE(MORE_THAN_QUADCORE),
-	CODE(PENTIUM_D),
-
-	CODE(SILVERTHORNE),
-	CODE(DIAMONDVILLE),
-	CODE(PINEVIEW),
-	CODE(CEDARVIEW),
+#endif /* __RDCPUID_H__ */

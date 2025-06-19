@@ -25,6 +25,7 @@
  */
 
 #include "libcpuid.h"
+#include "libcpuid_util.h"
 #include "asm-bits.h"
 
 int cpuid_exists_by_eflags(void)
@@ -75,29 +76,29 @@ int cpuid_exists_by_eflags(void)
 #endif /* PLATFORM_X86 */
 }
 
-#ifdef INLINE_ASM_SUPPORTED
-/* 
+#ifndef USE_EXTERNAL_ASM
+/*
  * with MSVC/AMD64, the exec_cpuid() and cpu_rdtsc() functions
  * are implemented in separate .asm files. Otherwise, use inline assembly
  */
 void exec_cpuid(uint32_t *regs)
 {
 #  if defined(COMPILER_GCC) || defined(COMPILER_CLANG)
-#	ifdef PLATFORM_X64
+#	if defined(PLATFORM_X64)
 	__asm __volatile(
 		"	mov	%0,	%%rdi\n"
 
 		"	push	%%rbx\n"
 		"	push	%%rcx\n"
 		"	push	%%rdx\n"
-		
+
 		"	mov	(%%rdi),	%%eax\n"
 		"	mov	4(%%rdi),	%%ebx\n"
 		"	mov	8(%%rdi),	%%ecx\n"
 		"	mov	12(%%rdi),	%%edx\n"
-		
+
 		"	cpuid\n"
-		
+
 		"	movl	%%eax,	(%%rdi)\n"
 		"	movl	%%ebx,	4(%%rdi)\n"
 		"	movl	%%ecx,	8(%%rdi)\n"
@@ -116,14 +117,14 @@ void exec_cpuid(uint32_t *regs)
 		"	push	%%ebx\n"
 		"	push	%%ecx\n"
 		"	push	%%edx\n"
-		
+
 		"	mov	(%%edi),	%%eax\n"
 		"	mov	4(%%edi),	%%ebx\n"
 		"	mov	8(%%edi),	%%ecx\n"
 		"	mov	12(%%edi),	%%edx\n"
-		
+
 		"	cpuid\n"
-		
+
 		"	mov	%%eax,	(%%edi)\n"
 		"	mov	%%ebx,	4(%%edi)\n"
 		"	mov	%%ecx,	8(%%edi)\n"
@@ -135,6 +136,8 @@ void exec_cpuid(uint32_t *regs)
 		:"m"(regs)
 		:"memory", "eax", "edi"
 	);
+#	else
+	UNUSED(regs);
 #	endif /* COMPILER_GCC */
 #else
 #  ifdef COMPILER_MICROSOFT
@@ -145,31 +148,33 @@ void exec_cpuid(uint32_t *regs)
 		push	edx
 		push	edi
 		mov	edi,	regs
-		
+
 		mov	eax,	[edi]
 		mov	ebx,	[edi+4]
 		mov	ecx,	[edi+8]
 		mov	edx,	[edi+12]
-		
+
 		cpuid
-		
+
 		mov	[edi],		eax
 		mov	[edi+4],	ebx
 		mov	[edi+8],	ecx
 		mov	[edi+12],	edx
-		
+
 		pop	edi
 		pop	edx
 		pop	ecx
 		pop	ebx
 	}
 #	endif /* PLATFORM_X86 */
+#  else
+#    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */
 #endif
 }
-#endif /* INLINE_ASSEMBLY_SUPPORTED */
+#endif /* USE_EXTERNAL_ASM */
 
-#ifdef INLINE_ASM_SUPPORTED
+#ifndef USE_EXTERNAL_ASM
 void cpu_rdtsc(uint64_t* result)
 {
 	uint32_t low_part = 0, hi_part = 0;
@@ -191,13 +196,15 @@ void cpu_rdtsc(uint64_t* result)
 		mov	hi_part,	edx
 	};
 #	endif /* PLATFORM_X86 */
+#  else
+#    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */
 #endif /* COMPILER_GCC */
 	*result = (uint64_t)low_part + (((uint64_t) hi_part) << 32);
 }
-#endif /* INLINE_ASM_SUPPORTED */
+#endif /* USE_EXTERNAL_ASM */
 
-#ifdef INLINE_ASM_SUPPORTED
+#ifndef USE_EXTERNAL_ASM
 void busy_sse_loop(int cycles)
 {
 #  if defined(COMPILER_GCC) || defined(COMPILER_CLANG)
@@ -507,12 +514,14 @@ void busy_sse_loop(int cycles)
 		"	addps	%%xmm6, %%xmm5\n"
 		"	addps	%%xmm7, %%xmm6\n"
 		"	addps	%%xmm0, %%xmm7\n"
-		
+
 		"	dec	%%eax\n"
 		/* "jnz	.bsLoop\n" */
 		"	jnz	1b\n"
 		::"a"(cycles)
 	);
+#else
+	UNUSED(cycles);
 #endif
 #else
 #  ifdef COMPILER_MICROSOFT
@@ -823,7 +832,9 @@ bsLoop:
 		jnz		bsLoop
 	}
 #	endif /* PLATFORM_X86 */
+#  else
+#    error "Unsupported compiler"
 #  endif /* COMPILER_MICROSOFT */
 #endif /* COMPILER_GCC */
 }
-#endif /* INLINE_ASSEMBLY_SUPPORTED */
+#endif /* USE_EXTERNAL_ASM */

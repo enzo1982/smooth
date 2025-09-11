@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2025 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -259,7 +259,7 @@ const int	 NSApplicationDropFiles	 = 9;
 							       context: nil
 							       subtype: NSApplicationPaint
 								 data1: (NSInteger) &rect
-								 data2: nil];
+								 data2: 0];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 
@@ -294,8 +294,8 @@ const int	 NSApplicationDropFiles	 = 9;
 							  windowNumber: [[self window] windowNumber]
 							       context: nil
 							       subtype: NSApplicationResize
-								 data1: nil
-								 data2: nil];
+								 data1: 0
+								 data2: 0];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
@@ -318,7 +318,7 @@ const int	 NSApplicationDropFiles	 = 9;
 							       context: nil
 							       subtype: NSApplicationInsertText
 								 data1: (NSInteger) string
-								 data2: nil];
+								 data2: 0];
 
 		if (backend != NIL && cursor != NIL) backend->ProcessSystemMessages(event);
 
@@ -604,7 +604,7 @@ const int	 NSApplicationDropFiles	 = 9;
 	- (void) processEvent: (int) type
 	{
 		[self processEvent: type
-			  withData: nil];
+			  withData: 0];
 	}
 
 	- (void) processEvent: (int) type withData: (NSInteger) data
@@ -618,7 +618,7 @@ const int	 NSApplicationDropFiles	 = 9;
 							       context: nil
 							       subtype: type
 								 data1: data
-								 data2: nil];
+								 data2: 0];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}
@@ -702,8 +702,8 @@ const int	 NSApplicationDropFiles	 = 9;
 							  windowNumber: [[note object] windowNumber]
 							       context: nil
 							       subtype: type
-								 data1: nil
-								 data2: nil];
+								 data1: 0
+								 data2: 0];
 
 		if (backend != NIL) backend->ProcessSystemMessages(event);
 	}

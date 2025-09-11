@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2025 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -48,8 +48,8 @@ S::Int	 backendCocoaTmp = S::Backends::Backend::AddBackend(&CreateBackendCocoa);
 						windowNumber: 0
 						     context: nil
 						     subtype: 0
-						       data1: nil
-						       data2: nil];
+						       data1: 0
+						       data2: 0];
 		[NSApp postEvent: event
 			 atStart: YES];
 

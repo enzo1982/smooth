@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2025 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -125,8 +125,6 @@ S::Int S::Backends::BackendXLib::Init()
 
 		gtk_init(NULL, NULL);
 
-		toggleTimerInterrupts(true);
-
 		/* Get default colors.
 		 */
 		UpdateColors();
@@ -147,6 +145,8 @@ S::Int S::Backends::BackendXLib::Deinit()
 {
 	if (im	    != NIL) XCloseIM(im);
 	if (display != NIL) XCloseDisplay(display);
+
+	toggleTimerInterrupts(true);
 
 	return Success();
 }

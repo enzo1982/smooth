@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2025 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -33,6 +33,10 @@ namespace smooth
 		class TimerPOSIX : public TimerBackend
 		{
 			private:
+#if defined(__linux__) || defined(__FreeBSD__)
+				static pid_t	 mainThreadID;
+#endif
+
 				timer_t		*timer;
 
 				static void	 TimerProc(int, siginfo_t *, void *);

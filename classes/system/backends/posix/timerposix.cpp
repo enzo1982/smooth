@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2017 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2025 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -13,6 +13,14 @@
 #include <smooth/system/backends/posix/timerposix.h>
 #include <smooth/init.h>
 
+#if defined(__FreeBSD__)
+#	include <pthread_np.h>
+#endif
+
+#if defined(__linux__) && !defined(sigev_notify_thread_id)
+#	define sigev_notify_thread_id _sigev_un._tid
+#endif
+
 S::Int	 addTimerPOSIXInitTmp = S::AddInitFunction(&S::System::TimerPOSIX::Initialize);
 S::Int	 addTimerPOSIXFreeTmp = S::AddFreeFunction(&S::System::TimerPOSIX::Free);
 
@@ -22,6 +30,10 @@ S::System::TimerBackend *CreateTimerPOSIX(S::System::Timer *timer)
 }
 
 S::Int	 timerPOSIXTmp = S::System::TimerBackend::SetBackend(&CreateTimerPOSIX);
+
+#if defined(__linux__) || defined(__FreeBSD__)
+pid_t	 S::System::TimerPOSIX::mainThreadID = 0;
+#endif
 
 S::System::TimerPOSIX::TimerPOSIX(Timer *iTimer) : TimerBackend(iTimer)
 {
@@ -39,6 +51,12 @@ S::Int S::System::TimerPOSIX::Initialize()
 {
 	EventProcessor::allowTimerInterrupts.Connect(&AllowTimerInterrupts);
 	EventProcessor::denyTimerInterrupts.Connect(&DenyTimerInterrupts);
+
+#if defined(__linux__)
+	mainThreadID = gettid();
+#elif defined(__FreeBSD__)
+	mainThreadID = pthread_getthreadid_np();
+#endif
 
 	return Success();
 }
@@ -104,9 +122,14 @@ S::Int S::System::TimerPOSIX::Start(Int nInterval)
 
 	memset(&se, 0, sizeof(se));
 
-	se.sigev_notify		 = SIGEV_SIGNAL;
-	se.sigev_signo		 = SIGALRM;
-	se.sigev_value.sival_int = thisTimer->GetHandle();
+#if defined(__linux__) || defined(__FreeBSD__)
+	se.sigev_notify		  = SIGEV_THREAD_ID;
+	se.sigev_notify_thread_id = mainThreadID;
+#else
+	se.sigev_notify		  = SIGEV_SIGNAL;
+#endif
+	se.sigev_signo		  = SIGALRM;
+	se.sigev_value.sival_int  = thisTimer->GetHandle();
 
 	timer_create(CLOCK_REALTIME, &se, timer);
 

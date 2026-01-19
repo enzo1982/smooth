@@ -75,7 +75,9 @@
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\filters_neon.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\filters_sse2.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_avx2.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_enc.c" />
+    <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_enc_avx2.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_enc_neon.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_enc_sse2.c" />
     <ClCompile Include="..\..\..\libraries\libwebp\src\dsp\lossless_enc_sse41.c" />

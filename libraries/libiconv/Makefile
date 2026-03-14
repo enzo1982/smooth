@@ -14,6 +14,7 @@ else
 endif
 
 MYCCOPTS    = -DBUILDING_LIBICONV -I"$(SRCDIR)" -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libiconv
+MYCCOPTS   += -Wno-pointer-to-int-cast -Wno-unused-variable -Wno-unused-function
 
 # Enter object files here:
 OBJECTS	    = iconv.o localcharset.o

@@ -242,7 +242,7 @@ else
 	endif
 
 	LIBS += -lpthread
-	LIBS += $(shell pkg-config --libs gtk+-3.0)
+	LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 endif

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,15 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <gtk/gtk.h>
+
+#ifdef GDK_WINDOWING_X11
+#	include <gdk/gdkx.h>
+
+#	undef True
+#	undef False
+#	undef Bool
+#	undef Success
+#endif
 
 #include <smooth/gui/dialogs/dirdlg.h>
 #include <smooth/files/directory.h>
@@ -23,6 +32,20 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 							      NULL);
 
 	if (directory != NIL) gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), directory);
+
+	/* Make sure dialog gets the focus.
+	 */
+#ifdef GDK_WINDOWING_X11
+	gtk_widget_show_all(GTK_WIDGET(dialog));
+
+	if (GDK_IS_X11_DISPLAY(gtk_widget_get_display(GTK_WIDGET(dialog))))
+	{
+		GdkWindow	*window = gtk_widget_get_window(GTK_WIDGET(dialog));
+
+		gdk_window_set_events(window, GdkEventMask(gdk_window_get_events(window) | GDK_PROPERTY_CHANGE_MASK));
+		gtk_window_present_with_time(GTK_WINDOW(dialog), gdk_x11_get_server_time(window));
+	}
+#endif
 
 	/* Run dialog and check result.
 	 */

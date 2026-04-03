@@ -9,7 +9,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_HAIKU),True)
-	MYCCOPTS += $(shell pkg-config --cflags gtk+-3.0)
+	MYCCOPTS += $(shell pkg-config --cflags gtk+-x11-3.0)
 endif
 endif
 endif

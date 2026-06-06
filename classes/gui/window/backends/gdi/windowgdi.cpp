@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2023 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -1112,7 +1112,7 @@ S::Void S::GUI::WindowGDI::SetCursor(Cursor *cursor, const Point &point)
 	const Font	&font	    = cursor->GetFont();
 	int		 nameLength = Math::Min(font.GetName().Length() + 1, LF_FACESIZE);
 
-	lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / Surface().GetSurfaceDPI());
+	lFont.lfHeight		= -Math::Round(font.GetSize() * 128.0 / 96.0 * Setup::FontSize);
 	lFont.lfWidth		= 0;
 	lFont.lfEscapement	= 0;
 	lFont.lfOrientation	= 0;

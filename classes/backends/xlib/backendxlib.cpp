@@ -377,3 +377,26 @@ S::String S::Backends::BackendXLib::QueryXfConf(const String &channel, const Str
 
 	return NIL;
 }
+
+S::String S::Backends::BackendXLib::QueryXftDPI()
+{
+	Display	*display = GetDisplay();
+
+	if (display == NIL) return NIL;
+
+	char	*resourceString = XResourceManagerString(display);
+
+	if (resourceString == NIL) return NIL;
+
+	String	 resources = resourceString;
+	Int	 pos	   = resources.Find("Xft.dpi:");
+
+	if (pos == -1) return NIL;
+
+	String	 value = resources.Tail(resources.Length() - pos - String("Xft.dpi:").Length());
+
+	value = value.Head(value.Find("\n") == -1 ? value.Length() : value.Find("\n"));
+	value = value.Trim();
+
+	return value;
+}

@@ -72,6 +72,7 @@ namespace smooth
 				static String		 QueryGSettings(const String &, const String &);
 				static String		 QueryKDESettings(const String &, const String &);
 				static String		 QueryXfConf(const String &, const String &);
+				static String		 QueryXftDPI();
 		};
 	};
 };

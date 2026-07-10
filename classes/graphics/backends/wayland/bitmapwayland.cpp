@@ -182,7 +182,7 @@ S::Bool S::GUI::BitmapWayland::SetPixel(const Point &iPoint, const Color &iColor
 	UnsignedInt	*pixel = (UnsignedInt *) ((UnsignedByte *) bytes + iPoint.y * size.cx * 4 + iPoint.x * 4);
 
 	if (depth == 32) *pixel = (color.GetAlpha() << 24) | (color.GetRed() << 16) | (color.GetGreen() << 8) | color.GetBlue();
-	else		 *pixel = (			  color.GetRed() << 16) | (color.GetGreen() << 8) | color.GetBlue();
+	else		 *pixel = 			     (color.GetRed() << 16) | (color.GetGreen() << 8) | color.GetBlue();
 
 	return True;
 }
@@ -195,8 +195,8 @@ S::GUI::Color S::GUI::BitmapWayland::GetPixel(const Point &iPoint) const
 
 	UnsignedInt	 value = *(UnsignedInt *) ((UnsignedByte *) bytes + iPoint.y * size.cx * 4 + iPoint.x * 4);
 
-	if (depth == 32) return ((value >> 24) & 255) << 24 | Color((value >> 16) & 255, (value >> 8) & 255, value & 255, Color::RGBA);
-	else		 return				      Color((value >> 16) & 255, (value >> 8) & 255, value & 255, Color::RGB);
+	if (depth == 32) return Color((((value >> 24) & 255) << 24) | (Long) Color((value >> 16) & 255, (value >> 8) & 255, value & 255		   ), Color::RGBA);
+	else		 return						     Color((value >> 16) & 255, (value >> 8) & 255, value & 255, Color::RGB);
 }
 
 S::GUI::BitmapBackend &S::GUI::BitmapWayland::operator =(const BitmapBackend &newBitmap)

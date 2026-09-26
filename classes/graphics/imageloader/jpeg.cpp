@@ -103,6 +103,11 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 	 * See libjpeg.doc for more info.
 	 */
 
+	/* Force RGB output regardless of the source color space (e.g. grayscale
+	 * or CMYK), since the scanline copy loop below assumes 3 components.
+	 */
+	cinfo.out_color_space = JCS_RGB;
+
 	/* Start decompressor
 	 */
 	jpeg_start_decompress(&cinfo);

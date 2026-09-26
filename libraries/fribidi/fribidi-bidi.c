@@ -55,17 +55,28 @@
  (((list)->type == FRIBIDI_TYPE_AN) || ((list)->type == FRIBIDI_TYPE_EN) | ((list)->type == FRIBIDI_TYPE_RTL)) ? FRIBIDI_TYPE_RTL : (list)->type)
 #define RL_BRACKET_TYPE(list) ((list)->bracket_type)
 #define RL_ISOLATE_LEVEL(list) ((list)->isolate_level)
+#define RL_FSI_BASE_LEVEL(list) ((list)->fsi_base_level)
 
 #define LOCAL_BRACKET_SIZE 16
 
-/* Pairing nodes are used for holding a pair of open/close brackets as
-   described in BD16. */
-struct _FriBidiPairingNodeStruct {
+/* A pairing entry holds a pair of open/close brackets as described in
+   BD16. They are collected (in an arbitrary order determined by the
+   bracket-matching scan) into a flat, growable array rather than a
+   malloc-per-pair linked list, then qsort()ed by the open bracket's
+   position for the N0 pass below. Real-world text has few brackets, so
+   the array typically stays within its small initial allocation. */
+typedef struct {
   FriBidiRun *open;
   FriBidiRun *close;
-  struct _FriBidiPairingNodeStruct *next;
-};
-typedef struct _FriBidiPairingNodeStruct FriBidiPairingNode;
+} FriBidiPairingNode;
+
+typedef struct {
+  FriBidiPairingNode *nodes;
+  int count;
+  int capacity;
+} FriBidiPairingNodeArray;
+
+#define FRIBIDI_PAIRING_ARRAY_MIN_CAPACITY 16
 
 static FriBidiRun *
 merge_with_prev (
@@ -93,7 +104,8 @@ merge_with_prev (
     second->prev_isolate->next_isolate = second->next_isolate;
   first->next_isolate = second->next_isolate;
 
-  fribidi_free (second);
+  /* 'second' is pool-owned; it just becomes unreachable garbage within
+     the pool instead of being freed individually (see run.h). */
   return first;
 }
 static void
@@ -145,7 +157,7 @@ compact_neutrals (
 
 /* The static sentinel is used to signal the end of an isolating
    sequence */
-static FriBidiRun sentinel = { NULL, NULL, 0,0, FRIBIDI_TYPE_SENTINEL, -1,-1,FRIBIDI_NO_BRACKET, NULL, NULL };
+static FriBidiRun sentinel = { NULL, NULL, 0,0, FRIBIDI_TYPE_SENTINEL, -1,-1,FRIBIDI_NO_BRACKET, NULL, NULL, 0 };
 
 static FriBidiRun *get_adjacent_run(FriBidiRun *list, fribidi_boolean forward, fribidi_boolean skip_neutral)
 {
@@ -280,14 +292,12 @@ print_bidi_string (
   MSG ("\n");
 }
 
-static void print_pairing_nodes(FriBidiPairingNode *nodes)
+static void print_pairing_nodes(FriBidiPairingNodeArray *nodes)
 {
+  int i;
   MSG ("Pairs: ");
-  while (nodes)
-    {
-      MSG3 ("(%d, %d) ", nodes->open->pos, nodes->close->pos);
-      nodes = nodes->next;
-    }
+  for (i = 0; i < nodes->count; i++)
+    MSG3 ("(%d, %d) ", nodes->nodes[i].open->pos, nodes->nodes[i].close->pos);
   MSG ("\n");
 }
 #endif /* DEBUG */
@@ -422,95 +432,60 @@ fribidi_get_par_direction (
   return FRIBIDI_PAR_ON;
 }
 
-/* Push a new entry to the pairing linked list */
-static FriBidiPairingNode * pairing_nodes_push(FriBidiPairingNode *nodes,
+static void pairing_node_array_init(FriBidiPairingNodeArray *arr)
+{
+  arr->nodes = NULL;
+  arr->count = 0;
+  arr->capacity = 0;
+}
+
+/* Append a new (open, close) pair, growing the backing array (by
+   doubling, geometric growth) if needed. */
+static fribidi_boolean pairing_node_array_push(FriBidiPairingNodeArray *arr,
                                                FriBidiRun *open,
                                                FriBidiRun *close)
 {
-  FriBidiPairingNode *node = fribidi_malloc(sizeof(FriBidiPairingNode));
-  node->open = open;
-  node->close = close;
-  node->next = nodes;
-  nodes = node;
-  return nodes;
-}
-
-/* Sort by merge sort */
-static void pairing_nodes_front_back_split(FriBidiPairingNode *source,
-                                           /* output */
-                                           FriBidiPairingNode **front,
-                                           FriBidiPairingNode **back)
-{
-  FriBidiPairingNode *pfast, *pslow;
-  if (!source || !source->next)
+  if UNLIKELY
+    (arr->count == arr->capacity)
     {
-      *front = source;
-      *back = NULL;
-    }
-  else
-    {
-      pslow = source;
-      pfast = source->next;
-      while (pfast)
+      int new_capacity = arr->capacity ? arr->capacity * 2 :
+        FRIBIDI_PAIRING_ARRAY_MIN_CAPACITY;
+      FriBidiPairingNode *new_nodes =
+        fribidi_malloc (new_capacity * sizeof (FriBidiPairingNode));
+      if UNLIKELY
+        (!new_nodes) return false;
+      if (arr->nodes)
         {
-          pfast= pfast->next;
-          if (pfast)
-            {
-              pfast = pfast->next;
-              pslow = pslow->next;
-            }
+          memcpy (new_nodes, arr->nodes, arr->count * sizeof (FriBidiPairingNode));
+          fribidi_free (arr->nodes);
         }
-      *front = source;
-      *back = pslow->next;
-      pslow->next = NULL;
+      arr->nodes = new_nodes;
+      arr->capacity = new_capacity;
     }
+
+  arr->nodes[arr->count].open = open;
+  arr->nodes[arr->count].close = close;
+  arr->count++;
+  return true;
 }
 
-static FriBidiPairingNode *
-pairing_nodes_sorted_merge(FriBidiPairingNode *nodes1,
-                           FriBidiPairingNode *nodes2)
+static int pairing_node_compare (const void *a, const void *b)
 {
-  FriBidiPairingNode *res = NULL;
-  if (!nodes1)
-    return nodes2;
-  if (!nodes2)
-    return nodes1;
-
-  if (nodes1->open->pos < nodes2->open->pos)
-    {
-      res = nodes1;
-      res->next = pairing_nodes_sorted_merge(nodes1->next, nodes2);
-    }
-  else
-    {
-      res = nodes2;
-      res->next = pairing_nodes_sorted_merge(nodes1, nodes2->next);
-    }
-  return res;
+  const FriBidiPairingNode *na = a, *nb = b;
+  return (na->open->pos > nb->open->pos) - (na->open->pos < nb->open->pos);
 }
 
-static void sort_pairing_nodes(FriBidiPairingNode **nodes)
+static void sort_pairing_nodes(FriBidiPairingNodeArray *arr)
 {
-  FriBidiPairingNode *front, *back;
-
-  /* 0 or 1 node case */
-  if (!*nodes || !(*nodes)->next)
-    return;
-
-  pairing_nodes_front_back_split(*nodes, &front, &back);
-  sort_pairing_nodes(&front);
-  sort_pairing_nodes(&back);
-  *nodes = pairing_nodes_sorted_merge(front, back);
+  if (arr->count > 1)
+    qsort (arr->nodes, arr->count, sizeof (FriBidiPairingNode), pairing_node_compare);
 }
 
-static void free_pairing_nodes(FriBidiPairingNode *nodes)
+static void free_pairing_nodes(FriBidiPairingNodeArray *arr)
 {
-  while (nodes)
-    {
-      FriBidiPairingNode *p = nodes;
-      nodes = nodes->next;
-      fribidi_free(p);
-    }
+  fribidi_free (arr->nodes);
+  arr->nodes = NULL;
+  arr->count = arr->capacity = 0;
 }
 
 FRIBIDI_ENTRY FriBidiLevel
@@ -528,6 +503,8 @@ fribidi_get_par_embedding_levels_ex (
   FriBidiLevel base_level, max_level = 0;
   FriBidiParType base_dir;
   FriBidiRun *main_run_list = NULL, *explicits_list = NULL, *pp;
+  fribidi_boolean has_isolate = false;
+  FriBidiRunPool *run_pool = NULL;
   fribidi_boolean status = false;
   int max_iso_level = 0;
 
@@ -544,10 +521,17 @@ fribidi_get_par_embedding_levels_ex (
   fribidi_assert (pbase_dir);
   fribidi_assert (embedding_levels);
 
+  /* All FriBidiRun nodes needed to resolve this paragraph's embedding
+     levels are carved out of this single pool and released together at
+     'out', rather than being malloc'd/freed one at a time. */
+  run_pool = fribidi_run_pool_new (len);
+  if UNLIKELY
+    (!run_pool) goto out;
+
   /* Determinate character types */
   {
     /* Get run-length encoded character types */
-    main_run_list = run_list_encode_bidi_types (bidi_types, bracket_types, len);
+    main_run_list = run_list_encode_bidi_types (bidi_types, bracket_types, len, run_pool, &has_isolate);
     if UNLIKELY
       (!main_run_list) goto out;
   }
@@ -620,9 +604,85 @@ fribidi_get_par_embedding_levels_ex (
    codes that are removed from main_run_list, to reinsert them later by
    calling the shadow_run_list.
 */
-    explicits_list = new_run_list ();
+    explicits_list = new_run_list (run_pool);
     if UNLIKELY
       (!explicits_list) goto out;
+
+    /* X5c preprocessing: resolve the effective direction of every FSI
+       up front, in a single linear pass over the (still untouched)
+       run list, using an explicit stack to skip over nested isolates.
+       This replaces rescanning the tail of the run list from every FSI
+       individually, which made paragraphs with many FSIs -- or with no
+       strong character before an FSI's matching PDI -- quadratic. Only
+       the direct content of each isolate initiator counts towards its
+       own resolution; content of a nested isolate is skipped entirely,
+       which a stack captures naturally: a strong character only ever
+       resolves the isolate currently on top of the stack. Skipped
+       entirely when the text has no isolate-initiator at all, which is
+       the common case and would otherwise cost a full, pointless pass
+       over the run list. */
+    if (has_isolate)
+    {
+      FriBidiRun *local_fsi_stack[LOCAL_BRACKET_SIZE];
+      FriBidiRun **fsi_stack = local_fsi_stack;
+      int fsi_stack_capacity = LOCAL_BRACKET_SIZE;
+      int fsi_stack_size = 0;
+      fribidi_boolean fsi_stack_heap = false;
+      FriBidiRun *fsi_pp;
+
+      for_run_list (fsi_pp, main_run_list)
+        {
+          FriBidiCharType fsi_this_type = RL_TYPE (fsi_pp);
+
+          if (fsi_this_type == FRIBIDI_TYPE_PDI)
+            {
+              if (fsi_stack_size)
+                fsi_stack_size--;
+            }
+          else if (FRIBIDI_IS_ISOLATE (fsi_this_type))
+            {
+              if UNLIKELY
+                (fsi_stack_size == fsi_stack_capacity)
+                {
+                  int new_capacity = fsi_stack_capacity * 2;
+                  FriBidiRun **new_stack =
+                    fribidi_malloc (new_capacity * sizeof (*new_stack));
+                  if UNLIKELY
+                    (!new_stack) break;
+                  memcpy (new_stack, fsi_stack,
+                          fsi_stack_size * sizeof (*new_stack));
+                  if (fsi_stack_heap)
+                    fribidi_free (fsi_stack);
+                  fsi_stack = new_stack;
+                  fsi_stack_capacity = new_capacity;
+                  fsi_stack_heap = true;
+                }
+
+              if (fsi_this_type == FRIBIDI_TYPE_FSI)
+                {
+                  RL_FSI_BASE_LEVEL (fsi_pp) = 0;
+                  fsi_stack[fsi_stack_size++] = fsi_pp;
+                }
+              else
+                fsi_stack[fsi_stack_size++] = NULL;
+            }
+          else if (fsi_stack_size && FRIBIDI_IS_LETTER (fsi_this_type))
+            {
+              FriBidiRun *pending = fsi_stack[fsi_stack_size - 1];
+              if (pending)
+                {
+                  RL_FSI_BASE_LEVEL (pending) =
+                    FRIBIDI_DIR_TO_LEVEL (fsi_this_type);
+                  /* Found; stop this isolate from being resolved again
+                     by a later, incorrect, character. */
+                  fsi_stack[fsi_stack_size - 1] = NULL;
+                }
+            }
+        }
+
+      if (fsi_stack_heap)
+        fribidi_free (fsi_stack);
+    }
 
     /* X1. Begin by setting the current embedding level to the paragraph
        embedding level. Set the directional override status to neutral,
@@ -734,28 +794,9 @@ fribidi_get_par_embedding_levels_ex (
             new_level = level + 1 + (level%2);
           else if (this_type == FRIBIDI_TYPE_FSI)
             {
-              /* Search for a local strong character until we
-                 meet the corresponding PDI or the end of the
-                 paragraph */
-              FriBidiRun *fsi_pp;
-              int isolate_count = 0;
-              int fsi_base_level = 0;
-              for_run_list (fsi_pp, pp)
-                {
-                  if (RL_TYPE(fsi_pp) == FRIBIDI_TYPE_PDI)
-                    {
-                      isolate_count--;
-                      if (valid_isolate_count < 0)
-                        break;
-                    }
-                  else if (FRIBIDI_IS_ISOLATE(RL_TYPE(fsi_pp)))
-                    isolate_count++;
-                  else if (isolate_count==0 && FRIBIDI_IS_LETTER (RL_TYPE (fsi_pp)))
-                    {
-                      fsi_base_level = FRIBIDI_DIR_TO_LEVEL (RL_TYPE (fsi_pp));
-                      break;
-                    }
-                }
+              /* The effective direction was already resolved by the
+                 single-pass X5c preprocessing above; just look it up. */
+              FriBidiLevel fsi_base_level = RL_FSI_BASE_LEVEL (pp);
 
               /* Same behavior like RLI and LRI above */
               if (FRIBIDI_LEVEL_IS_RTL (fsi_base_level))
@@ -1054,13 +1095,15 @@ fribidi_get_par_embedding_levels_ex (
   {
     /*  BD16 - Build list of all pairs*/
     int num_iso_levels = max_iso_level + 1;
-    FriBidiPairingNode *pairing_nodes = NULL;
+    FriBidiPairingNodeArray pairing_nodes;
+    fribidi_boolean pairing_alloc_failed = false;
     FriBidiRun *local_bracket_stack[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL][LOCAL_BRACKET_SIZE];
     FriBidiRun **bracket_stack[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL];
     int bracket_stack_size[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL];
     int last_level = RL_LEVEL(main_run_list);
     int last_iso_level = 0;
 
+    pairing_node_array_init (&pairing_nodes);
     memset(bracket_stack, 0, sizeof(bracket_stack[0])*num_iso_levels);
     memset(bracket_stack_size, 0, sizeof(bracket_stack_size[0])*num_iso_levels);
 
@@ -1111,17 +1154,35 @@ fribidi_get_par_embedding_levels_ex (
                       {
                         bracket_stack_size[iso_level] = stack_idx;
 
-                        pairing_nodes = pairing_nodes_push(pairing_nodes,
-                                                           bracket_stack[iso_level][stack_idx],
-                                                           pp);
+                        if UNLIKELY
+                          (!pairing_node_array_push (&pairing_nodes,
+                                                     bracket_stack[iso_level][stack_idx],
+                                                     pp))
+                          pairing_alloc_failed = true;
                         break;
                     }
                     stack_idx--;
                   }
               }
           }
+        if UNLIKELY
+          (pairing_alloc_failed) break;
         last_level = level;
         last_iso_level = iso_level;
+      }
+
+    if UNLIKELY
+      (pairing_alloc_failed)
+      {
+        free_pairing_nodes (&pairing_nodes);
+        if (num_iso_levels >= LOCAL_BRACKET_SIZE)
+          {
+            int i;
+            for (i=LOCAL_BRACKET_SIZE; i<num_iso_levels; i++)
+              fribidi_free(bracket_stack[i]);
+          }
+        status = false;
+        goto out;
       }
 
     /* The list must now be sorted for the next algo to work! */
@@ -1131,16 +1192,29 @@ fribidi_get_par_embedding_levels_ex (
     if UNLIKELY
     (fribidi_debug_status ())
       {
-        print_pairing_nodes (pairing_nodes);
+        print_pairing_nodes (&pairing_nodes);
       }
 # endif	/* DEBUG */
 
     /* Start the N0 */
     {
-      FriBidiPairingNode *ppairs = pairing_nodes;
-      while (ppairs)
+      int ppairs_idx;
+      /* Track, per isolate level, the level of the most recently seen
+         strong character while sweeping the run list forward exactly
+         once (strong_scan_pp only ever moves forward, it is never
+         rewound). This lets N0c below look up the preceding strong
+         character for each bracket pair in amortized O(1) instead of
+         rescanning backwards toward the start of the string for every
+         pair, which made runs of many bracket pairs with no strong
+         content quadratic. */
+      int last_strong_level[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL];
+      FriBidiRun *strong_scan_pp = main_run_list->next;
+      memset (last_strong_level, 0xFF, sizeof (int) * num_iso_levels);
+
+      for (ppairs_idx = 0; ppairs_idx < pairing_nodes.count; ppairs_idx++)
         {
-          int embedding_level = ppairs->open->level; 
+          FriBidiPairingNode *ppairs = &pairing_nodes.nodes[ppairs_idx];
+          int embedding_level = ppairs->open->level;
 
           /* Find matching strong. */
           fribidi_boolean found = false;
@@ -1167,20 +1241,25 @@ fribidi_get_par_embedding_levels_ex (
           /* Search for any strong type preceding and within the bracket pair */
           if (!found)
             {
-              /* Search for a preceding strong */
-              int prec_strong_level = embedding_level; /* TBDov! Extract from Isolate level in effect */
+              /* Search for a preceding strong. Catch the sweep cursor up
+                 to this pair's opening bracket, recording the level of
+                 every strong character passed along the way, indexed by
+                 its isolate level. */
               int iso_level = RL_ISOLATE_LEVEL(ppairs->open);
-              for (ppn = ppairs->open->prev; ppn->type != FRIBIDI_TYPE_SENTINEL; ppn=ppn->prev)
-                {
-                  FriBidiCharType this_type = RL_TYPE_AN_EN_AS_RTL(ppn);
-                  if (FRIBIDI_IS_STRONG (this_type) && RL_ISOLATE_LEVEL(ppn) == iso_level)
-                    {
-                      prec_strong_level = RL_LEVEL (ppn) +
-                        (FRIBIDI_LEVEL_IS_RTL (RL_LEVEL(ppn)) ^ FRIBIDI_DIR_TO_LEVEL (this_type));
+              int prec_strong_level;
 
-                      break;
+              for (; strong_scan_pp != ppairs->open; strong_scan_pp = strong_scan_pp->next)
+                {
+                  FriBidiCharType this_type = RL_TYPE_AN_EN_AS_RTL(strong_scan_pp);
+                  if (FRIBIDI_IS_STRONG (this_type))
+                    {
+                      last_strong_level[RL_ISOLATE_LEVEL(strong_scan_pp)] = RL_LEVEL (strong_scan_pp) +
+                        (FRIBIDI_LEVEL_IS_RTL (RL_LEVEL(strong_scan_pp)) ^ FRIBIDI_DIR_TO_LEVEL (this_type));
                     }
                 }
+
+              prec_strong_level = last_strong_level[iso_level] >= 0 ?
+                last_strong_level[iso_level] : embedding_level; /* TBDov! Extract from Isolate level in effect */
 
               for (ppn = ppairs->open; ppn!= ppairs->close; ppn = ppn->next)
                 {
@@ -1197,11 +1276,9 @@ fribidi_get_par_embedding_levels_ex (
                     }
                 }
             }
-
-          ppairs = ppairs->next;
         }
 
-      free_pairing_nodes(pairing_nodes);
+      free_pairing_nodes(&pairing_nodes);
 
       if (num_iso_levels >= LOCAL_BRACKET_SIZE)
         {
@@ -1319,7 +1396,7 @@ fribidi_get_par_embedding_levels_ex (
     {
       register FriBidiRun *p;
       register fribidi_boolean stat =
-	shadow_run_list (main_run_list, explicits_list, true);
+	shadow_run_list (main_run_list, explicits_list, true, run_pool);
       explicits_list = NULL;
       if UNLIKELY
 	(!stat) goto out;
@@ -1357,7 +1434,7 @@ fribidi_get_par_embedding_levels_ex (
        4. any sequence of whitespace characters and/or isolate formatting
           characters at the end of the line.
        ... (to be continued in fribidi_reorder_line()). */
-    list = new_run_list ();
+    list = new_run_list (run_pool);
     if UNLIKELY
       (!list) goto out;
     q = list;
@@ -1380,7 +1457,7 @@ fribidi_get_par_embedding_levels_ex (
                    || FRIBIDI_IS_ISOLATE(char_type)))
 	  {
 	    state = 0;
-	    p = new_run ();
+	    p = new_run (run_pool);
 	    if UNLIKELY
 	      (!p)
 	      {
@@ -1396,7 +1473,7 @@ fribidi_get_par_embedding_levels_ex (
 	  }
       }
     if UNLIKELY
-      (!shadow_run_list (main_run_list, list, false)) goto out;
+      (!shadow_run_list (main_run_list, list, false, run_pool)) goto out;
   }
 
 # if DEBUG
@@ -1425,10 +1502,7 @@ fribidi_get_par_embedding_levels_ex (
 out:
   DBG ("leaving fribidi_get_par_embedding_levels");
 
-  if (main_run_list)
-    free_run_list (main_run_list);
-  if UNLIKELY
-    (explicits_list) free_run_list (explicits_list);
+  fribidi_run_pool_free (run_pool);
 
   return status ? max_level + 1 : 0;
 }
@@ -1468,6 +1542,129 @@ index_array_reverse (
       arr[i] = arr[len - 1 - i];
       arr[len - 1 - i] = tmp;
     }
+}
+
+/* A maximal run of consecutive characters that share the same resolved
+ * embedding level, as used by the linear-time implementation of L2 below. */
+typedef struct
+{
+  FriBidiStrIndex pos, len;
+  FriBidiLevel level;
+  FriBidiStrIndex next;	/* index into the runs array, or -1 */
+} FriBidiL2Run;
+
+/* A range groups one or more adjacent runs (in *visual* order) that have
+ * already been merged together, along with the highest level seen among
+ * the runs that produced it. */
+typedef struct
+{
+  FriBidiLevel level;
+  FriBidiStrIndex left, right;	/* indices into the runs array */
+  FriBidiStrIndex previous;	/* index into the ranges array, or -1 */
+} FriBidiL2Range;
+
+/* Merges ranges[top] with ranges[ranges[top].previous], frees the top
+ * range by returning its slot to the caller, and returns the index of
+ * the surviving (previous) range. */
+static FriBidiStrIndex
+fribidi_l2_merge_range_with_previous (
+  FriBidiL2Run *runs,
+  FriBidiL2Range *ranges,
+  FriBidiStrIndex top
+)
+{
+  FriBidiStrIndex previous = ranges[top].previous;
+  FriBidiStrIndex left, right;
+
+  fribidi_assert (previous != -1);
+  fribidi_assert (ranges[previous].level < ranges[top].level);
+
+  if (FRIBIDI_LEVEL_IS_RTL (ranges[previous].level))
+    {
+      /* Odd, previous goes to the right of range. */
+      left = top;
+      right = previous;
+    }
+  else
+    {
+      /* Even, previous goes to the left of range. */
+      left = previous;
+      right = top;
+    }
+  /* Stitch them. */
+  runs[ranges[left].right].next = ranges[right].left;
+
+  ranges[previous].left = ranges[left].left;
+  ranges[previous].right = ranges[right].right;
+
+  return previous;
+}
+
+/* A one-pass linear-time implementation of UAX#9 rule L2, operating on
+ * maximal same-level runs instead of individual characters.  This avoids
+ * the O(len * max_level) cost of repeatedly rescanning the whole line for
+ * each embedding level from max_level down to 1.
+ *
+ * Reorders runs[0..num_runs-1], which must be given in logical order and
+ * linked via ->next accordingly, and returns the index of the left-most
+ * (i.e. first in visual order) run.  The runs array is used both as
+ * storage for the run list and as a preallocated stack for ranges sized
+ * to num_runs, since neither structure can exceed num_runs entries.
+ */
+static FriBidiStrIndex
+fribidi_l2_linear_reorder (
+  FriBidiL2Run *runs,
+  FriBidiL2Range *ranges,
+  const FriBidiStrIndex num_runs
+)
+{
+  FriBidiStrIndex top = -1;
+  FriBidiStrIndex range_count = 0;
+  FriBidiStrIndex i;
+
+  for (i = 0; i < num_runs; i++)
+    {
+      while (top != -1 && ranges[top].level > runs[i].level &&
+	     ranges[top].previous != -1 &&
+	     ranges[ranges[top].previous].level >= runs[i].level)
+	top = fribidi_l2_merge_range_with_previous (runs, ranges, top);
+
+      if (top != -1 && ranges[top].level >= runs[i].level)
+	{
+	  /* Attach run to the range. */
+	  if (FRIBIDI_LEVEL_IS_RTL (runs[i].level))
+	    {
+	      /* Odd, range goes to the right of run. */
+	      runs[i].next = ranges[top].left;
+	      ranges[top].left = i;
+	    }
+	  else
+	    {
+	      /* Even, range goes to the left of run. */
+	      runs[ranges[top].right].next = i;
+	      ranges[top].right = i;
+	    }
+	  ranges[top].level = runs[i].level;
+	}
+      else
+	{
+	  /* Push new range for run. */
+	  FriBidiStrIndex r = range_count++;
+	  ranges[r].left = ranges[r].right = i;
+	  ranges[r].level = runs[i].level;
+	  ranges[r].previous = top;
+	  top = r;
+	}
+    }
+
+  fribidi_assert (top != -1);
+  while (ranges[top].previous != -1)
+    top = fribidi_l2_merge_range_with_previous (runs, ranges, top);
+
+  /* Terminate. */
+  runs[ranges[top].right].next = -1;
+
+  return ranges[top].left;
 }
 
 
@@ -1514,13 +1711,14 @@ fribidi_reorder_line (
 
   /* 7. Reordering resolved levels */
   {
-    register FriBidiLevel level;
     register FriBidiStrIndex i;
 
     /* Reorder both the outstring and the order array */
     {
       if (FRIBIDI_TEST_BITS (flags, FRIBIDI_FLAG_REORDER_NSM))
 	{
+	  register FriBidiLevel level;
+
 	  /* L3. Reorder NSMs. */
 	  for (i = off + len - 1; i >= off; i--)
 	    if (FRIBIDI_LEVEL_IS_RTL (embedding_levels[i])
@@ -1551,28 +1749,117 @@ fribidi_reorder_line (
 	      }
 	}
 
-      /* Find max_level of the line.  We don't reuse the paragraph
-       * max_level, both for a cleaner API, and that the line max_level
-       * may be far less than paragraph max_level. */
-      for (i = off + len - 1; i >= off; i--)
-	if (embedding_levels[i] > max_level)
-	  max_level = embedding_levels[i];
+      /* L2. Reorder, and along the way find max_level of the line.  We
+       * don't reuse the paragraph max_level, both for a cleaner API, and
+       * that the line max_level may be far less than paragraph max_level.
+       *
+       * This is done in linear time by grouping the line into maximal
+       * same-level runs and reordering the runs, rather than repeatedly
+       * rescanning the whole line once per embedding level as the naive
+       * algorithm from the standard does. */
+      {
+	/* Count the runs first, so the runs/ranges arrays below can be
+	 * sized to the actual run count rather than to len: real-world
+	 * lines usually consist of a handful of long runs, so this keeps
+	 * the common case cheap. */
+	FriBidiStrIndex num_runs = 0;
+	FriBidiStrIndex pos;
 
-      /* L2. Reorder. */
-      for (level = max_level; level > 0; level--)
-	for (i = off + len - 1; i >= off; i--)
-	  if (embedding_levels[i] >= level)
+	for (pos = off; pos < off + len; num_runs++)
+	  {
+	    FriBidiStrIndex run_len = 1;
+	    while (pos + run_len < off + len &&
+		   embedding_levels[pos + run_len] == embedding_levels[pos])
+	      run_len++;
+	    pos += run_len;
+	  }
+
+	{
+	  char *runs_and_ranges =
+	    fribidi_malloc (num_runs * (sizeof (FriBidiL2Run) +
+					 sizeof (FriBidiL2Range)));
+	  FriBidiL2Run *runs = (FriBidiL2Run *) runs_and_ranges;
+	  FriBidiL2Range *ranges =
+	    (FriBidiL2Range *) (runs_and_ranges +
+				 num_runs * sizeof (FriBidiL2Run));
+	  FriBidiStrIndex run_idx = 0;
+
+	  for (pos = off; pos < off + len; run_idx++)
 	    {
-	      /* Find all stretches that are >= level_idx */
-	      register FriBidiStrIndex seq_end = i;
-	      for (i--; i >= off && embedding_levels[i] >= level; i--)
-		;
+	      FriBidiStrIndex run_len = 1;
+	      while (pos + run_len < off + len &&
+		     embedding_levels[pos + run_len] == embedding_levels[pos])
+		run_len++;
 
-	      if (visual_str)
-		bidi_string_reverse (visual_str + i + 1, seq_end - i);
-	      if (map)
-		index_array_reverse (map + i + 1, seq_end - i);
+	      runs[run_idx].pos = pos;
+	      runs[run_idx].len = run_len;
+	      runs[run_idx].level = embedding_levels[pos];
+	      runs[run_idx].next = -1;
+
+	      if (runs[run_idx].level > max_level)
+		max_level = runs[run_idx].level;
+
+	      /* The run's own content must be reversed exactly once if it
+	       * is an RTL run; further reordering only ever moves whole
+	       * runs around, it never touches what is inside them. */
+	      if (FRIBIDI_LEVEL_IS_RTL (runs[run_idx].level))
+		{
+		  if (visual_str)
+		    bidi_string_reverse (visual_str + pos, run_len);
+		  if (map)
+		    index_array_reverse (map + pos, run_len);
+		}
+
+	      pos += run_len;
 	    }
+
+	  if (num_runs > 1)
+	    {
+	      FriBidiStrIndex left =
+		fribidi_l2_linear_reorder (runs, ranges, num_runs);
+
+	      if (visual_str || map)
+		{
+		  char *tmp =
+		    fribidi_malloc (len * ((visual_str ? sizeof (FriBidiChar) :
+					     0) +
+					    (map ? sizeof (FriBidiStrIndex) :
+					     0)));
+		  FriBidiChar *tmp_visual = visual_str ? (FriBidiChar *) tmp :
+		    NULL;
+		  FriBidiStrIndex *tmp_map =
+		    map ? (FriBidiStrIndex *) (tmp +
+						(visual_str ?
+						 len * sizeof (FriBidiChar) :
+						 0)) : NULL;
+		  FriBidiStrIndex out_pos = 0;
+		  FriBidiStrIndex idx;
+
+		  for (idx = left; idx != -1; idx = runs[idx].next)
+		    {
+		      if (tmp_visual)
+			memcpy (tmp_visual + out_pos,
+				visual_str + runs[idx].pos,
+				runs[idx].len * sizeof (FriBidiChar));
+		      if (tmp_map)
+			memcpy (tmp_map + out_pos, map + runs[idx].pos,
+				runs[idx].len * sizeof (FriBidiStrIndex));
+		      out_pos += runs[idx].len;
+		    }
+
+		  if (tmp_visual)
+		    memcpy (visual_str + off, tmp_visual,
+			    len * sizeof (FriBidiChar));
+		  if (tmp_map)
+		    memcpy (map + off, tmp_map, len * sizeof (FriBidiStrIndex));
+
+		  fribidi_free (tmp);
+		}
+	    }
+
+	  fribidi_free (runs_and_ranges);
+	}
+      }
     }
 
   }

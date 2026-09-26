@@ -193,7 +193,11 @@ S::Short S::GUI::SurfaceXLib::GetSurfaceDPI() const
 	/* Evaluate GDK_SCALE setting.
 	 */
 	Float	 dpi   = 96.0;
-	Int	 scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
+	Float	 scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
+
+	Float	 xftDPI = Backends::BackendXLib::QueryXftDPI().ToFloat();
+
+	if (xftDPI > 0) scale = xftDPI / dpi;
 
 	if (scale > 0) dpi *= scale;
 

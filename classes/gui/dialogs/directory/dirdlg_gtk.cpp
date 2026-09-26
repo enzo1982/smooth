@@ -26,10 +26,8 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
 	/* Create file chooser dialog.
 	 */
-	GtkWidget	*dialog = gtk_file_chooser_dialog_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-							      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							      GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
-							      NULL);
+	GtkFileChooserNative	*dialog = gtk_file_chooser_native_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+							      "_Open", "_Cancel");
 
 	if (directory != NIL) gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), directory);
 
@@ -49,9 +47,11 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 	/* Run dialog and check result.
 	 */
-	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	if (gtk_native_dialog_run(GTK_NATIVE_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
-		char	*name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+		GtkFileChooser *chooser = GTK_FILE_CHOOSER(dialog);
+		char	*name = gtk_file_chooser_get_filename(chooser);
 
 		directory.ImportFrom("UTF-8", name);
 
@@ -62,7 +62,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 		directory = NIL;
 	}
 
-	gtk_widget_destroy(dialog);
+	g_object_unref(dialog);
 
 	/* Wait for GTK to finish pending actions.
 	 */

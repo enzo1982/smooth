@@ -379,7 +379,7 @@ size_t S::Net::Protocols::httpHeader(char *buffer, size_t size, size_t n, void *
 
 	/* Handle headers.
 	 */
-	if (header.StartsWith("HTTP/1."))
+	if (header.StartsWith("HTTP/"))
 	{
 		/* Reset output stream when we get a new HTTP response.
 		 */

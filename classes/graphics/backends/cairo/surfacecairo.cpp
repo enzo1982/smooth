@@ -221,6 +221,12 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 		if (ex_gdk_screen_get_monitor_scale_factor != NIL) scale = ex_gdk_screen_get_monitor_scale_factor(gdk_screen_get_default(), 0);
 		else						   scale = (Int64) Number::FromIntString(getenv("GDK_SCALE"));
 
+		/* Prefer the fractional Xft.dpi X resource if available.
+		 */
+		Float	 xftDPI = Backends::BackendXLib::QueryXftDPI().ToFloat();
+
+		if (xftDPI > 0) scale = xftDPI / dpi;
+
 		/* Alternatively, query the scale factor from the KDE configuration.
 		 */
 		if (scale <= 1.0) scale = Backends::BackendXLib::QueryKDESettings("KScreen", "ScaleFactor").ToFloat();

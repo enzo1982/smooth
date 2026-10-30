@@ -17,13 +17,13 @@ endif
 ifeq ($(USE_BUNDLED_LIBPNG),True)
 	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libpng
 else
-	MYCCOPTS += $(shell pkg-config --cflags libpng)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags libpng)
 endif
 
 ifeq ($(USE_BUNDLED_LIBWEBP),True)
 	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support/libwebp
 else
-	MYCCOPTS += $(shell pkg-config --cflags libwebp)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags libwebp)
 endif
 
 ifeq ($(BUILD_GDIPLUS),True)

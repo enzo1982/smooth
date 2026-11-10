@@ -26,6 +26,7 @@ namespace smooth
 
 struct xdg_wm_base;
 struct libdecor;
+struct zwp_primary_selection_device_manager_v1;
 
 namespace smooth
 {
@@ -57,6 +58,7 @@ namespace smooth
 				static xdg_wm_base			*wmBase;
 				static wl_seat				*seat;
 				static wl_data_device_manager		*dataDeviceManager;
+				static zwp_primary_selection_device_manager_v1 *primarySelectionManager;
 
 				static libdecor				*decorContext;
 
@@ -98,6 +100,7 @@ namespace smooth
 				static xdg_wm_base			*GetWMBase()		{ return wmBase; }
 				static wl_seat				*GetSeat()		{ return seat; }
 				static wl_data_device_manager		*GetDataDeviceManager()	{ return dataDeviceManager; }
+				static zwp_primary_selection_device_manager_v1 *GetPrimarySelectionManager() { return primarySelectionManager; }
 
 				static libdecor				*GetDecorContext()	{ return decorContext; }
 

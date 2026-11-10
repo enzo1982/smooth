@@ -9,10 +9,12 @@ OBJECTS	  = backend.o
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = $(call makein,cocoa) && $(call makein,gdiplus)
 ALLCMD2   = $(call makein,haiku) && $(call makein,win32)
-ALLCMD3   = $(call makein,xlib)
+ALLCMD3   = $(call makein,wayland) && $(call makein,xlib)
+ALLCMD4   = $(call makein,freedesktop)
 CLEANCMD1 = $(call cleanin,cocoa) && $(call cleanin,gdiplus)
 CLEANCMD2 = $(call cleanin,haiku) && $(call cleanin,win32)
-CLEANCMD3 = $(call cleanin,xlib)
+CLEANCMD3 = $(call cleanin,wayland) && $(call cleanin,xlib)
+CLEANCMD4 = $(call cleanin,freedesktop)
 
 ## Do not change anything below this line. ##
 

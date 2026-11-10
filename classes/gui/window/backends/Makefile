@@ -10,11 +10,11 @@ OBJECTS	  = windowbackend.o
 ALLCMD1   = $(call makein,cocoa)
 ALLCMD2   = $(call makein,gdi)
 ALLCMD3   = $(call makein,haiku)
-ALLCMD4   = $(call makein,xlib)
+ALLCMD4   = $(call makein,wayland) && $(call makein,xlib)
 CLEANCMD1 = $(call cleanin,cocoa)
 CLEANCMD2 = $(call cleanin,gdi)
 CLEANCMD3 = $(call cleanin,haiku)
-CLEANCMD4 = $(call cleanin,xlib)
+CLEANCMD4 = $(call cleanin,wayland) && $(call cleanin,xlib)
 
 ## Do not change anything below this line. ##
 

@@ -1,0 +1,33 @@
+########## smooth Wayland protocol rules makefile ##########
+
+# Include this file at the end of directory makefiles that need
+# Wayland protocol headers. Headers are generated in the build
+# folder from the XML files installed by wayland-protocols.
+
+WAYLAND_SCANNER	      = $(shell pkg-config --variable=wayland_scanner wayland-scanner)
+WAYLAND_PROTOCOLS_DIR = $(shell pkg-config --variable=pkgdatadir wayland-protocols)
+
+include $(dir $(lastword $(MAKEFILE_LIST)))Makefile-protocols
+
+WAYLAND_PROTOCOL_HEADERS = $(addsuffix -client-protocol.h,$(WAYLAND_PROTOCOL_NAMES))
+WAYLAND_PROTOCOL_SOURCES = $(addsuffix -protocol.c,$(WAYLAND_PROTOCOL_NAMES))
+
+vpath %.xml $(addprefix $(WAYLAND_PROTOCOLS_DIR)/,$(dir $(WAYLAND_PROTOCOLS)))
+
+MYCCOPTS += -I.
+
+$(OBJECTS): $(WAYLAND_PROTOCOL_HEADERS)
+
+%-client-protocol.h: %.xml
+	$(WAYLAND_SCANNER) client-header $< $@
+
+%-protocol.c: %.xml
+	$(WAYLAND_SCANNER) private-code $< $@
+
+clean: clean-wayland-protocols
+
+clean-wayland-protocols:
+	rm -f $(WAYLAND_PROTOCOL_HEADERS) $(WAYLAND_PROTOCOL_SOURCES)
+
+.PHONY: clean-wayland-protocols
+.SECONDARY: $(WAYLAND_PROTOCOL_SOURCES)

@@ -9,7 +9,11 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 ifneq ($(BUILD_WIN32),True)
 ifneq ($(BUILD_OSX),True)
 ifneq ($(BUILD_HAIKU),True)
+ifeq ($(BUILD_WAYLAND),True)
+	MYCCOPTS += $(shell pkg-config --cflags wayland-client) -DSMOOTH_USE_WAYLAND
+else
 	MYCCOPTS += $(shell pkg-config --cflags x11)
+endif
 endif
 endif
 endif

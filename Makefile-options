@@ -160,6 +160,14 @@ else
 # 		Disable POSIX timers
 		BUILD_POSIXTIMER = False
 	endif
+
+#	Use Wayland instead of XLib backends if requested
+	ifeq ($(findstring wayland,$(config)),wayland)
+		ifeq ($(BUILD_XLIB),True)
+			BUILD_XLIB = False
+			BUILD_WAYLAND = True
+		endif
+	endif
 endif
 
 # Set default commands

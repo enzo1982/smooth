@@ -96,6 +96,12 @@ else
 	OBJECTS += classes/gui/dialogs/file/filedlg_gtk.o
 endif
 
+# Desktop settings and Cairo fonts are shared by the XLib and Wayland backends.
+ifeq ($(BUILD_CAIRO),True)
+	OBJECTS += classes/backends/freedesktop/desktopsettings.o
+	OBJECTS += classes/graphics/backends/cairo/fontcairo.o
+endif
+
 ifeq ($(BUILD_XLIB),True)
 	OBJECTS += classes/backends/xlib/backendxlib.o
 	OBJECTS += classes/graphics/backends/xlib/bitmapxlib.o
@@ -105,10 +111,21 @@ ifeq ($(BUILD_XLIB),True)
 	OBJECTS += classes/system/backends/xlib/eventxlib.o classes/system/backends/xlib/screenxlib.o
 
 	ifeq ($(BUILD_CAIRO),True)
-		OBJECTS += classes/graphics/backends/cairo/fontcairo.o classes/graphics/backends/cairo/surfacecairo.o
+		OBJECTS += classes/graphics/backends/cairo/surfacecairo.o
 	else
 		OBJECTS += classes/graphics/backends/xlib/fontxlib.o classes/graphics/backends/xlib/surfacexlib.o
 	endif
+endif
+
+ifeq ($(BUILD_WAYLAND),True)
+	include $(SRCDIR)/classes/backends/wayland/Makefile-protocols
+
+	OBJECTS += $(addprefix classes/backends/wayland/,backendwayland.o $(addsuffix -protocol.o,$(WAYLAND_PROTOCOL_NAMES)))
+	OBJECTS += classes/graphics/backends/wayland/bitmapwayland.o classes/graphics/backends/wayland/surfacewayland.o
+	OBJECTS += classes/gui/clipboard/backends/wayland/clipboardwayland.o
+	OBJECTS += classes/gui/window/backends/wayland/windowwayland.o
+	OBJECTS += classes/input/backends/wayland/pointerwayland.o
+	OBJECTS += classes/system/backends/wayland/eventwayland.o classes/system/backends/wayland/screenwayland.o
 endif
 
 ifeq ($(BUILD_POSIXTIMER),True)
@@ -242,7 +259,11 @@ else
 	endif
 
 	LIBS += -lpthread
-	LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
+	ifeq ($(BUILD_WAYLAND),True)
+		LIBS += $(shell pkg-config --libs gtk+-3.0 wayland-client wayland-cursor xkbcommon libdecor-0)
+	else
+		LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
+	endif
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)
 endif

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -1281,10 +1281,19 @@ S::Int S::GUI::Cursor::SetCursorPos(Int newPos)
 	 */
 	p1.x += GetDisplayCursorPositionFromLogical(promptPos);
 
-	while (p1.x > frame.right || p1.x < frame.left)
+	if (p1.x > frame.right)
 	{
-		if	(p1.x > frame.right) { visibleOffset +=  5; p1.x -=  5; }
-		else if (p1.x < frame.left)  { visibleOffset -= 20; p1.x += 20; }
+		Int	 shift = (p1.x - frame.right + 4) / 5 * 5;
+
+		visibleOffset += shift;
+		p1.x	      -= shift;
+	}
+	else if (p1.x < frame.left)
+	{
+		Int	 shift = (frame.left - p1.x + 19) / 20 * 20;
+
+		visibleOffset -= shift;
+		p1.x	      += shift;
 	}
 
 	if (visibleOffset < 0) { p1.x -= visibleOffset; visibleOffset = 0; }

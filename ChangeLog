@@ -6,6 +6,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.11
 - bitmaphaiku.cpp	- fixed bitmap transparency issues
 - filedlg_gtk.cpp	- fixed GTK file dialog appearing in the background on X11 systems
 - timerposix.cpp	- fixed potential deadlocks when using POSIX timers with GLib/GTK
+- cursor.cpp		- fixed hang when scrolling in very narrow edit fields
 
 - fixed crash querying CPU info on systems without affinity setting support in libcpuid
 - fixed compilation with Xcode 16.3 and later toolchains

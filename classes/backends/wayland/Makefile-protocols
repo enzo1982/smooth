@@ -6,6 +6,8 @@
 
 WAYLAND_PROTOCOLS      = stable/xdg-shell/xdg-shell.xml \
 			 unstable/primary-selection/primary-selection-unstable-v1.xml \
-			 staging/xdg-toplevel-icon/xdg-toplevel-icon-v1.xml
+			 staging/xdg-toplevel-icon/xdg-toplevel-icon-v1.xml \
+			 stable/viewporter/viewporter.xml \
+			 unstable/xdg-output/xdg-output-unstable-v1.xml
 
 WAYLAND_PROTOCOL_NAMES = $(basename $(notdir $(WAYLAND_PROTOCOLS)))

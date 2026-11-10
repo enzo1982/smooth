@@ -28,6 +28,9 @@ struct xdg_wm_base;
 struct libdecor;
 struct zwp_primary_selection_device_manager_v1;
 struct xdg_toplevel_icon_manager_v1;
+struct wp_viewporter;
+struct zxdg_output_manager_v1;
+struct zxdg_output_v1;
 
 namespace smooth
 {
@@ -40,10 +43,12 @@ namespace smooth
 		struct WaylandOutput
 		{
 			wl_output	*output;
+			zxdg_output_v1	*xdgOutput;
 			UnsignedInt	 name;
 
 			GUI::Point	 position;
 			GUI::Size	 size;
+			GUI::Size	 logicalSize;
 
 			Int		 scale;
 		};
@@ -61,6 +66,12 @@ namespace smooth
 				static wl_data_device_manager		*dataDeviceManager;
 				static zwp_primary_selection_device_manager_v1 *primarySelectionManager;
 				static xdg_toplevel_icon_manager_v1 *toplevelIconManager;
+				static wp_viewporter		*viewporter;
+				static zxdg_output_manager_v1	*xdgOutputManager;
+
+				static Float			 scale;
+
+				static Void			 CreateXdgOutput(WaylandOutput *);
 
 				static libdecor				*decorContext;
 
@@ -104,6 +115,7 @@ namespace smooth
 				static wl_data_device_manager		*GetDataDeviceManager()	{ return dataDeviceManager; }
 				static zwp_primary_selection_device_manager_v1 *GetPrimarySelectionManager() { return primarySelectionManager; }
 				static xdg_toplevel_icon_manager_v1 *GetToplevelIconManager() { return toplevelIconManager; }
+				static wp_viewporter	*GetViewporter()		{ return viewporter; }
 
 				static libdecor				*GetDecorContext()	{ return decorContext; }
 
@@ -112,9 +124,11 @@ namespace smooth
 				static Int				 GetNOfOutputs()	{ return outputs.Length(); }
 				static const WaylandOutput		*GetNthOutput(Int n)	{ return outputs.GetNth(n); }
 
-				/* Get the integer buffer scale to use for windows.
+				/* Get the scale factor to render windows at. This is fractional
+				 * if the compositor supports viewports and integer otherwise.
+				 * It is determined once and stays fixed for the session.
 				 */
-				static Int				 GetScale();
+				static Float		 GetScale();
 
 				/* Internal registry callbacks.
 				 */

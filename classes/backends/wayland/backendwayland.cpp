@@ -16,6 +16,8 @@
 #include <xdg-shell-client-protocol.h>
 #include <primary-selection-unstable-v1-client-protocol.h>
 #include <xdg-toplevel-icon-v1-client-protocol.h>
+#include <viewporter-client-protocol.h>
+#include <xdg-output-unstable-v1-client-protocol.h>
 #include <libdecor.h>
 
 #include <string.h>
@@ -43,6 +45,10 @@ wl_seat					*S::Backends::BackendWayland::seat		 = NIL;
 wl_data_device_manager			*S::Backends::BackendWayland::dataDeviceManager	 = NIL;
 zwp_primary_selection_device_manager_v1	*S::Backends::BackendWayland::primarySelectionManager = NIL;
 xdg_toplevel_icon_manager_v1		*S::Backends::BackendWayland::toplevelIconManager = NIL;
+wp_viewporter				*S::Backends::BackendWayland::viewporter	 = NIL;
+zxdg_output_manager_v1			*S::Backends::BackendWayland::xdgOutputManager	 = NIL;
+
+S::Float				 S::Backends::BackendWayland::scale		 = -1;
 
 libdecor				*S::Backends::BackendWayland::decorContext	 = NIL;
 
@@ -93,6 +99,33 @@ static void outputScale(void *data, wl_output *output, int32_t factor)
 }
 
 static const wl_output_listener outputListener = { outputGeometry, outputMode, outputDone, outputScale };
+
+/* zxdg_output_v1 listener.
+ */
+static void xdgOutputLogicalPosition(void *data, zxdg_output_v1 *output, int32_t x, int32_t y)
+{
+}
+
+static void xdgOutputLogicalSize(void *data, zxdg_output_v1 *output, int32_t width, int32_t height)
+{
+	Backends::WaylandOutput	*info = (Backends::WaylandOutput *) data;
+
+	info->logicalSize = GUI::Size(width, height);
+}
+
+static void xdgOutputDone(void *data, zxdg_output_v1 *output)
+{
+}
+
+static void xdgOutputName(void *data, zxdg_output_v1 *output, const char *name)
+{
+}
+
+static void xdgOutputDescription(void *data, zxdg_output_v1 *output, const char *description)
+{
+}
+
+static const zxdg_output_v1_listener xdgOutputListener = { xdgOutputLogicalPosition, xdgOutputLogicalSize, xdgOutputDone, xdgOutputName, xdgOutputDescription };
 
 /* wl_seat listener.
  */
@@ -164,6 +197,11 @@ S::Int S::Backends::BackendWayland::Init()
 	wl_registry_add_listener(registry, &registryListener, NIL);
 
 	wl_display_roundtrip(display);
+
+	/* Outputs may have been bound before the xdg_output manager.
+	 */
+	foreach (WaylandOutput *output, outputs) CreateXdgOutput(output);
+
 	wl_display_roundtrip(display);
 
 	if (compositor == NIL || shm == NIL || wmBase == NIL)
@@ -218,6 +256,8 @@ S::Int S::Backends::BackendWayland::Deinit()
 
 	foreach (WaylandOutput *output, outputs)
 	{
+		if (output->xdgOutput != NIL) zxdg_output_v1_destroy(output->xdgOutput);
+
 		wl_output_destroy(output->output);
 
 		delete output;
@@ -225,6 +265,8 @@ S::Int S::Backends::BackendWayland::Deinit()
 
 	outputs.RemoveAll();
 
+	if (xdgOutputManager	   != NIL) zxdg_output_manager_v1_destroy(xdgOutputManager);
+	if (viewporter		   != NIL) wp_viewporter_destroy(viewporter);
 	if (toplevelIconManager	   != NIL) xdg_toplevel_icon_manager_v1_destroy(toplevelIconManager);
 	if (primarySelectionManager != NIL) zwp_primary_selection_device_manager_v1_destroy(primarySelectionManager);
 	if (dataDeviceManager != NIL) wl_data_device_manager_destroy(dataDeviceManager);
@@ -243,6 +285,8 @@ S::Int S::Backends::BackendWayland::Deinit()
 	dataDeviceManager = NIL;
 	primarySelectionManager = NIL;
 	toplevelIconManager	= NIL;
+	viewporter	  = NIL;
+	xdgOutputManager  = NIL;
 	seat		  = NIL;
 	wmBase		  = NIL;
 	shm		  = NIL;
@@ -289,18 +333,38 @@ S::Void S::Backends::BackendWayland::OnRegistryGlobal(wl_registry *registry, Uns
 	{
 		toplevelIconManager = (xdg_toplevel_icon_manager_v1 *) wl_registry_bind(registry, name, &xdg_toplevel_icon_manager_v1_interface, 1);
 	}
+	else if (strcmp(interface, wp_viewporter_interface.name) == 0)
+	{
+		viewporter = (wp_viewporter *) wl_registry_bind(registry, name, &wp_viewporter_interface, 1);
+	}
+	else if (strcmp(interface, zxdg_output_manager_v1_interface.name) == 0)
+	{
+		xdgOutputManager = (zxdg_output_manager_v1 *) wl_registry_bind(registry, name, &zxdg_output_manager_v1_interface, Math::Min(version, 3));
+	}
 	else if (strcmp(interface, wl_output_interface.name) == 0)
 	{
 		WaylandOutput	*output = new WaylandOutput();
 
-		output->name   = name;
-		output->scale  = 1;
-		output->output = (wl_output *) wl_registry_bind(registry, name, &wl_output_interface, Math::Min(version, 2));
+		output->name	  = name;
+		output->scale	  = 1;
+		output->xdgOutput = NIL;
+		output->output	  = (wl_output *) wl_registry_bind(registry, name, &wl_output_interface, Math::Min(version, 2));
 
 		wl_output_add_listener(output->output, &outputListener, output);
 
+		CreateXdgOutput(output);
+
 		outputs.Add(output);
 	}
+}
+
+S::Void S::Backends::BackendWayland::CreateXdgOutput(WaylandOutput *output)
+{
+	if (xdgOutputManager == NIL || output->xdgOutput != NIL) return;
+
+	output->xdgOutput = zxdg_output_manager_v1_get_xdg_output(xdgOutputManager, output->output);
+
+	zxdg_output_v1_add_listener(output->xdgOutput, &xdgOutputListener, output);
 }
 
 S::Void S::Backends::BackendWayland::OnRegistryGlobalRemove(wl_registry *registry, UnsignedInt name)
@@ -310,6 +374,8 @@ S::Void S::Backends::BackendWayland::OnRegistryGlobalRemove(wl_registry *registr
 		WaylandOutput	*output = outputs.GetNth(i);
 
 		if (output->name != name) continue;
+
+		if (output->xdgOutput != NIL) zxdg_output_v1_destroy(output->xdgOutput);
 
 		wl_output_destroy(output->output);
 
@@ -394,14 +460,41 @@ S::Int S::Backends::BackendWayland::Dispatch()
 	return wl_display_dispatch_pending(display);
 }
 
-S::Int S::Backends::BackendWayland::GetScale()
+S::Float S::Backends::BackendWayland::GetScale()
 {
+	/* The scale is determined once, as smooth uses a single
+	 * DPI value for all windows during a session.
+	 */
+	if (scale > 0) return scale;
+
 	/* Use the highest scale of all outputs, so content
 	 * looks sharp on every monitor.
 	 */
-	Int	 scale = 1;
+	Int	 integerScale = 1;
 
-	foreach (WaylandOutput *output, outputs) scale = Math::Max(scale, output->scale);
+	foreach (WaylandOutput *output, outputs) integerScale = Math::Max(integerScale, output->scale);
+
+	scale = integerScale;
+
+	/* With viewport support, derive fractional scales from the ratio
+	 * of physical to logical output size. Round to 1/120 steps like
+	 * the fractional-scale protocol does.
+	 */
+	if (viewporter == NIL || xdgOutputManager == NIL) return scale;
+
+	Float	 fractionalScale = 0;
+
+	foreach (WaylandOutput *output, outputs)
+	{
+		Int	 physical = Math::Max(output->size.cx, output->size.cy);
+		Int	 logical  = Math::Max(output->logicalSize.cx, output->logicalSize.cy);
+
+		if (physical <= 0 || logical <= 0) continue;
+
+		fractionalScale = Math::Max(fractionalScale, Math::Round(120.0 * physical / logical) / 120.0);
+	}
+
+	if (fractionalScale >= 1.0) scale = fractionalScale;
 
 	return scale;
 }

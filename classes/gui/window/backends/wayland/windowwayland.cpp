@@ -22,6 +22,7 @@
 #include <xdg-shell-client-protocol.h>
 #include <primary-selection-unstable-v1-client-protocol.h>
 #include <xdg-toplevel-icon-v1-client-protocol.h>
+#include <viewporter-client-protocol.h>
 #include <wayland-cursor.h>
 #include <libdecor.h>
 
@@ -919,6 +920,7 @@ S::GUI::WindowWayland::WindowWayland(Void *iWindow)
 	presentSource	= NIL;
 
 	scale		= Backends::BackendWayland::GetScale();
+	viewport	= NIL;
 	fontSize	= Surface().GetSurfaceDPI() / 96.0;
 
 	minSize		= Size(160, 24);
@@ -977,11 +979,41 @@ S::GUI::WindowWayland *S::GUI::WindowWayland::GetWindowBackend(const Window *win
 	return NIL;
 }
 
+S::Bool S::GUI::WindowWayland::IsFractional() const
+{
+	/* Fractional scales need viewports to map buffer pixels
+	 * to logical surface size. Otherwise scale is an integer.
+	 */
+	return Backends::BackendWayland::GetViewporter() != NIL;
+}
+
+S::GUI::Size S::GUI::WindowWayland::ToLogical(const Size &real) const
+{
+	if (IsFractional()) return Size(Math::Max(1, Math::Round(real.cx / scale)), Math::Max(1, Math::Round(real.cy / scale)));
+
+	Int	 integerScale = Math::Round(scale);
+
+	return Size(Math::Max(1, (real.cx + integerScale - 1) / integerScale), Math::Max(1, (real.cy + integerScale - 1) / integerScale));
+}
+
+S::GUI::Size S::GUI::WindowWayland::ToReal(const Size &logical) const
+{
+	return Size(Math::Round(logical.cx * scale), Math::Round(logical.cy * scale));
+}
+
 S::GUI::Size S::GUI::WindowWayland::GetRealSize(const Size &windowSize) const
 {
 	/* Convert a window size in smooth units to real pixels.
 	 */
 	return Size(Math::Round(windowSize.cx * fontSize) + sizeModifier.cx, Math::Round(windowSize.cy * fontSize) + sizeModifier.cy);
+}
+
+S::GUI::Size S::GUI::WindowWayland::GetSnappedSize(const Size &real) const
+{
+	/* Snap to a size that maps exactly to a logical size, so the
+	 * compositor does not need to resample fractionally scaled buffers.
+	 */
+	return IsFractional() ? ToReal(ToLogical(real)) : real;
 }
 
 S::GUI::Size S::GUI::WindowWayland::GetFloatingSize(Bool nMaximized) const
@@ -1078,7 +1110,7 @@ S::Int S::GUI::WindowWayland::Open(const String &nTitle, const Point &nPos, cons
 
 	pos	     = nPos;
 	size	     = nSize;
-	realSize     = GetRealSize(size);
+	realSize     = GetSnappedSize(GetRealSize(size));
 	floatingSize = realSize;
 
 	restoredRect = Rect(pos, size);
@@ -1191,6 +1223,10 @@ S::Void S::GUI::WindowWayland::CreateRole()
 	surface	   = wl_compositor_create_surface(Backends::BackendWayland::GetCompositor());
 	configured = False;
 
+	/* Use a viewport to map buffer pixels to logical size.
+	 */
+	if (IsFractional()) viewport = wp_viewporter_get_viewport(Backends::BackendWayland::GetViewporter(), surface);
+
 	if (IsToolWindow()) CreatePopup();
 
 	if (xdgPopup == NIL) CreateToplevel();
@@ -1256,9 +1292,9 @@ S::Void S::GUI::WindowWayland::CreatePopup()
 	 * translated to the parent's window geometry, which
 	 * includes client side decorations.
 	 */
-	Size		 logicalSize = Size(Math::Max(1, (realSize.cx + scale - 1) / scale), Math::Max(1, (realSize.cy + scale - 1) / scale));
-	int		 x	     = (pos.x - parent->pos.x) / scale;
-	int		 y	     = (pos.y - parent->pos.y) / scale;
+	Size		 logicalSize = ToLogical(realSize);
+	int		 x	     = Math::Round((pos.x - parent->pos.x) / scale);
+	int		 y	     = Math::Round((pos.y - parent->pos.y) / scale);
 
 	if (parent->frame != NIL) libdecor_frame_translate_coordinate(parent->frame, x, y, &x, &y);
 
@@ -1303,6 +1339,10 @@ S::Void S::GUI::WindowWayland::DestroyRole()
 	if (pointerSurface  == surface) pointerSurface	= NIL;
 	if (keyboardSurface == surface) keyboardSurface = NIL;
 	if (dragSurface	    == surface) dragSurface	= NIL;
+
+	if (viewport != NIL) wp_viewport_destroy(viewport);
+
+	viewport = NIL;
 
 	wl_surface_destroy(surface);
 
@@ -1526,7 +1566,8 @@ S::Int S::GUI::WindowWayland::SetMetrics(const Point &nPos, const Size &nSize)
 	 */
 	if (frame != NIL && configured)
 	{
-		libdecor_state	*state = libdecor_state_new((realSize.cx + scale - 1) / scale, (realSize.cy + scale - 1) / scale);
+		Size		 logicalSize = ToLogical(realSize);
+		libdecor_state	*state	     = libdecor_state_new(logicalSize.cx, logicalSize.cy);
 
 		libdecor_frame_commit(frame, state, NIL);
 		libdecor_state_free(state);
@@ -1543,8 +1584,8 @@ S::Void S::GUI::WindowWayland::UpdateMetrics(const Size &nRealSize, Bool forcePa
 
 	Size	 prevRealSize = realSize;
 
-	realSize = nRealSize;
-	size	 = (realSize - sizeModifier) / fontSize;
+	realSize = GetSnappedSize(nRealSize);
+	size	 =(realSize - sizeModifier) / fontSize;
 
 	if (drawSurface != NIL) drawSurface->SetSize(realSize);
 
@@ -1649,10 +1690,10 @@ S::Void S::GUI::WindowWayland::OnFrameConfigure(libdecor_frame *nFrame, libdecor
 	 */
 	if (!libdecor_configuration_get_content_size(configuration, nFrame, &width, &height) || width <= 0 || height <= 0)
 	{
-		Size	 size = GetFloatingSize(nMaximized);
+		Size	 size = ToLogical(GetFloatingSize(nMaximized));
 
-		width  = (size.cx + scale - 1) / scale;
-		height = (size.cy + scale - 1) / scale;
+		width  = size.cx;
+		height = size.cy;
 	}
 
 	libdecor_state	*state = libdecor_state_new(width, height);
@@ -1660,7 +1701,7 @@ S::Void S::GUI::WindowWayland::OnFrameConfigure(libdecor_frame *nFrame, libdecor
 	libdecor_frame_commit(nFrame, state, configuration);
 	libdecor_state_free(state);
 
-	OnConfigure(Size(width * scale, height * scale), nMaximized);
+	OnConfigure(ToReal(Size(width, height)), nMaximized);
 }
 
 S::Void S::GUI::WindowWayland::OnFrameCommit()
@@ -1694,7 +1735,7 @@ S::Void S::GUI::WindowWayland::OnXdgSurfaceConfigure(UnsignedInt serial)
 
 		if (parent->frame != NIL) libdecor_frame_translate_coordinate(parent->frame, 0, 0, &x, &y);
 
-		pos = parent->pos + Point(popupOffset.x - x, popupOffset.y - y) * scale;
+		pos = parent->pos + Point(Math::Round((popupOffset.x - x) * scale), Math::Round((popupOffset.y - y) * scale));
 	}
 
 	OnConfigure(Size(), False);
@@ -1713,7 +1754,10 @@ S::Void S::GUI::WindowWayland::OnPopupDone()
  */
 S::GUI::WaylandBuffer *S::GUI::WindowWayland::GetFreeBuffer()
 {
-	Size	 bufferSize = Size((realSize.cx + scale - 1) / scale * scale, (realSize.cy + scale - 1) / scale * scale);
+	/* Integer scaled buffers must be a multiple of the scale.
+	 */
+	Size	 logicalSize = ToLogical(realSize);
+	Size	 bufferSize  = IsFractional() ? realSize : Size(logicalSize.cx * Math::Round(scale), logicalSize.cy * Math::Round(scale));
 
 	if (bufferSize.cx <= 0 || bufferSize.cy <= 0) return NIL;
 
@@ -1835,10 +1879,21 @@ S::Void S::GUI::WindowWayland::Present(cairo_surface_t *source, const Rect &rect
 	 */
 	wl_surface_attach(surface, buffer->buffer, 0, 0);
 
-	if (scale > 1) wl_surface_set_buffer_scale(surface, scale);
+	/* Map buffer to logical size, either by viewport or buffer scale.
+	 */
+	if (viewport != NIL)
+	{
+		Size	 logicalSize = ToLogical(buffer->size);
+
+		wp_viewport_set_destination(viewport, logicalSize.cx, logicalSize.cy);
+	}
+	else if (scale > 1)
+	{
+		wl_surface_set_buffer_scale(surface, Math::Round(scale));
+	}
 
 	if (wl_surface_get_version(surface) >= 4) wl_surface_damage_buffer(surface, buffer->damage.left, buffer->damage.top, buffer->damage.GetWidth(), buffer->damage.GetHeight());
-	else					  wl_surface_damage(surface, buffer->damage.left / scale, buffer->damage.top / scale, (buffer->damage.GetWidth() + scale - 1) / scale + 1, (buffer->damage.GetHeight() + scale - 1) / scale + 1);
+	else					  wl_surface_damage(surface, 0, 0, INT32_MAX, INT32_MAX);
 
 	wl_surface_commit(surface);
 
@@ -1878,7 +1933,11 @@ S::Void S::GUI::WindowWayland::SetPointerCursor(Input::Pointer::CursorType nCurs
 
 	if (pointer == NIL || surface == NIL || pointerSurface != surface) return;
 
-	wl_cursor	*waylandCursor = GetCursor(cursor, scale);
+	/* Use the next integer scale for cursors, as cursor themes
+	 * only provide integer sizes.
+	 */
+	Int		 cursorScale   = Math::Ceil(scale);
+	wl_cursor	*waylandCursor = GetCursor(cursor, cursorScale);
 
 	if (waylandCursor == NIL || waylandCursor->image_count == 0) return;
 
@@ -1886,11 +1945,11 @@ S::Void S::GUI::WindowWayland::SetPointerCursor(Input::Pointer::CursorType nCurs
 
 	if (cursorSurface == NIL) cursorSurface = wl_compositor_create_surface(Backends::BackendWayland::GetCompositor());
 
-	wl_pointer_set_cursor(pointer, pointerSerial, cursorSurface, image->hotspot_x / scale, image->hotspot_y / scale);
+	wl_pointer_set_cursor(pointer, pointerSerial, cursorSurface, image->hotspot_x / cursorScale, image->hotspot_y / cursorScale);
 
 	wl_surface_attach(cursorSurface, wl_cursor_image_get_buffer(image), 0, 0);
 
-	if (scale > 1) wl_surface_set_buffer_scale(cursorSurface, scale);
+	if (cursorScale > 1) wl_surface_set_buffer_scale(cursorSurface, cursorScale);
 
 	wl_surface_damage(cursorSurface, 0, 0, image->width, image->height);
 	wl_surface_commit(cursorSurface);

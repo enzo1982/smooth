@@ -20,6 +20,7 @@
 #include <smooth/backends/wayland/backendwayland.h>
 
 #include <xdg-shell-client-protocol.h>
+#include <primary-selection-unstable-v1-client-protocol.h>
 #include <wayland-cursor.h>
 #include <libdecor.h>
 
@@ -123,6 +124,12 @@ namespace
 	wl_data_source		*selectionSource    = NIL;
 	String			 clipboardText;
 
+	/* Primary selection state.
+	 */
+	zwp_primary_selection_device_v1	*primaryDevice = NIL;
+	zwp_primary_selection_offer_v1	*primaryOffer  = NIL;
+	zwp_primary_selection_source_v1	*primarySource = NIL;
+
 	String			 primaryText;
 
 	Int64 GetMilliseconds()
@@ -134,18 +141,18 @@ namespace
 		return Int64(ts.tv_sec) * 1000 + ts.tv_nsec / 1000000;
 	}
 
-	/* Text formats offered for the clipboard.
+	/* Text formats offered for clipboard and primary selection.
 	 */
 	const char		*textMimeTypes[] = { "text/plain;charset=utf-8", "text/plain", "UTF8_STRING", "TEXT", "STRING" };
 
-	/* Get the offer information attached to an offer.
+	/* Get the offer information attached to a data or primary selection offer.
 	 */
 	template <class t> OfferInfo *GetOfferInfo(t *offer)
 	{
 		return (OfferInfo *) wl_proxy_get_user_data((wl_proxy *) offer);
 	}
 
-	/* Destroy an offer and its offer information.
+	/* Destroy a data or primary selection offer and its offer information.
 	 */
 	template <class t> Void DestroyOffer(t *&offer, void (*destroy)(t *))
 	{
@@ -200,7 +207,7 @@ namespace
 		return result;
 	}
 
-	/* Receive data from an offer synchronously.
+	/* Receive data from a data or primary selection offer synchronously.
 	 */
 	template <class t> String ReceiveOffer(t *offer, const char *mimeType, void (*receive)(t *, const char *, int32_t))
 	{
@@ -692,6 +699,51 @@ static void dataSourceCancelled(void *data, wl_data_source *source)
 
 static const wl_data_source_listener dataSourceListener = { dataSourceTarget, dataSourceSend, dataSourceCancelled };
 
+/* zwp_primary_selection_offer_v1 listener.
+ */
+static void primaryOfferOffer(void *data, zwp_primary_selection_offer_v1 *offer, const char *mimeType)
+{
+	((OfferInfo *) data)->mimeTypes.Add(mimeType);
+}
+
+static const zwp_primary_selection_offer_v1_listener primaryOfferListener = { primaryOfferOffer };
+
+/* zwp_primary_selection_device_v1 listener.
+ */
+static void primaryDeviceDataOffer(void *data, zwp_primary_selection_device_v1 *device, zwp_primary_selection_offer_v1 *offer)
+{
+	zwp_primary_selection_offer_v1_add_listener(offer, &primaryOfferListener, new OfferInfo());
+}
+
+static void primaryDeviceSelection(void *data, zwp_primary_selection_device_v1 *device, zwp_primary_selection_offer_v1 *offer)
+{
+	if (primaryOffer != offer) DestroyOffer(primaryOffer, &zwp_primary_selection_offer_v1_destroy);
+
+	primaryOffer = offer;
+}
+
+static const zwp_primary_selection_device_v1_listener primaryDeviceListener = { primaryDeviceDataOffer, primaryDeviceSelection };
+
+/* zwp_primary_selection_source_v1 listener.
+ */
+static void primarySourceSend(void *data, zwp_primary_selection_source_v1 *source, const char *mimeType, int32_t fd)
+{
+	WriteText(fd, primaryText);
+}
+
+static void primarySourceCancelled(void *data, zwp_primary_selection_source_v1 *source)
+{
+	if (source == primarySource)
+	{
+		primarySource = NIL;
+		primaryText   = NIL;
+	}
+
+	zwp_primary_selection_source_v1_destroy(source);
+}
+
+static const zwp_primary_selection_source_v1_listener primarySourceListener = { primarySourceSend, primarySourceCancelled };
+
 S::Int S::GUI::WindowWayland::Initialize()
 {
 	if (Backends::BackendWayland::GetDisplay() == NIL) return Success();
@@ -725,6 +777,15 @@ S::Int S::GUI::WindowWayland::Initialize()
 		wl_data_device_add_listener(dataDevice, &dataDeviceListener, NIL);
 	}
 
+	/* Create primary selection device if supported.
+	 */
+	if (Backends::BackendWayland::GetSeat() != NIL && Backends::BackendWayland::GetPrimarySelectionManager() != NIL)
+	{
+		primaryDevice = zwp_primary_selection_device_manager_v1_get_device(Backends::BackendWayland::GetPrimarySelectionManager(), Backends::BackendWayland::GetSeat());
+
+		zwp_primary_selection_device_v1_add_listener(primaryDevice, &primaryDeviceListener, NIL);
+	}
+
 	Backends::BackendWayland::Roundtrip();
 
 	return Success();
@@ -745,6 +806,14 @@ S::Int S::GUI::WindowWayland::Free()
 
 	selectionSource = NIL;
 	dataDevice	= NIL;
+
+	DestroyOffer(primaryOffer, &zwp_primary_selection_offer_v1_destroy);
+
+	if (primarySource != NIL) zwp_primary_selection_source_v1_destroy(primarySource);
+	if (primaryDevice != NIL) zwp_primary_selection_device_v1_destroy(primaryDevice);
+
+	primarySource = NIL;
+	primaryDevice = NIL;
 
 	if (cursorSurface != NIL) wl_surface_destroy(cursorSurface);
 	if (cursorTheme	  != NIL) wl_cursor_theme_destroy(cursorTheme);
@@ -1995,15 +2064,42 @@ S::Bool S::GUI::WindowWayland::SetClipboardText(const String &text)
 
 S::String S::GUI::WindowWayland::GetSelectionText()
 {
-	/* Primary selection protocol is not supported yet,
-	 * so keep the selection application internal.
+	/* Keep the selection application internal if the
+	 * compositor does not support primary selections.
 	 */
-	return primaryText;
+	if (primaryDevice == NIL) return primaryText;
+
+	/* Return our own text if we own the selection, as reading
+	 * from ourselves would block without dispatching events.
+	 */
+	if (primarySource != NIL) return primaryText;
+
+	if (primaryOffer == NIL) return NIL;
+
+	return ReceiveText(primaryOffer, &zwp_primary_selection_offer_v1_receive);
 }
 
 S::Bool S::GUI::WindowWayland::SetSelectionText(const String &text)
 {
 	primaryText = text;
+
+	if (primaryDevice == NIL) return True;
+
+	/* Offer selection to other clients.
+	 */
+	zwp_primary_selection_source_v1	*source = zwp_primary_selection_device_manager_v1_create_source(Backends::BackendWayland::GetPrimarySelectionManager());
+
+	zwp_primary_selection_source_v1_add_listener(source, &primarySourceListener, NIL);
+
+	for (UnsignedInt i = 0; i < sizeof(textMimeTypes) / sizeof(char *); i++) zwp_primary_selection_source_v1_offer(source, textMimeTypes[i]);
+
+	zwp_primary_selection_device_v1_set_selection(primaryDevice, source, inputSerial);
+
+	if (primarySource != NIL) zwp_primary_selection_source_v1_destroy(primarySource);
+
+	primarySource = source;
+
+	wl_display_flush(Backends::BackendWayland::GetDisplay());
 
 	return True;
 }

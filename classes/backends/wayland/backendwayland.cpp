@@ -14,6 +14,7 @@
 #include <smooth/foreach.h>
 
 #include <xdg-shell-client-protocol.h>
+#include <primary-selection-unstable-v1-client-protocol.h>
 #include <libdecor.h>
 
 #include <string.h>
@@ -39,6 +40,7 @@ wl_shm					*S::Backends::BackendWayland::shm		 = NIL;
 xdg_wm_base				*S::Backends::BackendWayland::wmBase		 = NIL;
 wl_seat					*S::Backends::BackendWayland::seat		 = NIL;
 wl_data_device_manager			*S::Backends::BackendWayland::dataDeviceManager	 = NIL;
+zwp_primary_selection_device_manager_v1	*S::Backends::BackendWayland::primarySelectionManager = NIL;
 
 libdecor				*S::Backends::BackendWayland::decorContext	 = NIL;
 
@@ -221,6 +223,7 @@ S::Int S::Backends::BackendWayland::Deinit()
 
 	outputs.RemoveAll();
 
+	if (primarySelectionManager != NIL) zwp_primary_selection_device_manager_v1_destroy(primarySelectionManager);
 	if (dataDeviceManager != NIL) wl_data_device_manager_destroy(dataDeviceManager);
 	if (seat	      != NIL) wl_seat_destroy(seat);
 	if (wmBase	      != NIL) xdg_wm_base_destroy(wmBase);
@@ -235,6 +238,7 @@ S::Int S::Backends::BackendWayland::Deinit()
 	pointer		  = NIL;
 	keyboard	  = NIL;
 	dataDeviceManager = NIL;
+	primarySelectionManager = NIL;
 	seat		  = NIL;
 	wmBase		  = NIL;
 	shm		  = NIL;
@@ -272,6 +276,10 @@ S::Void S::Backends::BackendWayland::OnRegistryGlobal(wl_registry *registry, Uns
 	else if (strcmp(interface, wl_data_device_manager_interface.name) == 0)
 	{
 		dataDeviceManager = (wl_data_device_manager *) wl_registry_bind(registry, name, &wl_data_device_manager_interface, Math::Min(version, 3));
+	}
+	else if (strcmp(interface, zwp_primary_selection_device_manager_v1_interface.name) == 0)
+	{
+		primarySelectionManager = (zwp_primary_selection_device_manager_v1 *) wl_registry_bind(registry, name, &zwp_primary_selection_device_manager_v1_interface, 1);
 	}
 	else if (strcmp(interface, wl_output_interface.name) == 0)
 	{

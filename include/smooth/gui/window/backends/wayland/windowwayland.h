@@ -32,6 +32,7 @@ struct xdg_surface;
 struct xdg_popup;
 struct libdecor_frame;
 struct libdecor_configuration;
+struct wp_viewport;
 
 namespace smooth
 {
@@ -83,7 +84,13 @@ namespace smooth
 				Void					 UpdateSizeHints();
 				Void					 ApplyIcon();
 
+				Bool					 IsFractional() const;
+
+				Size					 ToLogical(const Size &) const;
+				Size					 ToReal(const Size &) const;
+
 				Size					 GetRealSize(const Size &) const;
+				Size					 GetSnappedSize(const Size &) const;
 				Size					 GetFloatingSize(Bool) const;
 
 				Void					 UpdateMetrics(const Size &, Bool);
@@ -108,7 +115,8 @@ namespace smooth
 				Bool					 configured;
 				Point					 popupOffset;
 
-				Int					 scale;
+				Float					 scale;
+				wp_viewport				*viewport;
 				Float					 fontSize;
 
 				String					 title;
@@ -217,7 +225,7 @@ namespace smooth
 				static Bool				 SetSelectionText(const String &);
 
 				Bool					 IsDropFilesEnabled() const		{ return enableDropFiles; }
-				Int					 GetScale() const			{ return scale; }
+				Float					 GetScale() const			{ return scale; }
 				const Point				&GetPosition() const			{ return pos; }
 		};
 	};

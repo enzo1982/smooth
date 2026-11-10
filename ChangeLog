@@ -2,6 +2,8 @@ ChangeLog for smooth
 
 dd.mm.yy hh:mm - smooth alpha 0.9.11
 
+- added support for rendering with Wayland
+
 - windowgdi.cpp		- fixed IME pre-edit font size being too small
 - bitmaphaiku.cpp	- fixed bitmap transparency issues
 - filedlg_gtk.cpp	- fixed GTK file dialog appearing in the background on X11 systems

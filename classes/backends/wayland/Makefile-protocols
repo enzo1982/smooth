@@ -1,0 +1,9 @@
+########## smooth Wayland protocols list ##########
+
+# Wayland protocols used by smooth, relative to the data directory of
+# wayland-protocols. Header and object file names are derived from
+# this list by the makefiles including it.
+
+WAYLAND_PROTOCOLS      = stable/xdg-shell/xdg-shell.xml
+
+WAYLAND_PROTOCOL_NAMES = $(basename $(notdir $(WAYLAND_PROTOCOLS)))

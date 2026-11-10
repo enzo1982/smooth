@@ -9,10 +9,10 @@ OBJECTS	  = eventbackend.o screenbackend.o timerbackend.o
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = $(call makein,cocoa) && $(call makein,haiku)
 ALLCMD2   = $(call makein,posix) && $(call makein,threads)
-ALLCMD3   = $(call makein,win32) && $(call makein,xlib)
+ALLCMD3   = $(call makein,win32) && $(call makein,wayland) && $(call makein,xlib)
 CLEANCMD1 = $(call cleanin,cocoa) && $(call cleanin,haiku)
 CLEANCMD2 = $(call cleanin,posix) && $(call cleanin,threads)
-CLEANCMD3 = $(call cleanin,win32) && $(call cleanin,xlib)
+CLEANCMD3 = $(call cleanin,win32) && $(call cleanin,wayland) && $(call cleanin,xlib)
 
 ## Do not change anything below this line. ##
 

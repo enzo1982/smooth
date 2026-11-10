@@ -38,7 +38,7 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt update
-          sudo apt install -y libbz2-dev libcurl4-openssl-dev libfribidi-dev libgtk-3-dev libjpeg-dev libxml2-dev
+          sudo apt install -y libbz2-dev libcurl4-openssl-dev libdecor-0-dev libfribidi-dev libgtk-3-dev libjpeg-dev libwayland-dev libxkbcommon-dev libxml2-dev wayland-protocols
 
       - name: Checkout repository
         uses: actions/checkout@v6

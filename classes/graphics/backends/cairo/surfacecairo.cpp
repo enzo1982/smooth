@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -27,6 +27,7 @@ using namespace X11;
 #include <pango/pangocairo.h>
 
 #include <smooth/backends/xlib/backendxlib.h>
+#include <smooth/backends/freedesktop/desktopsettings.h>
 
 #include <unistd.h>
 #include <stdio.h>
@@ -223,11 +224,11 @@ S::Short S::GUI::SurfaceCairo::GetSurfaceDPI() const
 
 		/* Alternatively, query the scale factor from the KDE configuration.
 		 */
-		if (scale <= 1.0) scale = Backends::BackendXLib::QueryKDESettings("KScreen", "ScaleFactor").ToFloat();
+		if (scale <= 1.0) scale = Backends::DesktopSettings::QueryKDESettings("KScreen", "ScaleFactor").ToFloat();
 
 		/* Alternatively, query custom DPI setting via XfConf.
 		 */
-		if (scale <= 1.0) scale = Backends::BackendXLib::QueryXfConf("xsettings", "/Xft/DPI").ToInt() / dpi;
+		if (scale <= 1.0) scale = Backends::DesktopSettings::QueryXfConf("xsettings", "/Xft/DPI").ToInt() / dpi;
 
 		/* Update DPI value if a scale factor has been determined.
 		 */

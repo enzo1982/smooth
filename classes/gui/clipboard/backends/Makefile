@@ -10,11 +10,11 @@ OBJECTS	  = clipboardbackend.o
 ALLCMD1   = $(call makein,cocoa)
 ALLCMD2   = $(call makein,haiku)
 ALLCMD3   = $(call makein,win32)
-ALLCMD4   = $(call makein,xlib)
+ALLCMD4   = $(call makein,wayland) && $(call makein,xlib)
 CLEANCMD1 = $(call cleanin,cocoa)
 CLEANCMD2 = $(call cleanin,haiku)
 CLEANCMD3 = $(call cleanin,win32)
-CLEANCMD4 = $(call cleanin,xlib)
+CLEANCMD4 = $(call cleanin,wayland) && $(call cleanin,xlib)
 
 ## Do not change anything below this line. ##
 

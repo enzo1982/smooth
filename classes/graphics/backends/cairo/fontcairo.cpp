@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2022 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -16,12 +16,10 @@
 #include <smooth/foreach.h>
 #include <smooth/init.h>
 
-using namespace X11;
-
-#include <cairo/cairo-xlib.h>
+#include <cairo/cairo.h>
 #include <pango/pangocairo.h>
 
-#include <smooth/backends/xlib/backendxlib.h>
+#include <smooth/backends/freedesktop/desktopsettings.h>
 
 S::GUI::FontBackend *CreateFontCairo(const S::String &iFontName, S::Short iFontSize, S::Short iFontWeight, S::Short iFontStyle, const S::GUI::Color &iFontColor)
 {
@@ -37,8 +35,8 @@ S::Int S::GUI::FontCairo::Initialize()
 	Font::Default	= "Helvetica";
 	Setup::FontSize = 1.0;
 
-	String	 font	     = Backends::BackendXLib::QueryGSettings("org.gnome.desktop.interface", "font-name");
-	Float	 scaleFactor = Backends::BackendXLib::QueryGSettings("org.gnome.desktop.interface", "text-scaling-factor").ToFloat();
+	String	 font	     = Backends::DesktopSettings::QueryGSettings("org.gnome.desktop.interface", "font-name");
+	Float	 scaleFactor = Backends::DesktopSettings::QueryGSettings("org.gnome.desktop.interface", "text-scaling-factor").ToFloat();
 
 	if (font != NIL)
 	{

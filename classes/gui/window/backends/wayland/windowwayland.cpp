@@ -21,6 +21,7 @@
 
 #include <xdg-shell-client-protocol.h>
 #include <primary-selection-unstable-v1-client-protocol.h>
+#include <xdg-toplevel-icon-v1-client-protocol.h>
 #include <wayland-cursor.h>
 #include <libdecor.h>
 
@@ -1235,6 +1236,10 @@ S::Void S::GUI::WindowWayland::CreateToplevel()
 	UpdateSizeHints();
 
 	libdecor_frame_map(frame);
+
+	/* The xdg_toplevel is created when the frame is mapped.
+	 */
+	ApplyIcon();
 }
 
 S::Void S::GUI::WindowWayland::CreatePopup()
@@ -1341,6 +1346,91 @@ S::Int S::GUI::WindowWayland::SetTitle(const String &nTitle)
 	if (frame != NIL) libdecor_frame_set_title(frame, title.ConvertTo("UTF-8"));
 
 	return Success();
+}
+
+S::Int S::GUI::WindowWayland::SetIcon(const Bitmap &nIcon)
+{
+	icon = nIcon;
+
+	ApplyIcon();
+
+	return Success();
+}
+
+S::Void S::GUI::WindowWayland::ApplyIcon()
+{
+	xdg_toplevel_icon_manager_v1	*manager  = Backends::BackendWayland::GetToplevelIconManager();
+	xdg_toplevel			*toplevel = (frame != NIL ? libdecor_frame_get_xdg_toplevel(frame) : NIL);
+
+	if (manager == NIL || toplevel == NIL || icon == NIL || icon.GetBitsPerPixel() != 32) return;
+
+	/* Icon buffers must be square, so center the
+	 * bitmap in a square transparent buffer.
+	 */
+	Size	 iconSize = icon.GetSize();
+	Int	 extent	  = Math::Max(iconSize.cx, iconSize.cy);
+
+	if (extent <= 0) return;
+
+	Int		 dataSize = extent * extent * 4;
+	UnsignedInt	*data	  = NIL;
+	wl_buffer	*buffer	  = CreateBuffer(Size(extent, extent), WL_SHM_FORMAT_ARGB8888, (Void **) &data);
+
+	if (buffer == NIL) return;
+
+	memset(data, 0, dataSize);
+
+	/* Convert pixels to premultiplied ARGB. In 24 bit icons, the
+	 * background color is treated as transparent like on X11.
+	 */
+	UnsignedInt	 background = (Setup::BackgroundColor.GetRed() << 16) | (Setup::BackgroundColor.GetGreen() << 8) | Setup::BackgroundColor.GetBlue();
+	Point		 offset	    = Point((extent - iconSize.cx) / 2, (extent - iconSize.cy) / 2);
+	Int		 depth	    = icon.GetDepth();
+
+	for (Int y = 0; y < iconSize.cy; y++)
+	{
+		const UnsignedInt	*source = (const UnsignedInt *) (icon.GetBytes() + y * iconSize.cx * 4);
+		UnsignedInt		*target = data + (y + offset.y) * extent + offset.x;
+
+		for (Int x = 0; x < iconSize.cx; x++)
+		{
+			UnsignedInt	 value = source[x];
+
+			if (depth == 32)
+			{
+				UnsignedInt	 alpha = value >> 24;
+
+				target[x] = (alpha << 24) | ((((value >> 16) & 255) * alpha / 255) << 16) | ((((value >> 8) & 255) * alpha / 255) << 8) | ((value & 255) * alpha / 255);
+			}
+			else
+			{
+				value &= 0xFFFFFF;
+
+				target[x] = (value == background ? 0 : 0xFF000000 | value);
+			}
+		}
+	}
+
+	munmap(data, dataSize);
+
+	/* Assign icon.
+	 */
+	xdg_toplevel_icon_v1	*toplevelIcon = xdg_toplevel_icon_manager_v1_create_icon(manager);
+
+	xdg_toplevel_icon_v1_add_buffer(toplevelIcon, buffer, 1);
+	xdg_toplevel_icon_manager_v1_set_icon(manager, toplevel, toplevelIcon);
+
+	/* The toplevel keeps its icon when the icon object is destroyed.
+	 * The buffer must outlive the icon object.
+	 */
+	xdg_toplevel_icon_v1_destroy(toplevelIcon);
+	wl_buffer_destroy(buffer);
+
+	/* Apply icon if the window is already mapped.
+	 */
+	if (configured) wl_surface_commit(surface);
+
+	wl_display_flush(Backends::BackendWayland::GetDisplay());
 }
 
 S::Int S::GUI::WindowWayland::EnableDropFiles(Bool nEnableDropFiles)

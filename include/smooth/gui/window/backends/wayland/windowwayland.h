@@ -21,6 +21,7 @@ namespace smooth
 
 #include "../windowbackend.h"
 #include "../../../../graphics/forms/rect.h"
+#include "../../../../graphics/bitmap.h"
 #include "../../../../input/keyboard.h"
 #include "../../../../input/pointer.h"
 
@@ -80,6 +81,7 @@ namespace smooth
 				Void					 DestroyBuffers();
 
 				Void					 UpdateSizeHints();
+				Void					 ApplyIcon();
 
 				Size					 GetRealSize(const Size &) const;
 				Size					 GetFloatingSize(Bool) const;
@@ -110,6 +112,7 @@ namespace smooth
 				Float					 fontSize;
 
 				String					 title;
+				Bitmap					 icon;
 
 				Point					 pos;
 				Size					 size;
@@ -156,6 +159,8 @@ namespace smooth
 				Int					 RequestClose();
 
 				Int					 SetTitle(const String &);
+
+				Int					 SetIcon(const Bitmap &);
 
 				Int					 EnableDropFiles(Bool);
 				const Array<String>			&GetDroppedFiles() const;

@@ -433,6 +433,11 @@ int S::Net::Protocols::httpProgress(void *data, double dlTotal, double dlNow, do
 {
 	HTTP	*http = (HTTP *) data;
 
+	/* Cancel request if requested. libcurl calls this function also
+	 * while it waits for an answer, before any data arrives.
+	 */
+	if (http->doCancelDownload.Call()) return 1;
+
 	if (ulNow > 0 && http->ulStart == 0) http->ulStart = System::System::Clock() - 1;
 	if (dlNow > 0 && http->dlStart == 0) http->dlStart = System::System::Clock() - 1;
 

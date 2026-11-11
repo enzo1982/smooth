@@ -19,6 +19,7 @@
 #include <viewporter-client-protocol.h>
 #include <xdg-output-unstable-v1-client-protocol.h>
 #include <xdg-activation-v1-client-protocol.h>
+#include <text-input-unstable-v3-client-protocol.h>
 #include <libdecor.h>
 
 #include <string.h>
@@ -49,6 +50,7 @@ xdg_toplevel_icon_manager_v1		*S::Backends::BackendWayland::toplevelIconManager 
 wp_viewporter				*S::Backends::BackendWayland::viewporter	 = NIL;
 zxdg_output_manager_v1			*S::Backends::BackendWayland::xdgOutputManager	 = NIL;
 xdg_activation_v1			*S::Backends::BackendWayland::activation	 = NIL;
+zwp_text_input_manager_v3		*S::Backends::BackendWayland::textInputManager	 = NIL;
 
 S::String				 S::Backends::BackendWayland::launchToken;
 
@@ -281,6 +283,7 @@ S::Int S::Backends::BackendWayland::Deinit()
 
 	outputs.RemoveAll();
 
+	if (textInputManager	   != NIL) zwp_text_input_manager_v3_destroy(textInputManager);
 	if (activation		   != NIL) xdg_activation_v1_destroy(activation);
 	if (xdgOutputManager	   != NIL) zxdg_output_manager_v1_destroy(xdgOutputManager);
 	if (viewporter		   != NIL) wp_viewporter_destroy(viewporter);
@@ -305,6 +308,7 @@ S::Int S::Backends::BackendWayland::Deinit()
 	viewporter	  = NIL;
 	xdgOutputManager  = NIL;
 	activation	  = NIL;
+	textInputManager  = NIL;
 	seat		  = NIL;
 	wmBase		  = NIL;
 	shm		  = NIL;
@@ -354,6 +358,10 @@ S::Void S::Backends::BackendWayland::OnRegistryGlobal(wl_registry *registry, Uns
 	else if (strcmp(interface, wp_viewporter_interface.name) == 0)
 	{
 		viewporter = (wp_viewporter *) wl_registry_bind(registry, name, &wp_viewporter_interface, 1);
+	}
+	else if (strcmp(interface, zwp_text_input_manager_v3_interface.name) == 0)
+	{
+		textInputManager = (zwp_text_input_manager_v3 *) wl_registry_bind(registry, name, &zwp_text_input_manager_v3_interface, 1);
 	}
 	else if (strcmp(interface, xdg_activation_v1_interface.name) == 0)
 	{

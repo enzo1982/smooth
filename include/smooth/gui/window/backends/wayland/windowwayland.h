@@ -15,6 +15,8 @@ namespace smooth
 {
 	namespace GUI
 	{
+		class Cursor;
+
 		class WindowWayland;
 	};
 };
@@ -84,6 +86,9 @@ namespace smooth
 				Void					 UpdateSizeHints();
 				Void					 ApplyIcon();
 
+				Void					 DrawPreedit(const String &, Int);
+				Void					 ClearPreedit();
+
 				Bool					 IsFractional() const;
 
 				Size					 ToLogical(const Size &) const;
@@ -148,6 +153,11 @@ namespace smooth
 				 * key repeat. Return True if something was processed.
 				 */
 				static Bool				 ProcessPendingEvents();
+
+				/* Update text input state and apply input method changes.
+				 */
+				static Void				 UpdateTextInput();
+				static Void				 ApplyTextInput();
 
 				/* Activate a window using an activation token.
 				 */
@@ -231,6 +241,11 @@ namespace smooth
 				Bool					 IsDropFilesEnabled() const		{ return enableDropFiles; }
 				Float					 GetScale() const			{ return scale; }
 				const Point				&GetPosition() const			{ return pos; }
+			slots:
+				/* Track the active text cursor for input method support.
+				 */
+				static Void				 SetCursor(Cursor *, const Point &);
+				static Void				 RemoveCursor(Cursor *);
 		};
 	};
 };

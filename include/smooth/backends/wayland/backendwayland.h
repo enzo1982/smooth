@@ -32,6 +32,7 @@ struct wp_viewporter;
 struct zxdg_output_manager_v1;
 struct zxdg_output_v1;
 struct xdg_activation_v1;
+struct zwp_text_input_manager_v3;
 
 namespace smooth
 {
@@ -70,6 +71,7 @@ namespace smooth
 				static wp_viewporter		*viewporter;
 				static zxdg_output_manager_v1	*xdgOutputManager;
 				static xdg_activation_v1	*activation;
+				static zwp_text_input_manager_v3 *textInputManager;
 
 				static String			 launchToken;
 
@@ -121,6 +123,7 @@ namespace smooth
 				static xdg_toplevel_icon_manager_v1 *GetToplevelIconManager() { return toplevelIconManager; }
 				static wp_viewporter	*GetViewporter()		{ return viewporter; }
 				static xdg_activation_v1 *GetActivation()		{ return activation; }
+				static zwp_text_input_manager_v3 *GetTextInputManager() { return textInputManager; }
 
 				/* Get the activation token passed by the launching application.
 				 * The token is returned only once, as it can be used only once.

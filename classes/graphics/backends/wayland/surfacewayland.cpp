@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/wayland/surfacewayland.h>
+#include <smooth/backends/platform.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
@@ -27,7 +28,9 @@ S::GUI::SurfaceBackend *CreateSurfaceWayland(S::Void *iSurface, const S::GUI::Si
 	return new S::GUI::SurfaceWayland(iSurface, maxSize);
 }
 
-S::Int		 surfaceWaylandTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceWayland);
+static S::Int Register_surfaceWaylandTmp() { return S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceWayland); }
+
+S::Int		 surfaceWaylandTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_surfaceWaylandTmp);
 
 S::Short	 S::GUI::SurfaceWayland::surfaceDPI = -1;
 

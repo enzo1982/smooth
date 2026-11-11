@@ -6,7 +6,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 
 ### Object files ###
 
-OBJECTS  = classes/backends/backend.o
+OBJECTS  = classes/backends/backend.o classes/backends/platform.o
 OBJECTS += classes/basic/object.o classes/basic/objecttype.o classes/basic/setup.o
 OBJECTS += classes/errors/error.o classes/errors/success.o
 OBJECTS += classes/errors/fs/endoffile.o classes/errors/fs/filenotfound.o
@@ -259,10 +259,10 @@ else
 	endif
 
 	LIBS += -lpthread
+	LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
+
 	ifeq ($(BUILD_WAYLAND),True)
-		LIBS += $(shell pkg-config --libs gtk+-3.0 wayland-client wayland-cursor xkbcommon libdecor-0)
-	else
-		LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
+		LIBS += $(shell pkg-config --libs wayland-client wayland-cursor xkbcommon libdecor-0)
 	endif
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/backends/xlib/screenxlib.h>
+#include <smooth/backends/platform.h>
 #include <smooth/backends/xlib/backendxlib.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
@@ -23,7 +24,9 @@ S::System::ScreenBackend *CreateScreenXLib()
 	return new S::System::ScreenXLib();
 }
 
-S::Int	 screenXLibTmp = S::System::ScreenBackend::SetBackend(&CreateScreenXLib);
+static S::Int Register_screenXLibTmp() { return S::System::ScreenBackend::SetBackend(&CreateScreenXLib); }
+
+S::Int	 screenXLibTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_screenXLibTmp);
 
 S::Int	 addScreenXLibInitTmp = S::AddInitFunction(&S::System::ScreenXLib::Initialize);
 S::Int	 addScreenXLibFreeTmp = S::AddFreeFunction(&S::System::ScreenXLib::Free);
@@ -87,6 +90,8 @@ namespace smooth
 
 S::Int S::System::ScreenXLib::Initialize()
 {
+	if (!Backends::Platform::IsSelected(Backends::PLATFORM_X11)) return Success();
+
 	libXrandr = dlopen("libXrandr.so", RTLD_NOW | RTLD_LOCAL);
 
 	if (libXrandr != NIL)

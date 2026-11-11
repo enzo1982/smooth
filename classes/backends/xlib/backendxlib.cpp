@@ -10,6 +10,7 @@
 
 #include <smooth/backends/xlib/backendxlib.h>
 #include <smooth/backends/freedesktop/desktopsettings.h>
+#include <smooth/backends/platform.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +23,13 @@ S::Backends::Backend *CreateBackendXLib()
 	return new S::Backends::BackendXLib();
 }
 
+static S::Bool ProbeXLib()
+{
+	return getenv("DISPLAY") != NIL;
+}
+
 S::Int	 backendXLibTmp = S::Backends::Backend::AddBackend(&CreateBackendXLib);
+S::Int	 backendXLibProbeTmp = S::Backends::Platform::AddProbe(S::Backends::PLATFORM_X11, 1, &ProbeXLib);
 
 Display	*S::Backends::BackendXLib::display = NIL;
 XIM	 S::Backends::BackendXLib::im	   = NIL;
@@ -38,6 +45,8 @@ S::Backends::BackendXLib::~BackendXLib()
 
 S::Int S::Backends::BackendXLib::Init()
 {
+	if (!Platform::IsSelected(PLATFORM_X11)) return Success();
+
 	XInitThreads();
 
 	/* Open display.
@@ -57,7 +66,7 @@ S::Int S::Backends::BackendXLib::Init()
 
 		/* Init the desktop settings helper.
 		 */
-		DesktopSettings::InitDependencies();
+		DesktopSettings::InitDependencies("x11");
 
 		/* Get default colors.
 		 */
@@ -77,6 +86,8 @@ S::Int S::Backends::BackendXLib::Init()
 
 S::Int S::Backends::BackendXLib::Deinit()
 {
+	if (!Platform::IsSelected(PLATFORM_X11)) return Success();
+
 	if (im	    != NIL) XCloseIM(im);
 	if (display != NIL) XCloseDisplay(display);
 

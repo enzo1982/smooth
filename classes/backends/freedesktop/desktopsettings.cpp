@@ -78,8 +78,13 @@ S::Void S::Backends::DesktopSettings::BlockTimerInterrupts(Bool block)
 	pthread_sigmask(block ? SIG_BLOCK : SIG_UNBLOCK, &ss, NIL);
 }
 
-S::Void S::Backends::DesktopSettings::InitDependencies()
+S::Void S::Backends::DesktopSettings::InitDependencies(const char *gdkBackend)
 {
+	/* Use the same windowing system as smooth unless the user
+	 * explicitly chose a GDK backend.
+	 */
+	if (gdkBackend != NIL && getenv("GDK_BACKEND") == NIL) gdk_set_allowed_backends(gdkBackend);
+
 	/* Init the GTK with SIGALRM signals disabled to make
 	 * threads created by gtk_init inherit this SIGMASK.
 	 */

@@ -161,12 +161,14 @@ else
 		BUILD_POSIXTIMER = False
 	endif
 
-#	Use Wayland instead of XLib backends if requested
-	ifeq ($(findstring wayland,$(config)),wayland)
-		ifeq ($(BUILD_XLIB),True)
-			BUILD_XLIB = False
-			BUILD_WAYLAND = True
-		endif
+#	Build Wayland backends alongside XLib unless disabled. The windowing
+#	system is selected at runtime (see --display:x11|wayland argument).
+	ifeq ($(BUILD_XLIB),True)
+	ifeq ($(BUILD_CAIRO),True)
+	ifneq ($(findstring nowayland,$(config)),nowayland)
+		BUILD_WAYLAND = True
+	endif
+	endif
 	endif
 endif
 

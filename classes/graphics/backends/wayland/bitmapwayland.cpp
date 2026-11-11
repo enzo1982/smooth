@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/wayland/bitmapwayland.h>
+#include <smooth/backends/platform.h>
 
 #include <string.h>
 
@@ -32,10 +33,21 @@ S::GUI::BitmapBackend *CreateBitmapWayland_crB(const S::GUI::BitmapBackend &iBit
 	return new S::GUI::BitmapWayland((const S::GUI::BitmapWayland &) iBitmap);
 }
 
-S::Int	 bitmapWaylandTmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_pV);
-S::Int	 bitmapWaylandTmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_crSI);
-S::Int	 bitmapWaylandTmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_cI);
-S::Int	 bitmapWaylandTmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_crB);
+static S::Int Register_bitmapWaylandTmp_pV() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_pV); }
+
+S::Int	 bitmapWaylandTmp_pV	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_bitmapWaylandTmp_pV);
+
+static S::Int Register_bitmapWaylandTmp_crSI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_crSI); }
+
+S::Int	 bitmapWaylandTmp_crSI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_bitmapWaylandTmp_crSI);
+
+static S::Int Register_bitmapWaylandTmp_cI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_cI); }
+
+S::Int	 bitmapWaylandTmp_cI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_bitmapWaylandTmp_cI);
+
+static S::Int Register_bitmapWaylandTmp_crB() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapWayland_crB); }
+
+S::Int	 bitmapWaylandTmp_crB	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_bitmapWaylandTmp_crB);
 
 S::GUI::BitmapWayland::BitmapWayland(Void *iBitmap)
 {

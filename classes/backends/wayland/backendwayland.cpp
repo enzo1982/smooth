@@ -10,6 +10,7 @@
 
 #include <smooth/backends/wayland/backendwayland.h>
 #include <smooth/backends/freedesktop/desktopsettings.h>
+#include <smooth/backends/platform.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
 
@@ -35,7 +36,24 @@ S::Backends::Backend *CreateBackendWayland()
 	return new S::Backends::BackendWayland();
 }
 
+static S::Bool ProbeWayland()
+{
+	/* Check that a compositor is actually reachable, as the
+	 * environment may contain stale settings (e.g. over SSH).
+	 */
+	if (getenv("WAYLAND_DISPLAY") == NIL && getenv("WAYLAND_SOCKET") == NIL) return False;
+
+	wl_display	*display = wl_display_connect(NIL);
+
+	if (display == NIL) return False;
+
+	wl_display_disconnect(display);
+
+	return True;
+}
+
 S::Int	 backendWaylandTmp = S::Backends::Backend::AddBackend(&CreateBackendWayland);
+S::Int	 backendWaylandProbeTmp = S::Backends::Platform::AddProbe(S::Backends::PLATFORM_WAYLAND, 2, &ProbeWayland);
 
 wl_display				*S::Backends::BackendWayland::display		 = NIL;
 wl_registry				*S::Backends::BackendWayland::registry		 = NIL;
@@ -180,11 +198,15 @@ S::Backends::BackendWayland::~BackendWayland()
 
 S::Int S::Backends::BackendWayland::Init()
 {
+	if (!Platform::IsSelected(PLATFORM_WAYLAND)) return Success();
+
 	/* Connect to Wayland display.
 	 */
 	const char	*displayId = getenv("WAYLAND_DISPLAY");
 
-	if (displayId == NIL) return Success();
+	if (displayId == NIL && getenv("WAYLAND_SOCKET") == NIL) return Success();
+
+	if (displayId == NIL) displayId = "WAYLAND_SOCKET";
 
 	/* Take activation token passed by the launcher. Remove it from the
 	 * environment, so it is not inherited by processes we start.
@@ -250,7 +272,7 @@ S::Int S::Backends::BackendWayland::Init()
 
 	/* Init the desktop settings helper.
 	 */
-	DesktopSettings::InitDependencies();
+	DesktopSettings::InitDependencies("wayland");
 
 	/* Get default colors.
 	 */

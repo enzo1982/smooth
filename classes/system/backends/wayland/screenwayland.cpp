@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/backends/wayland/screenwayland.h>
+#include <smooth/backends/platform.h>
 #include <smooth/backends/wayland/backendwayland.h>
 #include <smooth/input/pointer.h>
 #include <smooth/misc/math.h>
@@ -18,7 +19,9 @@ S::System::ScreenBackend *CreateScreenWayland()
 	return new S::System::ScreenWayland();
 }
 
-S::Int	 screenWaylandTmp = S::System::ScreenBackend::SetBackend(&CreateScreenWayland);
+static S::Int Register_screenWaylandTmp() { return S::System::ScreenBackend::SetBackend(&CreateScreenWayland); }
+
+S::Int	 screenWaylandTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_screenWaylandTmp);
 
 S::System::ScreenWayland::ScreenWayland()
 {

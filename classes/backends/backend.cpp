@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/backend.h>
+#include <smooth/backends/platform.h>
 
 #if defined __WIN32__ && defined SMOOTH_STATIC
 	#include <smooth/backends/win32/backendwin32.h>
@@ -40,6 +41,10 @@ S::Backends::Backend *S::Backends::Backend::GetNthBackend(Int n)
 
 S::Int S::Backends::Backend::InitBackends()
 {
+	/* Select windowing platform if there is a choice.
+	 */
+	Platform::Select();
+
 	if (backends == NIL)		backends = new Array<Backend *, Void *>;
 	if (backend_creators == NIL)	backend_creators = new Array<Backend *(*)(), Void *>;
 

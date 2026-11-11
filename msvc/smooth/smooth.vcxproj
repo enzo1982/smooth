@@ -264,6 +264,7 @@
     <ClCompile Include="..\..\classes\basic\objecttype.cpp" />
     <ClCompile Include="..\..\classes\basic\setup.cpp" />
     <ClCompile Include="..\..\classes\backends\backend.cpp" />
+    <ClCompile Include="..\..\classes\backends\platform.cpp" />
     <ClCompile Include="..\..\classes\backends\gdiplus\backendgdiplus.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>

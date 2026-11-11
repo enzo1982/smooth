@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/xlib/fontxlib.h>
+#include <smooth/backends/platform.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/files/file.h>
 #include <smooth/foreach.h>
@@ -26,7 +27,9 @@ S::GUI::FontBackend *CreateFontXLib(const S::String &iFontName, S::Short iFontSi
 	return new S::GUI::FontXLib(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
-S::Int	 fontXLibTmp = S::GUI::FontBackend::SetBackend(&CreateFontXLib);
+static S::Int Register_fontXLibTmp() { return S::GUI::FontBackend::SetBackend(&CreateFontXLib); }
+
+S::Int	 fontXLibTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_fontXLibTmp);
 
 S::Int	 addFontXLibInitTmp = S::AddInitFunction(&S::GUI::FontXLib::Initialize);
 

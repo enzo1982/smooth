@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
+#include <smooth/backends/platform.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/cursor.h>
 #include <smooth/gui/application/application.h>
@@ -31,7 +32,9 @@ S::GUI::WindowBackend *CreateWindowXLib()
 	return new S::GUI::WindowXLib();
 }
 
-S::Int	 windowXLibTmp = S::GUI::WindowBackend::SetBackend(&CreateWindowXLib);
+static S::Int Register_windowXLibTmp() { return S::GUI::WindowBackend::SetBackend(&CreateWindowXLib); }
+
+S::Int	 windowXLibTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_windowXLibTmp);
 
 S::Int	 addWindowXLibInitTmp = S::AddInitFunction(&S::GUI::WindowXLib::Initialize);
 S::Int	 addWindowXLibFreeTmp = S::AddFreeFunction(&S::GUI::WindowXLib::Free);
@@ -71,6 +74,8 @@ namespace smooth
 
 S::Int S::GUI::WindowXLib::Initialize()
 {
+	if (!Backends::Platform::IsSelected(Backends::PLATFORM_X11)) return Success();
+
 	/* Register for cursor events.
 	 */
 	Cursor::internalSetCursor.Connect(&WindowXLib::SetCursor);
@@ -81,6 +86,8 @@ S::Int S::GUI::WindowXLib::Initialize()
 
 S::Int S::GUI::WindowXLib::Free()
 {
+	if (!Backends::Platform::IsSelected(Backends::PLATFORM_X11)) return Success();
+
 	/* Unregister cursor event handlers.
 	 */
 	Cursor::internalSetCursor.Disconnect(&WindowXLib::SetCursor);

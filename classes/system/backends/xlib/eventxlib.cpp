@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/event.h>
+#include <smooth/backends/platform.h>
 #include <smooth/system/system.h>
 #include <smooth/threads/thread.h>
 #include <smooth/system/backends/xlib/eventxlib.h>
@@ -22,7 +23,9 @@ S::System::EventBackend *CreateEventXLib()
 	return new S::System::EventXLib();
 }
 
-S::Int	 eventXLibTmp = S::System::EventBackend::SetBackend(&CreateEventXLib);
+static S::Int Register_eventXLibTmp() { return S::System::EventBackend::SetBackend(&CreateEventXLib); }
+
+S::Int	 eventXLibTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_eventXLibTmp);
 
 S::Int	 S::System::EventXLib::nested = 0;
 

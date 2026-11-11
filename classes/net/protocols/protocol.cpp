@@ -76,7 +76,12 @@ S::Int S::Net::Protocols::Protocol::DownloadToBuffer(Buffer<UnsignedByte> &desti
 	S::File	 downloadFile = S::System::System::GetTempDirectory().Append("download-").Append(Number((Int64) Math::Random() & 0x7FFFFFFF).ToHexString()).Append(".temp");
 	Bool	 error = DownloadToFile(downloadFile);
 
-	if (error) return Error();
+	if (error)
+	{
+		downloadFile.Delete();
+
+		return Error();
+	}
 
 	InStream	 in(STREAM_FILE, downloadFile, IS_READ);
 	Int		 size = in.Size();

@@ -161,14 +161,22 @@ else
 		BUILD_POSIXTIMER = False
 	endif
 
-#	Build Wayland backends alongside XLib unless disabled. The windowing
+#	Build XLib and Wayland backends unless disabled. The windowing
 #	system is selected at runtime (see --display:x11|wayland argument).
-	ifeq ($(BUILD_XLIB),True)
 	ifeq ($(BUILD_CAIRO),True)
-	ifneq ($(findstring nowayland,$(config)),nowayland)
-		BUILD_WAYLAND = True
-	endif
-	endif
+		ifeq ($(findstring noxlib,$(config)),noxlib)
+			BUILD_XLIB = False
+		endif
+
+		ifneq ($(findstring nowayland,$(config)),nowayland)
+			BUILD_WAYLAND = True
+		endif
+
+		ifneq ($(BUILD_XLIB),True)
+		ifneq ($(BUILD_WAYLAND),True)
+$(error Building with both noxlib and nowayland is not supported, at least one windowing system backend is required)
+		endif
+		endif
 	endif
 endif
 

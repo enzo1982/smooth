@@ -18,6 +18,7 @@
 #include <xdg-toplevel-icon-v1-client-protocol.h>
 #include <viewporter-client-protocol.h>
 #include <xdg-output-unstable-v1-client-protocol.h>
+#include <xdg-activation-v1-client-protocol.h>
 #include <libdecor.h>
 
 #include <string.h>
@@ -47,6 +48,9 @@ zwp_primary_selection_device_manager_v1	*S::Backends::BackendWayland::primarySel
 xdg_toplevel_icon_manager_v1		*S::Backends::BackendWayland::toplevelIconManager = NIL;
 wp_viewporter				*S::Backends::BackendWayland::viewporter	 = NIL;
 zxdg_output_manager_v1			*S::Backends::BackendWayland::xdgOutputManager	 = NIL;
+xdg_activation_v1			*S::Backends::BackendWayland::activation	 = NIL;
+
+S::String				 S::Backends::BackendWayland::launchToken;
 
 S::Float				 S::Backends::BackendWayland::scale		 = -1;
 
@@ -180,6 +184,18 @@ S::Int S::Backends::BackendWayland::Init()
 
 	if (displayId == NIL) return Success();
 
+	/* Take activation token passed by the launcher. Remove it from the
+	 * environment, so it is not inherited by processes we start.
+	 */
+	const char	*token = getenv("XDG_ACTIVATION_TOKEN");
+
+	if (token != NIL)
+	{
+		launchToken = token;
+
+		unsetenv("XDG_ACTIVATION_TOKEN");
+	}
+
 	display = wl_display_connect(NIL);
 
 	if (display == NIL)
@@ -265,6 +281,7 @@ S::Int S::Backends::BackendWayland::Deinit()
 
 	outputs.RemoveAll();
 
+	if (activation		   != NIL) xdg_activation_v1_destroy(activation);
 	if (xdgOutputManager	   != NIL) zxdg_output_manager_v1_destroy(xdgOutputManager);
 	if (viewporter		   != NIL) wp_viewporter_destroy(viewporter);
 	if (toplevelIconManager	   != NIL) xdg_toplevel_icon_manager_v1_destroy(toplevelIconManager);
@@ -287,6 +304,7 @@ S::Int S::Backends::BackendWayland::Deinit()
 	toplevelIconManager	= NIL;
 	viewporter	  = NIL;
 	xdgOutputManager  = NIL;
+	activation	  = NIL;
 	seat		  = NIL;
 	wmBase		  = NIL;
 	shm		  = NIL;
@@ -336,6 +354,10 @@ S::Void S::Backends::BackendWayland::OnRegistryGlobal(wl_registry *registry, Uns
 	else if (strcmp(interface, wp_viewporter_interface.name) == 0)
 	{
 		viewporter = (wp_viewporter *) wl_registry_bind(registry, name, &wp_viewporter_interface, 1);
+	}
+	else if (strcmp(interface, xdg_activation_v1_interface.name) == 0)
+	{
+		activation = (xdg_activation_v1 *) wl_registry_bind(registry, name, &xdg_activation_v1_interface, 1);
 	}
 	else if (strcmp(interface, zxdg_output_manager_v1_interface.name) == 0)
 	{
@@ -458,6 +480,15 @@ S::Int S::Backends::BackendWayland::Dispatch()
 	else			  wl_display_cancel_read(display);
 
 	return wl_display_dispatch_pending(display);
+}
+
+S::String S::Backends::BackendWayland::TakeLaunchToken()
+{
+	String	 token = launchToken;
+
+	launchToken = NIL;
+
+	return token;
 }
 
 S::Float S::Backends::BackendWayland::GetScale()

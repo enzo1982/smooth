@@ -149,6 +149,10 @@ namespace smooth
 				 */
 				static Bool				 ProcessPendingEvents();
 
+				/* Activate a window using an activation token.
+				 */
+				static Void				 ActivateWindow(Int, const String &);
+
 									 WindowWayland(Void * = NIL);
 									~WindowWayland();
 

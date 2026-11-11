@@ -23,6 +23,7 @@
 #include <primary-selection-unstable-v1-client-protocol.h>
 #include <xdg-toplevel-icon-v1-client-protocol.h>
 #include <viewporter-client-protocol.h>
+#include <xdg-activation-v1-client-protocol.h>
 #include <wayland-cursor.h>
 #include <libdecor.h>
 
@@ -382,6 +383,18 @@ static void frameDismissPopup(libdecor_frame *frame, const char *seatName, void 
 }
 
 static libdecor_frame_interface frameInterface = { frameConfigure, frameClose, frameCommit, frameDismissPopup };
+
+/* xdg_activation_token_v1 listener. The window is referenced by ID,
+ * as it might have been destroyed when the token arrives.
+ */
+static void activationTokenDone(void *data, xdg_activation_token_v1 *token, const char *tokenString)
+{
+	WindowWayland::ActivateWindow((Int) (intptr_t) data, tokenString);
+
+	xdg_activation_token_v1_destroy(token);
+}
+
+static const xdg_activation_token_v1_listener activationTokenListener = { activationTokenDone };
 
 /* wl_buffer listener.
  */
@@ -1631,9 +1644,44 @@ S::Int S::GUI::WindowWayland::Restore()
 
 S::Int S::GUI::WindowWayland::Raise()
 {
-	/* Raising windows requires the xdg-activation protocol.
+	xdg_activation_v1	*activation = Backends::BackendWayland::GetActivation();
+
+	if (surface == NIL || activation == NIL) return Success();
+
+	/* Nothing to do if we already have the keyboard focus.
 	 */
+	if (keyboardSurface == surface) return Success();
+
+	/* Request an activation token. Compositors grant activation only for
+	 * tokens tied to recent user input, so pass the serial of the last
+	 * input event and the surface that received it.
+	 */
+	xdg_activation_token_v1	*token = xdg_activation_v1_get_activation_token(activation);
+
+	xdg_activation_token_v1_add_listener(token, &activationTokenListener, (void *) (intptr_t) id);
+
+	if (inputSerial != 0 && Backends::BackendWayland::GetSeat() != NIL) xdg_activation_token_v1_set_serial(token, inputSerial, Backends::BackendWayland::GetSeat());
+
+	if	(keyboardSurface != NIL) xdg_activation_token_v1_set_surface(token, keyboardSurface);
+	else if (pointerSurface	 != NIL) xdg_activation_token_v1_set_surface(token, pointerSurface);
+
+	xdg_activation_token_v1_commit(token);
+
+	wl_display_flush(Backends::BackendWayland::GetDisplay());
+
 	return Success();
+}
+
+S::Void S::GUI::WindowWayland::ActivateWindow(Int windowID, const String &token)
+{
+	xdg_activation_v1	*activation = Backends::BackendWayland::GetActivation();
+	WindowWayland		*window	    = windowBackends.Get(windowID);
+
+	if (activation == NIL || window == NIL || window->surface == NIL || token == NIL) return;
+
+	xdg_activation_v1_activate(activation, token.ConvertTo("UTF-8"), window->surface);
+
+	wl_display_flush(Backends::BackendWayland::GetDisplay());
 }
 
 /* Configure handling.
@@ -1664,6 +1712,16 @@ S::Void S::GUI::WindowWayland::OnConfigure(const Size &nRealSize, Bool nMaximize
 	UpdateMetrics(targetSize, first);
 
 	if (first) onEvent.Call(SM_GETFOCUS, 0, 0);
+
+	/* Activate the first toplevel with the token passed by the
+	 * launching application, so it gets focus on all compositors.
+	 */
+	if (first && xdgPopup == NIL)
+	{
+		String	 token = Backends::BackendWayland::TakeLaunchToken();
+
+		if (token != NIL) ActivateWindow(id, token);
+	}
 
 	/* Make sure a buffer is committed in response to the configure.
 	 */

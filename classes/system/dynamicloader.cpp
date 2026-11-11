@@ -8,15 +8,15 @@
   * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
+#ifdef __linux__
+#	include <gtk/gtk.h>
+#endif
+
 #include <smooth/system/dynamicloader.h>
 #include <smooth/files/directory.h>
 #include <smooth/io/instream.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/foreach.h>
-
-#ifdef __linux__
-#	include <smooth/backends/xlib/backendxlib.h>
-#endif
 
 #ifdef __WIN32__
 #	include <windows.h>
@@ -161,11 +161,14 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		if (Directory("/opt/local/lib").Exists())   directories.Add("/opt/local/lib");
 		if (Directory("/sw/lib").Exists())	    directories.Add("/sw/lib");
 #elif defined __linux__
-		/* Query X11 library path to handle architecture-specific library paths on Linux.
+		/* Query GTK library path to handle architecture-specific library paths on Linux.
+		 *
+		 * GTK is always linked from the system on Linux and installed to the
+		 * architecture-specific library directory.
 		 */
 		Dl_info	 info = { 0 };
 
-		dladdr((void *) &X11::XOpenDisplay, &info);
+		dladdr((void *) &gtk_get_major_version, &info);
 
 		const String	 libraryPath = File(info.dli_fname).GetFilePath();
 

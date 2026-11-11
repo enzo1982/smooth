@@ -10,7 +10,7 @@
 
 #include <gtk/gtk.h>
 
-#ifdef GDK_WINDOWING_X11
+#if defined GDK_WINDOWING_X11 && defined SMOOTH_GTK_X11
 #	include <gdk/gdkx.h>
 
 #	undef True
@@ -35,7 +35,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 	/* Make sure dialog gets the focus.
 	 */
-#ifdef GDK_WINDOWING_X11
+#if defined GDK_WINDOWING_X11 && defined SMOOTH_GTK_X11
 	gtk_widget_show_all(GTK_WIDGET(dialog));
 
 	if (GDK_IS_X11_DISPLAY(gtk_widget_get_display(GTK_WIDGET(dialog))))

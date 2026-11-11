@@ -259,7 +259,12 @@ else
 	endif
 
 	LIBS += -lpthread
-	LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
+
+	ifeq ($(BUILD_XLIB),True)
+		LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
+	else
+		LIBS += $(shell pkg-config --libs gtk+-3.0)
+	endif
 
 	ifeq ($(BUILD_WAYLAND),True)
 		LIBS += $(shell pkg-config --libs wayland-client wayland-cursor xkbcommon libdecor-0)

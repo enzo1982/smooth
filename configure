@@ -16,7 +16,8 @@ echo
 echo "        - smooth supports X11 and Wayland and selects one at runtime,"
 echo "          preferring Wayland. Run applications with --display:x11 or"
 echo "          --display:wayland to override the choice. To build without"
-echo "          Wayland support, please build with \"make config=nowayland\"."
+echo "          Wayland or X11 support, please build with \"make config=nowayland\""
+echo "          or \"make config=noxlib\". At least one of them must be built."
 echo
 echo "        - smooth uses a bundled version of libcpuid by default. To use"
 echo "          the library installed on your system, please build with"

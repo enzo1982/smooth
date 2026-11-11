@@ -10,6 +10,8 @@
 
 #include <smooth/gui/window/backends/wayland/windowwayland.h>
 #include <smooth/gui/window/window.h>
+#include <smooth/gui/widgets/special/cursor.h>
+#include <smooth/gui/widgets/basic/editbox.h>
 #include <smooth/gui/application/application.h>
 #include <smooth/input/pointer.h>
 #include <smooth/threads/mutex.h>
@@ -24,6 +26,7 @@
 #include <xdg-toplevel-icon-v1-client-protocol.h>
 #include <viewporter-client-protocol.h>
 #include <xdg-activation-v1-client-protocol.h>
+#include <text-input-unstable-v3-client-protocol.h>
 #include <wayland-cursor.h>
 #include <libdecor.h>
 
@@ -134,6 +137,37 @@ namespace
 	zwp_primary_selection_source_v1	*primarySource = NIL;
 
 	String			 primaryText;
+
+	/* Text input (input method) state.
+	 */
+	zwp_text_input_v3	*textInput	    = NIL;
+	wl_surface		*textInputSurface   = NIL;
+	Bool			 textInputEnabled   = False;
+
+	Cursor			*activeCursor	    = NIL;
+	Point			 activeCursorPos;
+
+	String			 pendingPreedit;
+	Int			 pendingPreeditCaret = -1;
+	String			 pendingCommit;
+
+	Bool			 preeditShown	    = False;
+
+	/* Convert a byte offset in a UTF-8 string to a character offset.
+	 */
+	Int CharacterOffset(const char *utf8, Int byteOffset)
+	{
+		if (utf8 == NIL || byteOffset < 0) return -1;
+
+		Int	 characters = 0;
+
+		for (Int i = 0; i < byteOffset && utf8[i] != 0; i++)
+		{
+			if ((utf8[i] & 0xC0) != 0x80) characters++;
+		}
+
+		return characters;
+	}
 
 	Int64 GetMilliseconds()
 	{
@@ -759,6 +793,63 @@ static void primarySourceCancelled(void *data, zwp_primary_selection_source_v1 *
 
 static const zwp_primary_selection_source_v1_listener primarySourceListener = { primarySourceSend, primarySourceCancelled };
 
+/* zwp_text_input_v3 listener. Changes are collected and
+ * applied atomically when the done event arrives.
+ */
+static void textInputEnter(void *data, zwp_text_input_v3 *input, wl_surface *surface)
+{
+	textInputSurface = surface;
+	textInputEnabled = False;
+
+	WindowWayland::UpdateTextInput();
+}
+
+static void textInputLeave(void *data, zwp_text_input_v3 *input, wl_surface *surface)
+{
+	/* Leaving resets the text input state on the compositor side.
+	 */
+	textInputSurface = NIL;
+	textInputEnabled = False;
+
+	pendingPreedit	    = NIL;
+	pendingPreeditCaret = -1;
+	pendingCommit	    = NIL;
+
+	WindowWayland::ApplyTextInput();
+}
+
+static void textInputPreeditString(void *data, zwp_text_input_v3 *input, const char *text, int32_t cursorBegin, int32_t cursorEnd)
+{
+	pendingPreedit	    = NIL;
+	pendingPreeditCaret = -1;
+
+	if (text == NIL) return;
+
+	pendingPreedit.ImportFrom("UTF-8", text);
+	pendingPreeditCaret = CharacterOffset(text, cursorBegin);
+}
+
+static void textInputCommitString(void *data, zwp_text_input_v3 *input, const char *text)
+{
+	pendingCommit = NIL;
+
+	if (text != NIL) pendingCommit.ImportFrom("UTF-8", text);
+}
+
+static void textInputDeleteSurroundingText(void *data, zwp_text_input_v3 *input, uint32_t beforeLength, uint32_t afterLength)
+{
+	/* We do not provide surrounding text, so input
+	 * methods are not expected to delete any.
+	 */
+}
+
+static void textInputDone(void *data, zwp_text_input_v3 *input, uint32_t serial)
+{
+	WindowWayland::ApplyTextInput();
+}
+
+static const zwp_text_input_v3_listener textInputListener = { textInputEnter, textInputLeave, textInputPreeditString, textInputCommitString, textInputDeleteSurroundingText, textInputDone };
+
 S::Int S::GUI::WindowWayland::Initialize()
 {
 	if (Backends::BackendWayland::GetDisplay() == NIL) return Success();
@@ -801,6 +892,20 @@ S::Int S::GUI::WindowWayland::Initialize()
 		zwp_primary_selection_device_v1_add_listener(primaryDevice, &primaryDeviceListener, NIL);
 	}
 
+	/* Create text input for input method support.
+	 */
+	if (Backends::BackendWayland::GetSeat() != NIL && Backends::BackendWayland::GetTextInputManager() != NIL)
+	{
+		textInput = zwp_text_input_manager_v3_get_text_input(Backends::BackendWayland::GetTextInputManager(), Backends::BackendWayland::GetSeat());
+
+		zwp_text_input_v3_add_listener(textInput, &textInputListener, NIL);
+	}
+
+	/* Register for cursor events.
+	 */
+	Cursor::internalSetCursor.Connect(&WindowWayland::SetCursor);
+	Cursor::internalRemoveCursor.Connect(&WindowWayland::RemoveCursor);
+
 	Backends::BackendWayland::Roundtrip();
 
 	return Success();
@@ -811,6 +916,15 @@ S::Int S::GUI::WindowWayland::Free()
 	if (Backends::BackendWayland::GetDisplay() == NIL) return Success();
 
 	Backends::BackendWayland::SetSeatListeners(NIL, NIL);
+
+	Cursor::internalSetCursor.Disconnect(&WindowWayland::SetCursor);
+	Cursor::internalRemoveCursor.Disconnect(&WindowWayland::RemoveCursor);
+
+	if (textInput != NIL) zwp_text_input_v3_destroy(textInput);
+
+	textInput	 = NIL;
+	textInputSurface = NIL;
+	activeCursor	 = NIL;
 
 	DestroyOffer(selectionOffer, &wl_data_offer_destroy);
 
@@ -1352,6 +1466,8 @@ S::Void S::GUI::WindowWayland::DestroyRole()
 	if (pointerSurface  == surface) pointerSurface	= NIL;
 	if (keyboardSurface == surface) keyboardSurface = NIL;
 	if (dragSurface	    == surface) dragSurface	= NIL;
+
+	if (textInputSurface == surface) { textInputSurface = NIL; textInputEnabled = False; preeditShown = False; }
 
 	if (viewport != NIL) wp_viewport_destroy(viewport);
 
@@ -2309,4 +2425,162 @@ S::Bool S::GUI::WindowWayland::SetSelectionText(const String &text)
 	wl_display_flush(Backends::BackendWayland::GetDisplay());
 
 	return True;
+}
+
+/* Input method support.
+ */
+S::Void S::GUI::WindowWayland::SetCursor(Cursor *cursor, const Point &point)
+{
+	if (cursor != activeCursor && activeCursor != NIL) RemoveCursor(activeCursor);
+
+	activeCursor	= cursor;
+	activeCursorPos = point;
+
+	UpdateTextInput();
+}
+
+S::Void S::GUI::WindowWayland::RemoveCursor(Cursor *cursor)
+{
+	if (activeCursor != cursor) return;
+
+	/* Clear preediting area.
+	 */
+	WindowWayland	*window = GetWindowBackend(cursor->GetContainerWindow());
+
+	if (window != NIL && preeditShown && cursor->IsVisible()) window->ClearPreedit();
+
+	preeditShown	= False;
+
+	activeCursor	= NIL;
+	activeCursorPos = Point();
+
+	UpdateTextInput();
+}
+
+S::Void S::GUI::WindowWayland::UpdateTextInput()
+{
+	if (textInput == NIL) return;
+
+	WindowWayland	*window = (activeCursor != NIL ? GetWindowBackend(activeCursor->GetContainerWindow()) : NIL);
+
+	if (window != NIL && window->surface != NIL && window->surface == textInputSurface)
+	{
+		/* Enable text input and describe the text field.
+		 */
+		if (!textInputEnabled)
+		{
+			UnsignedInt	 hint	 = ZWP_TEXT_INPUT_V3_CONTENT_HINT_NONE;
+			UnsignedInt	 purpose = ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL;
+			Widget		*field	 = activeCursor->GetContainer();
+
+			if (field != NIL && field->GetObjectType() == EditBox::classID)
+			{
+				if	(field->GetFlags() & EDB_ASTERISK) { purpose = ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_PASSWORD; hint |= ZWP_TEXT_INPUT_V3_CONTENT_HINT_SENSITIVE_DATA | ZWP_TEXT_INPUT_V3_CONTENT_HINT_HIDDEN_TEXT; }
+				else if (field->GetFlags() & EDB_NUMERIC)  { purpose = ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_DIGITS; }
+			}
+
+			if (activeCursor->GetFlags() & CF_MULTILINE) hint |= ZWP_TEXT_INPUT_V3_CONTENT_HINT_MULTILINE;
+
+			zwp_text_input_v3_enable(textInput);
+			zwp_text_input_v3_set_content_type(textInput, hint, purpose);
+
+			textInputEnabled = True;
+		}
+
+		/* Tell the input method where the caret is, so candidate
+		 * windows can be placed next to it.
+		 */
+		Int	 height = activeCursor->GetFont().GetScaledTextSizeY();
+
+		zwp_text_input_v3_set_cursor_rectangle(textInput, Math::Round(activeCursorPos.x / window->scale), Math::Round(activeCursorPos.y / window->scale), 1, Math::Max(1, Math::Round(height / window->scale)));
+		zwp_text_input_v3_commit(textInput);
+	}
+	else if (textInputEnabled)
+	{
+		zwp_text_input_v3_disable(textInput);
+		zwp_text_input_v3_commit(textInput);
+
+		textInputEnabled = False;
+	}
+
+	wl_display_flush(Backends::BackendWayland::GetDisplay());
+}
+
+S::Void S::GUI::WindowWayland::ApplyTextInput()
+{
+	/* Take pending changes. Values are reset after each done event.
+	 */
+	String	 commit	= pendingCommit;
+	String	 preedit = pendingPreedit;
+	Int	 caret	= pendingPreeditCaret;
+
+	pendingCommit	    = NIL;
+	pendingPreedit	    = NIL;
+	pendingPreeditCaret = -1;
+
+	Application::Lock	 lock;
+
+	WindowWayland	*window = (activeCursor != NIL ? GetWindowBackend(activeCursor->GetContainerWindow()) : NIL);
+
+	if (window == NIL) { preeditShown = False; return; }
+
+	/* Apply changes in the order required by the protocol: remove
+	 * the old preedit text, insert committed text, show new preedit.
+	 */
+	if (preeditShown) window->ClearPreedit();
+
+	for (Int i = 0; i < commit.Length(); i++) window->onEvent.Call(SM_CHAR, commit[i], 0);
+
+	if (preedit != NIL && activeCursor != NIL) window->DrawPreedit(preedit, caret);
+}
+
+S::Void S::GUI::WindowWayland::DrawPreedit(const String &preedit, Int caret)
+{
+	if (activeCursor == NIL || drawSurface == NIL) return;
+
+	/* Draw underlined preedit text at the cursor position.
+	 */
+	Rect	 rect = Rect::OverlapRect(Rect(activeCursorPos - Point(1, 1), activeCursor->GetRealSize()), Rect(activeCursor->GetRealPosition(), activeCursor->GetRealSize()));
+	Font	 font = activeCursor->GetFont();
+
+	font.SetStyle(font.GetStyle() | Font::Underline);
+
+	activeCursor->SetIMECursor(True);
+
+	drawSurface->StartPaint(rect);
+	drawSurface->Box(rect, activeCursor->GetBackgroundColor(), Rect::Filled);
+	drawSurface->SetText(preedit, rect, font);
+	drawSurface->EndPaint();
+
+	/* Place the blinking cursor at the preedit caret.
+	 */
+	if (caret < 0 || caret > preedit.Length()) caret = preedit.Length();
+
+	activeCursor->SetIMEAdvance(font.GetScaledTextSizeX(preedit.Head(caret)));
+	activeCursor->SetIMECursor(False);
+
+	preeditShown = True;
+}
+
+S::Void S::GUI::WindowWayland::ClearPreedit()
+{
+	preeditShown = False;
+
+	if (activeCursor == NIL || drawSurface == NIL) return;
+
+	/* Restore the text covered by the preedit string.
+	 */
+	Rect	 rect = Rect::OverlapRect(Rect(activeCursorPos - Point(1, 1), activeCursor->GetRealSize()), Rect(activeCursor->GetRealPosition(), activeCursor->GetRealSize()));
+
+	activeCursor->SetIMECursor(True);
+
+	drawSurface->StartPaint(rect);
+	drawSurface->Box(rect, activeCursor->GetBackgroundColor(), Rect::Filled);
+
+	activeCursor->Paint(SP_PAINT);
+
+	drawSurface->EndPaint();
+
+	activeCursor->SetIMEAdvance(0);
+	activeCursor->SetIMECursor(False);
 }

@@ -4,7 +4,7 @@
 SMOOTH_PATH = ../..
 
 # Enter object files here:
-OBJECTS	  = backend.o
+OBJECTS	  = backend.o platform.o
 
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = $(call makein,cocoa) && $(call makein,gdiplus)

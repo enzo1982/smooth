@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2019 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,9 +14,7 @@
 #include <smooth/gui/application/application.h>
 #include <smooth/foreach.h>
 
-#if defined __linux__ && defined SMOOTH_USE_WAYLAND
-#	include <smooth/backends/wayland/backendwayland.h>
-#elif defined __linux__
+#ifdef __linux__
 #	include <smooth/backends/xlib/backendxlib.h>
 #endif
 
@@ -163,15 +161,11 @@ const S::Array<S::String> &S::System::DynamicLoader::GetLibraryDirectories()
 		if (Directory("/opt/local/lib").Exists())   directories.Add("/opt/local/lib");
 		if (Directory("/sw/lib").Exists())	    directories.Add("/sw/lib");
 #elif defined __linux__
-		/* Query X11 or Wayland library path to handle architecture-specific library paths on Linux.
+		/* Query X11 library path to handle architecture-specific library paths on Linux.
 		 */
 		Dl_info	 info = { 0 };
 
-#	ifdef SMOOTH_USE_WAYLAND
-		dladdr((void *) &wl_display_connect, &info);
-#	else
 		dladdr((void *) &X11::XOpenDisplay, &info);
-#	endif
 
 		const String	 libraryPath = File(info.dli_fname).GetFilePath();
 

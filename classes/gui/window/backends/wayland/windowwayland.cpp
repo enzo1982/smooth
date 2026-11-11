@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/window/backends/wayland/windowwayland.h>
+#include <smooth/backends/platform.h>
 #include <smooth/gui/window/window.h>
 #include <smooth/gui/widgets/special/cursor.h>
 #include <smooth/gui/widgets/basic/editbox.h>
@@ -53,7 +54,9 @@ S::GUI::WindowBackend *CreateWindowWayland()
 	return new S::GUI::WindowWayland();
 }
 
-S::Int	 windowWaylandTmp = S::GUI::WindowBackend::SetBackend(&CreateWindowWayland);
+static S::Int Register_windowWaylandTmp() { return S::GUI::WindowBackend::SetBackend(&CreateWindowWayland); }
+
+S::Int	 windowWaylandTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_windowWaylandTmp);
 
 S::Int	 addWindowWaylandInitTmp = S::AddInitFunction(&S::GUI::WindowWayland::Initialize);
 S::Int	 addWindowWaylandFreeTmp = S::AddFreeFunction(&S::GUI::WindowWayland::Free);

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/xlib/surfacexlib.h>
+#include <smooth/backends/platform.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/backends/xlib/backendxlib.h>
@@ -31,7 +32,9 @@ S::GUI::SurfaceBackend *CreateSurfaceXLib(S::Void *iSurface, const S::GUI::Size 
 	return new S::GUI::SurfaceXLib(iSurface);
 }
 
-S::Int		 surfaceXLibTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceXLib);
+static S::Int Register_surfaceXLibTmp() { return S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceXLib); }
+
+S::Int		 surfaceXLibTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_surfaceXLibTmp);
 
 S::Short	 S::GUI::SurfaceXLib::surfaceDPI = -1;
 

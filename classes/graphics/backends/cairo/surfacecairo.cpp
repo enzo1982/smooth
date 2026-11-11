@@ -11,6 +11,7 @@
 #include <gdk/gdk.h>
 
 #include <smooth/graphics/backends/cairo/surfacecairo.h>
+#include <smooth/backends/platform.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
 #include <smooth/graphics/color.h>
@@ -44,7 +45,9 @@ S::GUI::SurfaceBackend *CreateSurfaceCairo(S::Void *iSurface, const S::GUI::Size
 	return new S::GUI::SurfaceCairo(iSurface, maxSize);
 }
 
-S::Int		 surfaceCairoTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceCairo);
+static S::Int Register_surfaceCairoTmp() { return S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceCairo); }
+
+S::Int		 surfaceCairoTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_surfaceCairoTmp);
 
 S::Short	 S::GUI::SurfaceCairo::surfaceDPI = -1;
 

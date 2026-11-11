@@ -492,6 +492,9 @@
     <ClCompile Include="..\..\classes\backends\backend.cpp">
       <Filter>Quelldateien\classes\backends</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\classes\backends\platform.cpp">
+      <Filter>Quelldateien\classes\backends</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\classes\backends\gdiplus\backendgdiplus.cpp">
       <Filter>Quelldateien\classes\backends\gdiplus</Filter>
     </ClCompile>

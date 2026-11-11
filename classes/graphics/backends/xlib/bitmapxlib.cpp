@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/xlib/bitmapxlib.h>
+#include <smooth/backends/platform.h>
 #include <smooth/backends/xlib/backendxlib.h>
 
 using namespace X11;
@@ -33,10 +34,21 @@ S::GUI::BitmapBackend *CreateBitmapXLib_crB(const S::GUI::BitmapBackend &iBitmap
 	return new S::GUI::BitmapXLib((const S::GUI::BitmapXLib &) iBitmap);
 }
 
-S::Int	 bitmapXLibTmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_pV);
-S::Int	 bitmapXLibTmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crSI);
-S::Int	 bitmapXLibTmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_cI);
-S::Int	 bitmapXLibTmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crB);
+static S::Int Register_bitmapXLibTmp_pV() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_pV); }
+
+S::Int	 bitmapXLibTmp_pV	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_bitmapXLibTmp_pV);
+
+static S::Int Register_bitmapXLibTmp_crSI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crSI); }
+
+S::Int	 bitmapXLibTmp_crSI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_bitmapXLibTmp_crSI);
+
+static S::Int Register_bitmapXLibTmp_cI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_cI); }
+
+S::Int	 bitmapXLibTmp_cI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_bitmapXLibTmp_cI);
+
+static S::Int Register_bitmapXLibTmp_crB() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapXLib_crB); }
+
+S::Int	 bitmapXLibTmp_crB	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_bitmapXLibTmp_crB);
 
 S::GUI::BitmapXLib::BitmapXLib(Void *iBitmap)
 {

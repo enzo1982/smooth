@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/system/event.h>
+#include <smooth/backends/platform.h>
 #include <smooth/system/system.h>
 #include <smooth/threads/thread.h>
 #include <smooth/system/backends/wayland/eventwayland.h>
@@ -24,7 +25,9 @@ S::System::EventBackend *CreateEventWayland()
 	return new S::System::EventWayland();
 }
 
-S::Int	 eventWaylandTmp = S::System::EventBackend::SetBackend(&CreateEventWayland);
+static S::Int Register_eventWaylandTmp() { return S::System::EventBackend::SetBackend(&CreateEventWayland); }
+
+S::Int	 eventWaylandTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_eventWaylandTmp);
 
 S::Int	 S::System::EventWayland::nested = 0;
 

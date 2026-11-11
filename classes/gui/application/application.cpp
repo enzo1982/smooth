@@ -18,6 +18,7 @@
 #include <smooth/files/directory.h>
 #include <smooth/foreach.h>
 #include <smooth/init.h>
+#include <smooth/backends/platform.h>
 
 #if defined __WIN32__
 #	include <windows.h>
@@ -104,6 +105,10 @@ S::Void S::GUI::Application::SetArguments(const Array<String> &nArgs)
 		/* Filter out scale factor argument.
 		 */
 		if (arg.StartsWith("--scale:")) { scaleFactor = arg.Tail(arg.Length() - 8).ToFloat(); continue; }
+
+		/* Filter out display platform argument.
+		 */
+		if (arg.StartsWith("--display:")) { Backends::Platform::SetRequested(arg.Tail(arg.Length() - 10).ConvertTo("UTF-8")); continue; }
 
 		/* Add to arguments array.
 		 */

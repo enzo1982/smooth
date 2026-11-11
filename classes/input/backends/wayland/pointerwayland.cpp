@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/input/backends/wayland/pointerwayland.h>
+#include <smooth/backends/platform.h>
 #include <smooth/gui/window/backends/wayland/windowwayland.h>
 
 S::Input::PointerBackend *CreatePointerWayland()
@@ -16,7 +17,9 @@ S::Input::PointerBackend *CreatePointerWayland()
 	return new S::Input::PointerWayland();
 }
 
-S::Int	 pointerWaylandTmp = S::Input::PointerBackend::SetBackend(&CreatePointerWayland);
+static S::Int Register_pointerWaylandTmp() { return S::Input::PointerBackend::SetBackend(&CreatePointerWayland); }
+
+S::Int	 pointerWaylandTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_pointerWaylandTmp);
 
 S::Input::PointerWayland::PointerWayland()
 {

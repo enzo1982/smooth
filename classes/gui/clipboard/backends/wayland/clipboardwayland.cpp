@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/clipboard/backends/wayland/clipboardwayland.h>
+#include <smooth/backends/platform.h>
 #include <smooth/gui/window/backends/wayland/windowwayland.h>
 
 S::GUI::ClipboardBackend *CreateClipboardWayland(S::GUI::Window *window)
@@ -16,7 +17,9 @@ S::GUI::ClipboardBackend *CreateClipboardWayland(S::GUI::Window *window)
 	return new S::GUI::ClipboardWayland(window);
 }
 
-S::Int	 clipboardWaylandTmp = S::GUI::ClipboardBackend::SetBackend(&CreateClipboardWayland);
+static S::Int Register_clipboardWaylandTmp() { return S::GUI::ClipboardBackend::SetBackend(&CreateClipboardWayland); }
+
+S::Int	 clipboardWaylandTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_WAYLAND, &Register_clipboardWaylandTmp);
 
 S::GUI::ClipboardWayland::ClipboardWayland(Window *iWindow)
 {

@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/gui/clipboard/backends/xlib/clipboardxlib.h>
+#include <smooth/backends/platform.h>
 #include <smooth/gui/window/backends/xlib/windowxlib.h>
 #include <smooth/backends/xlib/backendxlib.h>
 #include <smooth/gui/window/window.h>
@@ -20,7 +21,9 @@ S::GUI::ClipboardBackend *CreateClipboardXLib(S::GUI::Window *window)
 	return new S::GUI::ClipboardXLib(window);
 }
 
-S::Int	 clipboardXLibTmp = S::GUI::ClipboardBackend::SetBackend(&CreateClipboardXLib);
+static S::Int Register_clipboardXLibTmp() { return S::GUI::ClipboardBackend::SetBackend(&CreateClipboardXLib); }
+
+S::Int	 clipboardXLibTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_clipboardXLibTmp);
 
 S::GUI::ClipboardXLib::ClipboardXLib(Window *iWindow)
 {

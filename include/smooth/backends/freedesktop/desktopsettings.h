@@ -38,7 +38,7 @@ namespace smooth
 			public:
 				static Void		 BlockTimerInterrupts(Bool);
 
-				static Void		 InitDependencies();
+				static Void		 InitDependencies(const char *);
 
 				static Void		 UpdateColors();
 

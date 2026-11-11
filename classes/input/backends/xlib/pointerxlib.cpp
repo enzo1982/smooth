@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/input/backends/xlib/pointerxlib.h>
+#include <smooth/backends/platform.h>
 
 using namespace X11;
 
@@ -17,7 +18,9 @@ S::Input::PointerBackend *CreatePointerXLib()
 	return new S::Input::PointerXLib();
 }
 
-S::Int	 pointerXLibTmp = S::Input::PointerBackend::SetBackend(&CreatePointerXLib);
+static S::Int Register_pointerXLibTmp() { return S::Input::PointerBackend::SetBackend(&CreatePointerXLib); }
+
+S::Int	 pointerXLibTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_X11, &Register_pointerXLibTmp);
 
 S::Input::PointerXLib::PointerXLib()
 {

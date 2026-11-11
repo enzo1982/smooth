@@ -31,6 +31,7 @@ struct xdg_toplevel_icon_manager_v1;
 struct wp_viewporter;
 struct zxdg_output_manager_v1;
 struct zxdg_output_v1;
+struct xdg_activation_v1;
 
 namespace smooth
 {
@@ -68,6 +69,9 @@ namespace smooth
 				static xdg_toplevel_icon_manager_v1 *toplevelIconManager;
 				static wp_viewporter		*viewporter;
 				static zxdg_output_manager_v1	*xdgOutputManager;
+				static xdg_activation_v1	*activation;
+
+				static String			 launchToken;
 
 				static Float			 scale;
 
@@ -116,6 +120,12 @@ namespace smooth
 				static zwp_primary_selection_device_manager_v1 *GetPrimarySelectionManager() { return primarySelectionManager; }
 				static xdg_toplevel_icon_manager_v1 *GetToplevelIconManager() { return toplevelIconManager; }
 				static wp_viewporter	*GetViewporter()		{ return viewporter; }
+				static xdg_activation_v1 *GetActivation()		{ return activation; }
+
+				/* Get the activation token passed by the launching application.
+				 * The token is returned only once, as it can be used only once.
+				 */
+				static String		 TakeLaunchToken();
 
 				static libdecor				*GetDecorContext()	{ return decorContext; }
 

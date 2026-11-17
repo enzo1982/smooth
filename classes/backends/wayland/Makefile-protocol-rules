@@ -8,8 +8,11 @@
 
 WAYLAND_PROTOCOLS_FALLBACK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))protocols
 
+# wayland-scanner runs on the build machine, so it is located using
+# plain pkg-config rather than $(PKG_CONFIG) when cross compiling.
+
 WAYLAND_SCANNER	      = $(shell pkg-config --variable=wayland_scanner wayland-scanner)
-WAYLAND_PROTOCOLS_DIR = $(shell pkg-config --variable=pkgdatadir wayland-protocols)
+WAYLAND_PROTOCOLS_DIR = $(shell $(PKG_CONFIG) --variable=pkgdatadir wayland-protocols)
 
 include $(dir $(lastword $(MAKEFILE_LIST)))Makefile-protocols
 

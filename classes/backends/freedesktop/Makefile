@@ -12,7 +12,7 @@ OBJECTS	  =
 ifeq ($(BUILD_CAIRO),True)
 	OBJECTS += desktopsettings.o
 
-	MYCCOPTS += $(shell pkg-config --cflags gtk+-3.0)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags gtk+-3.0)
 endif
 
 ## Do not change anything below this line. ##

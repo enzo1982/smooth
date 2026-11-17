@@ -11,7 +11,7 @@ OBJECTS	  =
 ifeq ($(BUILD_WAYLAND),True)
 	OBJECTS += windowwayland.o
 
-	MYCCOPTS += $(shell pkg-config --cflags wayland-client wayland-cursor xkbcommon libdecor-0 cairo)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags wayland-client wayland-cursor xkbcommon libdecor-0 cairo)
 endif
 
 ## Do not change anything below this line. ##

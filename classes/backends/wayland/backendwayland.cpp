@@ -11,6 +11,7 @@
 #include <smooth/backends/wayland/backendwayland.h>
 #include <smooth/backends/freedesktop/desktopsettings.h>
 #include <smooth/backends/platform.h>
+#include <smooth/gui/application/application.h>
 #include <smooth/misc/math.h>
 #include <smooth/foreach.h>
 
@@ -493,10 +494,16 @@ S::Int S::Backends::BackendWayland::Dispatch()
 {
 	if (display == NIL) return -1;
 
-	/* Let libdecor dispatch if available, as
-	 * its plugins may need to process events.
+	/* Let libdecor dispatch if available, as its plugins may need to process
+	 * events. Hold the application lock while doing so, as decoration plugins
+	 * may use GTK, which other threads might use as well (e.g. for dialogs).
 	 */
-	if (decorContext != NIL) return libdecor_dispatch(decorContext, 0);
+	if (decorContext != NIL)
+	{
+		GUI::Application::Lock	 lock;
+
+		return libdecor_dispatch(decorContext, 0);
+	}
 
 	/* Read and dispatch events without blocking.
 	 */

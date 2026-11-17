@@ -24,8 +24,14 @@
 #include <smooth/misc/number.h>
 #include <smooth/foreach.h>
 
+#include "../gtkdialog.h"
+
 const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 {
+	/* Hold the application lock while using GTK.
+	 */
+	Application::Lock	 lock;
+
 	/* Create file chooser dialog.
 	 */
 	GtkWidget	*dialog = NULL;
@@ -96,7 +102,7 @@ const Error &S::GUI::Dialogs::FileSelection::ShowDialog()
 
 	/* Run dialog and check result.
 	 */
-	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	if (RunGTKDialog(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
 		GSList	*list = gtk_file_chooser_get_uris(GTK_FILE_CHOOSER(dialog));
 		GSList	*current = list;

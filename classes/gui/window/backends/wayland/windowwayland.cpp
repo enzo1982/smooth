@@ -1366,6 +1366,11 @@ S::Void S::GUI::WindowWayland::CreateRole()
 
 S::Void S::GUI::WindowWayland::CreateToplevel()
 {
+	/* Serialize libdecor calls, as decoration plugins may use GTK,
+	 * which must not be used by multiple threads concurrently.
+	 */
+	Application::Lock	 lock;
+
 	String		 appID;
 
 	for (Int i = 0; i < Object::GetNOfObjects(); i++)
@@ -1449,6 +1454,8 @@ S::Void S::GUI::WindowWayland::CreatePopup()
 
 S::Void S::GUI::WindowWayland::DestroyRole()
 {
+	Application::Lock	 lock;
+
 	if (surface == NIL) return;
 
 	/* Popups must be destroyed before their parents.
@@ -1513,6 +1520,8 @@ S::Int S::GUI::WindowWayland::Hide()
 
 S::Int S::GUI::WindowWayland::SetTitle(const String &nTitle)
 {
+	Application::Lock	 lock;
+
 	title = nTitle;
 
 	if (frame != NIL) libdecor_frame_set_title(frame, title.ConvertTo("UTF-8"));
@@ -1619,6 +1628,8 @@ const S::Array<S::String> &S::GUI::WindowWayland::GetDroppedFiles() const
 
 S::Void S::GUI::WindowWayland::UpdateSizeHints()
 {
+	Application::Lock	 lock;
+
 	Size	 logicalMin = GetRealSize(minSize) / scale;
 	Size	 logicalMax = GetRealSize(maxSize) / scale;
 
@@ -1655,6 +1666,8 @@ S::Int S::GUI::WindowWayland::SetMaximumSize(const Size &nMaxSize)
 
 S::Int S::GUI::WindowWayland::SetMetrics(const Point &nPos, const Size &nSize)
 {
+	Application::Lock	 lock;
+
 	if (!opened) return Success();
 
 	Size	 nRealSize = GetRealSize(nSize);
@@ -1742,6 +1755,8 @@ S::Void S::GUI::WindowWayland::UpdateMetrics(const Size &nRealSize, Bool forcePa
 
 S::Int S::GUI::WindowWayland::Minimize()
 {
+	Application::Lock	 lock;
+
 	if (frame != NIL) libdecor_frame_set_minimized(frame);
 
 	return Success();
@@ -1749,6 +1764,8 @@ S::Int S::GUI::WindowWayland::Minimize()
 
 S::Int S::GUI::WindowWayland::Maximize()
 {
+	Application::Lock	 lock;
+
 	if (frame != NIL) libdecor_frame_set_maximized(frame);
 
 	return Success();
@@ -1756,6 +1773,8 @@ S::Int S::GUI::WindowWayland::Maximize()
 
 S::Int S::GUI::WindowWayland::Restore()
 {
+	Application::Lock	 lock;
+
 	if (frame != NIL) libdecor_frame_unset_maximized(frame);
 
 	return Success();

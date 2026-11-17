@@ -22,8 +22,14 @@
 #include <smooth/gui/dialogs/dirdlg.h>
 #include <smooth/files/directory.h>
 
+#include "../gtkdialog.h"
+
 const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 {
+	/* Hold the application lock while using GTK.
+	 */
+	Application::Lock	 lock;
+
 	/* Create file chooser dialog.
 	 */
 	GtkWidget	*dialog = gtk_file_chooser_dialog_new(caption, NULL, GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -49,7 +55,7 @@ const Error &S::GUI::Dialogs::DirSelection::ShowDialog()
 
 	/* Run dialog and check result.
 	 */
-	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	if (RunGTKDialog(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
 		char	*name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 

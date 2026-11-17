@@ -100,6 +100,8 @@ S::Int S::GUI::Application::Loop()
 
 S::Void S::GUI::Application::SetArguments(const Array<String> &nArgs)
 {
+	args.RemoveAll();
+
 	foreach (const String &arg, nArgs)
 	{
 		/* Filter out scale factor argument.

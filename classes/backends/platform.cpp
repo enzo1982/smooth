@@ -9,9 +9,18 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/platform.h>
+#include <smooth/gui/application/application.h>
+#include <smooth/misc/args.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#if defined __FreeBSD__ || defined __DragonFly__
+#	include <sys/types.h>
+#	include <sys/sysctl.h>
+#	include <unistd.h>
+#endif
 
 namespace
 {
@@ -39,6 +48,74 @@ namespace
 
 	Probe		 probes[maxProbes];
 	int		 numProbes     = 0;
+
+	/* Pass the process command line to Application::SetArguments. Libraries
+	 * using smooth initialize it from a constructor before main runs and
+	 * before the application calls Application::SetArguments.
+	 */
+	void SetArgumentsFromCommandLine()
+	{
+		size_t	 length = 0;
+		char	*buffer = NULL;
+
+#if defined __linux__
+		FILE	*file	= fopen("/proc/self/cmdline", "rb");
+
+		if (file == NULL) return;
+
+		size_t	 size	= 0;
+
+		do
+		{
+			char	*nBuffer = (char *) realloc(buffer, size + 4096);
+
+			if (nBuffer == NULL) break;
+
+			buffer	 = nBuffer;
+			size	+= 4096;
+			length	+= fread(buffer + length, 1, size - length, file);
+		}
+		while (length == size);
+
+		fclose(file);
+#elif defined __FreeBSD__ || defined __DragonFly__
+		int	 mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ARGS, getpid() };
+
+		if (sysctl(mib, 4, NULL, &length, NULL, 0) != 0 || length == 0) return;
+
+		buffer = (char *) malloc(length);
+
+		if (buffer != NULL && sysctl(mib, 4, buffer, &length, NULL, 0) != 0) length = 0;
+#endif
+
+		if (buffer == NULL) return;
+
+		/* Arguments are separated by null characters.
+		 */
+		int	 argc = 0;
+
+		for (size_t i = 0; i < length; i++) if (buffer[i] == 0) argc++;
+
+		char	**argv = (char **) malloc(argc * sizeof(char *));
+
+		if (argc > 0 && argv != NULL)
+		{
+			char	*argument = buffer;
+
+			for (int i = 0; i < argc; i++)
+			{
+				argv[i]	  = argument;
+				argument += strlen(argument) + 1;
+			}
+
+			S::ArgumentsParser	 args(argc, argv);
+
+			S::GUI::Application::SetArguments(args.GetArguments());
+		}
+
+		free(argv);
+		free(buffer);
+	}
 };
 
 S::Short	 S::Backends::Platform::selected	       = S::Backends::PLATFORM_NONE;
@@ -94,6 +171,10 @@ const char *S::Backends::Platform::GetPlatformName(Short platform)
 S::Short S::Backends::Platform::Select()
 {
 	if (selected != PLATFORM_NONE || numProbes == 0) return selected;
+
+	/* Check the command line if no platform has been requested yet.
+	 */
+	if (requested[0] == 0) SetArgumentsFromCommandLine();
 
 	/* Honor platform requested by the user if available.
 	 */

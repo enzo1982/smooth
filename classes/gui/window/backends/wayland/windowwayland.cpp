@@ -2097,7 +2097,24 @@ S::Void S::GUI::WindowWayland::OnBufferRelease(wl_buffer *releasedBuffer)
 
 	bufferMutex->Release();
 
-	if (present) Present(presentSource, Rect());
+	if (!present) return;
+
+	/* Present the pending update. Acquire the application lock first, as other
+	 * threads may currently be drawing to the source surface or replacing it.
+	 */
+	Application::Lock	 lock;
+
+	bufferMutex->Lock();
+
+	cairo_surface_t	*source = presentPending && presentSource != NIL ? cairo_surface_reference(presentSource) : NIL;
+
+	bufferMutex->Release();
+
+	if (source == NIL) return;
+
+	Present(source, Rect());
+
+	cairo_surface_destroy(source);
 }
 
 /* Pointer input.

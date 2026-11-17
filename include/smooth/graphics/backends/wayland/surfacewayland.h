@@ -20,9 +20,7 @@ namespace smooth
 	};
 };
 
-#include "../surfacebackend.h"
-
-#include <cairo/cairo.h>
+#include "../cairo/surfacecairobase.h"
 
 namespace smooth
 {
@@ -30,54 +28,26 @@ namespace smooth
 	{
 		const Short	 SURFACE_WAYLAND = 7;
 
-		/* Cairo based surface that renders into a backbuffer
-		 * and lets the window present damaged regions.
+		/* Cairo based surface that lets the window present
+		 * damaged regions of the backbuffer.
 		 */
-		class SurfaceWayland : public SurfaceBackend
+		class SurfaceWayland : public SurfaceCairoBase
 		{
 			private:
 				static Short		 surfaceDPI;
 			protected:
-				Size			 allocSize;
-
 				WindowWayland		*window;
 
-				Array<Rect>		 paintRects;
-
-				cairo_surface_t		*paintSurface;
-				cairo_t			*paintContext;
-
-				Void			 CreateBackbuffer(const Size &);
-				Void			 DestroyBackbuffer();
-
-				Void			 Present(const Rect &);
+				cairo_surface_t		*CreateBackbufferSurface(const Size &);
 			public:
 							 SurfaceWayland(Void * = NIL, const Size & = Size());
 							~SurfaceWayland();
 
-				Int			 SetSize(const Size &);
-				const Size		&GetSize() const;
-
 				Int			 PaintRect(const Rect &);
-
-				Int			 StartPaint(const Rect &);
-				Int			 EndPaint();
 
 				Void			*GetSystemSurface() const;
 
 				Short			 GetSurfaceDPI() const;
-
-				Int			 SetPixel(const Point &, const Color &);
-
-				Int			 Line(const Point &, const Point &, const Color &);
-				Int			 Box(const Rect &, const Color &, Int, const Size &);
-
-				Int			 SetText(const String &, const Rect &, const Font &, Bool);
-
-				Int			 Gradient(const Rect &, const Color &, const Color &, Int);
-
-				Int			 BlitFromBitmap(const Bitmap &, const Rect &, const Rect &);
-				Int			 BlitToBitmap(const Rect &, Bitmap &, const Rect &);
 		};
 	};
 };

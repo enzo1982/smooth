@@ -96,10 +96,10 @@ else
 	OBJECTS += classes/gui/dialogs/file/filedlg_gtk.o
 endif
 
-# Desktop settings and Cairo fonts are shared by the XLib and Wayland backends.
+# Desktop settings and Cairo fonts and surfaces are shared by the XLib and Wayland backends.
 ifeq ($(BUILD_CAIRO),True)
 	OBJECTS += classes/backends/freedesktop/desktopsettings.o
-	OBJECTS += classes/graphics/backends/cairo/fontcairo.o
+	OBJECTS += classes/graphics/backends/cairo/fontcairo.o classes/graphics/backends/cairo/surfacecairobase.o
 endif
 
 ifeq ($(BUILD_XLIB),True)
@@ -111,7 +111,7 @@ ifeq ($(BUILD_XLIB),True)
 	OBJECTS += classes/system/backends/xlib/eventxlib.o classes/system/backends/xlib/screenxlib.o
 
 	ifeq ($(BUILD_CAIRO),True)
-		OBJECTS += classes/graphics/backends/cairo/surfacecairo.o
+		OBJECTS += classes/graphics/backends/cairo/surfacecairoxlib.o
 	else
 		OBJECTS += classes/graphics/backends/xlib/fontxlib.o classes/graphics/backends/xlib/surfacexlib.o
 	endif

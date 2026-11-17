@@ -13,7 +13,7 @@ dd.mm.yy hh:mm - smooth alpha 0.9.11
 
 - upgraded fribidi to version 1.0.17
 - upgraded libcpuid to version 0.8.0
-- upgraded libxml2 to version 2.15.1
+- upgraded libxml2 to version 2.15.4
 - upgraded libcurl to version 8.11.0
 - upgraded libiconv to version 1.19
 - upgraded libpng to version 1.6.59

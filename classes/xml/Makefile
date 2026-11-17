@@ -11,7 +11,7 @@ ifeq ($(USE_BUNDLED_LIBXML2),True)
 else ifeq ($(BUILD_OSX),True)
 	MYCCOPTS += -I$(shell xcodebuild -sdk macosx -version | grep "^Path: " | head -n 1 | tail -c +7)/usr/include/libxml2
 else
-	MYCCOPTS += $(shell pkg-config --cflags libxml-2.0)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags libxml-2.0)
 endif
 
 ifeq ($(USE_BUNDLED_LIBICONV),True)

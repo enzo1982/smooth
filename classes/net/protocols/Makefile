@@ -9,7 +9,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 ifeq ($(USE_BUNDLED_LIBCURL),True)
 	MYCCOPTS += -I"$(SRCDIR)"/$(SMOOTH_PATH)/include/support -DCURL_STATICLIB
 else ifneq ($(BUILD_OSX),True)
-	MYCCOPTS += $(shell pkg-config --cflags libcurl)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags libcurl)
 endif
 
 # Enter object files here:

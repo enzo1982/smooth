@@ -11,7 +11,7 @@ OBJECTS	  =
 ifeq ($(BUILD_WAYLAND),True)
 	OBJECTS += bitmapwayland.o surfacewayland.o
 
-	MYCCOPTS += $(shell pkg-config --cflags wayland-client pangocairo)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags wayland-client pangocairo)
 endif
 
 ## Do not change anything below this line. ##

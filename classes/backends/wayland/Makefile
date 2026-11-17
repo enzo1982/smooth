@@ -13,7 +13,7 @@ include $(SRCDIR)/Makefile-protocols
 
 	OBJECTS += backendwayland.o $(addsuffix -protocol.o,$(WAYLAND_PROTOCOL_NAMES))
 
-	MYCCOPTS += $(shell pkg-config --cflags wayland-client wayland-cursor xkbcommon libdecor-0)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags wayland-client wayland-cursor xkbcommon libdecor-0)
 endif
 
 ## Do not change anything below this line. ##

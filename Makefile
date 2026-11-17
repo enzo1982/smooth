@@ -171,7 +171,7 @@ ifeq ($(USE_BUNDLED_LIBCURL),True)
 else ifeq ($(BUILD_OSX),True)
 	LIBS += -lcurl
 else
-	LIBS += $(shell pkg-config --libs libcurl)
+	LIBS += $(shell $(PKG_CONFIG) --libs libcurl)
 endif
 
 ifeq ($(USE_BUNDLED_LIBFRIBIDI),True)
@@ -203,13 +203,13 @@ else ifeq ($(BUILD_OSX),True)
 else ifeq ($(BUILD_HAIKU),True)
 	LIBS += -lpng
 else
-	LIBS += $(shell pkg-config --libs libpng)
+	LIBS += $(shell $(PKG_CONFIG) --libs libpng)
 endif
 
 ifeq ($(USE_BUNDLED_LIBWEBP),True)
 	LIBS += $(LIBDIR)/libwebp.a
 else
-	LIBS += $(shell pkg-config --libs libwebp)
+	LIBS += $(shell $(PKG_CONFIG) --libs libwebp)
 endif
 
 ifeq ($(USE_BUNDLED_LIBXML2),True)
@@ -255,19 +255,19 @@ else
 	endif
 
 	ifneq ($(BUILD_CAIRO),True)
-		LIBS += $(shell pkg-config --libs xft)
+		LIBS += $(shell $(PKG_CONFIG) --libs xft)
 	endif
 
 	LIBS += -lpthread
 
 	ifeq ($(BUILD_XLIB),True)
-		LIBS += $(shell pkg-config --libs gtk+-x11-3.0)
+		LIBS += $(shell $(PKG_CONFIG) --libs gtk+-x11-3.0)
 	else
-		LIBS += $(shell pkg-config --libs gtk+-3.0)
+		LIBS += $(shell $(PKG_CONFIG) --libs gtk+-3.0)
 	endif
 
 	ifeq ($(BUILD_WAYLAND),True)
-		LIBS += $(shell pkg-config --libs wayland-client wayland-cursor xkbcommon libdecor-0)
+		LIBS += $(shell $(PKG_CONFIG) --libs wayland-client wayland-cursor xkbcommon libdecor-0)
 	endif
 
 	DLLNAME = $(LIBDIR)/libsmooth-$(VERSION)$(SHARED)

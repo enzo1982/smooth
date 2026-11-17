@@ -11,7 +11,7 @@ OBJECTS	  =
 ifeq ($(BUILD_WAYLAND),True)
 	OBJECTS += pointerwayland.o
 
-	MYCCOPTS += $(shell pkg-config --cflags wayland-client cairo)
+	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags wayland-client cairo)
 endif
 
 ## Do not change anything below this line. ##

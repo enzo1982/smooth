@@ -193,6 +193,10 @@ ifeq ($(LD),ld)
 	LD	= $(CXX)
 endif
 
+ifndef PKG_CONFIG
+	PKG_CONFIG = pkg-config
+endif
+
 LDCONFIG	= /sbin/ldconfig
 
 INSTALL		= install

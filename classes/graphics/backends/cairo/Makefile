@@ -23,10 +23,10 @@ endif
 OBJECTS	  = 
 
 ifeq ($(BUILD_CAIRO),True)
-	OBJECTS += fontcairo.o
+	OBJECTS += fontcairo.o surfacecairobase.o
 
 ifeq ($(BUILD_XLIB),True)
-	OBJECTS += surfacecairo.o
+	OBJECTS += surfacecairoxlib.o
 endif
 endif
 

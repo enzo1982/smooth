@@ -582,7 +582,10 @@
     <ClCompile Include="..\..\classes\graphics\backends\cairo\fontcairo.cpp">
       <Filter>Quelldateien\classes\graphics\backends\cairo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairo.cpp">
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairoxlib.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\cairo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairobase.cpp">
       <Filter>Quelldateien\classes\graphics\backends\cairo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\classes\graphics\backends\gdiplus\bitmapgdiplus.cpp">
@@ -1616,7 +1619,10 @@
     <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\fontcairo.h">
       <Filter>Headerdateien\smooth\graphics\backends\cairo</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairo.h">
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairoxlib.h">
+      <Filter>Headerdateien\smooth\graphics\backends\cairo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairobase.h">
       <Filter>Headerdateien\smooth\graphics\backends\cairo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\bitmapgdiplus.h">

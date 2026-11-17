@@ -370,7 +370,17 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairo.cpp">
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairoxlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairobase.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
@@ -1164,7 +1174,8 @@
     <ClInclude Include="..\..\include\smooth\graphics\backends\xlib\bitmapxlib.h" />
     <ClInclude Include="..\..\include\smooth\graphics\backends\xlib\surfacexlib.h" />
     <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\fontcairo.h" />
-    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairo.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairoxlib.h" />
+    <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairobase.h" />
     <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\bitmapgdiplus.h" />
     <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\fontgdiplus.h" />
     <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\surfacegdiplus.h" />

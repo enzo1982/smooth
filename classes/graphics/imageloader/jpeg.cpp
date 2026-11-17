@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2016 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -14,6 +14,8 @@
 #include <smooth/files/file.h>
 
 #include <stdio.h>
+#include <string.h>
+#include <setjmp.h>
 
 extern "C"
 {
@@ -37,6 +39,10 @@ S::GUI::ImageLoaderJPEG::~ImageLoaderJPEG()
 
 void my_error_exit(j_common_ptr cinfo)
 {
+	/* libjpeg requires error_exit not to return, so jump back to
+	 * the setjmp point in ImageLoaderJPEG::Load() passed as client data.
+	 */
+	longjmp(*(jmp_buf *) cinfo->client_data, 1);
 }
 
 const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
@@ -70,12 +76,31 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderJPEG::Load()
 	 */
 	jpeg_decompress_struct	 cinfo;
 
+	memset(&cinfo, 0, sizeof(cinfo));
+
 	/* We set up the normal JPEG error routines, then override error_exit.
 	 */
 	jpeg_error_mgr	 jerr;
+	jmp_buf		 setjmpBuffer;
 
 	cinfo.err = jpeg_std_error(&jerr);
 	cinfo.err->error_exit = my_error_exit;
+	cinfo.client_data = &setjmpBuffer;
+
+	/* Establish the setjmp return context for my_error_exit to use. If we get
+	 * here, libjpeg has signaled an error (e.g. due to corrupt data or an
+	 * unsupported color space), so clean up and return an empty bitmap.
+	 */
+	if (setjmp(setjmpBuffer))
+	{
+		jpeg_destroy_decompress(&cinfo);
+
+		if (!gotBuffer) fclose(stream);
+
+		bitmap = NIL;
+
+		return bitmap;
+	}
 
 	/* Now we can initialize the JPEG decompression object.
 	 */

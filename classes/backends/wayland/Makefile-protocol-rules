@@ -2,7 +2,11 @@
 
 # Include this file at the end of directory makefiles that need
 # Wayland protocol headers. Headers are generated in the build
-# folder from the XML files installed by wayland-protocols.
+# folder from the XML files installed by wayland-protocols. Protocols
+# missing from older wayland-protocols versions are taken from the
+# protocols folder next to this file.
+
+WAYLAND_PROTOCOLS_FALLBACK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))protocols
 
 WAYLAND_SCANNER	      = $(shell pkg-config --variable=wayland_scanner wayland-scanner)
 WAYLAND_PROTOCOLS_DIR = $(shell pkg-config --variable=pkgdatadir wayland-protocols)
@@ -12,7 +16,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))Makefile-protocols
 WAYLAND_PROTOCOL_HEADERS = $(addsuffix -client-protocol.h,$(WAYLAND_PROTOCOL_NAMES))
 WAYLAND_PROTOCOL_SOURCES = $(addsuffix -protocol.c,$(WAYLAND_PROTOCOL_NAMES))
 
-vpath %.xml $(addprefix $(WAYLAND_PROTOCOLS_DIR)/,$(dir $(WAYLAND_PROTOCOLS)))
+vpath %.xml $(addprefix $(WAYLAND_PROTOCOLS_DIR)/,$(dir $(WAYLAND_PROTOCOLS))) $(WAYLAND_PROTOCOLS_FALLBACK_DIR)
 
 MYCCOPTS += -I.
 

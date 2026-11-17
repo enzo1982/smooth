@@ -34,8 +34,6 @@
 #include <xkbcommon/xkbcommon.h>
 #include <xkbcommon/xkbcommon-compose.h>
 
-#include <linux/input-event-codes.h>
-
 #include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -45,6 +43,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+/* Wayland reports pointer buttons as Linux evdev codes on all platforms.
+ * Define them here, as <linux/input-event-codes.h> is not available on
+ * systems other than Linux.
+ */
+#define BTN_LEFT	0x110
+#define BTN_RIGHT	0x111
+#define BTN_MIDDLE	0x112
 
 using namespace smooth;
 using namespace smooth::GUI;

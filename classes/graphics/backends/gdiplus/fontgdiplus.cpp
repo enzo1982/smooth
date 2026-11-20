@@ -66,18 +66,35 @@ S::GUI::Size S::GUI::FontGDIPlus::GetTextSize(const String &text) const
 		for (Int i = 0; i < textLength; i++) if (text[i] >= 0x0590 && text[i] <= 0x05FF) { fontName = "Tahoma"; break; }
 	}
 
-	/* Set up GDI+ font and calculate text size.
+	/* Set up GDI+ font with the same pixel height GDI would use and calculate text width.
 	 */
-	Float			 dpi = Surface().GetSurfaceDPI();
+	Float			 dpi	= Surface().GetSurfaceDPI();
+	Int			 height = Math::Round(fontSize * dpi / 72.0);
 
 	Gdiplus::Graphics	 gdip_context((HWND) NIL);
-	Gdiplus::Font		 gdip_font(fontName, fontSize * dpi / 96.0, fontWeight >= Font::Bold ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular);
-	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsMeasureTrailingSpaces);
+	Gdiplus::Font		 gdip_font(fontName, height, fontWeight >= Font::Bold ? Gdiplus::FontStyleBold : Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormat::GenericTypographic());
 	Gdiplus::RectF		 gdip_rect;
 
+	gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsMeasureTrailingSpaces);
 	gdip_format.SetAlignment(Gdiplus::StringAlignmentNear);
 
 	gdip_context.MeasureString(text, -1, &gdip_font, Gdiplus::PointF(0.0, 0.0), &gdip_format, &gdip_rect);
 
-	return Size(gdip_rect.Width, gdip_rect.Height - 2);
+	/* Use GDI line metrics for the text height, so text
+	 * is laid out the same way as with the GDI backend.
+	 */
+	HDC	 dc	  = CreateCompatibleDC(NIL);
+	HFONT	 hFont	  = CreateFont(-height, 0, 0, 0, fontWeight, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, fontName);
+	HFONT	 hOldFont = (HFONT) SelectObject(dc, hFont);
+	RECT	 tRect	  = { 0, 0, 0, 0 };
+
+	DrawTextEx(dc, text, -1, &tRect, DT_EXPANDTABS | DT_NOPREFIX | DT_LEFT | DT_CALCRECT, NIL);
+
+	SelectObject(dc, hOldFont);
+	::DeleteObject(hFont);
+
+	DeleteDC(dc);
+
+	return Size(Math::Ceil(gdip_rect.Width), tRect.bottom - tRect.top);
 }

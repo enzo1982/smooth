@@ -221,42 +221,59 @@ S::Int S::GUI::SurfaceGDIPlus::Line(const Point &iPos1, const Point &iPos2, cons
 	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
 	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
 
-	/* Adjust to Windows GDI behavior for diagonal lines.
+	/* Windows GDI does not draw the end point of a line, but GDI+ does.
+	 * Move the end point back by one step along the line to compensate.
 	 */
-	if (Math::Abs(pos2.x - pos1.x) == Math::Abs(pos2.y - pos1.y))
-	{
-		if	(pos1.x < pos2.x) pos2.x--;
-		else if (pos1.x > pos2.x) pos2.x++;
+	Int	 major = Math::Max(Math::Abs(pos2.x - pos1.x), Math::Abs(pos2.y - pos1.y));
 
-		if	(pos1.y < pos2.y) pos2.y--;
-		else if (pos1.y > pos2.y) pos2.y++;
-	}
+	if (major == 0) return Success();
 
-	/* Adjust to Windows GDI behaviour for horizontal and vertical lines.
-	 */
-	if (pos1.x == pos2.x && pos1.y < pos2.y) pos2.y--;
-	if (pos1.x == pos2.x && pos1.y > pos2.y) pos1.y--;
+	Gdiplus::REAL	 endX = pos2.x - Gdiplus::REAL(pos2.x - pos1.x) / major;
+	Gdiplus::REAL	 endY = pos2.y - Gdiplus::REAL(pos2.y - pos1.y) / major;
 
-	if (pos1.y == pos2.y && pos1.x < pos2.x) pos2.x--;
-	if (pos1.y == pos2.y && pos1.x > pos2.x) pos1.x--;
+	Gdiplus::Pen		 pen(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
+	Gdiplus::SolidBrush	 brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
 
-	if (pos1 == pos2) return SetPixel(rightToLeft.TranslatePoint(pos1), color);
-
-	Gdiplus::Pen	 pen(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
+	HDC			 gdi_dc	   = NIL;
+	Gdiplus::Graphics	*pGraphics = NIL;
 
 	if (!painting)
 	{
-		HDC			 gdi_dc = GetWindowDC(window);
-		Gdiplus::Graphics	*pGraphics = new Gdiplus::Graphics(gdi_dc);
+		gdi_dc	  = GetWindowDC(window);
+		pGraphics = new Gdiplus::Graphics(gdi_dc);
+	}
 
-		pGraphics->DrawLine(&pen, pos1.x, pos1.y, pos2.x, pos2.y);
+	/* Draw a single pixel for lines of length one, as GDI+
+	 * does not draw anything for lines of length zero.
+	 */
+	if (major == 1)
+	{
+		if (!painting) pGraphics->FillRectangle(&brush, pos1.x, pos1.y, 1, 1);
 
+		paintContext->FillRectangle(&brush, pos1.x, pos1.y, 1, 1);
+	}
+	else
+	{
+		if (!painting) pGraphics->DrawLine(&pen, Gdiplus::REAL(pos1.x), Gdiplus::REAL(pos1.y), endX, endY);
+
+		/* Move the line by 1/16 pixel towards the top or left along
+		 * its minor axis to decide for pixels halfway between two rows
+		 * or columns like GDI does. GDI+ rasterizes in steps of 1/16
+		 * pixel, so smaller shifts do not reliably take effect.
+		 */
+		Bool			 xMajor = (Math::Abs(pos2.x - pos1.x) >= Math::Abs(pos2.y - pos1.y));
+		Gdiplus::REAL		 shiftX = xMajor ? 0 : -1.0f / 16;
+		Gdiplus::REAL		 shiftY = xMajor ? -1.0f / 16 : 0;
+
+		paintContext->DrawLine(&pen, pos1.x + shiftX, pos1.y + shiftY, endX + shiftX, endY + shiftY);
+	}
+
+	if (!painting)
+	{
 		delete pGraphics;
 
 		ReleaseDC(window, gdi_dc);
 	}
-
-	paintContext->DrawLine(&pen, pos1.x, pos1.y, pos2.x, pos2.y);
 
 	return Success();
 }
@@ -361,14 +378,21 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 		for (Int i = 0; i < stringLength; i++) if (string[i] >= 0x0590 && string[i] <= 0x05FF) { font.SetName("Tahoma"); break; }
 	}
 
-	/* Set up GDI+ font.
+	/* Set up GDI+ font with the same pixel height GDI would use.
 	 */
-	Gdiplus::Font		 gdip_font(font.GetName(), fontSize.TranslateY(font.GetSize()), (font.GetWeight() >= Font::Bold    ? Gdiplus::FontStyleBold	 : Gdiplus::FontStyleRegular) |
-												(font.GetStyle() & Font::Italic    ? Gdiplus::FontStyleItalic    : Gdiplus::FontStyleRegular) |
-												(font.GetStyle() & Font::Underline ? Gdiplus::FontStyleUnderline : Gdiplus::FontStyleRegular) |
-												(font.GetStyle() & Font::StrikeOut ? Gdiplus::FontStyleStrikeout : Gdiplus::FontStyleRegular));
+	Int			 height	   = Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0);
+
+	/* GDI+ places the baseline of Segoe UI one pixel lower than GDI
+	 * at small sizes (up to 12 pixels, i.e. 9pt at 100% scaling).
+	 */
+	Int			 baseline  = (font.GetName() == "Segoe UI" && height <= 12) ? -1 : 0;
+
+	Gdiplus::Font		 gdip_font(font.GetName(), height, (font.GetWeight() >= Font::Bold    ? Gdiplus::FontStyleBold	 : Gdiplus::FontStyleRegular) |
+								   (font.GetStyle() & Font::Italic    ? Gdiplus::FontStyleItalic    : Gdiplus::FontStyleRegular) |
+								   (font.GetStyle() & Font::Underline ? Gdiplus::FontStyleUnderline : Gdiplus::FontStyleRegular) |
+								   (font.GetStyle() & Font::StrikeOut ? Gdiplus::FontStyleStrikeout : Gdiplus::FontStyleRegular), Gdiplus::UnitPixel);
 	Gdiplus::SolidBrush	 gdip_brush(Gdiplus::Color(color.GetRed(), color.GetGreen(), color.GetBlue()));
-	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormatFlagsNoWrap);
+	Gdiplus::StringFormat	 gdip_format(Gdiplus::StringFormat::GenericTypographic());
 
 	HDC			 gdi_dc	   = NIL;
 	Gdiplus::Graphics	*pGraphics = NIL;
@@ -397,7 +421,7 @@ S::Int S::GUI::SurfaceGDIPlus::SetText(const String &string, const Rect &iRect, 
 		for (Int i = 0; i < lineLength; i++) if (line[i] >= 0x0590 && line[i] <= 0x08FF) { rtlCharacters = True; break; }
 
 		Rect		 tRect = rightToLeft.TranslateRect(rect);
-		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top, tRect.GetWidth() + 2, tRect.GetHeight());
+		Gdiplus::RectF	 gdip_rect(tRect.left, tRect.top + baseline, tRect.GetWidth() + 2, tRect.GetHeight());
 
 		if (rtlCharacters) gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsDirectionRightToLeft);
 		else		   gdip_format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);

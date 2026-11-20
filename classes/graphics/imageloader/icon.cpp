@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -11,10 +11,6 @@
 #include <smooth/graphics/imageloader/icon.h>
 #include <smooth/backends/win32/backendwin32.h>
 #include <smooth/init.win32.h>
-
-#ifdef HAVE_GDIPLUS
-#	include <gdiplus.h>
-#endif
 
 S::GUI::ImageLoaderIcon::ImageLoaderIcon(const String &iFileName) : ImageLoader(iFileName)
 {
@@ -38,86 +34,78 @@ const S::GUI::Bitmap &S::GUI::ImageLoaderIcon::Load()
 	else if (iconID >= 20000 && iconID <= 20999) icon = (HICON) LoadImage(hDllInstance, MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 	else					     icon = (HICON) LoadImage(hInstance,    MAKEINTRESOURCE(iconID), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 
-	/* Create bitmap and draw icon.
+	if (icon == NIL) return bitmap;
+
+	/* Draw icon to a 32 bit DIB section. We do this
+	 * independently of the active graphics backend.
 	 */
-	Size	 size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
+	Size		 size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
 
-	bitmap.CreateBitmap(size, 32);
+	BITMAPINFO	 bmpInfo;
 
-#ifdef HAVE_GDIPLUS
-	Gdiplus::Bitmap		*gdipBitmap = (Gdiplus::Bitmap *) bitmap.GetSystemBitmap();
-	Gdiplus::Graphics	 graphics(gdipBitmap);
+	ZeroMemory(&bmpInfo, sizeof(bmpInfo));
 
-	graphics.Clear(Gdiplus::Color::Transparent);
+	bmpInfo.bmiHeader.biSize	= sizeof(bmpInfo.bmiHeader);
+	bmpInfo.bmiHeader.biWidth	= size.cx;
+	bmpInfo.bmiHeader.biHeight	= -size.cy;
+	bmpInfo.bmiHeader.biPlanes	= 1;
+	bmpInfo.bmiHeader.biBitCount	= 32;
+	bmpInfo.bmiHeader.biCompression	= BI_RGB;
 
-	HDC	 dc = graphics.GetHDC();
-#else
-	HDC	 dc = CreateCompatibleDC(NIL);
-	HBITMAP	 backup = (HBITMAP) SelectObject(dc, bitmap.GetSystemBitmap());
-#endif
+	UnsignedInt32	*pixels = NIL;
+	HBITMAP		 dib	= CreateDIBSection(NIL, &bmpInfo, DIB_RGB_COLORS, (Void **) &pixels, NIL, 0);
+
+	if (dib == NIL) return bitmap;
+
+	HDC		 dc	= CreateCompatibleDC(NIL);
+	HBITMAP		 backup	= (HBITMAP) SelectObject(dc, dib);
+	Int		 count	= size.cx * size.cy;
+
+	ZeroMemory(pixels, count * sizeof(UnsignedInt32));
 
 	DrawIconEx(dc, 0, 0, icon, 0, 0, 0, NIL, DI_DEFAULTSIZE | DI_IMAGE | DI_MASK);
 
-	/* Fix alpha channel for 8 bit icons.
+	GdiFlush();
+
+	/* Fix alpha channel for icons without one.
 	 */
-	if (!IsAlphaChannelSet())
+	Bool	 alphaSet = False;
+
+	for (Int i = 0; i < count && !alphaSet; i++) if (pixels[i] >> 24 != 0) alphaSet = True;
+
+	if (!alphaSet)
 	{
-		SetBackgroundColor(Setup::BackgroundColor);
+		Color		 background = Setup::BackgroundColor;
+		UnsignedInt32	 fill	    = background.GetRed() << 16 | background.GetGreen() << 8 | background.GetBlue();
+
+		for (Int i = 0; i < count; i++) pixels[i] = fill;
 
 		DrawIconEx(dc, 0, 0, icon, 0, 0, 0, NIL, DI_DEFAULTSIZE | DI_IMAGE | DI_MASK);
 
-		SetAlphaChannel(255);
+		GdiFlush();
+
+		for (Int i = 0; i < count; i++) pixels[i] |= 0xFF000000;
+	}
+
+	/* Copy pixels to the target bitmap.
+	 */
+	bitmap.CreateBitmap(size, 32);
+
+	for (Int y = 0; y < size.cy; y++)
+	{
+		for (Int x = 0; x < size.cx; x++)
+		{
+			UnsignedInt32	 pixel = pixels[y * size.cx + x];
+
+			bitmap.SetPixel(Point(x, y), Color((pixel & 0xFF000000) | (pixel & 0xFF) << 16 | (pixel & 0xFF00) | (pixel >> 16 & 0xFF), Color::RGBA));
+		}
 	}
 
 	/* Clean up.
 	 */
-#ifdef HAVE_GDIPLUS
-	graphics.ReleaseHDC(dc);
-#else
 	SelectObject(dc, backup);
 	DeleteDC(dc);
-#endif
+	DeleteObject(dib);
 
 	return bitmap;
-}
-
-S::Bool S::GUI::ImageLoaderIcon::IsAlphaChannelSet() const
-{
-	Size	 size = bitmap.GetSize();
-
-	for (Int x = 0; x < size.cx; x++)
-	{
-		for (Int y = 0; y < size.cy; y++)
-		{
-			if (bitmap.GetPixel(Point(x, y)).GetAlpha() != 0) return True;
-		}
-	}
-
-	return False;
-}
-
-S::Void S::GUI::ImageLoaderIcon::SetBackgroundColor(const Color &color)
-{
-	Size	 size = bitmap.GetSize();
-
-	for (Int x = 0; x < size.cx; x++)
-	{
-		for (Int y = 0; y < size.cy; y++)
-		{
-			bitmap.SetPixel(Point(x, y), color);
-		}
-	}
-}
-
-S::Void S::GUI::ImageLoaderIcon::SetAlphaChannel(Int value)
-{
-	Size	 size = bitmap.GetSize();
-
-	for (Int x = 0; x < size.cx; x++)
-	{
-		for (Int y = 0; y < size.cy; y++)
-		{
-			bitmap.SetPixel(Point(x, y), Color(value << 24 | bitmap.GetPixel(Point(x, y)), Color::RGBA));
-		}
-	}
 }

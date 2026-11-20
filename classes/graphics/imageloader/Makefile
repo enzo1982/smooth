@@ -26,10 +26,6 @@ else
 	MYCCOPTS += $(shell $(PKG_CONFIG) --cflags libwebp)
 endif
 
-ifeq ($(BUILD_GDIPLUS),True)
-	MYCCOPTS += -D HAVE_GDIPLUS=1
-endif
-
 # Enter object files here:
 OBJECTS	  = imageloader.o jpeg.o pci.o png.o webp.o
 

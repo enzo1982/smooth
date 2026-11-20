@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2021 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/win32/backendwin32.h>
+#include <smooth/backends/platform.h>
 #include <smooth/graphics/backends/gdi/surfacegdi.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -24,7 +25,15 @@ S::GUI::SurfaceBackend *CreateSurfaceGDI(S::Void *iSurface, const S::GUI::Size &
 	return new S::GUI::SurfaceGDI(iSurface, maxSize);
 }
 
-S::Int		 surfaceGDITmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceGDI);
+static S::Bool ProbeGDI()
+{
+	return S::True;
+}
+
+static S::Int Register_surfaceGDITmp() { return S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceGDI); }
+
+S::Int		 surfaceGDITmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDI, &Register_surfaceGDITmp);
+S::Int		 surfaceGDIProbeTmp = S::Backends::Platform::AddProbe(S::Backends::PLATFORM_GDI, 2, &ProbeGDI);
 
 S::Short	 S::GUI::SurfaceGDI::surfaceDPI = -1;
 

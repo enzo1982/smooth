@@ -179,7 +179,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -194,7 +194,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -211,7 +211,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -228,7 +228,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -248,7 +248,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SMOOTH_DLL;FRIBIDI_LIB_STATIC;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcpuid.lib;libbz2.lib;libcurl.lib;fribidi.lib;libxml2.lib;iconv.lib;libjpeg.lib;libpng.lib;libwebp.lib;zlib.lib;imm32.lib;msimg32.lib;gdiplus.lib;ws2_32.lib;wldap32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <DataExecutionPrevention>
@@ -265,16 +265,7 @@
     <ClCompile Include="..\..\classes\basic\setup.cpp" />
     <ClCompile Include="..\..\classes\backends\backend.cpp" />
     <ClCompile Include="..\..\classes\backends\platform.cpp" />
-    <ClCompile Include="..\..\classes\backends\gdiplus\backendgdiplus.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\classes\backends\gdiplus\backendgdiplus.cpp" />
     <ClCompile Include="..\..\classes\backends\win32\backendwin32.cpp" />
     <ClCompile Include="..\..\classes\backends\xlib\backendxlib.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -390,36 +381,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\bitmapgdiplus.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\fontgdiplus.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\surfacegdiplus.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\bitmapgdiplus.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\fontgdiplus.cpp" />
+    <ClCompile Include="..\..\classes\graphics\backends\gdiplus\surfacegdiplus.cpp" />
     <ClCompile Include="..\..\classes\graphics\modifiers\fontsize.cpp" />
     <ClCompile Include="..\..\classes\graphics\modifiers\righttoleft.cpp" />
     <ClCompile Include="..\..\classes\gui\clipboard\backends\haiku\clipboardhaiku.cpp">

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/gdiplus/bitmapgdiplus.h>
+#include <smooth/backends/platform.h>
 
 S::GUI::BitmapBackend *CreateBitmapGDIPlus_pV(S::Void *iBitmap)
 {
@@ -30,10 +31,21 @@ S::GUI::BitmapBackend *CreateBitmapGDIPlus_crB(const S::GUI::BitmapBackend &iBit
 	return new S::GUI::BitmapGDIPlus((const S::GUI::BitmapGDIPlus &) iBitmap);
 }
 
-S::Int	 bitmapGDIPlusTmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_pV);
-S::Int	 bitmapGDIPlusTmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_crSI);
-S::Int	 bitmapGDIPlusTmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_cI);
-S::Int	 bitmapGDIPlusTmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_crB);
+static S::Int Register_bitmapGDIPlusTmp_pV() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_pV); }
+
+S::Int	 bitmapGDIPlusTmp_pV	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDIPLUS, &Register_bitmapGDIPlusTmp_pV);
+
+static S::Int Register_bitmapGDIPlusTmp_crSI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_crSI); }
+
+S::Int	 bitmapGDIPlusTmp_crSI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDIPLUS, &Register_bitmapGDIPlusTmp_crSI);
+
+static S::Int Register_bitmapGDIPlusTmp_cI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_cI); }
+
+S::Int	 bitmapGDIPlusTmp_cI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDIPLUS, &Register_bitmapGDIPlusTmp_cI);
+
+static S::Int Register_bitmapGDIPlusTmp_crB() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDIPlus_crB); }
+
+S::Int	 bitmapGDIPlusTmp_crB	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDIPLUS, &Register_bitmapGDIPlusTmp_crB);
 
 S::GUI::BitmapGDIPlus::BitmapGDIPlus(Void *iBitmap)
 {

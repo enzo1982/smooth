@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/win32/backendwin32.h>
+#include <smooth/backends/platform.h>
 #include <smooth/graphics/backends/gdiplus/surfacegdiplus.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/graphics/bitmap.h>
@@ -22,7 +23,9 @@ S::GUI::SurfaceBackend *CreateSurfaceGDIPlus(S::Void *iSurface, const S::GUI::Si
 	return new S::GUI::SurfaceGDIPlus(iSurface, maxSize);
 }
 
-S::Int		 surfaceGDIPlusTmp = S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceGDIPlus);
+static S::Int Register_surfaceGDIPlusTmp() { return S::GUI::SurfaceBackend::SetBackend(&CreateSurfaceGDIPlus); }
+
+S::Int		 surfaceGDIPlusTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDIPLUS, &Register_surfaceGDIPlusTmp);
 
 S::Short	 S::GUI::SurfaceGDIPlus::surfaceDPI = -1;
 

@@ -20,6 +20,7 @@
 #include <smooth/threads/thread.h>
 #include <smooth/foreach.h>
 #include <smooth/backends/win32/backendwin32.h>
+#include <smooth/graphics/backends/gdiplus/bitmapgdiplus.h>
 
 #if !defined SM_CXPADDEDBORDER
 #	define SM_CXPADDEDBORDER 92
@@ -817,6 +818,19 @@ S::Int S::GUI::WindowGDI::SetIcon(const Bitmap &newIcon)
 	 */
 	Size	 iconSize	  = Size(GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
 	Bitmap	 iconScaled	  = newIcon.Scale(iconSize);
+
+	/* Let GDI+ create the icon from GDI+ bitmaps.
+	 */
+	if (iconScaled.GetBitmapType() == BITMAP_GDIPLUS)
+	{
+		HICON	 hIcon = NIL;
+		Bool	 ok    = (((Gdiplus::Bitmap *) iconScaled.GetSystemBitmap())->GetHICON(&hIcon) == Gdiplus::Ok);
+
+		sysIcon	    = ok ? hIcon : NIL;
+		destroyIcon = ok;
+
+		return ok ? Success() : Error();
+	}
 
 	/* Set up alpha mask.
 	 */

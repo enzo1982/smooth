@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/backends/win32/backendwin32.h>
+#include <smooth/backends/platform.h>
 #include <smooth/graphics/backends/gdiplus/fontgdiplus.h>
 #include <smooth/graphics/surface.h>
 #include <smooth/init.h>
@@ -20,7 +21,9 @@ S::GUI::FontBackend *CreateFontGDIPlus(const S::String &iFontName, S::Short iFon
 	return new S::GUI::FontGDIPlus(iFontName, iFontSize, iFontWeight, iFontStyle, iFontColor);
 }
 
-S::Int	 fontGDIPlusTmp = S::GUI::FontBackend::SetBackend(&CreateFontGDIPlus);
+static S::Int Register_fontGDIPlusTmp() { return S::GUI::FontBackend::SetBackend(&CreateFontGDIPlus); }
+
+S::Int	 fontGDIPlusTmp = S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDIPLUS, &Register_fontGDIPlusTmp);
 
 S::Int	 addFontGDIPlusInitTmp = S::AddInitFunction(&S::GUI::FontGDIPlus::Initialize);
 

@@ -14,9 +14,7 @@ endif
 OBJECTS	  = 
 
 ifeq ($(BUILD_WIN32),True)
-ifneq ($(BUILD_GDIPLUS),True)
 	OBJECTS += bitmapgdi.o fontgdi.o surfacegdi.o
-endif
 endif
 
 ## Do not change anything below this line. ##

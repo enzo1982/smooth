@@ -16,7 +16,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined __FreeBSD__ || defined __DragonFly__
+#if defined __WIN32__
+#	include <windows.h>
+#elif defined __FreeBSD__ || defined __DragonFly__
 #	include <sys/types.h>
 #	include <sys/sysctl.h>
 #	include <unistd.h>
@@ -55,6 +57,11 @@ namespace
 	 */
 	void SetArgumentsFromCommandLine()
 	{
+#if defined __WIN32__
+		S::ArgumentsParser	 args(GetCommandLineW());
+
+		S::GUI::Application::SetArguments(args.GetArguments());
+#else
 		size_t	 length = 0;
 		char	*buffer = NULL;
 
@@ -115,6 +122,7 @@ namespace
 
 		free(argv);
 		free(buffer);
+#endif
 	}
 };
 
@@ -164,6 +172,8 @@ const char *S::Backends::Platform::GetPlatformName(Short platform)
 {
 	if	(platform == PLATFORM_X11)     return "x11";
 	else if (platform == PLATFORM_WAYLAND) return "wayland";
+	else if (platform == PLATFORM_GDI)     return "gdi";
+	else if (platform == PLATFORM_GDIPLUS) return "gdi+";
 
 	return "none";
 }
@@ -184,6 +194,9 @@ S::Short S::Backends::Platform::Select()
 
 		if	(strcmp(requested, "x11")     == 0) platform = PLATFORM_X11;
 		else if (strcmp(requested, "wayland") == 0) platform = PLATFORM_WAYLAND;
+		else if (strcmp(requested, "gdi")     == 0) platform = PLATFORM_GDI;
+		else if (strcmp(requested, "gdi+")    == 0 ||
+			 strcmp(requested, "gdiplus") == 0) platform = PLATFORM_GDIPLUS;
 
 		Int	 index = GetProbeIndex(platform);
 

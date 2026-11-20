@@ -8,7 +8,7 @@ include $(dir $(firstword $(MAKEFILE_LIST)))/$(SMOOTH_PATH)/Makefile-options
 # Enter object files here:
 OBJECTS	  = 
 
-ifeq ($(BUILD_GDIPLUS),True)
+ifeq ($(BUILD_WIN32),True)
 	OBJECTS += bitmapgdiplus.o fontgdiplus.o surfacegdiplus.o
 endif
 

@@ -96,9 +96,6 @@ ifneq ($(findstring MINGW,$(UNAME)),)
 
 #	Build using Win32 backends
 	BUILD_WIN32 = True
-
-#	Disable GDI+ backend by default
-	BUILD_GDIPLUS = False
 else
 #	Set executable and shared object extensions
 	EXECUTABLE = 

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -9,6 +9,7 @@
   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <smooth/graphics/backends/gdi/bitmapgdi.h>
+#include <smooth/backends/platform.h>
 
 S::GUI::BitmapBackend *CreateBitmapGDI_pV(S::Void *iBitmap)
 {
@@ -30,10 +31,21 @@ S::GUI::BitmapBackend *CreateBitmapGDI_crB(const S::GUI::BitmapBackend &iBitmap)
 	return new S::GUI::BitmapGDI((const S::GUI::BitmapGDI &) iBitmap);
 }
 
-S::Int	 bitmapGDITmp_pV	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_pV);
-S::Int	 bitmapGDITmp_crSI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crSI);
-S::Int	 bitmapGDITmp_cI	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_cI);
-S::Int	 bitmapGDITmp_crB	= S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crB);
+static S::Int Register_bitmapGDITmp_pV() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_pV); }
+
+S::Int	 bitmapGDITmp_pV	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDI, &Register_bitmapGDITmp_pV);
+
+static S::Int Register_bitmapGDITmp_crSI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crSI); }
+
+S::Int	 bitmapGDITmp_crSI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDI, &Register_bitmapGDITmp_crSI);
+
+static S::Int Register_bitmapGDITmp_cI() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_cI); }
+
+S::Int	 bitmapGDITmp_cI	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDI, &Register_bitmapGDITmp_cI);
+
+static S::Int Register_bitmapGDITmp_crB() { return S::GUI::BitmapBackend::SetBackend(&CreateBitmapGDI_crB); }
+
+S::Int	 bitmapGDITmp_crB	= S::Backends::Platform::AddComponent(S::Backends::PLATFORM_GDI, &Register_bitmapGDITmp_crB);
 
 S::GUI::BitmapGDI::BitmapGDI(Void *iBitmap)
 {

@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -225,14 +225,10 @@ S::Int S::GUI::SurfaceHaiku::SetPixel(const Point &iPoint, const Color &color)
 
 	Point	 point = rightToLeft.TranslatePoint(iPoint);
 
-	if (!painting)
-	{
-		view->SetHighColor(color.GetRed(), color.GetGreen(), color.GetBlue());
-		view->FillRect(BRect(point.x, point.y, point.x, point.y));
-	}
-
 	bitmapView->SetHighColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 	bitmapView->FillRect(BRect(point.x, point.y, point.x, point.y));
+
+	if (!painting) PaintRect(Rect(point, Size(1, 1)));
 
 	return Success();
 }
@@ -263,16 +259,11 @@ S::Int S::GUI::SurfaceHaiku::Line(const Point &iPos1, const Point &iPos2, const 
 	if (pos1.y == pos2.y && pos1.x < pos2.x) pos2.x--;
 	if (pos1.y == pos2.y && pos1.x > pos2.x) pos1.x--;
 
-	if (!painting)
-	{
-		view->SetHighColor(color.GetRed(), color.GetGreen(), color.GetBlue());
-		view->MovePenTo(BPoint(pos1.x, pos1.y));
-		view->StrokeLine(BPoint(pos2.x, pos2.y));
-	}
-
 	bitmapView->SetHighColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 	bitmapView->MovePenTo(BPoint(pos1.x, pos1.y));
 	bitmapView->StrokeLine(BPoint(pos2.x, pos2.y));
+
+	if (!painting) PaintRect(Rect(Point(Math::Min(pos1.x, pos2.x), Math::Min(pos1.y, pos2.y)), Size(Math::Abs(pos2.x - pos1.x) + 1, Math::Abs(pos2.y - pos1.y) + 1)));
 
 	return Success();
 }
@@ -283,39 +274,35 @@ S::Int S::GUI::SurfaceHaiku::Box(const Rect &iRect, const Color &color, Int styl
 
 	Rect	 rect = rightToLeft.TranslateRect(iRect) - Size(1, 1);
 
-	if (!painting) view->SetHighColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 	bitmapView->SetHighColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 
 	if (style & Rect::Filled)
 	{
 		if (style & Rect::Rounded)
 		{
-			if (!painting) view->FillRoundRect(BRect(rect.left, rect.top, rect.right, rect.bottom), ellipse.cx, ellipse.cy);
 			bitmapView->FillRoundRect(BRect(rect.left, rect.top, rect.right, rect.bottom), ellipse.cx, ellipse.cy);
 		}
 		else
 		{
-			if (!painting) view->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom));
 			bitmapView->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom));
 		}
 	}
 	else if (style == Rect::Outlined)
 	{
-		if (!painting) view->StrokeRect(BRect(rect.left, rect.top, rect.right, rect.bottom));
 		bitmapView->StrokeRect(BRect(rect.left, rect.top, rect.right, rect.bottom));
 	}
 	else if (style & Rect::Inverted)
 	{
-		if (!painting) view->InvertRect(BRect(rect.left, rect.top, rect.right, rect.bottom));
 		bitmapView->InvertRect(BRect(rect.left, rect.top, rect.right, rect.bottom));
 	}
 	else if (style & Rect::Dotted)
 	{
 		pattern	 pattern = {{ 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA }};
 
-		if (!painting) view->StrokeRect(BRect(rect.left, rect.top, rect.right, rect.bottom), pattern);
 		bitmapView->StrokeRect(BRect(rect.left, rect.top, rect.right, rect.bottom), pattern);
 	}
+
+	if (!painting) PaintRect(rightToLeft.TranslateRect(iRect));
 
 	return Success();
 }
@@ -345,15 +332,6 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 	Rect	 tRect = rightToLeft.TranslateRect(rect);
 	BRegion	 clippingRegion(BRect(tRect.left, tRect.top, tRect.right, tRect.bottom));
 
-	if (!painting)
-	{
-		view->PushState();
-		view->SetFont(&viewFont);
-		view->SetDrawingMode(B_OP_OVER);
-		view->SetHighColor(font.GetColor().GetRed(), font.GetColor().GetGreen(), font.GetColor().GetBlue());
-		view->ConstrainClippingRegion(&clippingRegion);
-	}
-
 	bitmapView->PushState();
 	bitmapView->SetFont(&viewFont);
 	bitmapView->GetFontHeight(&height);
@@ -373,16 +351,14 @@ S::Int S::GUI::SurfaceHaiku::SetText(const String &string, const Rect &iRect, co
 
 		tRect.left = rightToLeft.GetRightToLeft() ? tRect.right - font.GetScaledTextSizeX(line) : tRect.left;
 
-		if (!painting) view->DrawString(line.ConvertTo("UTF-8"), BPoint(tRect.left, tRect.top + height.ascent));
-
 		bitmapView->DrawString(line.ConvertTo("UTF-8"), BPoint(tRect.left, tRect.top + height.ascent));
 
 		rect.top += lineHeight;
 	}
 
-	if (!painting) view->PopState();
-
 	bitmapView->PopState();
+
+	if (!painting) PaintRect(tRect);
 
 	return Success();
 }
@@ -406,10 +382,11 @@ S::Int S::GUI::SurfaceHaiku::Gradient(const Rect &iRect, const Color &color1, co
 	gradient->AddColorStop(BGradient::ColorStop(c1.GetRed(), c1.GetGreen(), c1.GetBlue(), 255, 0), 0);
 	gradient->AddColorStop(BGradient::ColorStop(c2.GetRed(), c2.GetGreen(), c2.GetBlue(), 255, 255), 1);
 
-	if (!painting) view->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom), *gradient);
 	bitmapView->FillRect(BRect(rect.left, rect.top, rect.right, rect.bottom), *gradient);
 
 	delete gradient;
+
+	if (!painting) PaintRect(rightToLeft.TranslateRect(iRect));
 
 	return Success();
 }
@@ -428,14 +405,10 @@ S::Int S::GUI::SurfaceHaiku::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 	 */
 	drawing_mode	 drawingMode = bitmap.GetDepth() == 32 ? B_OP_ALPHA : B_OP_COPY;
 
-	if (!painting) view->SetDrawingMode(drawingMode);
-
 	bitmapView->SetDrawingMode(drawingMode);
 
 	if (destRect.GetSize() == srcRect.GetSize())
 	{
-		if (!painting) view->DrawBitmap((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
-
 		bitmapView->DrawBitmap((BBitmap *) bitmap.GetSystemBitmap(), BRect(srcRect.left, srcRect.top, srcRect.right, srcRect.bottom), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
 	}
 	else
@@ -449,10 +422,10 @@ S::Int S::GUI::SurfaceHaiku::BlitFromBitmap(const Bitmap &bitmap, const Rect &sr
 		Size		 srcSize      = bitmap.GetSize();
 		const Bitmap	&scaledBitmap = bitmap.Scale(Size(Float(srcSize.cx) / scaleFactorX, Float(srcSize.cy) / scaleFactorY));
 
-		if (!painting) view->DrawBitmap((BBitmap *) scaledBitmap.GetSystemBitmap(), BRect(Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.right) / scaleFactorX, Float(srcRect.bottom) / scaleFactorY), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
-
 		bitmapView->DrawBitmap((BBitmap *) scaledBitmap.GetSystemBitmap(), BRect(Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.right) / scaleFactorX, Float(srcRect.bottom) / scaleFactorY), BRect(destRect.left, destRect.top, destRect.right, destRect.bottom), B_FILTER_BITMAP_BILINEAR);
 	}
+
+	if (!painting) PaintRect(destRect);
 
 	return Success();
 }

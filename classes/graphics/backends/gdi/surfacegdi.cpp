@@ -195,16 +195,9 @@ S::Int S::GUI::SurfaceGDI::SetPixel(const Point &iPoint, const Color &color)
 
 	Point	 point = rightToLeft.TranslatePoint(iPoint);
 
-	if (!painting)
-	{
-		HDC	 gdi_dc = GetWindowDC(window);
-
-		::SetPixel(gdi_dc, point.x, point.y, color);
-
-		ReleaseDC(window, gdi_dc);
-	}
-
 	::SetPixel(paintContext, point.x, point.y, color);
+
+	if (!painting) PaintRect(Rect(point, Size(1, 1)));
 
 	return Success();
 }
@@ -216,31 +209,17 @@ S::Int S::GUI::SurfaceGDI::Line(const Point &iPos1, const Point &iPos2, const Co
 	Point	 pos1 = rightToLeft.TranslatePoint(iPos1);
 	Point	 pos2 = rightToLeft.TranslatePoint(iPos2);
 
-	HPEN	 hPen = CreatePen(PS_SOLID, 1, color);
-	HPEN	 hOldPen = NIL;
-
-	if (!painting)
-	{
-		HDC	 gdi_dc = GetWindowDC(window);
-
-		hOldPen = (HPEN) SelectObject(gdi_dc, hPen);
-
-		MoveToEx(gdi_dc, pos1.x, pos1.y, NIL);
-		LineTo(gdi_dc, pos2.x, pos2.y);
-
-		hPen = (HPEN) SelectObject(gdi_dc, hOldPen);
-
-		ReleaseDC(window, gdi_dc);
-	}
-
-	hOldPen = (HPEN) SelectObject(paintContext, hPen);
+	HPEN	 hPen	 = CreatePen(PS_SOLID, 1, color);
+	HPEN	 hOldPen = (HPEN) SelectObject(paintContext, hPen);
 
 	MoveToEx(paintContext, pos1.x, pos1.y, NIL);
 	LineTo(paintContext, pos2.x, pos2.y);
 
-	hPen = (HPEN) SelectObject(paintContext, hOldPen);
+	SelectObject(paintContext, hOldPen);
 
 	::DeleteObject(hPen);
+
+	if (!painting) PaintRect(Rect(Point(Math::Min(pos1.x, pos2.x), Math::Min(pos1.y, pos2.y)), Size(Math::Abs(pos2.x - pos1.x) + 1, Math::Abs(pos2.y - pos1.y) + 1)));
 
 	return Success();
 }
@@ -251,7 +230,6 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 
 	Rect	 rect	= rightToLeft.TranslateRect(iRect);
 
-	HDC	 gdi_dc = painting ? NIL : GetWindowDC(window);
 	HBRUSH	 brush	= CreateSolidBrush(color);
 	RECT	 wRect	= { rect.left, rect.top, rect.right, rect.bottom };
 
@@ -259,55 +237,32 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 	{
 		if (style & Rect::Rounded)
 		{
-			HPEN	 pen = CreatePen(PS_SOLID, 0, color);
-
-			if (!painting)
-			{
-				HBRUSH	 previousBrush	= (HBRUSH) SelectObject(gdi_dc, brush);
-				HPEN	 previousPen	= (HPEN) SelectObject(gdi_dc, pen);
-
-				RoundRect(gdi_dc, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
-
-				brush	= (HBRUSH) SelectObject(gdi_dc, previousBrush);
-				pen	= (HPEN) SelectObject(gdi_dc, previousPen);
-			}
-
+			HPEN	 pen		= CreatePen(PS_SOLID, 0, color);
 			HBRUSH	 previousBrush	= (HBRUSH) SelectObject(paintContext, brush);
 			HPEN	 previousPen	= (HPEN) SelectObject(paintContext, pen);
 
 			RoundRect(paintContext, rect.left, rect.top, rect.right, rect.bottom, ellipse.cx, ellipse.cy);
 
-			brush	= (HBRUSH) SelectObject(paintContext, previousBrush);
-			pen	= (HPEN) SelectObject(paintContext, previousPen);
+			SelectObject(paintContext, previousBrush);
+			SelectObject(paintContext, previousPen);
 
 			::DeleteObject(pen);
 		}
 		else
 		{
-			if (!painting) FillRect(gdi_dc, &wRect, brush);
 			FillRect(paintContext, &wRect, brush);
 		}
 	}
 	else if (style == Rect::Outlined)
 	{
-		if (!painting) FrameRect(gdi_dc, &wRect, brush);
 		FrameRect(paintContext, &wRect, brush);
 	}
 	else if (style & Rect::Inverted)
 	{
-		if (!painting) InvertRect(gdi_dc, &wRect);
 		InvertRect(paintContext, &wRect);
 	}
 	else if (style & Rect::Dotted)
 	{
-		if (!painting)
-		{
-			for (Int x = rect.left						    + 1; x <  rect.right;  x += 2) ::SetPixel(gdi_dc, x, rect.top, color);
-			for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2; y <  rect.bottom; y += 2) ::SetPixel(gdi_dc, rect.right - 1, y, color);
-			for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2; x >= rect.left;   x -= 2) ::SetPixel(gdi_dc, x, rect.bottom - 1, color);
-			for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1; y >= rect.top;	   y -= 2) ::SetPixel(gdi_dc, rect.left, y, color);
-		}
-
 		for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) ::SetPixel(paintContext, x, rect.top, color);
 		for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) ::SetPixel(paintContext, rect.right - 1, y, color);
 		for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) ::SetPixel(paintContext, x, rect.bottom - 1, color);
@@ -316,7 +271,7 @@ S::Int S::GUI::SurfaceGDI::Box(const Rect &iRect, const Color &color, Int style,
 
 	::DeleteObject(brush);
 
-	if (!painting) ReleaseDC(window, gdi_dc);
+	if (!painting) PaintRect(rect);
 
 	return Success();
 }
@@ -343,29 +298,24 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 	/* Set up Windows font.
 	 */
-	HDC	 gdi_dc	   = painting ? NIL : GetWindowDC(window);
-	HFONT	 hfont	   = CreateFont(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
-	HFONT	 holdfont  = NIL;
-	HFONT	 holdfont2 = NIL;
-
-	if (!painting)
-	{
-		SetBkMode(gdi_dc, TRANSPARENT);
-		SetTextColor(gdi_dc, font.GetColor());
-
-		holdfont = (HFONT) SelectObject(gdi_dc, hfont);
-	}
+	HFONT	 hfont	  = CreateFont(-Math::Round(font.GetSize() * fontSize.TranslateY(96) / 72.0), 0, 0, 0, font.GetWeight(), font.GetStyle() & Font::Italic, font.GetStyle() & Font::Underline, font.GetStyle() & Font::StrikeOut, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, FF_ROMAN, font.GetName());
+	HFONT	 holdfont = (HFONT) SelectObject(paintContext, hfont);
 
 	SetBkMode(paintContext, TRANSPARENT);
 	SetTextColor(paintContext, font.GetColor());
-
-	holdfont2 = (HFONT) SelectObject(paintContext, hfont);
 
 	/* Draw text line by line.
 	 */
 	const Array<String>	&lines = string.Explode("\n");
 
 	if (lines.Length() > 1) lineHeight = font.GetScaledTextSizeY() + 3;
+
+	/* Area to be copied to the window if not painting.
+	 */
+	Rect	 updateRect = rightToLeft.TranslateRect(Rect(rect.GetPosition(), Size(rect.GetWidth(), rect.GetHeight() + lineHeight * (lines.Length() - 1))));
+
+	updateRect.left	 -= 10;
+	updateRect.right += 10;
 
 	foreach (const String &line, lines)
 	{
@@ -413,12 +363,6 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 			ZeroMemory(glyphs, 2 * (lineLength + 1));
 
-			if (!painting)
-			{
-				if (rightToLeft.GetRightToLeft()) SetTextAlign(gdi_dc, TA_RIGHT);
-				else				  SetTextAlign(gdi_dc, TA_LEFT);
-			}
-
 			if (rightToLeft.GetRightToLeft()) SetTextAlign(paintContext, TA_RIGHT);
 			else				  SetTextAlign(paintContext, TA_LEFT);
 
@@ -426,8 +370,6 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 
 			if (rightToLeft.GetRightToLeft()) wRect.left -= 10;
 			else				  wRect.right += 10;
-
-			if (!painting) ExtTextOut(gdi_dc, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, results.lpGlyphs, results.nGlyphs, NIL);
 
 			ExtTextOut(paintContext, (rightToLeft.GetRightToLeft() ? wRect.right : wRect.left), wRect.top, ETO_CLIPPED | ETO_GLYPH_INDEX, &wRect, results.lpGlyphs, results.nGlyphs, NIL);
 
@@ -440,13 +382,6 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 			 * on XP and later versions of Windows and even
 			 * later versions get the base direction wrong.
 			 */
-			if (!painting)
-			{
-				SetTextAlign(gdi_dc, TA_LEFT);
-
-				DrawTextEx(gdi_dc, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
-			}
-
 			SetTextAlign(paintContext, TA_LEFT);
 
 			DrawTextEx(paintContext, line, -1, &wRect, DT_EXPANDTABS | DT_NOPREFIX | (rightToLeft.GetRightToLeft() ? DT_RIGHT : DT_LEFT) | (rtlCharacters ? DT_RTLREADING : 0), NIL);
@@ -455,16 +390,11 @@ S::Int S::GUI::SurfaceGDI::SetText(const String &string, const Rect &iRect, cons
 		rect.top += lineHeight;
 	}
 
-	if (!painting)
-	{
-		SelectObject(gdi_dc, holdfont);
-
-		ReleaseDC(window, gdi_dc);
-	}
-
-	SelectObject(paintContext, holdfont2);
+	SelectObject(paintContext, holdfont);
 
 	::DeleteObject(hfont);
+
+	if (!painting) PaintRect(updateRect);
 
 	return Success();
 }
@@ -486,18 +416,10 @@ S::Int S::GUI::SurfaceGDI::Gradient(const Rect &iRect, const Color &color1, cons
 	TRIVERTEX	 vertices[2] = { { rect.left,  rect.top,    COLOR16(c1.GetRed() << 8), COLOR16(c1.GetGreen() << 8), COLOR16(c1.GetBlue() << 8), 0 },
 					 { rect.right, rect.bottom, COLOR16(c2.GetRed() << 8), COLOR16(c2.GetGreen() << 8), COLOR16(c2.GetBlue() << 8), 0 } };
 
-	if (!painting)
-	{
-		HDC	 gdi_dc = GetWindowDC(window);
-
-		if (style == OR_HORZ) GdiGradientFill(gdi_dc, vertices, 2, rects, 1, GRADIENT_FILL_RECT_H);
-		else		      GdiGradientFill(gdi_dc, vertices, 2, rects, 1, GRADIENT_FILL_RECT_V);
-
-		ReleaseDC(window, gdi_dc);
-	}
-
 	if (style == OR_HORZ) GdiGradientFill(paintContext, vertices, 2, rects, 1, GRADIENT_FILL_RECT_H);
 	else		      GdiGradientFill(paintContext, vertices, 2, rects, 1, GRADIENT_FILL_RECT_V);
+
+	if (!painting) PaintRect(rect);
 
 	return Success();
 }
@@ -514,7 +436,6 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 
 	/* Copy the image.
 	 */
-	HDC		 gdi_dc = painting ? NIL : GetWindowDC(window);
 	HDC		 cdc	= CreateCompatibleDC(paintContext);
 	BLENDFUNCTION	 blend	= { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
 
@@ -525,12 +446,6 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 	if (destRect.GetSize() == srcRect.GetSize())
 	{
 		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, premultipliedBitmap.GetSystemBitmap());
-
-		if (!painting)
-		{
-			if (bitmap.GetDepth() == 32) AlphaBlend(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), blend);
-			else			     BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
-		}
 
 		if (bitmap.GetDepth() == 32) AlphaBlend(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, srcRect.GetWidth(), srcRect.GetHeight(), blend);
 		else			     BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, srcRect.left, srcRect.top, SRCCOPY);
@@ -547,12 +462,6 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 
 		HBITMAP	 backup = (HBITMAP) SelectObject(cdc, srcBitmap.GetSystemBitmap());
 
-		if (!painting)
-		{
-			if (bitmap.GetDepth() == 32) AlphaBlend(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.GetWidth()) / scaleFactorX, Float(srcRect.GetHeight()) / scaleFactorY, blend);
-			else			     BitBlt(gdi_dc, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
-		}
-
 		if (bitmap.GetDepth() == 32) AlphaBlend(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, Float(srcRect.GetWidth()) / scaleFactorX, Float(srcRect.GetHeight()) / scaleFactorY, blend);
 		else			     BitBlt(paintContext, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight(), cdc, Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, SRCCOPY);
 
@@ -561,7 +470,7 @@ S::Int S::GUI::SurfaceGDI::BlitFromBitmap(const Bitmap &bitmap, const Rect &srcR
 
 	DeleteDC(cdc);
 
-	if (!painting) ReleaseDC(window, gdi_dc);
+	if (!painting) PaintRect(destRect);
 
 	return Success();
 }

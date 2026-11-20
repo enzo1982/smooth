@@ -1,5 +1,5 @@
  /* The smooth Class Library
-  * Copyright (C) 1998-2020 Robert Kausch <robert.kausch@gmx.net>
+  * Copyright (C) 1998-2026 Robert Kausch <robert.kausch@gmx.net>
   *
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of "The Artistic License, Version 2.0".
@@ -217,9 +217,9 @@ S::Int S::GUI::SurfaceXLib::SetPixel(const Point &iPoint, const Color &color)
 
 	XChangeGC(display, gc, GCForeground, &gcValues);
 
-	if (!painting) XDrawPoint(display, window, gc, point.x, point.y);
-
 	XDrawPoint(display, bitmap, gc, point.x, point.y);
+
+	if (!painting) PaintRect(Rect(point, Size(1, 1)));
 
 	return Success();
 }
@@ -256,9 +256,9 @@ S::Int S::GUI::SurfaceXLib::Line(const Point &iPos1, const Point &iPos2, const C
 
 	XChangeGC(display, gc, GCForeground, &gcValues);
 
-	if (!painting) XDrawLine(display, window, gc, pos1.x, pos1.y, pos2.x, pos2.y);
-
 	XDrawLine(display, bitmap, gc, pos1.x, pos1.y, pos2.x, pos2.y);
+
+	if (!painting) PaintRect(Rect(Point(Math::Min(pos1.x, pos2.x), Math::Min(pos1.y, pos2.y)), Size(Math::Abs(pos2.x - pos1.x) + 1, Math::Abs(pos2.y - pos1.y) + 1)));
 
 	return Success();
 }
@@ -283,15 +283,11 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 		}
 		else
 		{
-			if (!painting) XFillRectangle(display, window, gc, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
-
 			XFillRectangle(display, bitmap, gc, rect.left, rect.top, rect.GetWidth(), rect.GetHeight());
 		}
 	}
 	else if (style == Rect::Outlined)
 	{
-		if (!painting) XDrawRectangle(display, window, gc, rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1);
-
 		XDrawRectangle(display, bitmap, gc, rect.left, rect.top, rect.GetWidth() - 1, rect.GetHeight() - 1);
 	}
 	else if (style & Rect::Inverted)
@@ -303,22 +299,18 @@ S::Int S::GUI::SurfaceXLib::Box(const Rect &iRect, const Color &color, Int style
 		area.InvertColors();
 
 		BlitFromBitmap(area, Rect(Point(0, 0), area.GetSize()), iRect);
+
+		return Success();
 	}
 	else if (style & Rect::Dotted)
 	{
-		if (!painting)
-		{
-			for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) XDrawPoint(display, window, gc, x, rect.top);
-			for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) XDrawPoint(display, window, gc, rect.right - 1, y);
-			for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) XDrawPoint(display, window, gc, x, rect.bottom - 1);
-			for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1;  y >= rect.top;    y -= 2) XDrawPoint(display, window, gc, rect.left, y);
-		}
-
 		for (Int x = rect.left						    + 1;  x <  rect.right;  x += 2) XDrawPoint(display, bitmap, gc, x, rect.top);
 		for (Int y = rect.top	 - (rect.GetWidth()		      ) % 2 + 2;  y <  rect.bottom; y += 2) XDrawPoint(display, bitmap, gc, rect.right - 1, y);
 		for (Int x = rect.right	 - (rect.GetWidth() + rect.GetHeight()) % 2 - 2;  x >= rect.left;   x -= 2) XDrawPoint(display, bitmap, gc, x, rect.bottom - 1);
 		for (Int y = rect.bottom - (		      rect.GetHeight()) % 2 - 1;  y >= rect.top;    y -= 2) XDrawPoint(display, bitmap, gc, rect.left, y);
 	}
+
+	if (!painting) PaintRect(rect);
 
 	return Success();
 }
@@ -334,7 +326,6 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	Int		 lineHeight = font.GetScaledTextSizeY() + 3;
 
 	XftFont		*xfont = XftFontOpenName(display, XDefaultScreen(display), String(font.GetName()).Append("-").Append(String::FromInt(Math::Round(font.GetSize() * fontSize.TranslateY(96) / 96.0))).Append(":").Append(font.GetWeight() >= Font::Bold ? "bold" : "medium").Append(font.GetStyle() & Font::Italic ? ":italic" : ""));
-	XftDraw		*wdraw = XftDrawCreate(display, window, XDefaultVisual(display, XDefaultScreen(display)), XDefaultColormap(display, XDefaultScreen(display)));
 	XftDraw		*bdraw = XftDrawCreate(display, bitmap, XDefaultVisual(display, XDefaultScreen(display)), XDefaultColormap(display, XDefaultScreen(display)));
 
 	/* Allocate text color.
@@ -359,12 +350,15 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	clipRect.width	= pRect.GetWidth();
 	clipRect.height	= pRect.GetHeight();
 
-	XftDrawSetClipRectangles(wdraw, 0, 0, &clipRect, 1);
 	XftDrawSetClipRectangles(bdraw, 0, 0, &clipRect, 1);
 
 	/* Draw text line by line.
 	 */
 	const Array<String>	&lines = string.Explode("\n");
+
+	/* Area to be copied to the window if not painting.
+	 */
+	Rect	 updateRect = rightToLeft.TranslateRect(Rect(rect.GetPosition(), Size(rect.GetWidth(), Math::Max(rect.GetHeight(), lineHeight * lines.Length()))));
 
 	foreach (String line, lines)
 	{
@@ -396,9 +390,9 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 			delete [] visual;
 		}
 
-		if (!painting) XftDrawString16(wdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), lineLength);
-
 		XftDrawString16(bdraw, &xftcolor, xfont, tRect.left, tRect.top + lineHeight - 4, (XftChar16 *) line.ConvertTo("UCS2"), lineLength);
+
+		updateRect.right = Math::Max(updateRect.right, tRect.left + font.GetScaledTextSizeX(line));
 
 		rect.top += lineHeight;
 	}
@@ -407,10 +401,11 @@ S::Int S::GUI::SurfaceXLib::SetText(const String &string, const Rect &iRect, con
 	 */
 	XftColorFree(display, DefaultVisual(display, DefaultScreen(display)), DefaultColormap(display, DefaultScreen(display)), &xftcolor);
 
-	XftDrawDestroy(wdraw);
 	XftDrawDestroy(bdraw);
 
 	XftFontClose(display, xfont);
+
+	if (!painting) PaintRect(updateRect);
 
 	return Success();
 }
@@ -475,15 +470,11 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 	 */
 	if (destRect.GetSize() == srcRect.GetSize())
 	{
-		if (!painting) XPutImage(display, window, gc, (XImage *) srcBitmap->GetSystemBitmap(), srcRect.left, srcRect.top, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
-
 		XPutImage(display, this->bitmap, gc, (XImage *) srcBitmap->GetSystemBitmap(), srcRect.left, srcRect.top, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 	}
 	else
 	{
 		const Bitmap	&bitmap = srcBitmap->Scale(destSize);
-
-		if (!painting) XPutImage(display, window, gc, (XImage *) bitmap.GetSystemBitmap(), Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 
 		XPutImage(display, this->bitmap, gc, (XImage *) bitmap.GetSystemBitmap(), Float(srcRect.left) / scaleFactorX, Float(srcRect.top) / scaleFactorY, destRect.left, destRect.top, destRect.GetWidth(), destRect.GetHeight());
 	}
@@ -491,6 +482,8 @@ S::Int S::GUI::SurfaceXLib::BlitFromBitmap(const Bitmap &bitmap, const Rect &src
 	/* Delete copy if we created one earlier.
 	 */
 	if (bitmap.GetDepth() != windowAttributes.depth) delete srcBitmap;
+
+	if (!painting) PaintRect(destRect);
 
 	return Success();
 }

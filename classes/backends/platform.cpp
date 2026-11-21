@@ -170,10 +170,11 @@ S::Int S::Backends::Platform::GetProbeIndex(Short platform)
 
 const char *S::Backends::Platform::GetPlatformName(Short platform)
 {
-	if	(platform == PLATFORM_X11)     return "x11";
-	else if (platform == PLATFORM_WAYLAND) return "wayland";
-	else if (platform == PLATFORM_GDI)     return "gdi";
-	else if (platform == PLATFORM_GDIPLUS) return "gdi+";
+	if	(platform == PLATFORM_X11)      return "x11";
+	else if (platform == PLATFORM_WAYLAND)  return "wayland";
+	else if (platform == PLATFORM_GDI)      return "gdi";
+	else if (platform == PLATFORM_GDIPLUS)  return "gdi+";
+	else if (platform == PLATFORM_DIRECT2D) return "direct2d";
 
 	return "none";
 }
@@ -192,11 +193,13 @@ S::Short S::Backends::Platform::Select()
 	{
 		Short	 platform = PLATFORM_NONE;
 
-		if	(strcmp(requested, "x11")     == 0) platform = PLATFORM_X11;
-		else if (strcmp(requested, "wayland") == 0) platform = PLATFORM_WAYLAND;
-		else if (strcmp(requested, "gdi")     == 0) platform = PLATFORM_GDI;
-		else if (strcmp(requested, "gdi+")    == 0 ||
-			 strcmp(requested, "gdiplus") == 0) platform = PLATFORM_GDIPLUS;
+		if	(strcmp(requested, "x11")      == 0) platform = PLATFORM_X11;
+		else if (strcmp(requested, "wayland")  == 0) platform = PLATFORM_WAYLAND;
+		else if (strcmp(requested, "gdi")      == 0) platform = PLATFORM_GDI;
+		else if (strcmp(requested, "gdi+")     == 0 ||
+			 strcmp(requested, "gdiplus")  == 0) platform = PLATFORM_GDIPLUS;
+		else if (strcmp(requested, "direct2d") == 0 ||
+			 strcmp(requested, "d2d")      == 0) platform = PLATFORM_DIRECT2D;
 
 		Int	 index = GetProbeIndex(platform);
 
@@ -206,17 +209,27 @@ S::Short S::Backends::Platform::Select()
 	}
 
 	/* Otherwise use the available platform with the highest priority.
+	 * Probe in order of descending priority, so lower priority
+	 * platforms are not probed if a better one is available.
 	 */
 	if (selected == PLATFORM_NONE)
 	{
-		Int	 bestPriority = -1;
+		Bool	 probed[maxProbes] = { False };
 
-		for (int i = 0; i < numProbes; i++)
+		while (selected == PLATFORM_NONE)
 		{
-			if (probes[i].priority <= bestPriority || !probes[i].probeFunction()) continue;
+			Int	 next = -1;
 
-			selected     = probes[i].platform;
-			bestPriority = probes[i].priority;
+			for (int i = 0; i < numProbes; i++)
+			{
+				if (!probed[i] && (next < 0 || probes[i].priority > probes[next].priority)) next = i;
+			}
+
+			if (next < 0) break;
+
+			probed[next] = True;
+
+			if (probes[next].probeFunction()) selected = probes[next].platform;
 		}
 	}
 

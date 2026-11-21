@@ -27,18 +27,20 @@ namespace smooth
 	{
 		/* Windowing platforms that can be selected at runtime.
 		 */
-		const Short	 PLATFORM_NONE	  = 0;
-		const Short	 PLATFORM_X11	  = 1;
-		const Short	 PLATFORM_WAYLAND = 2;
-		const Short	 PLATFORM_GDI	  = 3;
-		const Short	 PLATFORM_GDIPLUS = 4;
+		const Short	 PLATFORM_NONE	   = 0;
+		const Short	 PLATFORM_X11	   = 1;
+		const Short	 PLATFORM_WAYLAND  = 2;
+		const Short	 PLATFORM_GDI	   = 3;
+		const Short	 PLATFORM_GDIPLUS  = 4;
+		const Short	 PLATFORM_DIRECT2D = 5;
 
 		/* Selects one of several windowing platforms compiled into smooth
 		 * at runtime and activates the backend components belonging to it.
 		 *
 		 * The platform can be forced by passing --display:x11 or
-		 * --display:wayland on Unix systems and --display:gdi or
-		 * --display:gdi+ on Windows on the command line.
+		 * --display:wayland on Unix systems and --display:gdi,
+		 * --display:gdi+ or --display:direct2d on Windows on the
+		 * command line.
 		 */
 		class Platform
 		{

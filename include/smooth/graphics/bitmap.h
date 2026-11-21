@@ -16,6 +16,7 @@ namespace smooth
 	namespace GUI
 	{
 		class Surface;
+		class SurfaceBackend;
 		class Bitmap;
 		class BitmapBackend;
 	};
@@ -32,6 +33,8 @@ namespace smooth
 	{
 		class SMOOTHAPI Bitmap
 		{
+			friend class SurfaceBackend;
+
 			private:
 				BitmapBackend		*backend;
 			public:

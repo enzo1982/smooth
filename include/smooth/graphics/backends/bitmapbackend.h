@@ -71,7 +71,7 @@ namespace smooth
 				const Size			&GetSize() const;
 				Byte				 GetDepth() const;
 
-				UnsignedByte			*GetBytes() const;
+				virtual UnsignedByte		*GetBytes() const;
 				Byte				 GetBitsPerPixel() const;
 				Byte				 GetLineAlignment() const;
 

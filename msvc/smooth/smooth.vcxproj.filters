@@ -14,6 +14,9 @@
     <Filter Include="Quelldateien\classes\backends">
       <UniqueIdentifier>{34299b6e-39bb-47cd-828a-68f8039fcedc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Quelldateien\classes\backends\direct2d">
+      <UniqueIdentifier>{d7465150-45f7-4398-8a43-8698358a84dc}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Quelldateien\classes\backends\gdiplus">
       <UniqueIdentifier>{e0797dd9-7f15-45e6-afad-69b0ff88fcda}</UniqueIdentifier>
     </Filter>
@@ -55,6 +58,9 @@
     </Filter>
     <Filter Include="Quelldateien\classes\graphics\backends\cairo">
       <UniqueIdentifier>{65617e76-9189-472e-a210-6e9683d231fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\classes\graphics\backends\direct2d">
+      <UniqueIdentifier>{5dc82e91-4583-405a-8760-c4652573313a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Quelldateien\classes\graphics\backends\gdiplus">
       <UniqueIdentifier>{ab8e3aa5-757e-416b-bbd9-b6eaf1e05f0b}</UniqueIdentifier>
@@ -231,6 +237,9 @@
     <Filter Include="Headerdateien\smooth\backends">
       <UniqueIdentifier>{6bd7f4a0-58bb-479c-903a-4dff50643e6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\smooth\backends\direct2d">
+      <UniqueIdentifier>{a1eb7ae9-d84c-4968-b153-895158788870}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Headerdateien\smooth\backends\gdiplus">
       <UniqueIdentifier>{c9a786e0-fc6d-43fd-a8bd-2f1d227aea3e}</UniqueIdentifier>
     </Filter>
@@ -329,6 +338,9 @@
     </Filter>
     <Filter Include="Headerdateien\smooth\graphics\backends\cairo">
       <UniqueIdentifier>{949baf55-e473-4f45-bece-34519f20f0d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\graphics\backends\direct2d">
+      <UniqueIdentifier>{578147e7-4e50-426f-9336-6f69c5952c4a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Headerdateien\smooth\graphics\backends\gdiplus">
       <UniqueIdentifier>{65d6c8b6-dd9a-4e57-a84d-c698b62bfb7e}</UniqueIdentifier>
@@ -495,6 +507,9 @@
     <ClCompile Include="..\..\classes\backends\platform.cpp">
       <Filter>Quelldateien\classes\backends</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\classes\backends\direct2d\backenddirect2d.cpp">
+      <Filter>Quelldateien\classes\backends\direct2d</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\classes\backends\gdiplus\backendgdiplus.cpp">
       <Filter>Quelldateien\classes\backends\gdiplus</Filter>
     </ClCompile>
@@ -587,6 +602,15 @@
     </ClCompile>
     <ClCompile Include="..\..\classes\graphics\backends\cairo\surfacecairobase.cpp">
       <Filter>Quelldateien\classes\graphics\backends\cairo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\direct2d\bitmapdirect2d.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\direct2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\direct2d\fontdirectwrite.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\direct2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\graphics\backends\direct2d\surfacedirect2d.cpp">
+      <Filter>Quelldateien\classes\graphics\backends\direct2d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\classes\graphics\backends\gdiplus\bitmapgdiplus.cpp">
       <Filter>Quelldateien\classes\graphics\backends\gdiplus</Filter>
@@ -1337,6 +1361,9 @@
     <ClInclude Include="..\..\include\smooth\backends\backend.h">
       <Filter>Headerdateien\smooth\backends</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\smooth\backends\direct2d\backenddirect2d.h">
+      <Filter>Headerdateien\smooth\backends\direct2d</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\smooth\backends\gdiplus\backendgdiplus.h">
       <Filter>Headerdateien\smooth\backends\gdiplus</Filter>
     </ClInclude>
@@ -1624,6 +1651,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\smooth\graphics\backends\cairo\surfacecairobase.h">
       <Filter>Headerdateien\smooth\graphics\backends\cairo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\direct2d\bitmapdirect2d.h">
+      <Filter>Headerdateien\smooth\graphics\backends\direct2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\direct2d\fontdirectwrite.h">
+      <Filter>Headerdateien\smooth\graphics\backends\direct2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\graphics\backends\direct2d\surfacedirect2d.h">
+      <Filter>Headerdateien\smooth\graphics\backends\direct2d</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\smooth\graphics\backends\gdiplus\bitmapgdiplus.h">
       <Filter>Headerdateien\smooth\graphics\backends\gdiplus</Filter>

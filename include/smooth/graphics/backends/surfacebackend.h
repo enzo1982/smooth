@@ -46,6 +46,8 @@ namespace smooth
 				FontSizeModifier	 fontSize;
 				RightToLeftModifier	 rightToLeft;
 
+				static BitmapBackend	*GetBitmapBackend(const Bitmap &bitmap)	{ return bitmap.backend; }
+
 				static Int		 PremultiplyAlpha(Bitmap &bitmap);
 			public:
 				static Int		 SetBackend(SurfaceBackend *(*)(Void *, const Size &));

@@ -7,11 +7,11 @@ SMOOTH_PATH = ../..
 OBJECTS	  = backend.o platform.o
 
 # Enter addition commands for targets all and clean here:
-ALLCMD1   = $(call makein,cocoa) && $(call makein,gdiplus)
+ALLCMD1   = $(call makein,cocoa) && $(call makein,direct2d) && $(call makein,gdiplus)
 ALLCMD2   = $(call makein,haiku) && $(call makein,win32)
 ALLCMD3   = $(call makein,wayland) && $(call makein,xlib)
 ALLCMD4   = $(call makein,freedesktop)
-CLEANCMD1 = $(call cleanin,cocoa) && $(call cleanin,gdiplus)
+CLEANCMD1 = $(call cleanin,cocoa) && $(call cleanin,direct2d) && $(call cleanin,gdiplus)
 CLEANCMD2 = $(call cleanin,haiku) && $(call cleanin,win32)
 CLEANCMD3 = $(call cleanin,wayland) && $(call cleanin,xlib)
 CLEANCMD4 = $(call cleanin,freedesktop)

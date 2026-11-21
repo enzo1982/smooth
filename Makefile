@@ -66,11 +66,14 @@ ifeq ($(BUILD_WIN32),True)
 	OBJECTS += classes/system/backends/win32/eventwin32.o classes/system/backends/win32/screenwin32.o classes/system/backends/win32/timerwin32.o
 	OBJECTS += classes/threads/backends/win32/mutexwin32.o classes/threads/backends/win32/semaphorewin32.o classes/threads/backends/win32/threadwin32.o
 
-#	GDI and GDI+ graphics backends are selected at runtime.
+#	GDI, GDI+ and Direct2D graphics backends are selected at runtime.
 	OBJECTS += classes/graphics/backends/gdi/bitmapgdi.o classes/graphics/backends/gdi/fontgdi.o classes/graphics/backends/gdi/surfacegdi.o
 
 	OBJECTS += classes/backends/gdiplus/backendgdiplus.o
 	OBJECTS += classes/graphics/backends/gdiplus/bitmapgdiplus.o classes/graphics/backends/gdiplus/fontgdiplus.o classes/graphics/backends/gdiplus/surfacegdiplus.o
+
+	OBJECTS += classes/backends/direct2d/backenddirect2d.o
+	OBJECTS += classes/graphics/backends/direct2d/bitmapdirect2d.o classes/graphics/backends/direct2d/fontdirectwrite.o classes/graphics/backends/direct2d/surfacedirect2d.o
 else ifeq ($(BUILD_OSX),True)
 	OBJECTS += classes/backends/cocoa/backendcocoa.o
 	OBJECTS += classes/graphics/backends/cocoa/bitmapcocoa.o classes/graphics/backends/cocoa/fontcocoa.o classes/graphics/backends/cocoa/surfacecocoa.o

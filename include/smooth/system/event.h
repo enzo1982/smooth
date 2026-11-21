@@ -22,6 +22,7 @@ namespace smooth
 
 #include "../definitions.h"
 #include "../templates/callbacks.h"
+#include "../templates/signals.h"
 
 namespace smooth
 {
@@ -39,6 +40,11 @@ namespace smooth
 			callbacks:
 				static Callback0<Int>	 allowTimerInterrupts;
 				static Callback0<Int>	 denyTimerInterrupts;
+			signals:
+				/* Emitted on the event processing thread before
+				 * processing each event.
+				 */
+				static Signal0<Void>	 onProcessEvents;
 		};
 	};
 };

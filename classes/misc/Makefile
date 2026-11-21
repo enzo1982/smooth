@@ -18,8 +18,10 @@ OBJECTS	  = args.o array.o binary.o config.o datetime.o math.o memory.o number.o
 # Enter addition commands for targets all and clean here:
 ALLCMD1   = $(call makein,encoding)
 ALLCMD2   = $(call makein,hash)
+ALLCMD3   = $(call makein,mcp)
 CLEANCMD1 = $(call cleanin,encoding)
 CLEANCMD2 = $(call cleanin,hash)
+CLEANCMD3 = $(call cleanin,mcp)
 
 ## Do not change anything below this line. ##
 

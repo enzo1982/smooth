@@ -639,6 +639,9 @@
     <ClCompile Include="..\..\classes\misc\hash\crc16.cpp" />
     <ClCompile Include="..\..\classes\misc\hash\crc64.cpp" />
     <ClCompile Include="..\..\classes\misc\math.cpp" />
+    <ClCompile Include="..\..\classes\misc\mcp\json.cpp" />
+    <ClCompile Include="..\..\classes\misc\mcp\server.cpp" />
+    <ClCompile Include="..\..\classes\misc\mcp\tools.cpp" />
     <ClCompile Include="..\..\classes\misc\memory.cpp" />
     <ClCompile Include="..\..\classes\misc\number.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
@@ -1057,6 +1060,9 @@
     <ClInclude Include="..\..\include\smooth\misc\config.h" />
     <ClInclude Include="..\..\include\smooth\misc\datetime.h" />
     <ClInclude Include="..\..\include\smooth\misc\math.h" />
+    <ClInclude Include="..\..\include\smooth\misc\mcp\json.h" />
+    <ClInclude Include="..\..\include\smooth\misc\mcp\server.h" />
+    <ClInclude Include="..\..\include\smooth\misc\mcp\tools.h" />
     <ClInclude Include="..\..\include\smooth\misc\memory.h" />
     <ClInclude Include="..\..\include\smooth\misc\number.h" />
     <ClInclude Include="..\..\include\smooth\misc\string.h" />

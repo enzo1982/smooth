@@ -19,6 +19,7 @@
 #include <smooth/foreach.h>
 #include <smooth/init.h>
 #include <smooth/backends/platform.h>
+#include <smooth/misc/mcp/server.h>
 
 #if defined __WIN32__
 #	include <windows.h>
@@ -84,6 +85,10 @@ S::Int S::GUI::Application::Loop()
 
 			if (window != NIL && !window->IsVisibilitySet()) window->Show();
 		}
+
+		/* Start the MCP server if requested.
+		 */
+		MCP::Server::Start();
 	}
 
 	/* Enter main application loop.
@@ -111,6 +116,10 @@ S::Void S::GUI::Application::SetArguments(const Array<String> &nArgs)
 		/* Filter out display platform argument.
 		 */
 		if (arg.StartsWith("--display:")) { Backends::Platform::SetRequested(arg.Tail(arg.Length() - 10).ConvertTo("UTF-8")); continue; }
+
+		/* Filter out MCP server argument.
+		 */
+		if (arg.StartsWith("--mcp:")) { MCP::Server::SetMode(arg.Tail(arg.Length() - 6)); continue; }
 
 		/* Add to arguments array.
 		 */

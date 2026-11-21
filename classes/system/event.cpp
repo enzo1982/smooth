@@ -15,6 +15,8 @@
 S::Callback0<S::Int>	 S::System::EventProcessor::allowTimerInterrupts;
 S::Callback0<S::Int>	 S::System::EventProcessor::denyTimerInterrupts;
 
+S::Signal0<S::Void>	 S::System::EventProcessor::onProcessEvents;
+
 S::System::EventProcessor::EventProcessor()
 {
 	backend = EventBackend::CreateBackendInstance();
@@ -27,6 +29,10 @@ S::System::EventProcessor::~EventProcessor()
 
 S::Bool S::System::EventProcessor::ProcessNextEvent()
 {
+	/* Let others do work on the event processing thread.
+	 */
+	onProcessEvents.Emit();
+
 	Int	 suspendCount = GUI::Application::Lock::SuspendLock();
 	Bool	 result	      = backend->ProcessNextEvent();
 

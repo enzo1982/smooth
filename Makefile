@@ -44,6 +44,7 @@ OBJECTS += classes/io/filters/filter_bzip2.o classes/io/filters/filter_xor.o
 OBJECTS += classes/misc/args.o classes/misc/array.o classes/misc/binary.o classes/misc/config.o classes/misc/datetime.o classes/misc/math.o classes/misc/memory.o classes/misc/number.o classes/misc/string.o classes/misc/string_case.o
 OBJECTS += classes/misc/encoding/base64.o classes/misc/encoding/urlencode.o
 OBJECTS += classes/misc/hash/crc16.o classes/misc/hash/crc32.o classes/misc/hash/crc64.o classes/misc/hash/md5.o classes/misc/hash/sha1.o
+OBJECTS += classes/misc/mcp/json.o classes/misc/mcp/server.o classes/misc/mcp/tools.o
 OBJECTS += classes/net/protocols/file.o classes/net/protocols/http.o classes/net/protocols/protocol.o
 OBJECTS += classes/system/console.o classes/system/cpu.o classes/system/dynamicloader.o classes/system/event.o classes/system/screen.o classes/system/system.o classes/system/timer.o
 OBJECTS += classes/system/backends/eventbackend.o classes/system/backends/screenbackend.o classes/system/backends/timerbackend.o

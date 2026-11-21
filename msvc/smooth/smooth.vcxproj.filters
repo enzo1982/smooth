@@ -143,6 +143,9 @@
     <Filter Include="Quelldateien\classes\misc\hash">
       <UniqueIdentifier>{4b03e5c3-b175-4cf4-b4f8-cb5f4ec2d5a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Quelldateien\classes\misc\mcp">
+      <UniqueIdentifier>{d609a6c2-9f2d-4629-9033-c13d8a1bab5d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Quelldateien\classes\xml">
       <UniqueIdentifier>{6b42ebee-8980-434d-a824-872489d588bf}</UniqueIdentifier>
     </Filter>
@@ -257,6 +260,9 @@
     </Filter>
     <Filter Include="Headerdateien\smooth\misc\hash">
       <UniqueIdentifier>{1b75e392-53ae-4bfd-98cd-032166d6216d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\smooth\misc\mcp">
+      <UniqueIdentifier>{f9aed42c-8685-4fae-abe5-ef5cb2959ebc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Headerdateien\smooth\gui">
       <UniqueIdentifier>{cc17a67b-24fa-44a7-bdda-9efc8235e052}</UniqueIdentifier>
@@ -846,6 +852,15 @@
     <ClCompile Include="..\..\classes\misc\math.cpp">
       <Filter>Quelldateien\classes\misc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\classes\misc\mcp\json.cpp">
+      <Filter>Quelldateien\classes\misc\mcp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\mcp\server.cpp">
+      <Filter>Quelldateien\classes\misc\mcp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\misc\mcp\tools.cpp">
+      <Filter>Quelldateien\classes\misc\mcp</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\classes\misc\memory.cpp">
       <Filter>Quelldateien\classes\misc</Filter>
     </ClCompile>
@@ -1387,6 +1402,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\smooth\misc\math.h">
       <Filter>Headerdateien\smooth\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\mcp\json.h">
+      <Filter>Headerdateien\smooth\misc\mcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\mcp\server.h">
+      <Filter>Headerdateien\smooth\misc\mcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\smooth\misc\mcp\tools.h">
+      <Filter>Headerdateien\smooth\misc\mcp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\smooth\misc\memory.h">
       <Filter>Headerdateien\smooth\misc</Filter>

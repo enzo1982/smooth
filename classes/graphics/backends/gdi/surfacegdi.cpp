@@ -504,5 +504,22 @@ S::Int S::GUI::SurfaceGDI::BlitToBitmap(const Rect &iSrcRect, Bitmap &bitmap, co
 
 	DeleteDC(cdc);
 
+	/* GDI leaves the alpha channel of 32 bit bitmaps undefined,
+	 * so make the copied pixels opaque.
+	 */
+	if (bitmap.GetDepth() == 32)
+	{
+		GdiFlush();
+
+		const Size	&size  = bitmap.GetSize();
+		Rect		 area  = Rect::OverlapRect(destRect, Rect(Point(0, 0), size));
+		UnsignedByte	*bytes = bitmap.GetBytes();
+
+		for (Int y = area.top; y < area.bottom; y++)
+		{
+			for (Int x = area.left; x < area.right; x++) bytes[((size.cy - y - 1) * size.cx + x) * 4 + 3] = 255;
+		}
+	}
+
 	return Success();
 }

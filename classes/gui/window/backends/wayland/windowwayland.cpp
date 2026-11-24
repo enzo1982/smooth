@@ -91,6 +91,7 @@ namespace
 
 	Threads::Mutex		*bufferMutex	    = NIL;
 
+	Array<Int>		 pendingClose;
 	Array<Int>		 pendingDestroy;
 
 	/* Pointer state.
@@ -981,6 +982,28 @@ S::Int S::GUI::WindowWayland::Free()
 S::Bool S::GUI::WindowWayland::ProcessPendingEvents()
 {
 	Bool	 processed = False;
+
+	/* Process deferred close requests.
+	 */
+	if (pendingClose.Length() > 0)
+	{
+		Array<Int>	 ids = pendingClose;
+
+		pendingClose.RemoveAll();
+
+		foreach (Int id, ids)
+		{
+			WindowWayland	*backend = windowBackends.Get(id);
+
+			if (backend == NIL) continue;
+
+			Application::Lock	 lock;
+
+			if (backend->doClose.Call()) backend->Close();
+		}
+
+		processed = True;
+	}
 
 	/* Emit deferred destroy notifications.
 	 */
@@ -1913,9 +1936,14 @@ S::Void S::GUI::WindowWayland::OnFrameCommit()
 
 S::Void S::GUI::WindowWayland::OnFrameClose()
 {
-	Application::Lock	 lock;
-
-	if (doClose.Call()) Close();
+	/* Defer closing the window until libdecor has finished dispatching.
+	 *
+	 * Decoration plugins hold a reference to the frame while calling this
+	 * handler, so destroying the window here would destroy the frame and
+	 * its xdg_surface only after the wl_surface. This is a protocol error
+	 * causing compositors like Mutter to disconnect the client.
+	 */
+	pendingClose.Add(id, id);
 }
 
 S::Void S::GUI::WindowWayland::OnPopupConfigure(const Point &offset)
